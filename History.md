@@ -1,5 +1,8 @@
 ## History
 
+- v2.0.0 March 27, 2013
+	- Split from bal-util
+
 - v1.16.14 March 27, 2013
 	- Killed explicit browser support, use [Browserify](http://browserify.org/) instead
 	- Removed the `out` directory from git

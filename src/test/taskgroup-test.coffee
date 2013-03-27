@@ -1,139 +1,13 @@
-# Requires
-assert = require?('assert') or @assert
-joe = require?('joe') or @joe
-balUtil = require?(__dirname+'/../lib/balutil') or @balUtil
+# Import
+assert = require('assert')
+joe = require('joe')
+TaskGroup = require('../lib/taskgroup')
 
-
-# =====================================
-# Tests
-
+# Prepare
 wait = (delay,fn) -> setTimeout(fn,delay)
 
-# -------------------------------------
-# Flow
-
-joe.describe 'misc', (describe,it) ->
-
-	it 'should suffix arrays', (done) ->
-		# Prepare
-		expected = ['ba','ca','da','ea']
-		actual = balUtil.suffixArray('a', 'b', ['c', 'd'], 'e')
-		assert.deepEqual(expected, actual, 'actual was as expected')
-		done()
-
-	it 'should detect arrays', (done) ->
-		# Prepare
-		arr = []
-		obj = {}
-		str = ''
-		assert.equal(true,balUtil.isArray(arr), 'array vs array comparison')
-		assert.equal(false,balUtil.isArray(obj), 'object vs array comparison')
-		assert.equal(false,balUtil.isArray(str), 'string vs array comparison')
-		done()
-
-	it 'should cycle arrays', (done) ->
-		# Prepare
-		arr = ['a','b','c']
-		out = []
-		balUtil.each arr, (value,key) ->
-			out[key] = value
-		assert.deepEqual(arr, out, 'cycling an array produced the expected results')
-		done()
-
-	it 'should cycle objects', (done) ->
-		# Prepare
-		obj = {'a':1,'b':2,'c':3}
-		out = {}
-		balUtil.each obj, (value,key) ->
-			out[key] = value
-		assert.deepEqual(obj, out, 'cycling an object produced the expected results')
-		done()
-
-	it 'should shallow extend correctly', (done) ->
-		# Prepare
-		src = {a:{b:2}}
-		out = balUtil.shallowExtendPlainObjects({},src)
-		out.a.b = 3
-		assert.deepEqual({a:{b:3}}, out, 'out object was as expected')
-		assert.deepEqual({a:{b:3}}, src, 'src object was modified')
-		done()
-
-	it 'should safe shallow extend correctly', (done) ->
-		# Prepare
-		expected = {a:2}
-		actual = balUtil.safeShallowExtendPlainObjects({a:1}, {a:2}, {a:null})
-		assert.deepEqual(actual, expected, 'out object was as expected')
-		done()
-
-	it 'should deep extend correctly', (done) ->
-		# Prepare
-		src = {a:{b:2}}
-		out = balUtil.deepExtendPlainObjects({},src)
-		out.a.b = 3
-		assert.deepEqual({a:{b:3}}, out, 'out object was as expected')
-		assert.deepEqual({a:{b:2}}, src, 'src object was not modified')
-		done()
-
-	it 'should safe deep extend correctly', (done) ->
-		# Prepare
-		expected = {a:b:2}
-		actual = balUtil.safeDeepExtendPlainObjects({a:b:2}, {a:b:2}, {a:b:null})
-		assert.deepEqual(actual, expected, 'out object was as expected')
-		done()
-
-	it 'should dereference correctly', (done) ->
-		# Prepare
-		src = {a:{b:2}}
-		out = balUtil.dereference(src)
-		out.a.b = 3
-		assert.deepEqual({a:{b:3}}, out, 'out object was as expected')
-		assert.deepEqual({a:{b:2}}, src, 'src object was not modified')
-		done()
-
-	it 'should getdeep correctly', (done) ->
-		# Prepare
-		src =
-			a:
-				b:
-					attributes:
-						c: 1
-
-		expected = 1
-		actual = balUtil.getDeep(src,'a.b.c')
-		assert.equal(expected, actual, 'out value was as expected')
-
-		actual = balUtil.getDeep(src,'a.b.unknown')
-		assert.ok(typeof actual is 'undefined', 'undefined value was as expected')
-
-		done()
-
-	it 'should setdeep correctly', (done) ->
-		# Prepare
-		src =
-			a:
-				unknown: 'asd'
-				b:
-					attributes:
-						c: 1
-
-		expected =
-			a:
-				b:
-					attributes:
-						c: 2
-
-		balUtil.setDeep(src,'a.unknown',undefined)
-		balUtil.setDeep(src,'a.b.c',2)
-
-		assert.deepEqual(expected, src, 'out value was as expected')
-
-		done()
-
-
-# -------------------------------------
-# Group
-
-joe.describe 'Group', (describe,it) ->
+# Tests
+joe.describe 'taskgroup', (describe,it) ->
 
 	it 'should work when tasks are specified manually', (done) ->
 		# Prepare
@@ -143,7 +17,7 @@ joe.describe 'Group', (describe,it) ->
 		total = 2
 
 		# Create our group
-		tasks = new balUtil.Group (err) ->
+		tasks = new TaskGroup (err) ->
 			return done(err)  if err
 			assert.equal(false, finished, 'the group of tasks only finished once')
 			finished = true
@@ -183,7 +57,7 @@ joe.describe 'Group', (describe,it) ->
 		total = 2
 
 		# Create our group
-		tasks = new balUtil.Group (err) ->
+		tasks = new TaskGroup (err) ->
 			return done(err)  if err
 			assert.equal(false, finished, 'the group of tasks only finished once')
 			finished = true
@@ -232,7 +106,7 @@ joe.describe 'Group', (describe,it) ->
 		total = 2
 
 		# Create our group
-		tasks = new balUtil.Group (err) ->
+		tasks = new TaskGroup (err) ->
 			return done(err)  if err
 			assert.equal(false, finished, 'the group of tasks only finished once')
 			finished = true
@@ -281,7 +155,7 @@ joe.describe 'Group', (describe,it) ->
 		total = 2
 
 		# Create our group
-		tasks = new balUtil.Group (err) ->
+		tasks = new TaskGroup (err) ->
 			return done(err)  if err
 			assert.equal(false, finished, 'the group of tasks only finished once')
 			finished = true
@@ -331,7 +205,7 @@ joe.describe 'Group', (describe,it) ->
 		total = 1
 
 		# Create our group
-		tasks = new balUtil.Group (err) ->
+		tasks = new TaskGroup (err) ->
 			assert.equal(true, err != null, 'an error is present');
 			assert.equal(false, finished, 'the group of tasks only finished once')
 			finished = true
@@ -376,7 +250,7 @@ joe.describe 'Group', (describe,it) ->
 		total = 2
 
 		# Create our group
-		tasks = new balUtil.Group (err) ->
+		tasks = new TaskGroup (err) ->
 			return done(err)  if err
 			assert.equal(false, finished, 'the group of tasks only finished once')
 			finished = true
@@ -407,7 +281,7 @@ joe.describe 'Group', (describe,it) ->
 		total = 2
 
 		# Create our group
-		tasks = new balUtil.Group (err) ->
+		tasks = new TaskGroup (err) ->
 			return done(err)  if err
 			assert.equal(false, finished, 'the group of tasks only finished once')
 			finished = true
@@ -446,7 +320,7 @@ joe.describe 'Group', (describe,it) ->
 		total = 2
 
 		# Create our group
-		tasks = new balUtil.Group 'serial', (err) ->
+		tasks = new TaskGroup 'serial', (err) ->
 			return done(err)  if err
 			assert.equal(false, finished, 'the group of tasks only finished once')
 			finished = true
@@ -493,7 +367,7 @@ joe.describe 'Group', (describe,it) ->
 		total = 2
 
 		# Create our group
-		tasks = new balUtil.Group 'parallel', (err) ->
+		tasks = new TaskGroup 'parallel', (err) ->
 			return done(err)  if err
 			assert.equal(false, finished, 'the group of tasks only finished once')
 			finished = true
@@ -535,7 +409,7 @@ joe.describe 'Group', (describe,it) ->
 		total = 2
 
 		# Create our group
-		tasks = new balUtil.Group 'serial', {autoClear: true}, (err) ->
+		tasks = new TaskGroup 'serial', {autoClear: true}, (err) ->
 			return done(err)  if err
 			++finished
 		assert.equal('serial', tasks.mode, 'mode was correctly set to serial')
@@ -565,7 +439,7 @@ joe.describe 'Group', (describe,it) ->
 		total = 10000
 
 		# Create our group
-		tasks = new balUtil.Group (err) ->
+		tasks = new TaskGroup (err) ->
 			return done(err)  if err
 			assert.equal(false, finished, 'the group of tasks only finished once')
 			finished = true
@@ -596,7 +470,7 @@ joe.describe 'Group', (describe,it) ->
 		total = 10000
 
 		# Create our group
-		tasks = new balUtil.Group (err) ->
+		tasks = new TaskGroup (err) ->
 			return done(err)  if err
 			assert.equal(false, finished, 'the group of tasks only finished once')
 			finished = true

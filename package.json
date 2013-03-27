@@ -1,58 +1,46 @@
 {
-	"name": "bal-util",
-	"version": "1.17.0",
-	"description": "Common utility functions for Node.js used and maintained by Benjamin Lupton",
-	"homepage": "https://github.com/balupton/bal-util",
+	"name": "taskgroup",
+	"version": "2.0.0",
+	"description": "Group together synchronous and asynchronous tasks and execute them in either serial or parallel",
+	"homepage": "https://github.com/bevry/taskgroup",
 	"keywords": [
-		"javascript",
 		"flow",
 		"control",
 		"async",
 		"sync",
 		"tasks",
-		"batch",
-		"utility",
-		"util",
-		"utilities",
-		"paths",
-		"path",
-		"events",
-		"event",
-		"module",
-		"modules",
-		"compare",
-		"comparison",
-		"html"
+		"batch"
 	],
-	"author": "Benjamin Lupton <b@lupton.cc> (http://balupton.com)",
+	"author": "Bevry Pty Ltd <us@bevry.me> (http://bevry.me)",
 	"maintainers": [
 		"Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)"
 	],
 	"contributors": [
-		"Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)",
-		"Sean Fridman <fridman@mail.sfsu.edu> (https://github.com/sfrdmn)"
+		"Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)"
 	],
 	"bugs": {
-		"url": "https://github.com/balupton/bal-util/issues"
+		"url": "https://github.com/bevry/taskgroup/issues"
 	},
 	"repository" : {
 		"type": "git",
-		"url": "http://github.com/balupton/bal-util.git"
+		"url": "http://github.com/bevry/taskgroup.git"
 	},
 	"engines" : {
 		"node": ">=0.4"
 	},
-	"dependencies": {},
+	"dependencies": {
+		"typechecker": "~2.0.1",
+		"ambi": "~2.0.0"
+	},
 	"devDependencies": {
 		"coffee-script": "~1.6.2",
-		"joe": "~1.1.2",
-		"chai": "~1.5.0"
+		"joe": "~1.1.2"
 	},
 	"directories": {
 		"lib": "./out/lib"
 	},
 	"scripts": {
-		"test": "node ./out/test/everything-test.js --joe-reporter=list"
+		"test": "node ./out/test/taskgroup-test.js --joe-reporter=list"
 	},
-	"main": "./out/lib/balutil"
+	"main": "./out/lib/taskgroup.js"
 }
