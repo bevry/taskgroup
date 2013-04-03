@@ -176,4 +176,25 @@ joe.describe 'taskgroup', (describe,it) ->
 
 		tasks.run(1)
 
+	# Error
+	it 'should handle error correctly', (done) ->
+		tasks = new TaskGroup (err,results) ->
+			expect(err.message).to.eql('deliberate error')
+			expect(results.length).to.eql(1)
+			expect(tasks.remaining.length).to.eql(1)
+			expect(tasks.running).to.eql(0)
+			expect(tasks.concurrency).to.eql(1)
+			done()
+
+		tasks.addTask (complete) ->
+			expect(tasks.remaining.length).to.eql(1)
+			expect(tasks.running).to.eql(1)
+			err = new Error('deliberate error')
+			complete(err)
+
+		tasks.addTask ->
+			throw 'unexpected'
+
+		tasks.run(1)
+
 
