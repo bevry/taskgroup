@@ -3,126 +3,187 @@ ambi = require('ambi')
 EventEmitter = require('eventemitter2').EventEmitter2
 
 # Task
+# Events
+# - complete
+# - run
 class Task extends EventEmitter
-	name: null
 	fn: null
 	completed: false
 
-	constructor: (@name,@fn) ->
+	constructor: (@fn) ->
 		super
 		@
 
 	run: ->
+		# What happens once the task is complete
 		complete = (args...) =>
+			# Update our status
 			@completed = true
-			@emit('error', args...)  if args[0]
-			@emit('complete', args...)
 
-		process.nextTick =>
-			ambi(@fn.bind(@),complete)
+			# Notify listeners we are now complete
+			@emit('complete', args...)
 		
+		# Notify our intention
+		@emit('run', @)
+
+		# Run it
+		ambi(@fn.bind(@),complete)
+		
+		# Chain
 		@
 
 # Task Group
+# Events
+# - (task|group).(complete|run)
+# - complete
+# - run
 class TaskGroup extends EventEmitter
-	name: null
+	TaskClass: Task
+	TaskGroupClass: TaskGroup
+
 	running: 0
 	remaining: null
 	concurrency: null
 	
-	constructor: (@name,next) ->
+	constructor: (next) ->
+		# Init
 		super
 		@remaining = []
+		@on('complete',next)
 
+		# Prepare
 		err = null
 		results = []
 
-		@on 'task.complete group.end', (args...) =>
-			err = args[0]  if args[0]
+		# What to do once an item completes
+		complete = (args...) =>
+			# Add the result
 			results.push(args)
 
+			# Mark that one less item is running
 			--@running
-			if @hasTasks()
-				@nextTask()
+
+			# Update error if it exists
+			err = args[0]  if args[0]
+
+			# If we have no more items or if we have an error
+			if err or (@hasItems() is false and @running is 0)
+				# Complete
+				@emit('complete',err,results)
 			else
-				@emit('end',err,results)
+				# Otherwise continue with the next item
+				@nextItem()	
+
+		# Listen for completion
+		@on('task.complete', complete)
+		@on('group.complete', complete)	
 		
-		@on('end',next)
+		# Chain
+		@
 
 	addItem: (item) ->
-		@remaining.push(item)
+		# Notify our intention
 		@emit('add',item)
-		@
+
+		# Add the item
+		@remaining.push(item)
+
+		# Return the item
+		return item
 
 	addTask: (args...) ->
-		task = new Task(args...)
-		
-		task.on 'error', (err) =>
-			@emit('error', err)
-		task.on '*', (eventName, args...) =>
-			@emit("task.#{eventName}", args...)
+		# Prepare
+		me = @
 
-		@addItem(task)
+		# Create the task with our arguments
+		task = new @TaskClass(args...)
 		
-		@
+		# Bubble task events
+		task.onAny (args...) ->
+			me.emit("task.#{@event}", args...)
+
+		# Return the item
+		return @addItem(task)
 
 	addGroup: (args...) ->
-		group = new TaskGroup(args...)
+		# Prepare
+		me = @
 
-		group.on 'error', (err) =>
-			@emit('error', err)
-		group.on '*', (eventName, args...) =>
-			@emit("group.#{eventName}", args...)
+		# Create the group with our arugments
+		group = new @TaskGroupClass(args...)
 
-		@remaining.push(group)
-		@emit('add',group)
+		# Bubble task events
+		task.onAny (args...) ->
+			me.emit("group.#{@event}", args...)
 
-		return group
+		# Return the item
+		return @addItem(group)
 
 	hasItems: ->
+		# Do we have any items left to run
 		return @remaining.length isnt 0
 
 	isReady: ->
+		# Do we have available slots to run
 		return !@concurrency or @running < @concurrency
 
 	nextItem: ->
+		# Do we have items to run?
 		if @hasItems()
+			# Do we have available slots to run?
 			if @isReady()
-				nextItem = @remaining.unshift()
-				@emit('run',nextItem)
-				nextItem.run()
-		@
+				# Get the next item and remove it from the remaining items
+				nextItem = @remaining.shift()
+				++@running
+				
+				# Notify that we are about to run it
+				@emit('run', nextItem)
+				
+				# Run it
+				process.nextTick -> nextItem.run()
+
+				# Return the item
+				return nextItem
+		
+		# Didn't fire another item
+		return false
 
 	clear: ->
+		# Clear the remaining items
 		@remaining.splice(0)
+		
+		# Chain
 		@
 
 	run: (concurrency) ->
+		# Set the concurency if we have it
 		@concurrency = concurrency  if concurrency?
-		@nextItem()
+		
+		# Fire the next item
+		while true
+			break  unless @nextItem()
+
+		# Chain
 		@
 
 # Task Runner
-class TaskRunner extends TaskGroup
-	constructor: ->
-		super
-		@on 'add', (item) ->
-			item.run()
+class TaskRunner extends Task
+	constructor: (@name,fn) ->
 
-# Test Runner
-class TestRunner extends TaskRunner
+class TaskGroupRunner extends TaskGroup
+	TaskClass: TaskRunner
+	TaskGroupClass: TaskGroupRunner
+	constructor: (@name,fn) ->
+		super
+		fn.call(@)
+		@run(1)
+
+# Test Group Runner
+class TestGroupRunner extends TaskRunner
 	describe: @addGroup
 	suite: @addGroup
 	it: @addTask
 	test: @addTask
 
 # Export
-module.exports = {Task,TaskGroup,TaskRunner,TestRunner}
-
-
-###
-Questions
-1. Should it stop on error?
-2. Should complete fire when there is an error? Yes.
-
-###
+module.exports = {Task,TaskGroup,TaskRunner,TaskGroupRunner,TestGroupRunner}

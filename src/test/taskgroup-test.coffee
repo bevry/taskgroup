@@ -14,15 +14,13 @@ joe.describe 'task', (describe,it) ->
 		checks = 0
 
 		# Create
-		task = new Task 'my name', (complete) ->
+		task = new Task (complete) ->
 			wait 500, ->
 				++checks
 				expect(task.completed).to.eql(false)
 				complete(null,10)
 
 		# Check
-		task.on 'error', ->
-			throw new Error('unexpected')
 		task.on 'complete', (err,result) ->
 			++checks
 			expect(task.completed).to.eql(true)
@@ -45,14 +43,12 @@ joe.describe 'task', (describe,it) ->
 		checks = 0
 
 		# Create
-		task = new Task 'my name', ->
+		task = new Task ->
 			++checks
 			expect(task.completed).to.eql(false)
 			return 10
 
 		# Check
-		task.on 'error', ->
-			throw new Error('unexpected')
 		task.on 'complete', (err,result) ->
 			++checks
 			expect(task.completed).to.eql(true)
@@ -75,7 +71,7 @@ joe.describe 'task', (describe,it) ->
 		checks = 0
 
 		# Create
-		task = new Task 'my name', (complete) ->
+		task = new Task (complete) ->
 			wait 500, ->
 				++checks
 				expect(task.completed).to.eql(false)
@@ -83,10 +79,6 @@ joe.describe 'task', (describe,it) ->
 				complete(err)
 
 		# Check
-		task.on 'error', (err) ->
-			++checks
-			expect(task.completed).to.eql(true)
-			expect(err.message).to.eql('deliberate error')
 		task.on 'complete', (err) ->
 			++checks
 			expect(task.completed).to.eql(true)
@@ -96,7 +88,7 @@ joe.describe 'task', (describe,it) ->
 		wait 1000, ->
 			++checks
 			expect(task.completed).to.eql(true)
-			expect(checks).to.eql(4)
+			expect(checks).to.eql(3)
 			done()
 
 		# Run
@@ -109,17 +101,13 @@ joe.describe 'task', (describe,it) ->
 		checks = 0
 
 		# Create
-		task = new Task 'my name', ->
+		task = new Task ->
 			++checks
 			expect(task.completed).to.eql(false)
 			err = new Error('deliberate error')
 			return err
 
 		# Check
-		task.on 'error', (err) ->
-			++checks
-			expect(task.completed).to.eql(true)
-			expect(err.message).to.eql('deliberate error')
 		task.on 'complete', (err) ->
 			++checks
 			expect(task.completed).to.eql(true)
@@ -129,7 +117,7 @@ joe.describe 'task', (describe,it) ->
 		wait 1000, ->
 			++checks
 			expect(task.completed).to.eql(true)
-			expect(checks).to.eql(4)
+			expect(checks).to.eql(3)
 			done()
 
 		# Run
@@ -137,3 +125,55 @@ joe.describe 'task', (describe,it) ->
 
 
 # Task Group
+joe.describe 'taskgroup', (describe,it) ->
+	# Parallel
+	it 'should work when running in parallel', (done) ->
+		tasks = new TaskGroup (err,results) ->
+			expect(err).to.eql(null)
+			expect(results).to.eql([[null,5],[null,10]])
+			expect(tasks.remaining.length).to.eql(0)
+			expect(tasks.running).to.eql(0)
+			expect(tasks.concurrency).to.eql(null)
+			done()
+
+		tasks.addTask (complete) ->
+			expect(tasks.remaining.length).to.eql(0)
+			expect(tasks.running).to.eql(2)
+			wait 500, ->
+				expect(tasks.remaining.length).to.eql(0)
+				expect(tasks.running).to.eql(1)
+				complete(null,10)
+
+		tasks.addTask ->
+			expect(tasks.remaining.length).to.eql(0)
+			expect(tasks.running).to.eql(2)
+			return 5
+
+		tasks.run()
+
+	# Serial
+	it 'should work when running in serial', (done) ->
+		tasks = new TaskGroup (err,results) ->
+			expect(err).to.eql(null)
+			expect(results).to.eql([[null,10],[null,5]])
+			expect(tasks.remaining.length).to.eql(0)
+			expect(tasks.running).to.eql(0)
+			expect(tasks.concurrency).to.eql(1)
+			done()
+
+		tasks.addTask (complete) ->
+			expect(tasks.remaining.length).to.eql(1)
+			expect(tasks.running).to.eql(1)
+			wait 500, ->
+				expect(tasks.remaining.length).to.eql(1)
+				expect(tasks.running).to.eql(1)
+				complete(null,10)
+
+		tasks.addTask ->
+			expect(tasks.remaining.length).to.eql(0)
+			expect(tasks.running).to.eql(1)
+			return 5
+
+		tasks.run(1)
+
+
