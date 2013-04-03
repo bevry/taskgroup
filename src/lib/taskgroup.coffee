@@ -24,11 +24,13 @@ class Task extends EventEmitter
 			@emit('complete', args...)
 		
 		# Notify our intention
-		@emit('run', @)
-
-		# Run it
-		ambi(@fn.bind(@),complete)
+		@emit('run')
 		
+		# Queue
+		process.nextTick =>
+			# Run it
+			ambi(@fn.bind(@),complete)
+			
 		# Chain
 		@
 
@@ -38,9 +40,6 @@ class Task extends EventEmitter
 # - complete
 # - run
 class TaskGroup extends EventEmitter
-	TaskClass: Task
-	TaskGroupClass: TaskGroup
-
 	running: 0
 	remaining: null
 	concurrency: null
@@ -50,7 +49,7 @@ class TaskGroup extends EventEmitter
 		# Init
 		super
 		@remaining = []
-		@on('complete',next)
+		@on('complete',next)  if next
 
 		# Prepare
 		err = results = null
@@ -105,7 +104,7 @@ class TaskGroup extends EventEmitter
 		me = @
 
 		# Create the task with our arguments
-		task = new @TaskClass(args...)
+		task = new Task(args...)
 		
 		# Bubble task events
 		task.onAny (args...) ->
@@ -119,10 +118,10 @@ class TaskGroup extends EventEmitter
 		me = @
 
 		# Create the group with our arugments
-		group = new @TaskGroupClass(args...)
+		group = new TaskGroup(args...)
 
 		# Bubble task events
-		task.onAny (args...) ->
+		group.onAny (args...) ->
 			me.emit("group.#{@event}", args...)
 
 		# Return the item
@@ -145,11 +144,8 @@ class TaskGroup extends EventEmitter
 				nextItem = @remaining.shift()
 				++@running
 				
-				# Notify that we are about to run it
-				@emit('run', nextItem)
-				
 				# Run it
-				process.nextTick -> nextItem.run()
+				nextItem.run()
 
 				# Return the item
 				return nextItem
@@ -168,32 +164,66 @@ class TaskGroup extends EventEmitter
 		# Set the concurency if we have it
 		@concurrency = concurrency  if concurrency?
 		@exited = false
+
+		# Notify that we are about to run it
+		@emit('run')
 		
-		# Fire the next item
-		while true
-			break  unless @nextItem()
+		# Queue
+		process.nextTick =>
+			# Fire the next item
+			while true
+				break  unless @nextItem()
 
 		# Chain
 		@
 
-# Task Runner
-class TaskRunner extends Task
-	constructor: (@name,fn) ->
-
-class TaskGroupRunner extends TaskGroup
-	TaskClass: TaskRunner
-	TaskGroupClass: TaskGroupRunner
-	constructor: (@name,fn) ->
-		super
-		fn.call(@)
-		@run(1)
 
 # Test Group Runner
-class TestGroupRunner extends TaskRunner
-	describe: @addGroup
-	suite: @addGroup
-	it: @addTask
-	test: @addTask
+class TestGroupRunner extends TaskGroup
+	parent: null
+	concurrency: 1
+
+	constructor: (@name,fn,@parent) ->
+		super()
+		@on 'run', =>
+			fn.call(@, @addGroup, @addTask)
+		unless @parent
+			process.nextTick => @run()
+	
+	addTask: (name,fn) =>
+		# Prepare
+		me = @
+
+		# Create the task with our arguments
+		task = new Task(fn)
+		task.name = name
+		task.parent = @
+		
+		# Bubble task events
+		task.onAny (args...) ->
+			me.emit("task.#{@event}", args...)
+
+		# Return the item
+		return @addItem(task)
+
+	addGroup: (name,fn) =>
+		# Prepare
+		me = @
+
+		# Create the group with our arugments
+		group = new TestGroupRunner(name,fn,@)
+
+		# Bubble task events
+		group.onAny (args...) ->
+			me.emit("group.#{@event}", args...)
+
+		# Return the item
+		return @addItem(group)
+
+	describe: (args...) -> @addGroup(args...)
+	suite: (args...) -> @addGroup(args...)
+	it: (args...) -> @addTask(args...)
+	test: (args...) -> @addTask(args...)
 
 # Export
-module.exports = {Task,TaskGroup,TaskRunner,TaskGroupRunner,TestGroupRunner}
+module.exports = {Task,TaskGroup,TestGroupRunner}

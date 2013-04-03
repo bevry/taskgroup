@@ -1,7 +1,7 @@
 # Import
 {expect} = require('chai')
 joe = require('joe')
-{Task,TaskGroup,TaskRunner,TestRunner} = require('../../')
+{Task,TaskGroup,TestGroupRunner} = require('../../')
 
 # Prepare
 wait = (delay,fn) -> setTimeout(fn,delay)
@@ -222,3 +222,39 @@ joe.describe 'taskgroup', (describe,it) ->
 		tasks.run(1)
 
 
+
+# Test Runner
+joe.describe 'testrunner', (describe,it) ->
+	# Work
+	it 'should work', (done) ->
+		checks = 0
+
+		tasks = new TestGroupRunner 'my tests', (addGroup,addTask) ->
+			expect(@name).to.eql('my tests')
+
+			addTask 'my task', (complete) ->
+				++checks
+				expect(@name).to.eql('my task')
+				expect(tasks.remaining.length).to.eql(1)
+				expect(tasks.running).to.eql(1)
+				wait 500, ->
+					++checks
+					expect(tasks.remaining.length).to.eql(1)
+					expect(tasks.running).to.eql(1)
+					complete()
+
+			addGroup 'my group', (addGroup,addTask) ->
+				++checks
+				expect(@name).to.eql('my group')
+				expect(tasks.remaining.length).to.eql(0)
+				expect(tasks.running).to.eql(1)
+
+				addTask 'my second task', ->
+					++checks
+					expect(@name).to.eql('my second task')
+					expect(tasks.remaining.length).to.eql(0)
+					expect(tasks.running).to.eql(1)
+
+		wait 1000, ->
+			expect(checks).to.eql(4)
+			done()
