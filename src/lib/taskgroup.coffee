@@ -1,4 +1,5 @@
 # Import
+typeChecker = require('typechecker')
 ambi = require('ambi')
 EventEmitter = require('eventemitter2').EventEmitter2
 
@@ -10,11 +11,28 @@ class Task extends EventEmitter
 	fn: null
 	completed: false
 
-	constructor: (@fn) ->
+	constructor: (args...) ->
+		# Prepare
 		super
+
+		# Fetch args
+		opts = fn = null
+		if args.length is 2
+			[opts,fn] = args
+		else if args.length is 1
+			if typeChecker.isFunction(args[0])
+				fn = args[0]
+			else
+				opts = args[0]
+
+		# Apply args
+		@setConfig(opts)  if opts
+		@fn = fn  if fn
+
+		# Chain
 		@
 
-	setConfig: (opts={}) ->
+	setConfig: (opts={}) =>
 		# Configure
 		for own key,value of opts
 			@[key] = value
@@ -44,38 +62,49 @@ class Task extends EventEmitter
 
 # Task Group
 # Events
-# - (task|group).(complete|run)
+# - (task|group|item).(complete|run)
 # - complete
 # - run
 class TaskGroup extends EventEmitter
 	running: 0
 	remaining: null
-	concurrency: null
+	err: null
+	results: null
 
+	# Config
+	concurrency: 0
 	paused: true
 	pauseOnError: true  # needs testing
 	pauseOnExit: true   # needs testing
 	
-	constructor: (next) ->
+	constructor: (args...) ->
 		# Init
 		super
+		@err = null
+		@results = []
 		@remaining = []
+
+		# Fetch args
+		opts = next = null
+		if args.length is 2
+			[opts,next] = args
+		else if args.length is 1
+			if typeChecker.isFunction(args[0])
+				next = args[0]
+			else
+				opts = args[0]
+
+		# Apply args
+		@setConfig(opts)  if opts
 		@on('complete',next)  if next
 
-		# Prepare
-		err = results = null
-		reset = ->
-			err = null
-			results = []
-		reset()
-
-		# What to do once an item completes
-		complete = (args...) =>
+		# Handle item completion
+		@on 'item.complete', (args...) =>
 			# Add the result
-			results.push(args)
+			@results.push(args)
 
 			# Update error if it exists
-			err = args[0]  if args[0]
+			@err = args[0]  if args[0]
 
 			# Mark that one less item is running
 			--@running
@@ -84,23 +113,24 @@ class TaskGroup extends EventEmitter
 			return  if @paused
 
 			# If we have no more items or if we have an error
-			if (@pauseOnError and err) or (@hasItems() is false and @running is 0)
+			if (@pauseOnError and @err) or (@hasItems() is false and @running is 0)
 				# Complete
-				@paused = true  if @pauseOnExit
-				@emit('complete',err,results)
-				reset()
+				@complete()
 			else
 				# Otherwise continue with the next item
 				@nextItems()	
-
-		# Listen for completion
-		@on('task.complete', complete)
-		@on('group.complete', complete)	
 		
 		# Chain
 		@
 
-	setConfig: (opts={}) ->
+	complete: =>
+		@paused = true  if @pauseOnExit
+		@emit('complete',@err,@results)
+		@err = null
+		@results = []
+		@
+
+	setConfig: (opts={}) =>
 		# Configure
 		for own key,value of opts
 			@[key] = value
@@ -111,7 +141,7 @@ class TaskGroup extends EventEmitter
 	addItem: (item) =>
 		# Prepare
 		me = @
-		
+
 		# Bubble item events
 		item.onAny (args...) ->
 			me.emit("item.#{@event}", args...)
@@ -210,16 +240,18 @@ class TaskGroup extends EventEmitter
 		# Chain
 		@
 
-	run: (concurrency) =>
-		# Set the concurency if we have it
-		@concurrency = concurrency  if concurrency?
+	run: =>
+		# Start again
 		@paused = false
 
 		# Notify that we are about to run it
 		@emit('run')
 		
 		# Queue
-		@nextItems()
+		if @hasItems() is false
+			@complete()  # needs testing
+		else
+			@nextItems()
 
 		# Chain
 		@
@@ -231,29 +263,31 @@ class TaskRunner extends TaskGroup
 	concurrency: 1
 	pauseOnExit: false
 
-	constructor: (@name,fn,@parent) ->
-		super()
+	constructor: (name,fn,parent) ->
+		super({name,fn,parent})
 		@on 'run', =>
-			fn.call(@, @addGroup, @addTask)
+			@fn.call(@, @addGroup, @addTask)
+			@fn = null  # no need for it anymore
 		unless @parent
 			process.nextTick => @run()
 	
 	createTask: (name,fn) =>
-		task = new Task(fn).setConfig({
-			name: name
-			parent: @
-		})
+		parent = @
+		task = new Task({name,parent},fn)
 		return task
 
 	createGroup: (name,fn) =>
-		group = new TaskRunner(name,fn,@)
+		parent = @
+		group = new TaskRunner(name,fn,parent)
 		return group
 
 # Test Runner
 class TestRunner extends TaskRunner
 	createGroup: (name,fn) =>
-		group = new TestRunner(name,fn,@)
+		parent = @
+		group = new TestRunner(name,fn,parent)
 		return group
+
 	describe: (args...) => @addGroup(args...)
 	suite: (args...) => @addGroup(args...)
 	it: (args...) => @addTask(args...)

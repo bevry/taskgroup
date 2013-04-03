@@ -25,11 +25,7 @@ Group together synchronous and asynchronous tasks and execute them in either ser
 {TaskGroup} = require('taskgroup')
 
 # Create our group
-tasks = new TaskGroup().setConfig(
-	concurrency: 0  # unlimited at once
-	pauseOnExit: true
-	pauseOnError: true
-).on 'complete', (err,results) ->
+tasks = new TaskGroup (err,results) ->
 	console.log(err)  # null
 	console.log(results)  # [[null,10],[null,5]]
 
@@ -47,6 +43,7 @@ tasks.addTask ->
 # Fire the tasks
 tasks.run()
 ```
+
 
 
 ## History

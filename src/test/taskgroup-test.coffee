@@ -133,7 +133,7 @@ joe.describe 'taskgroup', (describe,it) ->
 			expect(results).to.eql([[null,5],[null,10]])
 			expect(tasks.remaining.length).to.eql(0)
 			expect(tasks.running).to.eql(0)
-			expect(tasks.concurrency).to.eql(null)
+			expect(tasks.concurrency).to.eql(0)
 			done()
 
 		tasks.addTask (complete) ->
@@ -153,7 +153,7 @@ joe.describe 'taskgroup', (describe,it) ->
 
 	# Serial
 	it 'should work when running in serial', (done) ->
-		tasks = new TaskGroup (err,results) ->
+		tasks = new TaskGroup {concurrency:1}, (err,results) ->
 			expect(err).to.eql(null)
 			expect(results).to.eql([[null,10],[null,5]])
 			expect(tasks.remaining.length).to.eql(0)
@@ -174,7 +174,7 @@ joe.describe 'taskgroup', (describe,it) ->
 			expect(tasks.running).to.eql(1)
 			return 5
 
-		tasks.run(1)
+		tasks.run()
 
 	# Error Parallel
 	it 'should handle error correctly in parallel', (done) ->
@@ -183,7 +183,7 @@ joe.describe 'taskgroup', (describe,it) ->
 			expect(results.length).to.eql(1)
 			expect(tasks.remaining.length).to.eql(0)
 			expect(tasks.running).to.eql(1)
-			expect(tasks.concurrency).to.eql(null)
+			expect(tasks.concurrency).to.eql(0)
 			done()
 
 		tasks.addTask (complete) ->
@@ -202,7 +202,7 @@ joe.describe 'taskgroup', (describe,it) ->
 
 	# Error Serial
 	it 'should handle error correctly in serial', (done) ->
-		tasks = new TaskGroup (err,results) ->
+		tasks = new TaskGroup {concurrency:1}, (err,results) ->
 			expect(err.message).to.eql('deliberate error')
 			expect(results.length).to.eql(1)
 			expect(tasks.remaining.length).to.eql(1)
@@ -219,7 +219,7 @@ joe.describe 'taskgroup', (describe,it) ->
 		tasks.addTask ->
 			throw 'unexpected'
 
-		tasks.run(1)
+		tasks.run()
 
 
 

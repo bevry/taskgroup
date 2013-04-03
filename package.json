@@ -29,7 +29,9 @@
 		"node": ">=0.4"
 	},
 	"dependencies": {
-		"ambi": "~2.0.0"
+		"ambi": "~2.0.0",
+		"typechecker": "~2.0.1",
+		"eventemitter2": "~0.4.11"
 	},
 	"devDependencies": {
 		"coffee-script": "~1.6.2",
