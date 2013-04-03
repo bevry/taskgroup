@@ -29,18 +29,18 @@
 		"node": ">=0.4"
 	},
 	"dependencies": {
-		"typechecker": "~2.0.1",
 		"ambi": "~2.0.0"
 	},
 	"devDependencies": {
 		"coffee-script": "~1.6.2",
-		"joe": "~1.1.2"
+		"joe": "~1.1.2",
+		"chai": "~1.5.0"
 	},
 	"directories": {
 		"lib": "./out/lib"
 	},
 	"scripts": {
-		"test": "node ./out/test/taskgroup-test.js --joe-reporter=list"
+		"test": "node ./out/test/taskgroup-test.js"
 	},
 	"main": "./out/lib/taskgroup.js"
 }
