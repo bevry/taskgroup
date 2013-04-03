@@ -52,8 +52,11 @@ class TaskGroup extends EventEmitter
 		@on('complete',next)
 
 		# Prepare
-		err = null
-		results = []
+		err = results = null
+		reset = ->
+			err = null
+			results = []
+		reset()
 
 		# What to do once an item completes
 		complete = (args...) =>
@@ -70,6 +73,7 @@ class TaskGroup extends EventEmitter
 			if err or (@hasItems() is false and @running is 0)
 				# Complete
 				@emit('complete',err,results)
+				reset()
 			else
 				# Otherwise continue with the next item
 				@nextItem()	
