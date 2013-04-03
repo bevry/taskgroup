@@ -18,25 +18,32 @@ Group together synchronous and asynchronous tasks and execute them in either ser
 
 ## Usage
 
+### Example
+
 ``` coffeescript
 # Import
-TaskGroup = require('taskgroup')
+{TaskGroup} = require('taskgroup')
 
-# Add tasks to the group and fire them in parallel
-tasks = new TaskGroup (err,lastResult,results) -> console.log(err,lastResult,results)
-tasks.push (complete) ->
-	someAsyncFunction(arg1, arg2, complete)
-tasks.push ->
-	someSyncFunction(arg1, arg2)
-tasks.run()  # can also use tasks.run('parallel')
+# Create our group
+tasks = new TaskGroup().setConfig(
+	concurrency: 0  # unlimited at once
+	pauseOnExit: true
+	pauseOnError: true
+).on 'complete', (err,results) ->
 
-# Add tasks to the group and fire them in serial
-tasks = new TaskGroup (err,lastResult,results) -> console.log(err,lastResult,results)
-tasks.push (complete) ->
-	someAsyncFunction(arg1, arg2, complete)
-tasks.push ->
-	someSyncFunction(arg1, arg2)
-tasks.run('serial')
+# Add an asynchronous task
+tasks.addTask (complete) ->
+	setTimeout(
+		-> complete(null,5)
+		500
+	)
+
+# Add a synchronous task
+tasks.addTask ->
+	return 10
+
+# Fire the tasks
+tasks.run()
 ```
 
 
