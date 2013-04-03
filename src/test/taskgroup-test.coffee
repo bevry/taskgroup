@@ -176,8 +176,32 @@ joe.describe 'taskgroup', (describe,it) ->
 
 		tasks.run(1)
 
-	# Error
-	it 'should handle error correctly', (done) ->
+	# Error Parallel
+	it 'should handle error correctly in parallel', (done) ->
+		tasks = new TaskGroup (err,results) ->
+			expect(err.message).to.eql('deliberate error')
+			expect(results.length).to.eql(1)
+			expect(tasks.remaining.length).to.eql(0)
+			expect(tasks.running).to.eql(1)
+			expect(tasks.concurrency).to.eql(null)
+			done()
+
+		tasks.addTask (complete) ->
+			expect(tasks.remaining.length).to.eql(0)
+			expect(tasks.running).to.eql(2)
+			err = new Error('deliberate error')
+			complete(err)
+
+		tasks.addTask ->
+			expect(tasks.remaining.length).to.eql(0)
+			expect(tasks.running).to.eql(2)
+			err = new Error('deliberate error')
+			return err
+
+		tasks.run()
+
+	# Error Serial
+	it 'should handle error correctly in serial', (done) ->
 		tasks = new TaskGroup (err,results) ->
 			expect(err.message).to.eql('deliberate error')
 			expect(results.length).to.eql(1)
