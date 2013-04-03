@@ -14,6 +14,14 @@ class Task extends EventEmitter
 		super
 		@
 
+	setConfig: (opts={}) ->
+		# Configure
+		for own key,value of opts
+			@[key] = value
+
+		# Chain
+		@
+
 	run: ->
 		# What happens once the task is complete
 		complete = (args...) =>
@@ -83,12 +91,20 @@ class TaskGroup extends EventEmitter
 				reset()
 			else
 				# Otherwise continue with the next item
-				@nextItem()	
+				@nextItems()	
 
 		# Listen for completion
 		@on('task.complete', complete)
 		@on('group.complete', complete)	
 		
+		# Chain
+		@
+
+	setConfig: (opts={}) ->
+		# Configure
+		for own key,value of opts
+			@[key] = value
+
 		# Chain
 		@
 
@@ -100,7 +116,7 @@ class TaskGroup extends EventEmitter
 		@remaining.push(item)
 
 		# Run the item right away, unless we are paused
-		@nextItem()  unless @paused
+		@nextItems()  unless @paused
 
 		# Return the item
 		return item
@@ -149,6 +165,19 @@ class TaskGroup extends EventEmitter
 		# Do we have available slots to run
 		return !@concurrency or @running < @concurrency
 
+	nextItems: =>
+		items = []
+
+		# Fire the next items
+		while true
+			item = @nextItem()
+			if item
+				items.push(item)
+			else
+				break
+
+		return if items.length then items else false
+
 	nextItem: =>
 		# Do we have items to run?
 		if @hasItems()
@@ -183,10 +212,7 @@ class TaskGroup extends EventEmitter
 		@emit('run')
 		
 		# Queue
-		process.nextTick =>
-			# Fire the next item
-			while true
-				break  unless @nextItem()
+		@nextItems()
 
 		# Chain
 		@
@@ -196,6 +222,7 @@ class TaskGroup extends EventEmitter
 class TaskRunner extends TaskGroup
 	parent: null
 	concurrency: 1
+	pauseOnExit: false
 
 	constructor: (@name,fn,@parent) ->
 		super()
@@ -205,9 +232,10 @@ class TaskRunner extends TaskGroup
 			process.nextTick => @run()
 	
 	createTask: (name,fn) =>
-		task = new Task(fn)
-		task.name = name
-		task.parent = @
+		task = new Task(fn).setConfig({
+			name: name
+			parent: @
+		})
 		return task
 
 	createGroup: (name,fn) =>
