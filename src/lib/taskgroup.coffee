@@ -43,7 +43,10 @@ class TaskGroup extends EventEmitter
 	running: 0
 	remaining: null
 	concurrency: null
-	exited: false
+
+	paused: true
+	pauseOnError: true  # needs testing
+	pauseOnExit: true   # needs testing
 	
 	constructor: (next) ->
 		# Init
@@ -63,19 +66,19 @@ class TaskGroup extends EventEmitter
 			# Add the result
 			results.push(args)
 
+			# Update error if it exists
+			err = args[0]  if args[0]
+
 			# Mark that one less item is running
 			--@running
 
 			# Already exited?
-			return  if @exited
-
-			# Update error if it exists
-			err = args[0]  if args[0]
+			return  if @paused
 
 			# If we have no more items or if we have an error
-			if err or (@hasItems() is false and @running is 0)
+			if (@pauseOnError and err) or (@hasItems() is false and @running is 0)
 				# Complete
-				@exited = true
+				@paused = true  if @pauseOnExit
 				@emit('complete',err,results)
 				reset()
 			else
@@ -89,22 +92,29 @@ class TaskGroup extends EventEmitter
 		# Chain
 		@
 
-	addItem: (item) ->
+	addItem: (item) =>
 		# Notify our intention
 		@emit('add',item)
 
 		# Add the item
 		@remaining.push(item)
 
+		# Run the item right away, unless we are paused
+		@nextItem()  unless @paused
+
 		# Return the item
 		return item
 
-	addTask: (args...) ->
+	createTask: (args...) =>
+		task = new Task(args...)
+		return task
+
+	addTask: (args...) =>
 		# Prepare
 		me = @
 
 		# Create the task with our arguments
-		task = new Task(args...)
+		task = @createTask(args...)
 		
 		# Bubble task events
 		task.onAny (args...) ->
@@ -113,12 +123,16 @@ class TaskGroup extends EventEmitter
 		# Return the item
 		return @addItem(task)
 
-	addGroup: (args...) ->
+	createGroup: (args...) =>
+		group = new TaskGroup(args...)
+		return group
+
+	addGroup: (args...) =>
 		# Prepare
 		me = @
 
 		# Create the group with our arugments
-		group = new TaskGroup(args...)
+		group = @createGroup(args...)
 
 		# Bubble task events
 		group.onAny (args...) ->
@@ -127,15 +141,15 @@ class TaskGroup extends EventEmitter
 		# Return the item
 		return @addItem(group)
 
-	hasItems: ->
+	hasItems: =>
 		# Do we have any items left to run
 		return @remaining.length isnt 0
 
-	isReady: ->
+	isReady: =>
 		# Do we have available slots to run
 		return !@concurrency or @running < @concurrency
 
-	nextItem: ->
+	nextItem: =>
 		# Do we have items to run?
 		if @hasItems()
 			# Do we have available slots to run?
@@ -153,17 +167,17 @@ class TaskGroup extends EventEmitter
 		# Didn't fire another item
 		return false
 
-	clear: ->
+	clear: =>
 		# Clear the remaining items
 		@remaining.splice(0)
 		
 		# Chain
 		@
 
-	run: (concurrency) ->
+	run: (concurrency) =>
 		# Set the concurency if we have it
 		@concurrency = concurrency  if concurrency?
-		@exited = false
+		@paused = false
 
 		# Notify that we are about to run it
 		@emit('run')
@@ -178,8 +192,8 @@ class TaskGroup extends EventEmitter
 		@
 
 
-# Test Group Runner
-class TestGroupRunner extends TaskGroup
+# Task Runner
+class TaskRunner extends TaskGroup
 	parent: null
 	concurrency: 1
 
@@ -190,40 +204,25 @@ class TestGroupRunner extends TaskGroup
 		unless @parent
 			process.nextTick => @run()
 	
-	addTask: (name,fn) =>
-		# Prepare
-		me = @
-
-		# Create the task with our arguments
+	createTask: (name,fn) =>
 		task = new Task(fn)
 		task.name = name
 		task.parent = @
-		
-		# Bubble task events
-		task.onAny (args...) ->
-			me.emit("task.#{@event}", args...)
+		return task
 
-		# Return the item
-		return @addItem(task)
+	createGroup: (name,fn) =>
+		group = new TaskRunner(name,fn,@)
+		return group
 
-	addGroup: (name,fn) =>
-		# Prepare
-		me = @
-
-		# Create the group with our arugments
-		group = new TestGroupRunner(name,fn,@)
-
-		# Bubble task events
-		group.onAny (args...) ->
-			me.emit("group.#{@event}", args...)
-
-		# Return the item
-		return @addItem(group)
-
-	describe: (args...) -> @addGroup(args...)
-	suite: (args...) -> @addGroup(args...)
-	it: (args...) -> @addTask(args...)
-	test: (args...) -> @addTask(args...)
+# Test Runner
+class TestRunner extends TaskRunner
+	createGroup: (name,fn) =>
+		group = new TestRunner(name,fn,@)
+		return group
+	describe: (args...) => @addGroup(args...)
+	suite: (args...) => @addGroup(args...)
+	it: (args...) => @addTask(args...)
+	test: (args...) => @addTask(args...)
 
 # Export
-module.exports = {Task,TaskGroup,TestGroupRunner}
+module.exports = {Task,TaskGroup,TaskRunner,TestRunner}
