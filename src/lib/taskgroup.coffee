@@ -109,6 +109,13 @@ class TaskGroup extends EventEmitter
 		@
 
 	addItem: (item) =>
+		# Prepare
+		me = @
+		
+		# Bubble item events
+		item.onAny (args...) ->
+			me.emit("item.#{@event}", args...)
+
 		# Notify our intention
 		@emit('add',item)
 
