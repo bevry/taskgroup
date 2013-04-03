@@ -30,6 +30,8 @@ tasks = new TaskGroup().setConfig(
 	pauseOnExit: true
 	pauseOnError: true
 ).on 'complete', (err,results) ->
+	console.log(err)  # null
+	console.log(results)  # [[null,10],[null,5]]
 
 # Add an asynchronous task
 tasks.addTask (complete) ->
