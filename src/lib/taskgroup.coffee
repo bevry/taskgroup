@@ -11,22 +11,11 @@ class Task extends EventEmitter
 	fn: null
 	completed: false
 
-	constructor: (args...) ->
+	constructor: (fn) ->
 		# Prepare
 		super
 
-		# Fetch args
-		opts = fn = null
-		if args.length is 2
-			[opts,fn] = args
-		else if args.length is 1
-			if typeChecker.isFunction(args[0])
-				fn = args[0]
-			else
-				opts = args[0]
-
-		# Apply args
-		@setConfig(opts)  if opts
+		# Apply
 		@fn = fn  if fn
 
 		# Chain
@@ -77,26 +66,12 @@ class TaskGroup extends EventEmitter
 	pauseOnError: true  # needs testing
 	pauseOnExit: true   # needs testing
 	
-	constructor: (args...) ->
+	constructor: ->
 		# Init
 		super
 		@err = null
 		@results = []
 		@remaining = []
-
-		# Fetch args
-		opts = next = null
-		if args.length is 2
-			[opts,next] = args
-		else if args.length is 1
-			if typeChecker.isFunction(args[0])
-				next = args[0]
-			else
-				opts = args[0]
-
-		# Apply args
-		@setConfig(opts)  if opts
-		@on('complete',next)  if next
 
 		# Handle item completion
 		@on 'item.complete', (args...) =>
@@ -263,29 +238,39 @@ class TaskRunner extends TaskGroup
 	concurrency: 1
 	pauseOnExit: false
 
-	constructor: (name,fn,parent) ->
-		super({name,fn,parent})
+	constructor: (args...) ->
+		# Prepare
+		super()
+
+		# Configure if we are going the constructor configuration route
+		if args.length
+			[name,fn] = args
+			@setConfig({name,fn})
+
+		# Fire our function that adds our tasks before we run our tasks
 		@on 'run', =>
 			@fn.call(@, @addGroup, @addTask)
 			@fn = null  # no need for it anymore
-		unless @parent
-			process.nextTick => @run()
+		
+		# Give setConfig enough chance to fire
+		process.nextTick =>
+			@run()  unless @parent
 	
 	createTask: (name,fn) =>
 		parent = @
-		task = new Task({name,parent},fn)
+		task = new Task().setConfig({name,parent,fn})
 		return task
 
 	createGroup: (name,fn) =>
 		parent = @
-		group = new TaskRunner(name,fn,parent)
+		group = new TaskRunner().setConfig({name,parent,fn})
 		return group
 
 # Test Runner
 class TestRunner extends TaskRunner
 	createGroup: (name,fn) =>
 		parent = @
-		group = new TestRunner(name,fn,parent)
+		group = new TestRunner().setConfig({name,parent,fn})
 		return group
 
 	describe: (args...) => @addGroup(args...)
