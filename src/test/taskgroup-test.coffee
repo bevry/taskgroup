@@ -189,8 +189,9 @@ joe.describe 'taskgroup', (describe,it) ->
 		tasks.addTask (complete) ->
 			expect(tasks.remaining.length).to.eql(0)
 			expect(tasks.running).to.eql(2)
-			err = new Error('deliberate error')
-			complete(err)
+			wait 500, ->
+				err = new Error('deliberate error')
+				complete(err)
 
 		tasks.addTask ->
 			expect(tasks.remaining.length).to.eql(0)
@@ -255,6 +256,7 @@ joe.describe 'testrunner', (describe,it) ->
 					expect(tasks.remaining.length).to.eql(0)
 					expect(tasks.running).to.eql(1)
 
-		wait 1000, ->
+		tasks.on 'complete', (err) ->
+			expect(err).to.eql(null)
 			expect(checks).to.eql(4)
 			done()

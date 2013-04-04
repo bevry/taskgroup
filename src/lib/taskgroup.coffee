@@ -64,7 +64,6 @@ class TaskGroup extends EventEmitter
 	concurrency: 0
 	paused: true
 	pauseOnError: true  # needs testing
-	pauseOnExit: true   # needs testing
 	
 	constructor: ->
 		# Init
@@ -96,13 +95,6 @@ class TaskGroup extends EventEmitter
 				@nextItems()	
 		
 		# Chain
-		@
-
-	complete: =>
-		@paused = true  if @pauseOnExit
-		@emit('complete',@err,@results)
-		@err = null
-		@results = []
 		@
 
 	setConfig: (opts={}) =>
@@ -208,35 +200,65 @@ class TaskGroup extends EventEmitter
 		# Didn't fire another item
 		return false
 
+	complete: =>
+		# Pause under error condition
+		@pause()  if @pauseOnError and @err
+
+		# Notify we've completed and send the error and results if we have them
+		@emit('complete',@err,@results)
+
+		# Reset the error and results to build up again for the next completion
+		@err = null
+		@results = []
+
+		# Chain
+		@
+
 	clear: =>
-		# Clear the remaining items
+		# Removes all the items from remaining
 		@remaining.splice(0)
+
+		# Chain
+		@
+		
+	stop: =>
+		# Stop further execution
+		@pause()
+
+		# Clear everything remaining
+		@clear()
 		
 		# Chain
 		@
 
-	run: =>
-		# Start again
+	pause: =>
+		@paused = true
+		@
+
+	run: (args...) =>
+		# Resume
 		@paused = false
 
-		# Notify that we are about to run it
+		# Notify our intention to run
 		@emit('run')
-		
+
 		# Queue
 		if @hasItems() is false
-			@complete()  # needs testing
+			# Complete if we have no tasks
+			# needs testing
+			@complete()
 		else
+			# We have tasks, so fire them
 			@nextItems()
 
 		# Chain
 		@
-
+		
 
 # Task Runner
 class TaskRunner extends TaskGroup
 	parent: null
 	concurrency: 1
-	pauseOnExit: false
 
 	constructor: (args...) ->
 		# Prepare
