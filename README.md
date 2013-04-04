@@ -48,18 +48,18 @@ tasks.run()
 
 #### Notes
 
-- Available methods are:
+- Available methods:
 	- `setConfig(config)` - sets the configuration for the group
 	- `clear()` - clears remaining items
 	- `run()` - starts executing of the tasks
 	- All those of [EventEmitter2](https://github.com/hij1nx/EventEmitter2)
-- Available configuration is:
+- Available configuration:
 	- `concurrency`, defaults to `0` - how many items to run at the same time
 	- `pauseOnError`, defaults to `true` - if an error occurs in one of our items, should we stop executing any remaining items?
 		- setting to `false` will continue with execution with the other items even if an item experiences an error
 	- `pauseOnExit`, defaults to `true` - if we have completed, should we stop executing any future items?
 		- setting to `false` allows you to add more items that will execute right away, even after the first batch have completed
-- Available events are:
+- Available events:
 	- `run()` - fired just before we are about to execute
 	- `complete(err, results)` - fired when all our items have completed
 	- `task.run()` - fired just before a sub-task is about to execute
