@@ -49,9 +49,11 @@ tasks.run()
 #### Notes
 
 - Available methods:
-	- `setConfig(config)` - sets the configuration for the group
-	- `clear()` - clears remaining items
-	- `run()` - starts executing of the tasks
+	- `setConfig(config)` - sets the configuration for the group, returns chain
+	- `addTask(fn)` - adds a a new task item to our group, returns the new task object
+	- `addGroup()` - adds a new group item to our group, returns the new group object
+	- `clear()` - clears remaining items, returns chain
+	- `run()` - starts executing of the tasks, returns chain
 	- All those of [EventEmitter2](https://github.com/hij1nx/EventEmitter2)
 - Available configuration:
 	- `concurrency`, defaults to `0` - how many items to run at the same time
@@ -62,10 +64,10 @@ tasks.run()
 - Available events:
 	- `run()` - fired just before we are about to execute
 	- `complete(err, results)` - fired when all our items have completed
-	- `task.run()` - fired just before a sub-task is about to execute
-	- `task.complete(err, args...)` - fired when a sub-task have completed
-	- `group.run()` - fired just before a sub-group is about to execute
-	- `group.complete(err, results)` - fired when all a sub-groups items have completed
+	- `task.run()` - fired just before a task item is about to execute
+	- `task.complete(err, args...)` - fired when a task item has completed
+	- `group.run()` - fired just before a group item is about to execute
+	- `group.complete(err, results)` - fired when a group item has completed
 	- `item.run()` - fired just before an item is about to execute (fired for both sub-tasks and sub-groups)
 	- `item.complete(err, args...)` - fired when an item has completed (fired for both sub-task and sub-groups)
 
