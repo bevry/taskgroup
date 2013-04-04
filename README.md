@@ -84,7 +84,7 @@ group.addGroup(function(addGroup,addTask){
 group.run();
 ```
 
-### `require('taskgroup').TaskGroup`
+### require('taskgroup').TaskGroup
 
 - Available methods:
 	- `constructor(name?,fn?)` - create our new group, the arguments `name` and `fn` are optional, refer to their entries in configuration
@@ -113,7 +113,7 @@ group.run();
 	- `item.complete(err, args...)` - fired when an item has completed (fired for both sub-task and sub-groups)
 
 
-### `require('taskgroup').Task`
+### require('taskgroup').Task
 
 - Available methods:
 	- `constructor(name?,fn?)` - create our new task, the arguments `name` and `fn` are optional though `fn` must be set at some point, refer to their entries in configuration
