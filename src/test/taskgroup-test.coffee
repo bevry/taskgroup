@@ -1,7 +1,7 @@
 # Import
 {expect} = require('chai')
 joe = require('joe')
-{Task,TaskGroup,TestRunner} = require('../../')
+{Task,TaskGroup} = require('../../')
 
 # Prepare
 wait = (delay,fn) -> setTimeout(fn,delay)
@@ -128,7 +128,7 @@ joe.describe 'task', (describe,it) ->
 joe.describe 'taskgroup', (describe,it) ->
 	# Parallel
 	it 'should work when running in parallel', (done) ->
-		tasks = new TaskGroup().on 'complete', (err,results) ->
+		tasks = new TaskGroup().setConfig({concurrency:0}).on 'complete', (err,results) ->
 			expect(err).to.eql(null)
 			expect(results).to.eql([[null,5],[null,10]])
 			expect(tasks.remaining.length).to.eql(0)
@@ -178,7 +178,7 @@ joe.describe 'taskgroup', (describe,it) ->
 
 	# Error Parallel
 	it 'should handle error correctly in parallel', (done) ->
-		tasks = new TaskGroup().on 'complete', (err,results) ->
+		tasks = new TaskGroup().setConfig({concurrency:0}).on 'complete', (err,results) ->
 			expect(err.message).to.eql('deliberate error')
 			expect(results.length).to.eql(1)
 			expect(tasks.remaining.length).to.eql(0)
@@ -225,12 +225,12 @@ joe.describe 'taskgroup', (describe,it) ->
 
 
 # Test Runner
-joe.describe 'testrunner', (describe,it) ->
+joe.describe 'inline', (describe,it) ->
 	# Work
 	it 'should work', (done) ->
 		checks = 0
 
-		tasks = new TestRunner 'my tests', (addGroup,addTask) ->
+		tasks = new TaskGroup 'my tests', (addGroup,addTask) ->
 			expect(@name).to.eql('my tests')
 
 			addTask 'my task', (complete) ->

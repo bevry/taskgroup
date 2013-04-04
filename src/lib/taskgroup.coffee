@@ -1,5 +1,4 @@
 # Import
-typeChecker = require('typechecker')
 ambi = require('ambi')
 EventEmitter = require('eventemitter2').EventEmitter2
 
@@ -12,12 +11,18 @@ class Task extends EventEmitter
 	completed: false
 	parent: null
 
-	constructor: (fn) ->
+	constructor: (args...) ->
 		# Prepare
 		super
 
 		# Apply
-		@fn = fn  if fn
+		name = fn = null
+		if args.length
+			if args.length is 2
+				[name,fn] = args
+			else if args.length is 1
+				[fn] = args
+		@setConfig({name,fn})
 
 		# Chain
 		@
@@ -58,17 +63,18 @@ class Task extends EventEmitter
 class TaskGroup extends EventEmitter
 	running: 0
 	remaining: null
-	fn: null
 	err: null
 	results: null
 	parent: null
 
 	# Config
-	concurrency: 0
+	name: null
+	fn: null
+	concurrency: 1  # use 0 for unlimited
 	paused: true
 	pauseOnError: true  # needs testing
 	
-	constructor: (fn) ->
+	constructor: (args...) ->
 		# Init
 		super
 		@err = null
@@ -76,7 +82,13 @@ class TaskGroup extends EventEmitter
 		@remaining = []
 
 		# Apply
-		@fn = fn  if fn
+		name = fn = null
+		if args.length
+			if args.length is 2
+				[name,fn] = args
+			else if args.length is 1
+				[fn] = args
+		@setConfig({name,fn})
 
 		# Fire our function that adds our tasks before we run our tasks
 		@on 'run', =>
@@ -270,36 +282,6 @@ class TaskGroup extends EventEmitter
 
 		# Chain
 		@
-		
-
-# Task Runner
-class TaskRunner extends TaskGroup
-	concurrency: 1
-
-	constructor: (name,fn) ->
-		super()
-		@setConfig({name,fn})
-		@
-
-	createTask: (name,fn) =>
-		task = new Task().setConfig({name,fn})
-		return task
-
-	createGroup: (name,fn) =>
-		group = new TaskRunner().setConfig({name,fn})
-		return group
-
-# Test Runner
-class TestRunner extends TaskRunner
-	createGroup: (name,fn) =>
-		parent = @
-		group = new TestRunner().setConfig({name,parent,fn})
-		return group
-
-	describe: (args...) => @addGroup(args...)
-	suite: (args...) => @addGroup(args...)
-	it: (args...) => @addTask(args...)
-	test: (args...) => @addTask(args...)
 
 # Export
-module.exports = {Task,TaskGroup,TaskRunner,TestRunner}
+module.exports = {Task,TaskGroup}
