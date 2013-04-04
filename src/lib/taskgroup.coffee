@@ -7,6 +7,7 @@ EventEmitter = require('eventemitter2').EventEmitter2
 # - complete
 # - run
 class Task extends EventEmitter
+	type: 'task'  # for duck typing
 	fn: null
 	completed: false
 	parent: null
@@ -61,6 +62,7 @@ class Task extends EventEmitter
 # - complete
 # - run
 class TaskGroup extends EventEmitter
+	type: 'taskgroup'  # for duck typing
 	running: 0
 	remaining: null
 	err: null
