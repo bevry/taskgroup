@@ -124,6 +124,71 @@ joe.describe 'task', (describe,it) ->
 		task.run()
 
 
+	# Async
+	it 'should work with arguments in async', (done) ->
+		# Prepare
+		checks = 0
+
+		# Create
+		task = new Task (a,b,complete) ->
+			wait 500, ->
+				++checks
+				expect(task.completed).to.eql(false)
+				complete(null,a*b)
+
+		# Apply the arguments
+		task.setConfig(args:[2,5])
+
+		# Check
+		task.on 'complete', (err,result) ->
+			++checks
+			expect(task.completed).to.eql(true)
+			expect(err).to.eql(null)
+			expect(result).to.eql(10)
+
+		# Check
+		wait 1000, ->
+			++checks
+			expect(task.completed).to.eql(true)
+			expect(checks).to.eql(3)
+			done()
+
+		# Run
+		task.run()
+
+
+	# Async
+	it 'should work with arguments in sync', (done) ->
+		# Prepare
+		checks = 0
+
+		# Create
+		task = new Task (a,b) ->
+			++checks
+			expect(task.completed).to.eql(false)
+			return a*b
+
+		# Apply the arguments
+		task.setConfig(args:[2,5])
+
+		# Check
+		task.on 'complete', (err,result) ->
+			++checks
+			expect(task.completed).to.eql(true)
+			expect(err).to.eql(null)
+			expect(result).to.eql(10)
+
+		# Check
+		wait 1000, ->
+			++checks
+			expect(task.completed).to.eql(true)
+			expect(checks).to.eql(3)
+			done()
+
+		# Run
+		task.run()
+
+
 # Task Group
 joe.describe 'taskgroup', (describe,it) ->
 	# Parallel
@@ -260,3 +325,4 @@ joe.describe 'inline', (describe,it) ->
 			expect(err).to.eql(null)
 			expect(checks).to.eql(4)
 			done()
+

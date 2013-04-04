@@ -106,19 +106,19 @@ new require('taskgroup').TaskGroup()
 	- All those of [EventEmitter2](https://github.com/hij1nx/EventEmitter2)
 - Available configuration:
 	- `name`, no default - allows us to assign a name to the group, useful for debugging
-	- `fn(addGroup,addTask)`, no default - allows us to use an inline and self-executing style for defining groups, useful for nesting
+	- `fn(addGroup,addTask,complete?)`, no default - allows us to use an inline and self-executing style for defining groups, useful for nesting
 	- `concurrency`, defaults to `1` - how many items shall we allow to be run at the same time, set to `0` to allow unlimited
 	- `pauseOnError`, defaults to `true` - if an error occurs in one of our items, should we stop executing any remaining items?
 		- setting to `false` will continue with execution with the other items even if an item experiences an error
 - Available events:
 	- `run()` - fired just before we execute the items
 	- `complete(err, results)` - fired when all our items have completed
-	- `task.run()` - fired just before a task item executes
-	- `task.complete(err, args...)` - fired when a task item has completed
-	- `group.run()` - fired just before a group item executes
-	- `group.complete(err, results)` - fired when a group item has completed
-	- `item.run()` - fired just before an item executes (fired for both sub-tasks and sub-groups)
-	- `item.complete(err, args...)` - fired when an item has completed (fired for both sub-task and sub-groups)
+	- `task.run(task)` - fired just before a task item executes
+	- `task.complete(task, err, args...)` - fired when a task item has completed
+	- `group.run(group)` - fired just before a group item executes
+	- `group.complete(group, err, results)` - fired when a group item has completed
+	- `item.run(item)` - fired just before an item executes (fired for both sub-tasks and sub-groups)
+	- `item.complete(item, err, args...)` - fired when an item has completed (fired for both sub-task and sub-groups)
 
 
 ### Task API
@@ -134,6 +134,7 @@ new require('taskgroup').Task()
 - Available configuration:
 	- `name`, no default - allows us to assign a name to the group, useful for debugging
 	- `fn(complete?)`, no default - must be set at some point, it is the function to execute for the task, if it is asynchronous it should use the completion callback provided
+	- `args`, no default - an array of arguments that you would like to precede the completion callback when executing `fn`
 - Available events:
 	- `run()` - fired just before we execute the task
 	- `complete(err, args...)` - fired when the task has completed

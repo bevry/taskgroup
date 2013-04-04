@@ -10,10 +10,11 @@ class Task extends EventEmitter
 	type: 'task'  # for duck typing
 	completed: false
 	parent: null
-	
+
 	# Config
 	name: null
 	fn: null
+	args: null
 
 	constructor: (args...) ->
 		# Prepare
@@ -47,15 +48,17 @@ class Task extends EventEmitter
 
 			# Notify listeners we are now complete
 			@emit('complete', args...)
-		
+
 		# Notify our intention
 		@emit('run')
-		
+
 		# Give time for the listeners to complete before continuing
 		process.nextTick =>
 			# Run it
-			ambi(@fn.bind(@),complete)
-			
+			fn = @fn.bind(@)
+			args = (@args or []).concat([complete])
+			ambi(fn,args...)
+
 		# Chain
 		@
 
@@ -78,7 +81,7 @@ class TaskGroup extends EventEmitter
 	fn: null
 	concurrency: 1  # use 0 for unlimited
 	pauseOnError: true  # needs testing
-	
+
 	constructor: (args...) ->
 		# Init
 		super
@@ -95,19 +98,21 @@ class TaskGroup extends EventEmitter
 				[fn] = args
 		@setConfig({name,fn})
 
-		# Fire our function that adds our tasks before we run our tasks
-		@on 'run', =>
-			@fn?.call(@, @addGroup, @addTask)
-		
 		# Give setConfig enough chance to fire
 		process.nextTick =>
 			# Auto run if we are going the inline style and have no parent
-			@run()  if @fn and !@parent
+			if @fn
+				# Add the function as our first unamed task with the extra arguments
+				args = [@addGroup, @addTask]
+				@addTask(fn.bind(@)).setConfig({args,includeInResults:false})
+
+				# Proceed to run if we are the topmost group
+				@run()  if !@parent
 
 		# Handle item completion
-		@on 'item.complete', (args...) =>
+		@on 'item.complete', (item,args...) =>
 			# Add the result
-			@results.push(args)
+			@results.push(args)  if item.includeInResults isnt false
 
 			# Update error if it exists
 			@err = args[0]  if args[0]
@@ -120,7 +125,7 @@ class TaskGroup extends EventEmitter
 
 			# Continue or finish up
 			@nextItems()  unless @complete()
-		
+
 		# Chain
 		@
 
@@ -138,7 +143,7 @@ class TaskGroup extends EventEmitter
 
 		# Bubble item events
 		item.onAny (args...) ->
-			me.emit("item.#{@event}", args...)
+			me.emit("item.#{@event}", item, args...)
 
 		# Notify our intention
 		@emit('add',item)
@@ -162,10 +167,10 @@ class TaskGroup extends EventEmitter
 
 		# Create the task with our arguments
 		task = @createTask(args...).setConfig({parent:@})
-		
+
 		# Bubble task events
 		task.onAny (args...) ->
-			me.emit("task.#{@event}", args...)
+			me.emit("task.#{@event}", task, args...)
 
 		# Return the item
 		return @addItem(task)
@@ -183,7 +188,7 @@ class TaskGroup extends EventEmitter
 
 		# Bubble task events
 		group.onAny (args...) ->
-			me.emit("group.#{@event}", args...)
+			me.emit("group.#{@event}", group, args...)
 
 		# Return the item
 		return @addItem(group)
@@ -217,13 +222,13 @@ class TaskGroup extends EventEmitter
 				# Get the next item and remove it from the remaining items
 				nextItem = @remaining.shift()
 				++@running
-				
+
 				# Run it
 				nextItem.run()
 
 				# Return the item
 				return nextItem
-		
+
 		# Didn't fire another item
 		return false
 
@@ -252,14 +257,14 @@ class TaskGroup extends EventEmitter
 
 		# Chain
 		@
-		
+
 	stop: =>
 		# Stop further execution
 		@pause()
 
 		# Clear everything remaining
 		@clear()
-		
+
 		# Chain
 		@
 

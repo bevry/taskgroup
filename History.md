@@ -1,5 +1,10 @@
 ## History
 
+- v3.1.0 April 5, 2013
+	- Tasks can now have the arguments that are sent to them customized by the `args` configuration option
+	- Group inline functions now support an optional completion callback
+	- Group events for items now have their first argument as the item the event was for
+
 - v3.0.0 April 5, 2013
 	- Significant rewrite and b/c break
 
