@@ -29,16 +29,17 @@ Group together synchronous and asynchronous tasks and execute them in either ser
 # Create our group
 tasks = new TaskGroup().once 'complete', (err,results) ->
 	console.log(err)  # null
-	console.log(results) ###
-		[
-			[null, 'first'],
-			[null, 'second'],
-			[null, [
-				[null, 'sub second'],
-				[null, 'sub first']
-			]]
-		]
-		###
+	console.log(results)
+	###
+	[
+		[null, 'first'],
+		[null, 'second'],
+		[null, [
+			[null, 'sub second'],
+			[null, 'sub first']
+		]]
+	]
+	###
 
 # Add an asynchronous task
 tasks.addTask (complete) ->
