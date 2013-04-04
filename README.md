@@ -53,7 +53,7 @@ tasks.run()
 	- `clear()` - clears remaining items
 	- `run()` - starts executing of the tasks
 	- All those of [EventEmitter2](https://github.com/hij1nx/EventEmitter2)
-- Available configuration options are:
+- Available configuration is:
 	- `concurrency`, defaults to `0` - how many items to run at the same time
 	- `pauseOnError`, defaults to `true` - if an error occurs in one of our items, should we stop executing any remaining items?
 		- setting to `false` will continue with execution with the other items even if an item experiences an error
@@ -61,13 +61,13 @@ tasks.run()
 		- setting to `false` allows you to add more items that will execute right away, even after the first batch have completed
 - Available events are:
 	- `run()` - fired just before we are about to execute
-	- `complete(args...)` - fired when all our items have completed
+	- `complete(err, results)` - fired when all our items have completed
 	- `task.run()` - fired just before a sub-task is about to execute
-	- `task.complete(args...)` - fired when a sub-task have completed
+	- `task.complete(err, args...)` - fired when a sub-task have completed
 	- `group.run()` - fired just before a sub-group is about to execute
-	- `group.complete(args...)` - fired when all a sub-groups items have completed
+	- `group.complete(err, results)` - fired when all a sub-groups items have completed
 	- `item.run()` - fired just before an item is about to execute (fired for both sub-tasks and sub-groups)
-	- `item.complete(args...)` - fired when an item has completed (fired for both sub-task and sub-groups)
+	- `item.complete(err, args...)` - fired when an item has completed (fired for both sub-task and sub-groups)
 
 ## History
 You can discover the history inside the [History.md](https://github.com/bevry/taskgroup/blob/master/History.md#files) file
