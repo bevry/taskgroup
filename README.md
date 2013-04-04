@@ -58,7 +58,7 @@ group.addTask(function(complete){
 // Errors should be returned, though if an error is thrown we will catch it
 group.addTask(function(){
 	return 'second task';
-})
+});
 
 // Add a sub-group to our exiting group
 group.addGroup(function(addGroup,addTask){
@@ -70,13 +70,13 @@ group.addGroup(function(addGroup,addTask){
 	// Add an asynchronous task that gives its result to the completion callback
 	addTask(function(complete){
 		setTimeout(function(){
-			complete(null, 'sub first', 'task')
+			complete(null, 'sub first', 'task');
 		},500);
 	});
 
 	// Add a synchronous task that returns its result
 	addTask(function(){
-		return 'sub second task'
+		return 'sub second task';
 	});
 });
 
