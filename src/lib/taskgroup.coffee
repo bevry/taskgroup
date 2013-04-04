@@ -41,7 +41,7 @@ class Task extends EventEmitter
 		# Notify our intention
 		@emit('run')
 		
-		# Queue
+		# Give time for the listeners to complete before continuing
 		process.nextTick =>
 			# Run it
 			ambi(@fn.bind(@),complete)
@@ -242,14 +242,16 @@ class TaskGroup extends EventEmitter
 		# Notify our intention to run
 		@emit('run')
 
-		# Queue
-		if @hasItems() is false
-			# Complete if we have no tasks
-			# needs testing
-			@complete()
-		else
-			# We have tasks, so fire them
-			@nextItems()
+		# Give time for the listeners to complete before continuing
+		process.nextTick =>
+			# Run it
+			if @hasItems() is false
+				# Complete if we have no tasks
+				# needs testing
+				@complete()
+			else
+				# We have tasks, so fire them
+				@nextItems()
 
 		# Chain
 		@
