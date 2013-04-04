@@ -10,6 +10,7 @@ EventEmitter = require('eventemitter2').EventEmitter2
 class Task extends EventEmitter
 	fn: null
 	completed: false
+	parent: null
 
 	constructor: (fn) ->
 		# Prepare
@@ -57,20 +58,34 @@ class Task extends EventEmitter
 class TaskGroup extends EventEmitter
 	running: 0
 	remaining: null
+	fn: null
 	err: null
 	results: null
+	parent: null
 
 	# Config
 	concurrency: 0
 	paused: true
 	pauseOnError: true  # needs testing
 	
-	constructor: ->
+	constructor: (fn) ->
 		# Init
 		super
 		@err = null
 		@results = []
 		@remaining = []
+
+		# Apply
+		@fn = fn  if fn
+
+		# Fire our function that adds our tasks before we run our tasks
+		@on 'run', =>
+			@fn?.call(@, @addGroup, @addTask)
+		
+		# Give setConfig enough chance to fire
+		process.nextTick =>
+			# Auto run if we are going the inline style and have no parent
+			@run()  if @fn and !@parent
 
 		# Handle item completion
 		@on 'item.complete', (args...) =>
@@ -134,7 +149,7 @@ class TaskGroup extends EventEmitter
 		me = @
 
 		# Create the task with our arguments
-		task = @createTask(args...)
+		task = @createTask(args...).setConfig({parent:@})
 		
 		# Bubble task events
 		task.onAny (args...) ->
@@ -151,8 +166,8 @@ class TaskGroup extends EventEmitter
 		# Prepare
 		me = @
 
-		# Create the group with our arugments
-		group = @createGroup(args...)
+		# Create the group with our arguments
+		group = @createGroup(args...).setConfig({concurrency:@concurrency,parent:@})
 
 		# Bubble task events
 		group.onAny (args...) ->
@@ -259,35 +274,19 @@ class TaskGroup extends EventEmitter
 
 # Task Runner
 class TaskRunner extends TaskGroup
-	parent: null
 	concurrency: 1
 
-	constructor: (args...) ->
-		# Prepare
+	constructor: (name,fn) ->
 		super()
+		@setConfig({name,fn})
+		@
 
-		# Configure if we are going the constructor configuration route
-		if args.length
-			[name,fn] = args
-			@setConfig({name,fn})
-
-		# Fire our function that adds our tasks before we run our tasks
-		@on 'run', =>
-			@fn.call(@, @addGroup, @addTask)
-			@fn = null  # no need for it anymore
-		
-		# Give setConfig enough chance to fire
-		process.nextTick =>
-			@run()  unless @parent
-	
 	createTask: (name,fn) =>
-		parent = @
-		task = new Task().setConfig({name,parent,fn})
+		task = new Task().setConfig({name,fn})
 		return task
 
 	createGroup: (name,fn) =>
-		parent = @
-		group = new TaskRunner().setConfig({name,parent,fn})
+		group = new TaskRunner().setConfig({name,fn})
 		return group
 
 # Test Runner

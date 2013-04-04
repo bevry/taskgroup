@@ -27,14 +27,23 @@ Group together synchronous and asynchronous tasks and execute them in either ser
 {TaskGroup} = require('taskgroup')
 
 # Create our group
-tasks = new TaskGroup().setConfig({concurrency:1}).once 'complete', (err,results) ->
+tasks = new TaskGroup().once 'complete', (err,results) ->
 	console.log(err)  # null
-	console.log(results)  # [[null,'first'],[null,'second']]
+	console.log(results) ###
+		[
+			[null, 'second'],
+			[null, 'first'],
+			[null, [
+				[null, 'sub first'],
+				[null, 'sub second']
+			]]
+		]
+		###
 
 # Add an asynchronous task
 tasks.addTask (complete) ->
 	setTimeout(
-		-> complete(null,'first')
+		-> complete(null, 'first')
 		500
 	)
 
@@ -43,9 +52,22 @@ tasks.addTask ->
 	return 'second'
 
 # Add a group
-tasks.addGroup -> # todo
+tasks.addGroup (addGroup,addTask) ->
+	# Run these sub tasks in serial, so
+	# wait for each item to complete before moving onto the next item
+	# Normally the concurrency is inherited from the parent
+	@setConfig({concurrency:1})
+	
+	# Add an asynchronous task
+	@addTask (complete) ->
+		setTimeout(
+			-> complete(null, 'sub first')
+			1000
+		)
+
+	# Add a synchronous task
 	@addTask ->
-		return 'third'
+		return 'sub second'
 
 # Fire the tasks
 tasks.run()
@@ -54,9 +76,10 @@ tasks.run()
 #### Notes
 
 - Available methods:
+	- `constructor(fn?)` - `fn(addGroup,addTask)` is optional, it allows us to use an inline and self-executing style for defining groups
 	- `setConfig(config)` - sets the configuration for the group, returns chain
-	- `addTask(fn)` - adds a a new task item to our group, returns the new task item
-	- `addGroup()` - adds a new group item to our group, returns the new group item
+	- `addTask(args...)` - creates a new task item with the arguments and adds it to the group, returns the new task item
+	- `addGroup(args...)` - creates a new group item with the arguments and adds it to the group, returns the new group item
 	- `run()` - starts executing of the tasks, returns chain
 	- All those of [EventEmitter2](https://github.com/hij1nx/EventEmitter2)
 - Available configuration:
