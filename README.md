@@ -76,16 +76,16 @@ tasks.run()
 #### Notes
 
 - Available methods:
-	- `constructor(name?,fn?)` - creates our new group
+	- `constructor(name?,fn?)` - create our new group
 		- `name` is optional, allows us to assign a name to the group, useful for debugging
 		- `fn(addGroup,addTask)` is optional, allows us to use an inline and self-executing style for defining groups, useful for nesting
-	- `setConfig(config)` - sets the configuration for the group, returns chain
-	- `addTask(args...)` - creates a new task item with the arguments and adds it to the group, returns the new task item
-	- `addGroup(args...)` - creates a new group item with the arguments and adds it to the group, returns the new group item
-	- `clear()` - removed the remaining items to be executed
-	- `stop()` - clears and pauses
-	- `pause()` - pauses the execution of the items
-	- `run()` - starts/resumes executing of the items, returns chain
+	- `setConfig(config)` - set the configuration for the group, returns chain
+	- `addTask(args...)` - create a new task item with the arguments and adds it to the group, returns the new task item
+	- `addGroup(args...)` - create a new group item with the arguments and adds it to the group, returns the new group item
+	- `clear()` - remove the remaining items to be executed
+	- `stop()` - clear and pause
+	- `pause()` - pause the execution of the items
+	- `run()` - start/resume executing of the items, returns chain
 	- All those of [EventEmitter2](https://github.com/hij1nx/EventEmitter2)
 - Available configuration:
 	- `concurrency`, defaults to `1` - how many items shall we allow to be run at the same time, set to `0` to allow unlimited
