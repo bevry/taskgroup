@@ -84,7 +84,11 @@ group.addGroup(function(addGroup,addTask){
 group.run();
 ```
 
-### TaskGroup: `new require('taskgroup').TaskGroup()`
+### TaskGroup API
+
+``` javascript
+new require('taskgroup').TaskGroup()
+```
 
 - Available methods:
 	- `constructor(name?,fn?)` - create our new group, the arguments `name` and `fn` are optional, refer to their entries in configuration
@@ -113,7 +117,11 @@ group.run();
 	- `item.complete(err, args...)` - fired when an item has completed (fired for both sub-task and sub-groups)
 
 
-### Task: `new require('taskgroup').Task()`
+### Task API
+
+``` javascript
+new require('taskgroup').Task()
+```
 
 - Available methods:
 	- `constructor(name?,fn?)` - create our new task, the arguments `name` and `fn` are optional though `fn` must be set at some point, refer to their entries in configuration
