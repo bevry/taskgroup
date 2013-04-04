@@ -50,7 +50,7 @@ group.once('complete', function(err,results){
 // Add an asynchronous task that gives the result to the completion callback
 group.addTask(function(complete){
 	setTimeout(function(){
-		complete(null,'first','task');
+		complete(null, 'first', 'task');
 	},500);
 });
 
