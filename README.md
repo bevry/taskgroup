@@ -27,20 +27,25 @@ Group together synchronous and asynchronous tasks and execute them in either ser
 {TaskGroup} = require('taskgroup')
 
 # Create our group
-tasks = new TaskGroup().once 'complete', (err,results) ->
+tasks = new TaskGroup().setConfig({concurrency:1}).once 'complete', (err,results) ->
 	console.log(err)  # null
-	console.log(results)  # [[null,10],[null,5]]
+	console.log(results)  # [[null,'first'],[null,'second']]
 
 # Add an asynchronous task
 tasks.addTask (complete) ->
 	setTimeout(
-		-> complete(null,5)
+		-> complete(null,'first')
 		500
 	)
 
 # Add a synchronous task
 tasks.addTask ->
-	return 10
+	return 'second'
+
+# Add a group
+tasks.addGroup -> # todo
+	@addTask ->
+		return 'third'
 
 # Fire the tasks
 tasks.run()
