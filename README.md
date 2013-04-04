@@ -26,10 +26,11 @@ Group together synchronous and asynchronous tasks and execute them in either ser
 # Import
 {TaskGroup} = require('taskgroup')
 
+
 # Create our group
 tasks = new TaskGroup().once 'complete', (err,results) ->
 	console.log(err)  # null
-	console.log(results)
+	console.log(JSON.stringify results)
 	###
 	[
 		[null, 'first'],

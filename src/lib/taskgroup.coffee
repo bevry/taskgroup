@@ -113,13 +113,8 @@ class TaskGroup extends EventEmitter
 			# Already exited?
 			return  if @paused
 
-			# If we have no more items or if we have an error
-			if (@pauseOnError and @err) or (@hasItems() is false and @running is 0)
-				# Complete
-				@complete()
-			else
-				# Otherwise continue with the next item
-				@nextItems()	
+			# Continue or finish up
+			@nextItems()  unless @complete()
 		
 		# Chain
 		@
@@ -228,18 +223,23 @@ class TaskGroup extends EventEmitter
 		return false
 
 	complete: =>
-		# Pause under error condition
-		@pause()  if @pauseOnError and @err
+		pause = @pauseOnError and @err
+		empty = @hasItems() is false and @running is 0
+		completed = pause or empty
 
-		# Notify we've completed and send the error and results if we have them
-		@emit('complete',@err,@results)
+		if completed
+			# Pause if desired
+			@pause()  if pause
 
-		# Reset the error and results to build up again for the next completion
-		@err = null
-		@results = []
+			# Notify we've completed and send the error and results if we have them
+			@emit('complete',@err,@results)
 
-		# Chain
-		@
+			# Reset the error and results to build up again for the next completion
+			@err = null
+			@results = []
+
+		# Return result
+		return completed
 
 	clear: =>
 		# Removes all the items from remaining
@@ -271,14 +271,8 @@ class TaskGroup extends EventEmitter
 
 		# Give time for the listeners to complete before continuing
 		process.nextTick =>
-			# Run it
-			if @hasItems() is false
-				# Complete if we have no tasks
-				# needs testing
-				@complete()
-			else
-				# We have tasks, so fire them
-				@nextItems()
+			# Continue or finish up
+			@nextItems()  unless @complete()
 
 		# Chain
 		@
