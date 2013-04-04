@@ -18,66 +18,76 @@ Group together synchronous and asynchronous tasks and execute them, supports nes
 
 ## Usage
 
-### TaskGroup
+### Example
 
-#### Example
+``` javascript
+// Import
+var TaskGroup = require('taskgroup').TaskGroup;
 
-``` coffeescript
-# Import
-{TaskGroup} = require('taskgroup')
+// Create our new group
+var group = new TaskGroup();
 
-# Create our group
-group = new TaskGroup().once 'complete', (err,results) ->
-	console.log(err)  # null
-	console.log(JSON.stringify results)
-	###
-	[
-		[null, 'first'],
-		[null, 'second'],
-		[null, [
-			[null, 'sub second'],
-			[null, 'sub first']
-		]]
-	]
-	###
+// Define what should happen once the group has completed
+group.once('complete', function(err,results){
+	// Log the error that has occured
+	console.log(err);
+	// => null
 
-# Add an asynchronous task
-group.addTask (complete) ->
-	setTimeout(
-		-> complete(null, 'first')
-		500
-	)
+	// Log the results that our group received from the executing items
+	console.log(JSON.stringify(results));
+	/*	=>
+		[
+			[null, 'first', 'task'],
+			[null, 'second task'],
+			[null, [
+				[null, 'sub second task'],
+				[null, 'sub first', 'task']
+			]]
+		]
+	*/
+});
 
-# Add a synchronous task
-group.addTask ->
-	return 'second'
+// Add an asynchronous task that gives the result to the completion callback
+group.addTask(function(complete){
+	setTimeout(function(){
+		complete(null,'first','task');
+	},500);
+});
 
-# Add a group
-group.addGroup (addGroup,addTask) ->
-	# Tell this sub group to execute in parallel
-	@setConfig({concurrency:0})
+// Add a synchronous task that returns the result
+// Errors should be returned, though if an error is thrown we will catch it
+group.addTask(function(){
+	return 'second task';
+})
 
-	# Add an asynchronous task
-	@addTask (complete) ->
-		setTimeout(
-			-> complete(null, 'sub first')
-			1000
-		)
+// Add a sub-group to our exiting group
+group.addGroup(function(addGroup,addTask){
+	// Tell this sub-group to execute in parallel (all at once) by setting its concurrency to unlimited
+	// by default the concurrency for all groups is set to 1
+	// which means that they execute in serial fashion (one after the other, instead of all at once)
+	this.setConfig({concurrency:0});
 
-	# Add a synchronous task
-	@addTask ->
-		return 'sub second'
+	// Add an asynchronous task that gives its result to the completion callback
+	addTask(function(complete){
+		setTimeout(function(){
+			complete(null, 'sub first', 'task')
+		},500);
+	});
 
-# Execute the items in the group
-group.run()
+	// Add a synchronous task that returns its result
+	addTask(function(){
+		return 'sub second task'
+	});
+});
+
+// Begin executing our group!
+group.run();
 ```
 
-#### Notes
+### `require('taskgroup').TaskGroup`
 
 - Available methods:
-	- `constructor(name?,fn?)` - create our new group
-		- `name` is optional, allows us to assign a name to the group, useful for debugging
-		- `fn(addGroup,addTask)` is optional, allows us to use an inline and self-executing style for defining groups, useful for nesting
+	- `constructor(name?,fn?)` - create our new group, the arguments `name` and `fn` are optional, refer to their entries in configuration
 	- `setConfig(config)` - set the configuration for the group, returns chain
 	- `addTask(args...)` - create a new task item with the arguments and adds it to the group, returns the new task item
 	- `addGroup(args...)` - create a new group item with the arguments and adds it to the group, returns the new group item
@@ -87,18 +97,36 @@ group.run()
 	- `run()` - start/resume executing of the items, returns chain
 	- All those of [EventEmitter2](https://github.com/hij1nx/EventEmitter2)
 - Available configuration:
+	- `name`, no default - allows us to assign a name to the group, useful for debugging
+	- `fn(addGroup,addTask)`, no default - allows us to use an inline and self-executing style for defining groups, useful for nesting
 	- `concurrency`, defaults to `1` - how many items shall we allow to be run at the same time, set to `0` to allow unlimited
 	- `pauseOnError`, defaults to `true` - if an error occurs in one of our items, should we stop executing any remaining items?
 		- setting to `false` will continue with execution with the other items even if an item experiences an error
 - Available events:
-	- `run()` - fired just before we are about to execute the items
+	- `run()` - fired just before we execute the items
 	- `complete(err, results)` - fired when all our items have completed
-	- `task.run()` - fired just before a task item is about to execute
+	- `task.run()` - fired just before a task item executes
 	- `task.complete(err, args...)` - fired when a task item has completed
-	- `group.run()` - fired just before a group item is about to execute
+	- `group.run()` - fired just before a group item executes
 	- `group.complete(err, results)` - fired when a group item has completed
-	- `item.run()` - fired just before an item is about to execute (fired for both sub-tasks and sub-groups)
+	- `item.run()` - fired just before an item executes (fired for both sub-tasks and sub-groups)
 	- `item.complete(err, args...)` - fired when an item has completed (fired for both sub-task and sub-groups)
+
+
+### `require('taskgroup').Task`
+
+- Available methods:
+	- `constructor(name?,fn?)` - create our new task, the arguments `name` and `fn` are optional though `fn` must be set at some point, refer to their entries in configuration
+	- `setConfig(config)` - set the configuration for the group, returns chain
+	- `run()` - execute the task
+- Available configuration:
+	- `name`, no default - allows us to assign a name to the group, useful for debugging
+	- `fn(complete?)`, no default - must be set at some point, it is the function to execute for the task, if it is asynchronous it should use the completion callback provided
+- Available events:
+	- `run()` - fired just before we execute the task
+	- `complete(err, args...)` - fired when the task has completed
+
+
 
 ## History
 You can discover the history inside the [History.md](https://github.com/bevry/taskgroup/blob/master/History.md#files) file

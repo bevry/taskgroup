@@ -8,9 +8,12 @@ EventEmitter = require('eventemitter2').EventEmitter2
 # - run
 class Task extends EventEmitter
 	type: 'task'  # for duck typing
-	fn: null
 	completed: false
 	parent: null
+	
+	# Config
+	name: null
+	fn: null
 
 	constructor: (args...) ->
 		# Prepare
@@ -68,12 +71,12 @@ class TaskGroup extends EventEmitter
 	err: null
 	results: null
 	parent: null
+	paused: true
 
 	# Config
 	name: null
 	fn: null
 	concurrency: 1  # use 0 for unlimited
-	paused: true
 	pauseOnError: true  # needs testing
 	
 	constructor: (args...) ->
