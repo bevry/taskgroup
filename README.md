@@ -50,8 +50,8 @@ tasks.run()
 
 - Available methods:
 	- `setConfig(config)` - sets the configuration for the group, returns chain
-	- `addTask(fn)` - adds a a new task item to our group, returns the new task object
-	- `addGroup()` - adds a new group item to our group, returns the new group object
+	- `addTask(fn)` - adds a a new task item to our group, returns the new task item
+	- `addGroup()` - adds a new group item to our group, returns the new group item
 	- `clear()` - clears remaining items, returns chain
 	- `run()` - starts executing of the tasks, returns chain
 	- All those of [EventEmitter2](https://github.com/hij1nx/EventEmitter2)
