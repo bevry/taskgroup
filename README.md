@@ -27,7 +27,7 @@ Group together synchronous and asynchronous tasks and execute them, supports nes
 {TaskGroup} = require('taskgroup')
 
 # Create our group
-tasks = new TaskGroup().once 'complete', (err,results) ->
+group = new TaskGroup().once 'complete', (err,results) ->
 	console.log(err)  # null
 	console.log(JSON.stringify results)
 	###
@@ -42,19 +42,19 @@ tasks = new TaskGroup().once 'complete', (err,results) ->
 	###
 
 # Add an asynchronous task
-tasks.addTask (complete) ->
+group.addTask (complete) ->
 	setTimeout(
 		-> complete(null, 'first')
 		500
 	)
 
 # Add a synchronous task
-tasks.addTask ->
+group.addTask ->
 	return 'second'
 
 # Add a group
-tasks.addGroup (addGroup,addTask) ->
-	# Tell this group to execute in parallel
+group.addGroup (addGroup,addTask) ->
+	# Tell this sub group to execute in parallel
 	@setConfig({concurrency:0})
 
 	# Add an asynchronous task
@@ -68,8 +68,8 @@ tasks.addGroup (addGroup,addTask) ->
 	@addTask ->
 		return 'sub second'
 
-# Fire the tasks
-tasks.run()
+# Execute the items in the group
+group.run()
 ```
 
 #### Notes
