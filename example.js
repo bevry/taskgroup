@@ -57,5 +57,5 @@ group.addGroup(function(addGroup,addTask){
 	});
 });
 
-// Begin executing our group!
+// Execute our group
 group.run();

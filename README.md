@@ -1,5 +1,9 @@
-# Task Group [![Build Status](https://secure.travis-ci.org/bevry/taskgroup.png?branch=master)](http://travis-ci.org/bevry/taskgroup)
-Group together synchronous and asynchronous tasks and execute them, supports nested groups, naming, and concurrency
+# Task Group
+
+[![Build Status](https://secure.travis-ci.org/bevry/taskgroup.png?branch=master)](http://travis-ci.org/bevry/taskgroup)
+[![NPM version](https://badge.fury.io/js/taskgroup.png)](https://npmjs.org/package/taskgroup)
+
+Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.
 
 
 
@@ -80,7 +84,7 @@ group.addGroup(function(addGroup,addTask){
 	});
 });
 
-// Begin executing our group!
+// Execute our group
 group.run();
 ```
 
@@ -98,7 +102,7 @@ new require('taskgroup').TaskGroup()
 	- `clear()` - remove the remaining items to be executed
 	- `stop()` - clear and pause
 	- `pause()` - pause the execution of the items
-	- `run()` - start/resume executing of the items, returns chain
+	- `run()` - start/resume executing the items, returns chain
 	- All those of [EventEmitter2](https://github.com/hij1nx/EventEmitter2)
 - Available configuration:
 	- `name`, no default - allows us to assign a name to the group, useful for debugging

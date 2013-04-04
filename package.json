@@ -1,7 +1,7 @@
 {
 	"name": "taskgroup",
-	"version": "2.0.0",
-	"description": "Group together synchronous and asynchronous tasks and execute them in either serial or parallel",
+	"version": "3.0.0",
+	"description": "Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.",
 	"homepage": "https://github.com/bevry/taskgroup",
 	"keywords": [
 		"flow",
@@ -9,7 +9,8 @@
 		"async",
 		"sync",
 		"tasks",
-		"batch"
+		"batch",
+		"concurrency"
 	],
 	"author": "Bevry Pty Ltd <us@bevry.me> (http://bevry.me)",
 	"maintainers": [
@@ -30,7 +31,6 @@
 	},
 	"dependencies": {
 		"ambi": "~2.0.0",
-		"typechecker": "~2.0.1",
 		"eventemitter2": "~0.4.11"
 	},
 	"devDependencies": {
