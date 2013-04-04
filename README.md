@@ -1,5 +1,5 @@
 # Task Group [![Build Status](https://secure.travis-ci.org/bevry/taskgroup.png?branch=master)](http://travis-ci.org/bevry/taskgroup)
-Group together synchronous and asynchronous tasks and execute them in either serial or parallel
+Group together synchronous and asynchronous tasks and execute them, supports nested groups, naming, and concurrency
 
 
 
