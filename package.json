@@ -1,6 +1,6 @@
 {
 	"name": "taskgroup",
-	"version": "3.1.0",
+	"version": "3.1.1",
 	"description": "Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.",
 	"homepage": "https://github.com/bevry/taskgroup",
 	"keywords": [

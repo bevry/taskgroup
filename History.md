@@ -1,5 +1,9 @@
 ## History
 
+- v3.1.1 April 5, 2013
+	- Fixed task run issue under certain circumstances
+	- Added `exit(err)` function
+
 - v3.1.0 April 5, 2013
 	- Tasks can now have the arguments that are sent to them customized by the `args` configuration option
 	- Group inline functions now support an optional completion callback

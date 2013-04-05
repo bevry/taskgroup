@@ -100,8 +100,9 @@ new require('taskgroup').TaskGroup()
 	- `addTask(args...)` - create a new task item with the arguments and adds it to the group, returns the new task item
 	- `addGroup(args...)` - create a new group item with the arguments and adds it to the group, returns the new group item
 	- `clear()` - remove the remaining items to be executed
-	- `stop()` - clear and pause
 	- `pause()` - pause the execution of the items
+	- `stop()` - clear and pause
+	- `exit(err)` - stop and complete, `err` if specified is sent to the completion event when fired
 	- `run()` - start/resume executing the items, returns chain
 	- All those of [EventEmitter2](https://github.com/hij1nx/EventEmitter2)
 - Available configuration:

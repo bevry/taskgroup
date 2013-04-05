@@ -55,9 +55,8 @@ class Task extends EventEmitter
 		# Give time for the listeners to complete before continuing
 		process.nextTick =>
 			# Run it
-			fn = @fn.bind(@)
 			args = (@args or []).concat([complete])
-			ambi(fn,args...)
+			ambi(@fn.bind(@), args...)
 
 		# Chain
 		@
@@ -104,7 +103,7 @@ class TaskGroup extends EventEmitter
 			if @fn
 				# Add the function as our first unamed task with the extra arguments
 				args = [@addGroup, @addTask]
-				@addTask(fn.bind(@)).setConfig({args,includeInResults:false})
+				@addTask(@fn.bind(@)).setConfig({args,includeInResults:false})
 
 				# Proceed to run if we are the topmost group
 				@run()  if !@parent
@@ -118,7 +117,7 @@ class TaskGroup extends EventEmitter
 			@err = args[0]  if args[0]
 
 			# Mark that one less item is running
-			--@running
+			--@running  if @running > 0
 
 			# Already exited?
 			return  if @paused
@@ -264,6 +263,22 @@ class TaskGroup extends EventEmitter
 
 		# Clear everything remaining
 		@clear()
+
+		# Chain
+		@
+
+	exit: (err) =>
+		# Apply
+		@err = err  if err
+
+		# Clear
+		@stop()
+
+		# Stop running
+		@running = 0
+
+		# Complete
+		@complete()
 
 		# Chain
 		@
