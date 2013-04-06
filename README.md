@@ -99,10 +99,12 @@ new require('taskgroup').TaskGroup()
 	- `setConfig(config)` - set the configuration for the group, returns chain
 	- `addTask(args...)` - create a new task item with the arguments and adds it to the group, returns the new task item
 	- `addGroup(args...)` - create a new group item with the arguments and adds it to the group, returns the new group item
+	- `getTotals()` - returns counts for the following `{running,remaining,completed,total}`
 	- `clear()` - remove the remaining items to be executed
 	- `pause()` - pause the execution of the items
 	- `stop()` - clear and pause
 	- `exit(err)` - stop and complete, `err` if specified is sent to the completion event when fired
+	- `complete()` - will fire the completion event if we are already complete, useful if you're binding your listeners after run
 	- `run()` - start/resume executing the items, returns chain
 	- All those of [EventEmitter2](https://github.com/hij1nx/EventEmitter2)
 - Available configuration:
@@ -131,6 +133,7 @@ new require('taskgroup').Task()
 - Available methods:
 	- `constructor(name?,fn?)` - create our new task, the arguments `name` and `fn` are optional though `fn` must be set at some point, refer to their entries in configuration
 	- `setConfig(config)` - set the configuration for the group, returns chain
+	- `complete()` - will fire the completion event if we are already complete, useful if you're binding your listeners after run
 	- `run()` - execute the task
 - Available configuration:
 	- `name`, no default - allows us to assign a name to the group, useful for debugging

@@ -1,5 +1,9 @@
 ## History
 
+- v3.1.2 April 6, 2013
+	- Added `getTotals()` to `TaskGroup`
+	- Added `complete()` to `Task`
+
 - v3.1.1 April 5, 2013
 	- Fixed task run issue under certain circumstances
 	- Added `exit(err)` function

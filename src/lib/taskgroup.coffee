@@ -8,7 +8,8 @@ EventEmitter = require('eventemitter2').EventEmitter2
 # - run
 class Task extends EventEmitter
 	type: 'task'  # for duck typing
-	completed: false
+	result: null
+	running: false
 	parent: null
 
 	# Config
@@ -44,12 +45,14 @@ class Task extends EventEmitter
 		# What happens once the task is complete
 		complete = (args...) =>
 			# Update our status
-			@completed = true
+			@running = false
+			@result = args
 
-			# Notify listeners we are now complete
-			@emit('complete', args...)
+			# Complete
+			@complete()
 
 		# Notify our intention
+		@running = true
 		@emit('run')
 
 		# Give time for the listeners to complete before continuing
@@ -60,6 +63,19 @@ class Task extends EventEmitter
 
 		# Chain
 		@
+
+	complete: ->
+		# Determine completion
+		completed = @result? and @running is false
+
+		# Continue completion
+		if completed
+			# Notify our listeners
+			@emit('complete', @result...)
+
+		# Return completion
+		return completed
+
 
 # Task Group
 # Events
@@ -135,6 +151,13 @@ class TaskGroup extends EventEmitter
 
 		# Chain
 		@
+
+	getTotals: ->
+		running = @running
+		remaining = @remaining.length
+		completed = @results.length
+		total = running + remaining + completed
+		return {running,remaining,completed,total}
 
 	addItem: (item) =>
 		# Prepare
@@ -232,10 +255,12 @@ class TaskGroup extends EventEmitter
 		return false
 
 	complete: =>
+		# Determine completion
 		pause = @pauseOnError and @err
 		empty = @hasItems() is false and @running is 0
 		completed = pause or empty
 
+		# Continue with completion
 		if completed
 			# Pause if desired
 			@pause()  if pause

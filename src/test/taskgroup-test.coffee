@@ -17,20 +17,19 @@ joe.describe 'task', (describe,it) ->
 		task = new Task (complete) ->
 			wait 500, ->
 				++checks
-				expect(task.completed).to.eql(false)
+				expect(task.result).to.eql(null)
 				complete(null,10)
 
 		# Check
 		task.on 'complete', (err,result) ->
 			++checks
-			expect(task.completed).to.eql(true)
+			expect(task.result).to.eql([err,result])
 			expect(err).to.eql(null)
 			expect(result).to.eql(10)
 
 		# Check
 		wait 1000, ->
 			++checks
-			expect(task.completed).to.eql(true)
 			expect(checks).to.eql(3)
 			done()
 
@@ -45,20 +44,19 @@ joe.describe 'task', (describe,it) ->
 		# Create
 		task = new Task ->
 			++checks
-			expect(task.completed).to.eql(false)
+			expect(task.result).to.eql(null)
 			return 10
 
 		# Check
 		task.on 'complete', (err,result) ->
 			++checks
-			expect(task.completed).to.eql(true)
+			expect(task.result).to.eql([err,result])
 			expect(err).to.eql(null)
 			expect(result).to.eql(10)
 
 		# Check
 		wait 1000, ->
 			++checks
-			expect(task.completed).to.eql(true)
 			expect(checks).to.eql(3)
 			done()
 
@@ -74,20 +72,19 @@ joe.describe 'task', (describe,it) ->
 		task = new Task (complete) ->
 			wait 500, ->
 				++checks
-				expect(task.completed).to.eql(false)
+				expect(task.result).to.eql(null)
 				err = new Error('deliberate error')
 				complete(err)
 
 		# Check
 		task.on 'complete', (err) ->
 			++checks
-			expect(task.completed).to.eql(true)
+			expect(task.result).to.eql([err])
 			expect(err.message).to.eql('deliberate error')
 
 		# Check
 		wait 1000, ->
 			++checks
-			expect(task.completed).to.eql(true)
 			expect(checks).to.eql(3)
 			done()
 
@@ -103,20 +100,19 @@ joe.describe 'task', (describe,it) ->
 		# Create
 		task = new Task ->
 			++checks
-			expect(task.completed).to.eql(false)
+			expect(task.result).to.eql(null)
 			err = new Error('deliberate error')
 			return err
 
 		# Check
 		task.on 'complete', (err) ->
 			++checks
-			expect(task.completed).to.eql(true)
+			expect(task.result).to.eql([err])
 			expect(err.message).to.eql('deliberate error')
 
 		# Check
 		wait 1000, ->
 			++checks
-			expect(task.completed).to.eql(true)
 			expect(checks).to.eql(3)
 			done()
 
@@ -133,7 +129,7 @@ joe.describe 'task', (describe,it) ->
 		task = new Task (a,b,complete) ->
 			wait 500, ->
 				++checks
-				expect(task.completed).to.eql(false)
+				expect(task.result).to.eql(null)
 				complete(null,a*b)
 
 		# Apply the arguments
@@ -142,14 +138,13 @@ joe.describe 'task', (describe,it) ->
 		# Check
 		task.on 'complete', (err,result) ->
 			++checks
-			expect(task.completed).to.eql(true)
+			expect(task.result).to.eql([err,result])
 			expect(err).to.eql(null)
 			expect(result).to.eql(10)
 
 		# Check
 		wait 1000, ->
 			++checks
-			expect(task.completed).to.eql(true)
 			expect(checks).to.eql(3)
 			done()
 
@@ -165,7 +160,7 @@ joe.describe 'task', (describe,it) ->
 		# Create
 		task = new Task (a,b) ->
 			++checks
-			expect(task.completed).to.eql(false)
+			expect(task.result).to.eql(null)
 			return a*b
 
 		# Apply the arguments
@@ -174,14 +169,13 @@ joe.describe 'task', (describe,it) ->
 		# Check
 		task.on 'complete', (err,result) ->
 			++checks
-			expect(task.completed).to.eql(true)
+			expect(task.result).to.eql([err,result])
 			expect(err).to.eql(null)
 			expect(result).to.eql(10)
 
 		# Check
 		wait 1000, ->
 			++checks
-			expect(task.completed).to.eql(true)
 			expect(checks).to.eql(3)
 			done()
 
