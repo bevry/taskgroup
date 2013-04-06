@@ -91,7 +91,7 @@ group.run();
 ### TaskGroup API
 
 ``` javascript
-new require('taskgroup').TaskGroup()
+new (require('taskgroup')).TaskGroup()
 ```
 
 - Available methods:
@@ -127,7 +127,7 @@ new require('taskgroup').TaskGroup()
 ### Task API
 
 ``` javascript
-new require('taskgroup').Task()
+new (require('taskgroup')).Task()
 ```
 
 - Available methods:
