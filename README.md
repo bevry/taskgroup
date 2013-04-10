@@ -2,6 +2,7 @@
 
 [![Build Status](https://secure.travis-ci.org/bevry/taskgroup.png?branch=master)](http://travis-ci.org/bevry/taskgroup)
 [![NPM version](https://badge.fury.io/js/taskgroup.png)](https://npmjs.org/package/taskgroup)
+[![Flattr this project](https://raw.github.com/balupton/flattr-buttons/master/badge-89x18.gif)](http://flattr.com/thing/344188/balupton-on-Flattr)
 
 Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.
 
