@@ -145,7 +145,8 @@ new (require('taskgroup')).Task()
 	- `complete(err, args...)` - fired when the task has completed
 
 
-### [Async.js](https://github.com/caolan/async) Comparison
+
+## Comparison with [Async.js](https://github.com/caolan/async)
 
 The advantage of TaskGroup over async.js is that TaskGroup has one uniform API to rule them all, whereas with async.js I found that I was always having to keep referring to the async manual to try and figure out which is the right call for my use case then somehow wrap my head around the async.js way of doing things (which more often than not I couldn't), whereas with TaskGroup I never have that problem as it is one consistent API for all the different use cases.
 
