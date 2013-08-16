@@ -5,92 +5,195 @@ joe = require('joe')
 
 # Prepare
 wait = (delay,fn) -> setTimeout(fn,delay)
+delay = 100
 
 # Task
 joe.describe 'task', (describe,it) ->
 	# Async
+	# Test that the task executes correctly asynchronously
 	it 'should work with async', (done) ->
-		# Prepare
+		# Specify how many special checks we are expecting
 		checks = 0
 
-		# Create
+		# Create our asynchronous task
 		task = new Task (complete) ->
-			wait 500, ->
+			# Wait a while as this is an async test
+			wait delay, ->
 				++checks
-				expect(task.result).to.eql(null)
+				expect(task.result, "result to be null as we haven't set it yet").to.eql(null)
+				# Return no error, and the result to the completion callback completing the task
 				complete(null,10)
 
-		# Check
+		# Check the task completed as expected
 		task.on 'complete', (err,result) ->
 			++checks
-			expect(task.result).to.eql([err,result])
-			expect(err).to.eql(null)
-			expect(result).to.eql(10)
+			expect(task.result, "the set result to be as expected as the task has completed").to.eql([err,result])
+			expect(err, "the callback error to be null as we did not error").to.eql(null)
+			expect(result, "the callback result to be as expected").to.eql(10)
 
-		# Check
-		wait 1000, ->
-			++checks
-			expect(checks).to.eql(3)
-			done()
+		# Check task hasn't run yet
+		expect(task.running, "running to be false as we haven't started running yet").to.eql(false)
+		expect(task.result, "result to be null as we haven't started running yet").to.eql(null)
 
-		# Run
+		# Run thet ask
 		task.run()
+
+		# Check that task has started running
+		expect(task.running, 'running to be true as tasks execute asynchronously').to.eql(true)
+		expect(task.result, 'result to be null as tasks execute asynchronously').to.eql(null)
+
+		# Check that all our special checks have run
+		wait delay*2, ->
+			++checks
+			expect(checks, "all our special checks have run").to.eql(3)
+			done()
 
 	# Sync
+	# Test that the task
 	it 'should work with sync', (done) ->
-		# Prepare
+		# Specify how many special checks we are expecting
 		checks = 0
 
-		# Create
+		# Create our synchronous task
 		task = new Task ->
 			++checks
-			expect(task.result).to.eql(null)
+			expect(task.result, "result to be null as we haven't set it yet").to.eql(null)
+			# Return our result completing the task
 			return 10
 
-		# Check
+		# Check the task completed as expected
 		task.on 'complete', (err,result) ->
 			++checks
-			expect(task.result).to.eql([err,result])
-			expect(err).to.eql(null)
-			expect(result).to.eql(10)
+			expect(task.result, "the set result to be as expected as the task has completed").to.eql([err,result])
+			expect(err, "the callback error to be null as we did not error").to.eql(null)
+			expect(result, "the callback result to be as expected").to.eql(10)
 
-		# Check
-		wait 1000, ->
-			++checks
-			expect(checks).to.eql(3)
-			done()
+		# Check task hasn't run yet
+		expect(task.running, "running to be false as we haven't started running yet").to.eql(false)
+		expect(task.result, "result to be null as we haven't started running yet").to.eql(null)
 
 		# Run
 		task.run()
 
-	# Async
-	it 'should detect async error', (done) ->
-		# Prepare
-		checks = 0
+		# Check that task has started running
+		expect(task.running, 'running to be true as tasks execute asynchronously').to.eql(true)
+		expect(task.result, 'result to be null as tasks execute asynchronously').to.eql(null)
 
-		# Create
-		task = new Task (complete) ->
-			wait 500, ->
+		# Check that all our special checks have run
+		wait delay, ->
+			++checks
+			expect(checks, "all our special checks have run").to.eql(3)
+			done()
+
+	# Error Handling
+	describe "error handling", (suite,it) ->
+		it 'should detect synchronous error via returning', (done) ->
+			# Specify how many special checks we are expecting
+			checks = 0
+			err = new Error('deliberate error')
+
+			# Create our synchronous task
+			task = new Task ->
 				++checks
-				expect(task.result).to.eql(null)
-				err = new Error('deliberate error')
-				complete(err)
+				expect(task.result, "result to be null as we haven't set it yet").to.eql(null)
+				return err
 
-		# Check
-		task.on 'complete', (err) ->
-			++checks
-			expect(task.result).to.eql([err])
-			expect(err.message).to.eql('deliberate error')
+			# Check the task completed as expected
+			task.on 'complete', (_err,result) ->
+				++checks
+				expect(task.result, "the set result to be as expected as the task has completed").to.eql([err])
+				expect(_err, "the callback error to be set as we errord").to.eql(err)
+				expect(result, "the callback result to be null we errord").to.not.exist
 
-		# Check
-		wait 1000, ->
-			++checks
-			expect(checks).to.eql(3)
-			done()
+			# Check task hasn't run yet
+			expect(task.running, "running to be false as we haven't started running yet").to.eql(false)
+			expect(task.result, "result to be null as we haven't started running yet").to.eql(null)
 
-		# Run
-		task.run()
+			# Run
+			task.run()
 
+			# Check that task has started running
+			expect(task.running, 'running to be true as tasks execute asynchronously').to.eql(true)
+			expect(task.result, 'result to be null as tasks execute asynchronously').to.eql(null)
+
+			# Check that all our special checks have run
+			wait delay, ->
+				++checks
+				expect(checks, "all our special checks have run").to.eql(3)
+				done()
+
+		it 'should detect synchronous error via throwing', (done) ->
+			# Specify how many special checks we are expecting
+			checks = 0
+			err = new Error('deliberate error')
+
+			# Create our synchronous task
+			task = new Task ->
+				++checks
+				expect(task.result, "result to be null as we haven't set it yet").to.eql(null)
+				throw err
+
+			# Check the task completed as expected
+			task.on 'complete', (_err,result) ->
+				++checks
+				expect(task.result, "the set result to be as expected as the task has completed").to.eql([err])
+				expect(_err, "the callback error to be set as we errord").to.eql(err)
+				expect(result, "the callback result to be null we errord").to.not.exist
+
+			# Check task hasn't run yet
+			expect(task.running, "running to be false as we haven't started running yet").to.eql(false)
+			expect(task.result, "result to be null as we haven't started running yet").to.eql(null)
+
+			# Run
+			task.run()
+
+			# Check that task has started running
+			expect(task.running, 'running to be true as tasks execute asynchronously').to.eql(true)
+			expect(task.result, 'result to be null as tasks execute asynchronously').to.eql(null)
+
+			# Check that all our special checks have run
+			wait delay, ->
+				++checks
+				expect(checks, "all our special checks have run").to.eql(3)
+				done()
+
+		###
+		it 'should detect asynchronous error via throwing', (done) ->
+			# Specify how many special checks we are expecting
+			checks = 0
+			err = new Error('deliberate error')
+
+			# Create our asynchronous task
+			task = new Task (done) ->
+				wait delay, ->
+					++checks
+					expect(task.result, "result to be null as we haven't set it yet").to.eql(null)
+					throw err
+
+			# Check the task completed as expected
+			task.on 'complete', (_err,result) ->
+				++checks
+				expect(task.result, "the set result to be as expected as the task has completed").to.eql([err])
+				expect(_err, "the callback error to be set as we errord").to.eql(err)
+				expect(result, "the callback result to be null we errord").to.not.exist
+
+			# Check task hasn't run yet
+			expect(task.running, "running to be false as we haven't started running yet").to.eql(false)
+			expect(task.result, "result to be null as we haven't started running yet").to.eql(null)
+
+			# Run
+			task.run()
+
+			# Check that task has started running
+			expect(task.running, 'running to be true as tasks execute asynchronously').to.eql(true)
+			expect(task.result, 'result to be null as tasks execute asynchronously').to.eql(null)
+
+			# Check that all our special checks have run
+			wait delay*2, ->
+				++checks
+				expect(checks, "all our special checks have run").to.eql(3)
+				done()
+		###
 
 	# Sync
 	it 'should detect sync error', (done) ->
@@ -235,7 +338,8 @@ joe.describe 'taskgroup', (describe,it) ->
 
 		tasks.run()
 
-	# Error Parallel
+	###
+	# Parallel
 	it 'should handle error correctly in parallel', (done) ->
 		tasks = new TaskGroup().setConfig({concurrency:0}).on 'complete', (err,results) ->
 			expect(err.message).to.eql('deliberate error')
@@ -245,20 +349,33 @@ joe.describe 'taskgroup', (describe,it) ->
 			expect(tasks.concurrency).to.eql(0)
 			done()
 
+		# Error via completion callback
 		tasks.addTask (complete) ->
 			expect(tasks.remaining.length).to.eql(0)
-			expect(tasks.running).to.eql(2)
+			expect(tasks.running).to.eql(3)
 			wait 500, ->
 				err = new Error('deliberate error')
 				complete(err)
+			return null
 
+		# Error via return
 		tasks.addTask ->
 			expect(tasks.remaining.length).to.eql(0)
-			expect(tasks.running).to.eql(2)
+			expect(tasks.running).to.eql(3)
 			err = new Error('deliberate error')
 			return err
 
+		# Error via throw
+		tasks.addTask ->
+			expect(tasks.remaining.length).to.eql(0)
+			expect(tasks.running).to.eql(3)
+			err = new Error('deliberate error')
+			throw err
+			return null
+
+		# Run tasks
 		tasks.run()
+	###
 
 	# Error Serial
 	it 'should handle error correctly in serial', (done) ->
@@ -287,36 +404,40 @@ joe.describe 'taskgroup', (describe,it) ->
 joe.describe 'inline', (describe,it) ->
 	# Work
 	it 'should work', (done) ->
-		checks = 0
+		checks = []
 
 		tasks = new TaskGroup 'my tests', (addGroup,addTask) ->
 			expect(@name).to.eql('my tests')
 
 			addTask 'my task', (complete) ->
-				++checks
+				checks.push('my task 1')
 				expect(@name).to.eql('my task')
 				expect(tasks.remaining.length).to.eql(1)
 				expect(tasks.running).to.eql(1)
 				wait 500, ->
-					++checks
+					checks.push('my task 2')
 					expect(tasks.remaining.length).to.eql(1)
 					expect(tasks.running).to.eql(1)
 					complete()
 
 			addGroup 'my group', (addGroup,addTask) ->
-				++checks
+				checks.push('my group')
 				expect(@name).to.eql('my group')
-				expect(tasks.remaining.length).to.eql(0)
+				expect(tasks.remaining.length, 'my group remaining').to.eql(0)
 				expect(tasks.running).to.eql(1)
 
 				addTask 'my second task', ->
-					++checks
+					checks.push('my second task')
 					expect(@name).to.eql('my second task')
-					expect(tasks.remaining.length).to.eql(0)
+					expect(tasks.remaining.length, 'my second task remaining').to.eql(0)
 					expect(tasks.running).to.eql(1)
 
 		tasks.on 'complete', (err) ->
+			console.log(err)  if err
 			expect(err).to.eql(null)
-			expect(checks).to.eql(4)
+
+			console.log(checks)  if checks.length isnt 4
+			expect(checks.length, 'checks').to.eql(4)
+
 			done()
 
