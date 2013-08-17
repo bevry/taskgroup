@@ -13,6 +13,7 @@ class Task extends EventEmitter
 	running: false
 	completed: false
 	parent: null
+	taskDomain: null
 
 	# Config
 	name: null
@@ -46,7 +47,7 @@ class Task extends EventEmitter
 		@
 
 	# Set Configuration
-	setConfig: (opts={}) =>
+	setConfig: (opts={}) ->
 		# Apply the configuration directly to our instance
 		for own key,value of opts
 			@[key] = value
@@ -55,7 +56,7 @@ class Task extends EventEmitter
 		@
 
 	# Reset
-	reset: =>
+	reset: ->
 		# Reset our flags
 		@completed = false
 		@running = false
@@ -67,7 +68,7 @@ class Task extends EventEmitter
 	# Uncaught Exception
 	# Define our uncaught error callback to put the task into its completion state
 	# as well as emit the error event
-	uncaughtExceptionCallback: (args...) =>
+	uncaughtExceptionCallback: (args...) ->
 		# Extract the error
 		err = args[0]
 
@@ -81,7 +82,7 @@ class Task extends EventEmitter
 		@
 
 	# Completion Callback
-	completionCallback: (args...) =>
+	completionCallback: (args...) ->
 		# Complete for the first (and hopefully only) time
 		unless @completed
 			# Update our flags
@@ -98,8 +99,16 @@ class Task extends EventEmitter
 		# Chain
 		@
 
+	# Destroy
+	destroy: ->
+		# Remove all isteners
+		@removeAllListeners()
+
+		# Chain
+		@
+
 	# Complete
-	complete: (result) =>
+	complete: (result) ->
 		# Apply completion flags
 		@completed = true
 		@running = false
@@ -109,21 +118,24 @@ class Task extends EventEmitter
 		@
 
 	# Fire
-	fire: =>
+	fire: ->
 		# Add our completion callback to our specified arguments to send over to the method
-		args = (@args or []).concat([@completionCallback])
+		args = (@args or []).concat([@completionCallback.bind(@)])
+
+		# Prepare the task domain if it doesn't already exist
+		unless @taskDomain?
+			@taskDomain = require('domain').create()
+			@taskDomain.on('error', @uncaughtExceptionCallback.bind(@))
 
 		# Listen for uncaught errors
-		try
-			ambi(@method.bind(@), args...)
-		catch err
-			@uncaughtExceptionCallback(err)
+		@taskDomain.run => ambi(@method.bind(@), args...)
+		#ambi(@method.bind(@), args...)
 
 		# Chain
 		@
 
 	# Run
-	run: =>
+	run: ->
 		# Already completed?
 		if @completed
 			err = new Error("A task was about to run but it has already completed, this is unexpected")
@@ -140,7 +152,7 @@ class Task extends EventEmitter
 
 			# Give time for the listeners to complete before continuing
 			# This delay is needed for task groups
-			process.nextTick(@fire)
+			process.nextTick(@fire.bind(@))
 
 		# Chain
 		@
@@ -169,6 +181,7 @@ class TaskGroup extends EventEmitter
 
 	constructor: (args...) ->
 		# Init
+		me = @
 		super
 		@results ?= []
 		@remaining ?= []
@@ -191,20 +204,20 @@ class TaskGroup extends EventEmitter
 		@setConfig({name, method})
 
 		# Give setConfig enough chance to fire
-		process.nextTick(@fire)
+		process.nextTick(@fire.bind(@))
 
 		# Handle item completion
-		@on('item.complete', @itemCompletionCallback)
+		@on('item.complete', @itemCompletionCallback.bind(@))
 
 		# Handle item error
-		@on 'item.error', (item, err) =>
-			@stop()
-			@emit('error', err)
+		@on 'item.error', (item, err) ->
+			me.stop()
+			me.emit('error', err)
 
 		# Chain
 		@
 
-	setConfig: (opts={}) =>
+	setConfig: (opts={}) ->
 		# Configure
 		for own key,value of opts
 			@[key] = value
@@ -212,7 +225,7 @@ class TaskGroup extends EventEmitter
 		# Chain
 		@
 
-	fire: =>
+	fire: ->
 		# Auto run if we are going the inline style and have no parent
 		if @method
 			# Add the function as our first unamed task with the extra arguments
@@ -225,7 +238,7 @@ class TaskGroup extends EventEmitter
 		# Chain
 		@
 
-	itemCompletionCallback: (item, args...) =>
+	itemCompletionCallback: (item, args...) ->
 		# Add the result
 		@results.push(args)  if item.includeInResults isnt false
 
@@ -258,7 +271,7 @@ class TaskGroup extends EventEmitter
 
 	# Add an item
 	# also run for groups too
-	addItem: (item) =>
+	addItem: (item) ->
 		# Prepare
 		me = @
 
@@ -279,7 +292,7 @@ class TaskGroup extends EventEmitter
 		# Return the item
 		return item
 
-	createTask: (args...) =>
+	createTask: (args...) ->
 		task = new Task(args...)
 		return task
 
@@ -301,7 +314,7 @@ class TaskGroup extends EventEmitter
 		# Return the item
 		return @addItem(task)
 
-	createGroup: (args...) =>
+	createGroup: (args...) ->
 		group = new TaskGroup(args...)
 		return group
 
@@ -323,15 +336,15 @@ class TaskGroup extends EventEmitter
 		# Return the item
 		return @addItem(group)
 
-	hasItems: =>
+	hasItems: ->
 		# Do we have any items left to run
 		return @remaining.length isnt 0
 
-	isReady: =>
+	isReady: ->
 		# Do we have available slots to run
 		return !@concurrency or @running < @concurrency
 
-	nextItems: =>
+	nextItems: ->
 		items = []
 
 		# Fire the next items
@@ -345,7 +358,7 @@ class TaskGroup extends EventEmitter
 		result = if items.length then items else false
 		return result
 
-	nextItem: =>
+	nextItem: ->
 		# Do we have items to run?
 		if @hasItems()
 			# Do we have available slots to run?
@@ -363,7 +376,7 @@ class TaskGroup extends EventEmitter
 		# Didn't fire another item
 		return false
 
-	complete: =>
+	complete: ->
 		# Determine completion
 		pause = @pauseOnError and @err
 		empty = @hasItems() is false and @running is 0
@@ -384,14 +397,25 @@ class TaskGroup extends EventEmitter
 		# Return result
 		return completed
 
-	clear: =>
+	clear: ->
 		# Removes all the items from remaining
-		@remaining.splice(0)
+		for item in @remaining.splice(0)
+			item.destroy()
 
 		# Chain
 		@
 
-	stop: =>
+	destroy: ->
+		# Destroy and clear items
+		@stop()
+
+		# Remove listeners
+		@removeAllListeners()
+
+		# Chain
+		@
+
+	stop: ->
 		# Stop further execution
 		@pause()
 
@@ -401,7 +425,7 @@ class TaskGroup extends EventEmitter
 		# Chain
 		@
 
-	exit: (err) =>
+	exit: (err) ->
 		# Apply
 		@err = err  if err
 
@@ -417,11 +441,13 @@ class TaskGroup extends EventEmitter
 		# Chain
 		@
 
-	pause: =>
+	pause: ->
 		@paused = true
 		@
 
-	run: (args...) =>
+	run: (args...) ->
+		# Prepare
+		me = @
 		# Resume
 		@paused = false
 
@@ -429,9 +455,9 @@ class TaskGroup extends EventEmitter
 		@emit('run')
 
 		# Give time for the listeners to complete before continuing
-		process.nextTick =>
+		process.nextTick ->
 			# Continue or finish up
-			@nextItems()  unless @complete()
+			me.nextItems()  unless me.complete()
 
 		# Chain
 		@
