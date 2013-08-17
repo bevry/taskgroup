@@ -1,12 +1,13 @@
 # Import
 ambi = require('ambi')
-EventEmitter = require('eventemitter2').EventEmitter2
+EventEmitter = require('events').EventEmitter
 
 # Task
 # Events
 # - complete
 # - run
 class Task extends EventEmitter
+	# Variables
 	type: 'task'  # for duck typing
 	result: null
 	running: false
@@ -44,6 +45,7 @@ class Task extends EventEmitter
 		# Chain
 		@
 
+	# Set Configuration
 	setConfig: (opts={}) =>
 		# Apply the configuration directly to our instance
 		for own key,value of opts
@@ -52,77 +54,93 @@ class Task extends EventEmitter
 		# Chain
 		@
 
-	run: ->
-		# Prepare
-		domain = null
-
-		# Define our uncaught error callback to put the task into its completion state
-		# as well as emit the error event
-		uncaughtErrorCallback = (args...) =>
-			# Dispose of our domain
-			if domain?
-				domain.dispose()
-				domain = null
-
-			# Apply our completion flags if we have not yet completed
-			unless @completed
-				@completed = true
-				@running = false
-				@result = args
-
-			# Fire our uncaught error handler
-			@emit('error', err)
-
-		# Define our completion callback to put the task into its completion state
-		# as well as emit the completion event
-		# we also check for unexpected double completion
-		completionCallback = (args...) =>
-			# Dispose of our domain
-			if domain?
-				domain.dispose()
-				domain = null
-
-			# Already completed?
-			if @completed is true
-				# We have already completed and this is unexpected so emit an error event
-				err = new Error("A task's completion callback has fired when the task was already in a completed state, this is unexpected")
-				@emit('error', err)
-
-			# Complete for the first (and hopefully only) time
-			else
-				# Update our flags
-				@completed = true
-				@running = false
-				@result = args
-
-				# Notify our listeners of our completion
-				@emit('complete', @result...)
-
+	# Reset
+	reset: =>
 		# Reset our flags
 		@completed = false
-		@running = true
+		@running = false
 		@result = null
 
-		# Reset our domain
-		if domain?
-			domain.dispose()
-			domain = null
-		#domain = require('domain').create()
+		# Chain
+		@
 
-		# Notify our intention
-		@emit('run')
+	# Uncaught Exception
+	# Define our uncaught error callback to put the task into its completion state
+	# as well as emit the error event
+	uncaughtExceptionCallback: (args...) =>
+		# Extract the error
+		err = args[0]
 
-		# Give time for the listeners to complete before continuing
-		# needed for task groups
-		process.nextTick =>
-			# Add our completion callback to our specified arguments to send over to the method
-			args = (@args or []).concat([completionCallback])
+		# Apply our completion flags if we have not yet completed
+		@complete(args)  unless @completed
 
-			# Fire the method be it asynchronously or synchronously with ambi
-			# and wrap it in a domain to ensure that the task executes safely
-			#domain.on('error', completionCallback)
-			#domain.run =>
+		# Fire our uncaught error handler
+		@emit('error', err)
+
+		# Chain
+		@
+
+	# Completion Callback
+	completionCallback: (args...) =>
+		# Complete for the first (and hopefully only) time
+		unless @completed
+			# Update our flags
+			@complete(args)
+
+			# Notify our listeners of our completion
+			@emit('complete', @result...)
+
+		# Error as we have already completed before
+		else
+			err = new Error("A task's completion callback has fired when the task was already in a completed state, this is unexpected")
+			@emit('error', err)
+
+		# Chain
+		@
+
+	# Complete
+	complete: (result) =>
+		# Apply completion flags
+		@completed = true
+		@running = false
+		@result = result
+
+		# Chain
+		@
+
+	# Fire
+	fire: =>
+		# Add our completion callback to our specified arguments to send over to the method
+		args = (@args or []).concat([@completionCallback])
+
+		# Listen for uncaught errors
+		try
 			ambi(@method.bind(@), args...)
+		catch err
+			@uncaughtExceptionCallback(err)
+
+		# Chain
+		@
+
+	# Run
+	run: =>
+		# Already completed?
+		if @completed
+			err = new Error("A task was about to run but it has already completed, this is unexpected")
+			@emit('error', err)
+
+		# Not yet completed, so lets run!
+		else
+			# Reset to a running state
+			@reset()
+			@running = true
+
+			# Notify our intention
+			@emit('run')
+
+			# Give time for the listeners to complete before continuing
+			# This delay is needed for task groups
+			process.nextTick(@fire)
 
 		# Chain
 		@
@@ -141,6 +159,7 @@ class TaskGroup extends EventEmitter
 	results: null
 	parent: null
 	paused: true
+	bubbleEvents: null
 
 	# Config
 	name: null
@@ -151,46 +170,36 @@ class TaskGroup extends EventEmitter
 	constructor: (args...) ->
 		# Init
 		super
-		@err = null
-		@results = []
-		@remaining = []
+		@results ?= []
+		@remaining ?= []
+		@bubbleEvents ?= ['complete', 'run', 'error']
 
-		# Apply
+		# Prepare configuration
 		name = method = null
+
+		# Extract the configuration from the arguments
 		if args.length
+			# If we have both arguments then set name and method
 			if args.length is 2
 				[name, method] = args
+
+			# If we just have one argument then just set the method
 			else if args.length is 1
 				[method] = args
+
+		# Apply configuration
 		@setConfig({name, method})
 
 		# Give setConfig enough chance to fire
-		process.nextTick =>
-			# Auto run if we are going the inline style and have no parent
-			if @method
-				# Add the function as our first unamed task with the extra arguments
-				args = [@addGroup, @addTask]
-				@addTask(@method.bind(@)).setConfig({args, includeInResults:false})
-
-				# Proceed to run if we are the topmost group
-				@run()  if !@parent
+		process.nextTick(@fire)
 
 		# Handle item completion
-		@on 'item.complete', (item,args...) =>
-			# Add the result
-			@results.push(args)  if item.includeInResults isnt false
+		@on('item.complete', @itemCompletionCallback)
 
-			# Update error if it exists
-			@err = args[0]  if args[0]
-
-			# Mark that one less item is running
-			--@running  if @running > 0
-
-			# Already exited?
-			return  if @paused
-
-			# Continue or finish up
-			@nextItems()  unless @complete()
+		# Handle item error
+		@on 'item.error', (item, err) =>
+			@stop()
+			@emit('error', err)
 
 		# Chain
 		@
@@ -203,28 +212,63 @@ class TaskGroup extends EventEmitter
 		# Chain
 		@
 
+	fire: =>
+		# Auto run if we are going the inline style and have no parent
+		if @method
+			# Add the function as our first unamed task with the extra arguments
+			args = [@addGroup, @addTask]
+			@addTask(@method.bind(@)).setConfig({args, includeInResults:false})
+
+			# Proceed to run if we are the topmost group
+			@run()  if !@parent
+
+		# Chain
+		@
+
+	itemCompletionCallback: (item, args...) =>
+		# Add the result
+		@results.push(args)  if item.includeInResults isnt false
+
+		# Update error if it exists
+		@err = args[0]  if args[0]
+
+		# Mark that one less item is running
+		--@running  if @running > 0
+
+		# Already exited?
+		return  if @paused
+
+		# Continue or finish up
+		@nextItems()  unless @complete()
+
+		# Chain
+		@
+
 	getTotals: ->
 		running = @running
 		remaining = @remaining.length
 		completed = @results.length
 		total = running + remaining + completed
-		return {running,remaining,completed,total}
+		return {
+			running,
+			remaining,
+			completed,
+			total
+		}
 
+	# Add an item
+	# also run for groups too
 	addItem: (item) =>
 		# Prepare
 		me = @
 
 		# Bubble item events
-		# be explicit about error events due to their special nature
-		item.onAny (args...) ->
-			# return  if @event is 'error'
-			me.emit("item.#{@event}", item, args...)
-		item.on 'error', (err) ->
-			me.emit("item.error", item, args...)
-			me.exit(err)
+		@bubbleEvents.forEach (bubbleEvent) ->
+			item.on bubbleEvent, (args...) ->
+				me.emit("item.#{bubbleEvent}", item, args...)
 
 		# Notify our intention
-		@emit('add', item)
+		@emit('item.add', item)
 
 		# Add the item
 		@remaining.push(item)
@@ -246,9 +290,13 @@ class TaskGroup extends EventEmitter
 		# Create the task with our arguments
 		task = @createTask(args...).setConfig({parent:@})
 
-		# Bubble task events
-		task.onAny (args...) ->
-			me.emit("task.#{@event}", task, args...)
+		# Bubble item events
+		@bubbleEvents.forEach (bubbleEvent) ->
+			task.on bubbleEvent, (args...) ->
+				me.emit("task.#{bubbleEvent}", task, args...)
+
+		# Notify our intention
+		@emit('task.add', task)
 
 		# Return the item
 		return @addItem(task)
@@ -264,9 +312,13 @@ class TaskGroup extends EventEmitter
 		# Create the group with our arguments
 		group = @createGroup(args...).setConfig({concurrency:@concurrency,parent:@})
 
-		# Bubble task events
-		group.onAny (args...) ->
-			me.emit("group.#{@event}", group, args...)
+		# Bubble item events
+		@bubbleEvents.forEach (bubbleEvent) ->
+			group.on bubbleEvent, (args...) ->
+				me.emit("group.#{bubbleEvent}", group, args...)
+
+		# Notify our intention
+		@emit('group.add', group)
 
 		# Return the item
 		return @addItem(group)
@@ -290,7 +342,8 @@ class TaskGroup extends EventEmitter
 			else
 				break
 
-		return if items.length then items else false
+		result = if items.length then items else false
+		return result
 
 	nextItem: =>
 		# Do we have items to run?
@@ -322,7 +375,7 @@ class TaskGroup extends EventEmitter
 			@pause()  if pause
 
 			# Notify we've completed and send the error and results if we have them
-			@emit('complete',@err,@results)
+			@emit('complete', @err, @results)
 
 			# Reset the error and results to build up again for the next completion
 			@err = null
