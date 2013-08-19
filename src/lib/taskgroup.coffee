@@ -128,8 +128,11 @@ class Task extends EventEmitter
 			@taskDomain.on('error', @uncaughtExceptionCallback.bind(@))
 
 		# Listen for uncaught errors
-		@taskDomain.run => ambi(@method.bind(@), args...)
-		#ambi(@method.bind(@), args...)
+		@taskDomain.run =>
+			try
+				ambi(@method.bind(@), args...)
+			catch err
+				@uncaughtExceptionCallback(err)
 
 		# Chain
 		@

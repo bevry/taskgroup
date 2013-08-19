@@ -1,5 +1,9 @@
 ## History
 
+- v3.2.1 August 19, 2013
+	- Republish with older verson of joe dev dependency to try and stop cyclic errors
+	- Better node 0.8 support when catching thrown errors
+
 - v3.2.0 August 19, 2013
 	- Wrapped Task execution in a domain to catch uncaught errors within the task execution, as well as added checks to ensure the completion callback does not fire multiple times
 		- These will be reported via the `error` event that the Task will emit
