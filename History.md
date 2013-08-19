@@ -1,5 +1,11 @@
 ## History
 
+- v3.2.0 August 19, 2013
+	- Wrapped Task execution in a domain to catch uncaught errors within the task execution, as well as added checks to ensure the completion callback does not fire multiple times
+		- These will be reported via the `error` event that the Task will emit
+			- If the Task is part of a TaskGroup, the TaskGroup will listen for this, kill the TaskGroup and emit an `error` event on the TaskGroup
+	- Moved from EventEmitter2 to node's own EventEmitter to ensure domain compatibility
+
 - v3.1.2 April 6, 2013
 	- Added `getTotals()` to `TaskGroup`
 	- Added `complete()` to `Task`
