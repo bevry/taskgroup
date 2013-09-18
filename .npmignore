@@ -6,3 +6,9 @@ History.md
 src/
 out/test/
 test/
+
+build/
+components/
+template.js
+component.json
+index.js

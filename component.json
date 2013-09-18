@@ -1,0 +1,25 @@
+{
+  "name": "taskgroup",
+  "repo": "bevry/taskgroup",
+  "description": "Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.",
+  "version": "3.2.2",
+  "keywords": [
+    "flow",
+    "control",
+    "async",
+    "sync",
+    "tasks",
+    "batch",
+    "concurrency"
+  ],
+  "dependencies": {
+    "bevry/ambi": "master"
+  },
+  "development": {},
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": [
+    "index.js",
+    "out/lib/taskgroup.js"
+  ]
+}

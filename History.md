@@ -1,5 +1,8 @@
 ## History
 
+- v3.2.2 September 18, 2013
+	- Component.io compatibility
+
 - v3.2.1 August 19, 2013
 	- Republish with older verson of joe dev dependency to try and stop cyclic errors
 	- Better node 0.8 support when catching thrown errors
