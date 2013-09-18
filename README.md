@@ -13,7 +13,7 @@ Group together synchronous and asynchronous tasks and execute them with support 
 
 ### [Node](http://nodejs.org/), [Browserify](http://browserify.org/)
 - Use: `require('taskgroup')`
-- Install: 'npm install --save taskgroup'
+- Install: `npm install --save taskgroup`
 
 ### [Ender](http://ender.jit.su/)
 - Use: `require('taskgroup')`
