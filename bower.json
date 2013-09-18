@@ -1,0 +1,32 @@
+{
+  "name": "taskgroup",
+  "version": "3.2.3",
+  "homepage": "https://github.com/bevry/taskgroup",
+  "authors": [
+    "Benjamin Lupton <b@lupton.cc>"
+  ],
+  "description": "Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.",
+  "main": "out/lib/taskgroup.js",
+  "keywords": [
+    "flow",
+    "control",
+    "async",
+    "sync",
+    "tasks",
+    "batch",
+    "concurrency"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "ambi": "~2.1.4",
+    "domain-browser": "~1.0.1",
+    "events-browser": "~1.0.3"
+  }
+}

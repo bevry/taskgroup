@@ -11,4 +11,4 @@ build/
 components/
 template.js
 component.json
-index.js
+bower.json

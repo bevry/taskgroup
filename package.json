@@ -1,6 +1,6 @@
 {
   "name": "taskgroup",
-  "version": "3.2.2",
+  "version": "3.2.3",
   "description": "Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.",
   "homepage": "https://github.com/bevry/taskgroup",
   "keywords": [
@@ -31,7 +31,7 @@
     "node": ">=0.4"
   },
   "dependencies": {
-    "ambi": "~2.1.0"
+    "ambi": "~2.1.4"
   },
   "devDependencies": {
     "coffee-script": "~1.6.2",
@@ -43,7 +43,7 @@
     "lib": "./out/lib"
   },
   "scripts": {
-    "preinstall": "node -e \"if(require('fs').existsSync('./.git')){ require('child_process').spawn('npm', ['install','--force',require('./package.json').name], {env:process.env,cwd:process.cwd(),stdio:'inherit'}); }\"",
+    "preinstall": "node ./cyclic.js",
     "test": "node ./out/test/everything-test.js"
   },
   "main": "./out/lib/taskgroup.js"

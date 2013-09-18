@@ -9,18 +9,23 @@
 Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.
 
 
-
 ## Install
 
-### Backend
+### [Node](http://nodejs.org/), [Browserify](http://browserify.org/)
+- Use: `require('taskgroup')`
+- Install: 'npm install --save taskgroup'
 
-1. [Install Node.js](http://bevry.me/node/install)
-2. `npm install --save taskgroup`
+### [Ender](http://ender.jit.su/)
+- Use: `require('taskgroup')`
+- Install: `ender add taskgroup`
 
-### Frontend
+## [Component](http://github.com/component/component)
+- Use: `require('taskgroup')`
+- Install: `component install bevry/taskgroup`
 
-1. [See Browserify](http://browserify.org/)
-
+## [Bower](http://bower.io/)
+- Use: `require('taskgroup')`
+- Install: `bower install taskgroup`
 
 
 ## Usage
@@ -208,10 +213,8 @@ Another big advantage of TaskGroup over async.js is TaskGroup's ability to add t
 A final big advantage of TaskGroup over async.js is TaskGroup's ability to do nested groups, this allowed us to created the [Joe Testing Framework & Runner](https://github.com/bevry/joe) incredibly easily, and because of this functionality Joe will always know which test (task) is associated to which suite (task group), whereas test runners like mocha have to guess (they add the task to the last group, which may not always be the case! especially with dynamically created tests!).
 
 
-
 ## History
 You can discover the history inside the [History.md](https://github.com/bevry/taskgroup/blob/master/History.md#files) file
-
 
 
 ## License

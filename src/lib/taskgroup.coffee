@@ -1,6 +1,8 @@
 # Import
 ambi = require('ambi')
-EventEmitter = require('events').EventEmitter
+events = if window? then require('events-browser') else require('events')
+domain = if window? then require('domain-browser') else require('domain')
+{EventEmitter} = events
 
 # Task
 # Events
@@ -124,7 +126,7 @@ class Task extends EventEmitter
 
 		# Prepare the task domain if it doesn't already exist
 		unless @taskDomain?
-			@taskDomain = require('domain').create()
+			@taskDomain = domain.create()
 			@taskDomain.on('error', @uncaughtExceptionCallback.bind(@))
 
 		# Listen for uncaught errors
