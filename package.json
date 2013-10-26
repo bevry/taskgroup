@@ -1,8 +1,19 @@
 {
+  "title": "TaskGroup",
   "name": "taskgroup",
-  "version": "3.2.3",
+  "version": "3.2.4",
   "description": "Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.",
   "homepage": "https://github.com/bevry/taskgroup",
+  "license": {
+    "type": "MIT"
+  },
+  "badges": {
+    "travis": true,
+    "npm": true,
+    "gittip": "bevry",
+    "flattr": "344188/balupton-on-Flattr",
+    "paypal": "QB8GQPZAH84N6"
+  },
   "keywords": [
     "flow",
     "control",
@@ -12,7 +23,7 @@
     "batch",
     "concurrency"
   ],
-  "author": "Bevry Pty Ltd <us@bevry.me> (http://bevry.me)",
+  "author": "Benjamin Lupton <b@lupton.cc>",
   "maintainers": [
     "Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)"
   ],
@@ -26,25 +37,25 @@
     "type": "git",
     "url": "http://github.com/bevry/taskgroup.git"
   },
-  "license": "MIT",
   "engines": {
     "node": ">=0.4"
   },
   "dependencies": {
-    "ambi": "~2.1.4"
+    "ambi": "~2.1.5"
   },
   "devDependencies": {
     "coffee-script": "~1.6.2",
     "joe": "~1.3.0",
     "joe-reporter-console": "~1.2.1",
-    "chai": "~1.7.1"
+    "chai": "~1.8.1",
+    "projectz": "~0.2.3"
   },
   "directories": {
     "lib": "./out/lib"
   },
   "scripts": {
     "preinstall": "node ./cyclic.js",
-    "test": "node ./out/test/everything-test.js"
+    "test": "node ./out/test/taskgroup-test.js"
   },
   "main": "./out/lib/taskgroup.js"
 }
