@@ -1,7 +1,11 @@
 # Import
 ambi = require('ambi')
-events = if window? then require('events-browser') else require('events')
-domain = if window? then require('domain-browser') else require('domain')
+events = require('events')
+domain =
+	try
+		require('domain')
+	catch err
+		null
 {EventEmitter} = events
 
 # Task
@@ -14,13 +18,16 @@ class Task extends EventEmitter
 	result: null
 	running: false
 	completed: false
-	parent: null
 	taskDomain: null
 
 	# Config
-	name: null
-	method: null
-	args: null
+	config: null
+		###
+		name: null
+		method: null
+		args: null
+		parent: null
+		###
 
 	# Create a new task
 	# - new Task(name, method)
@@ -28,22 +35,25 @@ class Task extends EventEmitter
 	constructor: (args...) ->
 		# Prepare
 		super
+		@config ?= {}
+		@config.run ?= false
 
 		# Prepare configuration
-		name = method = null
+		opts = {}
 
 		# Extract the configuration from the arguments
-		if args.length
-			# If we have both arguments then set name and method
-			if args.length is 2
-				[name, method] = args
-
-			# If we just have one argument then just set the method
-			else if args.length is 1
-				[method] = args
+		for arg in args
+			switch typeof arg
+				when 'string'
+					opts.name = arg
+				when 'function'
+					opts.method = arg
+				when 'object'
+					for own key,value of arg
+						opts[key] = value
 
 		# Apply configuration
-		@setConfig({name, method})
+		@setConfig(opts)
 
 		# Chain
 		@
@@ -52,10 +62,17 @@ class Task extends EventEmitter
 	setConfig: (opts={}) ->
 		# Apply the configuration directly to our instance
 		for own key,value of opts
-			@[key] = value
+			switch key
+				when 'next'
+					@once('complete', value.bind(@))  if value
+				else
+					@config[key] = value
 
 		# Chain
 		@
+
+	# Get Config
+	getConfig: -> @config
 
 	# Reset
 	reset: ->
@@ -121,20 +138,28 @@ class Task extends EventEmitter
 
 	# Fire
 	fire: ->
+		# Prepare
+		me = @
+
 		# Add our completion callback to our specified arguments to send over to the method
-		args = (@args or []).concat([@completionCallback.bind(@)])
+		args = (@config.args or []).concat([@completionCallback.bind(@)])
 
 		# Prepare the task domain if it doesn't already exist
-		unless @taskDomain?
+		if @taskDomain? is false and domain?.create?
 			@taskDomain = domain.create()
 			@taskDomain.on('error', @uncaughtExceptionCallback.bind(@))
 
 		# Listen for uncaught errors
-		@taskDomain.run =>
+		fire = ->
 			try
-				ambi(@method.bind(@), args...)
+				ambi(me.config.method.bind(me), args...)
 			catch err
-				@uncaughtExceptionCallback(err)
+				me.uncaughtExceptionCallback(err)
+
+		if @taskDomain?
+			@taskDomain.run(fire)
+		else
+			fire()
 
 		# Chain
 		@
@@ -174,39 +199,47 @@ class TaskGroup extends EventEmitter
 	remaining: null
 	err: null
 	results: null
-	parent: null
 	paused: true
 	bubbleEvents: null
 
 	# Config
-	name: null
-	method: null
-	concurrency: 1  # use 0 for unlimited
-	pauseOnError: true  # needs testing
+	config: null
+		###
+		name: null
+		method: null
+		concurrency: 1  # use 0 for unlimited
+		pauseOnError: true
+		parent: null
+		###
 
 	constructor: (args...) ->
 		# Init
 		me = @
 		super
+		@config ?= {}
+		@config.concurrency ?= 1
+		@config.pauseOnError ?= true
+		@config.run ?= false
 		@results ?= []
 		@remaining ?= []
 		@bubbleEvents ?= ['complete', 'run', 'error']
 
 		# Prepare configuration
-		name = method = null
+		opts = {}
 
 		# Extract the configuration from the arguments
-		if args.length
-			# If we have both arguments then set name and method
-			if args.length is 2
-				[name, method] = args
-
-			# If we just have one argument then just set the method
-			else if args.length is 1
-				[method] = args
+		for arg in args
+			switch typeof arg
+				when 'string'
+					opts.name = arg
+				when 'function'
+					opts.method = arg
+				when 'object'
+					for own key,value of arg
+						opts[key] = value
 
 		# Apply configuration
-		@setConfig({name, method})
+		@setConfig(opts)
 
 		# Give setConfig enough chance to fire
 		process.nextTick(@fire.bind(@))
@@ -223,29 +256,46 @@ class TaskGroup extends EventEmitter
 		@
 
 	setConfig: (opts={}) ->
-		# Configure
+		# Apply the configuration directly to our instance
 		for own key,value of opts
-			@[key] = value
+			switch key
+				when 'next'
+					@once('complete', value.bind(@))  if value
+				when 'task', 'tasks'
+					@addTasks(value)  if value
+				when 'group', 'groups'
+					@addGroups(value)  if value
+				when 'item', 'items'
+					@addItems(value)  if value
+				else
+					@config[key] = value
 
 		# Chain
 		@
 
+	getConfig: -> @config
+
 	fire: ->
 		# Auto run if we are going the inline style and have no parent
-		if @method
+		if @config.method
 			# Add the function as our first unamed task with the extra arguments
-			args = [@addGroup, @addTask]
-			@addTask(@method.bind(@)).setConfig({args, includeInResults:false})
+			@addTask(@config.method.bind(@), {
+				args: [@addGroup.bind(@), @addTask.bind(@)]
+				includeInResults:false
+			})
 
 			# Proceed to run if we are the topmost group
-			@run()  if !@parent
+			@run()  if !@config.parent
+
+		# Auto run if we are ocnfigured to
+		@run()  if @config.run is true
 
 		# Chain
 		@
 
 	itemCompletionCallback: (item, args...) ->
 		# Add the result
-		@results.push(args)  if item.includeInResults isnt false
+		@results.push(args)  if item.config.includeInResults isnt false
 
 		# Update error if it exists
 		@err = args[0]  if args[0]
@@ -280,6 +330,28 @@ class TaskGroup extends EventEmitter
 		# Prepare
 		me = @
 
+		# Link our item to ourself
+		item.setConfig({parent: @})
+
+		# Bubble task events
+		if item instanceof Task
+			@bubbleEvents.forEach (bubbleEvent) ->
+				item.on bubbleEvent, (args...) ->
+					me.emit("task.#{bubbleEvent}", item, args...)
+
+			# Notify our intention
+			@emit('task.add', item)
+
+		# Bubble group events
+		if item instanceof TaskGroup
+			# Bubble item events
+			@bubbleEvents.forEach (bubbleEvent) ->
+				item.on bubbleEvent, (args...) ->
+					me.emit("group.#{bubbleEvent}", item, args...)
+
+			# Notify our intention
+			@emit('group.add', item)
+
 		# Bubble item events
 		@bubbleEvents.forEach (bubbleEvent) ->
 			item.on bubbleEvent, (args...) ->
@@ -297,49 +369,32 @@ class TaskGroup extends EventEmitter
 		# Return the item
 		return item
 
+	addItems: (items, args...) ->
+		items = [items]  unless Array.isArray(items)
+		return (@addItem(item, args...)  for item in items)
+
+
 	createTask: (args...) ->
-		task = new Task(args...)
-		return task
+		return new Task(args...)
 
-	addTask: (args...) =>
-		# Prepare
-		me = @
+	addTask: (args...) ->
+		return @addItem @createTask args...
 
-		# Create the task with our arguments
-		task = @createTask(args...).setConfig({parent:@})
+	addTasks: (items, args...) ->
+		items = [items]  unless Array.isArray(items)
+		return (@addTask(item, args...)  for item in items)
 
-		# Bubble item events
-		@bubbleEvents.forEach (bubbleEvent) ->
-			task.on bubbleEvent, (args...) ->
-				me.emit("task.#{bubbleEvent}", task, args...)
-
-		# Notify our intention
-		@emit('task.add', task)
-
-		# Return the item
-		return @addItem(task)
 
 	createGroup: (args...) ->
-		group = new TaskGroup(args...)
-		return group
+		return new TaskGroup(args...)
 
-	addGroup: (args...) =>
-		# Prepare
-		me = @
+	addGroup: (args...) ->
+		return @addItem @createGroup args...
 
-		# Create the group with our arguments
-		group = @createGroup(args...).setConfig({concurrency:@concurrency,parent:@})
+	addGroups: (items, args...) ->
+		items = [items]  unless Array.isArray(items)
+		return (@addGroup(item, args...)  for item in items)
 
-		# Bubble item events
-		@bubbleEvents.forEach (bubbleEvent) ->
-			group.on bubbleEvent, (args...) ->
-				me.emit("group.#{bubbleEvent}", group, args...)
-
-		# Notify our intention
-		@emit('group.add', group)
-
-		# Return the item
-		return @addItem(group)
 
 	hasItems: ->
 		# Do we have any items left to run
@@ -347,7 +402,7 @@ class TaskGroup extends EventEmitter
 
 	isReady: ->
 		# Do we have available slots to run
-		return !@concurrency or @running < @concurrency
+		return !@config.concurrency or @running < @config.concurrency
 
 	nextItems: ->
 		items = []
@@ -383,7 +438,7 @@ class TaskGroup extends EventEmitter
 
 	complete: ->
 		# Determine completion
-		pause = @pauseOnError and @err
+		pause = @config.pauseOnError and @err
 		empty = @hasItems() is false and @running is 0
 		completed = pause or empty
 

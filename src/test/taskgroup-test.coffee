@@ -282,7 +282,7 @@ joe.describe 'taskgroup', (describe,it) ->
 				expect(results).to.eql([[null,10], [null,5]])
 				expect(tasks.remaining.length).to.eql(0)
 				expect(tasks.running).to.eql(0)
-				expect(tasks.concurrency).to.eql(1)
+				expect(tasks.config.concurrency).to.eql(1)
 				done()
 
 			tasks.addTask (complete) ->
@@ -300,14 +300,14 @@ joe.describe 'taskgroup', (describe,it) ->
 
 			tasks.run()
 
-		# Parallel
+		# Parallel with new API
 		it 'should work when running in parallel', (done) ->
 			tasks = new TaskGroup().setConfig({concurrency:0}).on 'complete', (err,results) ->
 				expect(err).to.eql(null)
 				expect(results).to.eql([[null,5],[null,10]])
 				expect(tasks.remaining.length).to.eql(0)
 				expect(tasks.running).to.eql(0)
-				expect(tasks.concurrency).to.eql(0)
+				expect(tasks.config.concurrency).to.eql(0)
 				done()
 
 			tasks.addTask (complete) ->
@@ -325,6 +325,32 @@ joe.describe 'taskgroup', (describe,it) ->
 
 			tasks.run()
 
+		# Parallel
+		it 'should work when running in parallel with new API', (done) ->
+			tasks = new TaskGroup(
+				concurrency: 0
+				next: (err,results) ->
+					expect(err).to.eql(null)
+					expect(results).to.eql([[null,5],[null,10]])
+					expect(tasks.remaining.length).to.eql(0)
+					expect(tasks.running).to.eql(0)
+					expect(tasks.config.concurrency).to.eql(0)
+					done()
+				tasks: [
+					(complete) ->
+						expect(tasks.remaining.length).to.eql(0)
+						expect(tasks.running).to.eql(2)
+						wait 500, ->
+							expect(tasks.remaining.length).to.eql(0)
+							expect(tasks.running).to.eql(1)
+							complete(null,10)
+					->
+						expect(tasks.remaining.length).to.eql(0)
+						expect(tasks.running).to.eql(2)
+						return 5
+				]
+			).run()
+
 	# Basic
 	describe "errors", (suite,it) ->
 		# Parallel
@@ -334,7 +360,7 @@ joe.describe 'taskgroup', (describe,it) ->
 				expect(results.length).to.eql(1)
 				expect(tasks.remaining.length).to.eql(0)
 				expect(tasks.running).to.eql(1)
-				expect(tasks.concurrency).to.eql(0)
+				expect(tasks.config.concurrency).to.eql(0)
 				done()
 
 			# Error via completion callback
@@ -363,7 +389,7 @@ joe.describe 'taskgroup', (describe,it) ->
 				expect(results.length).to.eql(1)
 				expect(tasks.remaining.length).to.eql(1)
 				expect(tasks.running).to.eql(0)
-				expect(tasks.concurrency).to.eql(1)
+				expect(tasks.config.concurrency).to.eql(1)
 				done()
 
 			tasks.addTask (complete) ->
@@ -386,11 +412,11 @@ joe.describe 'inline', (describe,it) ->
 		checks = []
 
 		tasks = new TaskGroup 'my tests', (addGroup,addTask) ->
-			expect(@name).to.eql('my tests')
+			expect(@config.name).to.eql('my tests')
 
 			addTask 'my task', (complete) ->
 				checks.push('my task 1')
-				expect(@name).to.eql('my task')
+				expect(@config.name).to.eql('my task')
 				expect(tasks.remaining.length).to.eql(1)
 				expect(tasks.running).to.eql(1)
 				wait 500, ->
@@ -401,13 +427,13 @@ joe.describe 'inline', (describe,it) ->
 
 			addGroup 'my group', (addGroup,addTask) ->
 				checks.push('my group')
-				expect(@name).to.eql('my group')
+				expect(@config.name).to.eql('my group')
 				expect(tasks.remaining.length, 'my group remaining').to.eql(0)
 				expect(tasks.running).to.eql(1)
 
 				addTask 'my second task', ->
 					checks.push('my second task')
-					expect(@name).to.eql('my second task')
+					expect(@config.name).to.eql('my second task')
 					expect(tasks.remaining.length, 'my second task remaining').to.eql(0)
 					expect(tasks.running).to.eql(1)
 

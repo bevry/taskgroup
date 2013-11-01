@@ -1,5 +1,11 @@
 ## History
 
+- v3.3.0 November 1, 2013
+	- Bindings are now more explicit
+	- Improved configuration parsing
+	- Configuration is now accessed via `getConfig()`
+	- Dropped component.io and bower support, just use ender or browserify
+
 - v3.2.4 October 27, 2013
 	- Re-packaged
 
