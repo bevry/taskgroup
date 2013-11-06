@@ -1,5 +1,10 @@
 ## History
 
+- v3.3.1 November 6, 2013
+	- Fixed child event bubbling by using duck typing (regression since v3.3.0)
+	- Better error handling on uncaught task exceptions
+	- Tasks will now get a default name set to ease debugging
+
 - v3.3.0 November 1, 2013
 	- Bindings are now more explicit
 	- Improved configuration parsing

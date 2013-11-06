@@ -36,6 +36,7 @@ class Task extends EventEmitter
 		# Prepare
 		super
 		@config ?= {}
+		@config.name ?= "Task #{Math.random()}"
 		@config.run ?= false
 
 		# Prepare configuration
@@ -217,6 +218,7 @@ class TaskGroup extends EventEmitter
 		me = @
 		super
 		@config ?= {}
+		@config.name ?= "Task Group #{Math.random()}"
 		@config.concurrency ?= 1
 		@config.pauseOnError ?= true
 		@config.run ?= false
@@ -248,9 +250,7 @@ class TaskGroup extends EventEmitter
 		@on('item.complete', @itemCompletionCallback.bind(@))
 
 		# Handle item error
-		@on 'item.error', (item, err) ->
-			me.stop()
-			me.emit('error', err)
+		@on('item.error', @itemUncaughtExceptionCallback.bind(@))
 
 		# Chain
 		@
@@ -312,15 +312,22 @@ class TaskGroup extends EventEmitter
 		# Chain
 		@
 
+	itemUncaughtExceptionCallback: (item, err) ->
+		# Stop further execution and exit with the error
+		@exit(err)
+
+		# Chain
+		@
+
 	getTotals: ->
 		running = @running
 		remaining = @remaining.length
 		completed = @results.length
 		total = running + remaining + completed
 		return {
-			running,
-			remaining,
-			completed,
+			running
+			remaining
+			completed
 			total
 		}
 
@@ -334,7 +341,7 @@ class TaskGroup extends EventEmitter
 		item.setConfig({parent: @})
 
 		# Bubble task events
-		if item instanceof Task
+		if item.type is 'task'
 			@bubbleEvents.forEach (bubbleEvent) ->
 				item.on bubbleEvent, (args...) ->
 					me.emit("task.#{bubbleEvent}", item, args...)
@@ -343,7 +350,7 @@ class TaskGroup extends EventEmitter
 			@emit('task.add', item)
 
 		# Bubble group events
-		if item instanceof TaskGroup
+		if item.type is 'taskgroup'
 			# Bubble item events
 			@bubbleEvents.forEach (bubbleEvent) ->
 				item.on bubbleEvent, (args...) ->
@@ -375,6 +382,7 @@ class TaskGroup extends EventEmitter
 
 
 	createTask: (args...) ->
+		return args[0]  if args[0]?.type is 'task'
 		return new Task(args...)
 
 	addTask: (args...) ->
@@ -386,6 +394,7 @@ class TaskGroup extends EventEmitter
 
 
 	createGroup: (args...) ->
+		return args[0]  if args[0]?.type is 'taskgroup'
 		return new TaskGroup(args...)
 
 	addGroup: (args...) ->
