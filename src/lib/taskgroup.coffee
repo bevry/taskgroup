@@ -246,6 +246,9 @@ class TaskGroup extends EventEmitter
 		# Give setConfig enough chance to fire
 		process.nextTick(@fire.bind(@))
 
+		# Handle errors
+		@on('error', (err) -> me.exit(err))
+
 		# Handle item completion
 		@on('item.complete', @itemCompletionCallback.bind(@))
 
