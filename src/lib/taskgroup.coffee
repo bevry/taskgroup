@@ -337,6 +337,9 @@ class TaskGroup extends EventEmitter
 		# Prepare
 		me = @
 
+		# Only add the item if it exists
+		return null  unless item
+
 		# Link our item to ourself
 		item.setConfig({parent: @})
 
@@ -382,6 +385,7 @@ class TaskGroup extends EventEmitter
 
 
 	createTask: (args...) ->
+		return null  unless args[0]
 		return args[0]  if args[0]?.type is 'task'
 		return new Task(args...)
 
@@ -394,6 +398,7 @@ class TaskGroup extends EventEmitter
 
 
 	createGroup: (args...) ->
+		return null  unless args[0]
 		return args[0]  if args[0]?.type is 'taskgroup'
 		return new TaskGroup(args...)
 

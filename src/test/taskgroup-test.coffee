@@ -408,7 +408,7 @@ joe.describe 'taskgroup', (describe,it) ->
 # Test Runner
 joe.describe 'inline', (describe,it) ->
 	# Work
-	it 'should work', (done) ->
+	it 'should work (format 1)', (done) ->
 		checks = []
 
 		tasks = new TaskGroup 'my tests', (addGroup,addTask) ->
@@ -445,4 +445,42 @@ joe.describe 'inline', (describe,it) ->
 			expect(checks.length, 'checks').to.eql(4)
 
 			done()
+	# Work
+	it 'should work (format 2)', (done) ->
+		checks = []
+
+		tasks = new TaskGroup().run()
+
+		tasks.addTask 'my task', (complete) ->
+			checks.push('my task 1')
+			expect(@config.name).to.eql('my task')
+			expect(tasks.remaining.length).to.eql(1)
+			expect(tasks.running).to.eql(1)
+			wait 500, ->
+				checks.push('my task 2')
+				expect(tasks.remaining.length).to.eql(1)
+				expect(tasks.running).to.eql(1)
+				complete()
+
+		tasks.addGroup 'my group', ->
+			checks.push('my group')
+			expect(@config.name).to.eql('my group')
+			expect(tasks.remaining.length, 'my group remaining').to.eql(0)
+			expect(tasks.running).to.eql(1)
+
+			@addTask 'my second task', ->
+				checks.push('my second task')
+				expect(@config.name).to.eql('my second task')
+				expect(tasks.remaining.length, 'my second task remaining').to.eql(0)
+				expect(tasks.running).to.eql(1)
+
+		tasks.on 'complete', (err) ->
+			console.log(err)  if err
+			expect(err).to.eql(null)
+
+			console.log(checks)  if checks.length isnt 4
+			expect(checks.length, 'checks').to.eql(4)
+
+			done()
+
 

@@ -1,5 +1,8 @@
 ## History
 
+- v3.3.2 November 19, 2013
+	- Don't add or create empty tasks and groups
+
 - v3.3.1 November 6, 2013
 	- Fixed child event bubbling by using duck typing (regression since v3.3.0)
 	- Better error handling on uncaught task exceptions
