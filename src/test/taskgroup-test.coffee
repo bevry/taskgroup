@@ -406,9 +406,9 @@ joe.describe 'taskgroup', (describe,it) ->
 
 
 # Test Runner
-joe.describe 'inline', (describe,it) ->
-	# Work
-	it 'should work (format 1)', (done) ->
+joe.describe 'nested', (describe,it) ->
+	# Inline
+	it 'inline format', (done) ->
 		checks = []
 
 		tasks = new TaskGroup 'my tests', (addGroup,addTask) ->
@@ -445,8 +445,9 @@ joe.describe 'inline', (describe,it) ->
 			expect(checks.length, 'checks').to.eql(4)
 
 			done()
-	# Work
-	it 'should work (format 2)', (done) ->
+
+	# Traditional
+	it 'traditional format', (done) ->
 		checks = []
 
 		tasks = new TaskGroup().run()
@@ -483,4 +484,73 @@ joe.describe 'inline', (describe,it) ->
 
 			done()
 
+	# Mixed
+	it 'mixed format', (done) ->
+		checks = []
 
+		tasks = new TaskGroup()
+
+		tasks.addTask 'my task 1', ->
+			checks.push('my task 1')
+			expect(@config.name).to.eql('my task 1')
+			expect(tasks.remaining.length).to.eql(2)
+			expect(tasks.running).to.eql(1)
+
+		tasks.addGroup 'my group 1', ->
+			checks.push('my group 1')
+			expect(@config.name).to.eql('my group 1')
+			expect(tasks.remaining.length, 'my group 1 remaining').to.eql(1)
+			expect(tasks.running).to.eql(1)
+
+			@addTask 'my task 2', ->
+				checks.push('my task 2')
+				expect(@config.name).to.eql('my task 2')
+				expect(tasks.remaining.length, 'my task 2 remaining').to.eql(1)
+				expect(tasks.running).to.eql(1)
+
+		tasks.addTask 'my task 3', ->
+			checks.push('my task 3')
+			expect(@config.name).to.eql('my task 3')
+			expect(tasks.remaining.length).to.eql(0)
+			expect(tasks.running).to.eql(1)
+
+		tasks.on 'complete', (err) ->
+			console.log(err)  if err
+			expect(err).to.eql(null)
+
+			console.log(checks)  if checks.length isnt 4
+			expect(checks.length, 'checks').to.eql(4)
+
+			done()
+
+		tasks.run()
+
+	###
+	# Idle
+	it 'idling', (done) ->
+		checks = []
+
+		tasks = new TaskGroup()
+
+		task = tasks.addTask 'my task 1', (complete) ->
+			checks.push('my task 1')
+			expect(@config.name).to.eql('my task 1')
+			expect(tasks.remaining.length).to.eql(0)
+			expect(tasks.running).to.eql(1)
+
+		tasks.on 'complete', (err) ->
+			console.log(err)  if err
+			expect(err).to.eql(null)
+			throw new Error('should never reach here')
+
+		tasks.on 'idle', (item) ->
+			checks.push('idle check')
+			expect(item).to.eql(task)
+
+			console.log(checks)  if checks.length isnt 2
+			expect(checks.length, 'checks').to.eql(2)
+
+			tasks.destroy()
+
+		tasks.run()
+	###
