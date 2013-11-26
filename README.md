@@ -41,70 +41,171 @@ Group together synchronous and asynchronous tasks and execute them with support 
 
 ## Usage
 
-### Example
+`taskgroup` provides two classes, `Task` and `TaskGroup`. A single task can be
+created like that:
 
 ``` javascript
-// Import
-var TaskGroup = require('taskgroup').TaskGroup;
+var Task = require('taskgroup').Task
 
+var task = new Task(function () {
+  // Do something ...
+  console.log('Done');
+});
+
+// execute the task
+task.run();
+```
+
+Task groups bundle several tasks:
+
+``` javascript
+var TaskGroup = require('taskgroup').TaskGroup
+
+var group = new TaskGroup();
+
+group.addTask(function () {
+  // Do something
+  console.log('First Task');
+});
+
+group.addTask(function () {
+  // Do something
+  console.log('Second Task');
+});
+
+group.run();
+```
+
+It's also possible to nest task groups.
+
+``` javascript
+var group = new TaskGroup();
+
+group.addTask(function () {
+  // Do something
+  console.log('First Task');
+});
+
+group.addGroup(function () {
+  // `this` is bound to the sub task group
+  this.addTask(function () {
+    // do some work
+    console.log('Nested task')
+  });
+});
+
+group.run();
+```
+
+Tasks can be either synchronous or asynchronous. To make a task asynchronous,
+you have to hand it a callback function as an argument and call it at some
+point in your task function. Please note that its important to call the `next`
+callback in asynchronous tasks. If you forget to call it, then task group will
+not proceed to any other following tasks.
+
+``` javascript
+var group = new TaskGroup();
+
+group.addTask(function (next) {
+  // Do something
+  setTimeout(function () {
+    console.log('First Task');
+    next(null, 'some', 'data');
+  }, 500);
+});
+
+group.addTask(function (next) {
+  // Do something
+  setTimeout(function () {
+    console.log('Second Task');
+    next(null, 'some', 'other', 'data');
+  }, 1000)
+});
+
+group.run();
+```
+
+Both, `Task` and `TaskGroup` will fire a `complete` event when they finished.
+You can use that event to collect the results from your different tasks.
+Synchronous tasks can simply return their result, asynchronous tasks hand them
+to the next callback handler. There are more events, which you can find in the
+API documentation below.
+
+``` javascript
 // Create our new group
 var group = new TaskGroup();
 
+// Add a synchronous task that returns the result
+group.addTask(function(){
+  return 'first task';
+});
+
+group.addGroup(function(addGroup, addTask){
+  // Add an asynchronous task that gives its result to the completion callback
+  addTask(function (next){
+    setTimeout(function(){
+      next(null, 'sub first', 'task');
+    },500);
+  });
+});
+
 // Define what should happen once the group has completed
 group.once('complete', function(err, results){
-	// Log the error that has occured
-	console.log(err);
-	// => null
-
-	// Log the results that our group received from the executing items
-	console.log(JSON.stringify(results));
-	/*	=>
-		[
-			[null, 'first', 'task'],
-			[null, 'second task'],
-			[null, [
-				[null, 'sub second task'],
-				[null, 'sub first', 'task']
-			]]
-		]
-	*/
-});
-
-// Add an asynchronous task that gives the result to the completion callback
-group.addTask(function(complete){
-	setTimeout(function(){
-		complete(null, 'first', 'task');
-	},500);
-});
-
-// Add a synchronous task that returns the result
-// Errors should be returned, though if an error is thrown we will catch it
-group.addTask(function(){
-	return 'second task';
-});
-
-// Add a sub-group to our exiting group
-group.addGroup(function(addGroup, addTask){
-	// Tell this sub-group to execute in parallel (all at once) by setting its concurrency to unlimited
-	// by default the concurrency for all groups is set to 1
-	// which means that they execute in serial fashion (one after the other, instead of all at once)
-	this.setConfig({concurrency:0});
-
-	// Add an asynchronous task that gives its result to the completion callback
-	addTask(function(complete){
-		setTimeout(function(){
-			complete(null, 'sub first', 'task');
-		},500);
-	});
-
-	// Add a synchronous task that returns its result
-	addTask(function(){
-		return 'sub second task';
-	});
+  console.log(JSON.stringify(results));
+  // [[null, 'first task'],
+  //  [null, [
+  //    [null, 'sub first', 'task']
+  //  ]]]
 });
 
 // Execute our group
 group.run();
+```
+
+Tasks can be run either as a series, in parallel or in parallel but only with a
+certain amount of tasks at once. The concurrency behaviour of a task is set
+using `group.setConfig`.
+
+- `group.setConfig({concurrency: 0})` - Run tasks in parallel.
+- `group.setConfig({concurrency: 1})` - Run one task at a time (series).
+- `group.setConfig({concurrency: X})` - Run in parallel, but at most X tasks in
+  parallel.
+
+The following example executes all tasks in series. The nested task group
+itself is executed in parallel.
+
+``` javascript
+var group = new TaskGroup();
+
+// Execute this group in series. Tasks are executed in order they have been
+// declared.
+group.setConfig({concurrency: 1});
+
+group.addTask(function () {
+  console.log('Running first task outside of group.');
+});
+
+group.addGroup(function (){
+  // Tell this sub-group to execute in parallel.
+  this.setConfig({concurrency: 0});
+
+  this.addTask(function (next){
+    setTimeout(function(){
+      console.log('Running asynchronous task in group.')
+      next(null);
+    },500);
+  });
+
+  this.addTask(function (){
+    console.log("Running synchronous task in group.")
+  });
+});
+
+group.addTask(function () {
+  console.log('Running second task outside of group.');
+});
+
+group.run()
 ```
 
 ### TaskGroup API
