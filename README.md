@@ -37,6 +37,13 @@ Group together synchronous and asynchronous tasks and execute them with support 
 
 <!-- /INSTALL -->
 
+## Contents
+
+1. [Usage](#usage)
+2. [API](#api)
+3. [Comparisons to other flow libraries](#comparisons)
+4. [Libraries built on top of TaskGroup](#libraries)
+
 
 ## Usage
 
@@ -455,6 +462,15 @@ new TaskGroup({
 Another big advantage of TaskGroup over async.js is TaskGroup's ability to add tasks to the group once execution has already started - this is a common use case when creating an application that must perform it's actions serially, so using TaskGroup you can create a serial TaskGroup for the application, run it right away, then add the actions to the group as tasks.
 
 A final big advantage of TaskGroup over async.js is TaskGroup's ability to do nested groups, this allowed us to created the [Joe Testing Framework & Runner](https://github.com/bevry/joe) incredibly easily, and because of this functionality Joe will always know which test (task) is associated to which suite (task group), whereas test runners like mocha have to guess (they add the task to the last group, which may not always be the case! especially with dynamically created tests!).
+
+
+## Libraries
+
+These are libaries and extensions that are built ontop of TaskGroup's robust API.
+
+- [Joe Test Runner](https://github.com/bevry/joe) — Mocha falls down when you have to create your tests dynamically, because Tests in Joe are Tasks, and Suites are TaskGroups, Joe will always know which tests are for which suite. Works tremendously well, with a modular architecture. Also works in the browser!
+- [Event Emitter Grouped](https://github.com/bevry/event-emitter-grouped) — Execute event listeners as TaskGroups, adding support for asynchronous listeners, parallel execution, and completion callbacks. Great for plugin infrastructures.
+
 
 
 <!-- HISTORY/ -->
