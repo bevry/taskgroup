@@ -276,7 +276,7 @@ tasks.addTask(function(){
 tasks.once('complete', function(err, results){
 	console.log([err, result]);
 	/* [Error("the first task failed"), [
-		[Error("the first task failed")],
+		[Error("the first task failed")]
 	]] */
 });
 
@@ -310,7 +310,7 @@ tasks.addTask(function(){
 tasks.once('complete', function(err, results){
 	console.log([err, result]);
 	/* [Error("the second task failed"), [
-		[Error("the second task failed")],
+		[Error("the second task failed")]
 	]] */
 });
 
