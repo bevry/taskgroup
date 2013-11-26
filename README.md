@@ -7,7 +7,6 @@
 
 <!-- BADGES/ -->
 
-[![Build Status](http://img.shields.io/travis-ci/bevry/taskgroup.png?branch=master)](http://travis-ci.org/bevry/taskgroup "Check this project's build status on TravisCI")
 [![NPM version](http://badge.fury.io/js/taskgroup.png)](https://npmjs.org/package/taskgroup "View this project on NPM")
 [![Gittip donate button](http://img.shields.io/gittip/bevry.png)](https://www.gittip.com/bevry/ "Donate weekly to this project using Gittip")
 [![Flattr donate button](http://img.shields.io/flattr/donate.png?color=yellow)](http://flattr.com/thing/344188/balupton-on-Flattr "Donate monthly to this project using Flattr")
@@ -255,7 +254,7 @@ Safely handling errors is an important thing to do. TaskGroup makes this easy by
 
 When an error is detected, the remaining tasks in a TaskGroup will be cleared, and the TaskGroup's completion callback with the error will be fired.
 
-``` javsacript
+``` javascript
 var TaskGroup = require('taskgroup').TaskGroup
 
 // Create our serial task group
@@ -287,7 +286,7 @@ tasks.run();
 
 Which comes in very handling with dealing with asynchronous parallel code:
 
-``` javsacript
+``` javascript
 var TaskGroup = require('taskgroup').TaskGroup
 
 // Create our parallel task group
