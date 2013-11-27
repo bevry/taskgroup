@@ -7,6 +7,7 @@
 
 <!-- BADGES/ -->
 
+[![Build Status](http://img.shields.io/travis-ci/bevry/taskgroup.png?branch=master)](http://travis-ci.org/bevry/taskgroup "Check this project's build status on TravisCI")
 [![NPM version](http://badge.fury.io/js/taskgroup.png)](https://npmjs.org/package/taskgroup "View this project on NPM")
 [![Gittip donate button](http://img.shields.io/gittip/bevry.png)](https://www.gittip.com/bevry/ "Donate weekly to this project using Gittip")
 [![Flattr donate button](http://img.shields.io/flattr/donate.png?color=yellow)](http://flattr.com/thing/344188/balupton-on-Flattr "Donate monthly to this project using Flattr")
@@ -35,6 +36,7 @@ Group together synchronous and asynchronous tasks and execute them with support 
 - Install: `ender add taskgroup`
 
 <!-- /INSTALL -->
+
 
 ## Contents
 

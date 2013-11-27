@@ -244,7 +244,9 @@ class TaskGroup extends EventEmitter
 		@setConfig(opts)
 
 		# Give setConfig enough chance to fire
-		setImmediate(@fire.bind(@))
+		# Changing this to setImmediate breaks a lot of things
+		# As tasks inside nested taskgroups will fire in any order
+		process.nextTick(@fire.bind(@))
 
 		# Handle item completion
 		@on('item.complete', @itemCompletionCallback.bind(@))
