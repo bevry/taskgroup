@@ -1,4 +1,4 @@
-## History
+# History
 
 - v3.3.3 November 27, 2013
 	- Fixed possible "(node) warning: Recursive process.nextTick detected. This will break in the next version of node. Please use setImmediate for recursive deferral." error under certain circumstances
