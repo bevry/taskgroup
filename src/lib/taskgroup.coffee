@@ -183,7 +183,7 @@ class Task extends EventEmitter
 
 			# Give time for the listeners to complete before continuing
 			# This delay is needed for task groups
-			process.nextTick(@fire.bind(@))
+			setImmediate(@fire.bind(@))
 
 		# Chain
 		@
@@ -244,7 +244,7 @@ class TaskGroup extends EventEmitter
 		@setConfig(opts)
 
 		# Give setConfig enough chance to fire
-		process.nextTick(@fire.bind(@))
+		setImmediate(@fire.bind(@))
 
 		# Handle item completion
 		@on('item.complete', @itemCompletionCallback.bind(@))
