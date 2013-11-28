@@ -1,4 +1,5 @@
 # Import
+setImmediate = setImmediate or process.nextTick  # node 0.8 b/c
 ambi = require('ambi')
 events = require('events')
 domain =

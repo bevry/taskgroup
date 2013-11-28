@@ -1,5 +1,8 @@
 # History
 
+- v3.3.5 November 28, 2013
+	- Re-added Node.js v0.8 support (regression since v3.3.3)
+
 - v3.3.4 November 27, 2013
 	- Fixed the v3.3.3 fix
 
