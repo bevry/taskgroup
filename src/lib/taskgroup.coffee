@@ -1,5 +1,5 @@
 # Import
-`setImmediate = setImmediate || process.nextTick`  # node 0.8 b/c
+`var setImmediate = setImmediate; if (!setImmediate) setImmediate=process.nextTick`  # node 0.8 b/c
 ambi = require('ambi')
 events = require('events')
 domain =
