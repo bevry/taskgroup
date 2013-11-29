@@ -1,12 +1,8 @@
 # Import
-`var setImmediate = setImmediate; if (!setImmediate) setImmediate=process.nextTick`  # node 0.8 b/c
+setImmediate = global?.setImmediate or process.nextTick  # node 0.8 b/c
 ambi = require('ambi')
 events = require('events')
-domain =
-	try
-		require('domain')
-	catch err
-		null
+domain = (try require('domain')) ? null
 {EventEmitter} = events
 
 # Task

@@ -1,5 +1,9 @@
 # History
 
+- v3.3.6 November 29, 2013
+	- Properly fixed v3.3.3 issue while maintaining node.js v0.8 and browserify support
+		- Thanks to [pflannery](https://github.com/pflannery) for [pull request #11](https://github.com/bevry/taskgroup/pull/11)
+
 - v3.3.5 November 28, 2013
 	- Re-added Node.js v0.8 support (regression since v3.3.3)
 
