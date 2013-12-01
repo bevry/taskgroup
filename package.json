@@ -58,5 +58,5 @@
     "preinstall": "node ./cyclic.js",
     "test": "node ./out/test/taskgroup-test.js"
   },
-  "main": "./out/lib/taskgroup.js"
+  "main": "./out"
 }
