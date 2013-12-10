@@ -55,7 +55,7 @@ TaskGroup provides two classes, `Task` and `TaskGroup`
 
 Tasks are used to wrap a function (synchronous or asynchronous, it doesn't matter) inside a task execution flow.
 
-This is useful for using a consistent interface for executing tasks and doing something on their completion or failure, as well as catching uncaught errors and handling them safely.
+This is useful as a consistent interface for executing tasks and doing something on their completion or failure, as well as catching uncaught errors and handling them safely.
 
 We can define a synchronous task like so:
 
@@ -115,7 +115,7 @@ task.run();
 
 Often at times, we want to execute multipe things and wait for the completion. TaskGroup makes this easy with the other class, `TaskGroup`.
 
-We simply create a `TaskGroup` and add out Tasks to it!
+We simply create a `TaskGroup` and add our Tasks to it!
 
 ``` javascript
 var TaskGroup = require('taskgroup').TaskGroup
