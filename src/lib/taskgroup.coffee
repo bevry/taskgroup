@@ -36,28 +36,32 @@ class Task extends EventEmitter
 		@config.name ?= "Task #{Math.random()}"
 		@config.run ?= false
 
-		# Prepare configuration
-		opts = {}
-
-		# Extract the configuration from the arguments
-		for arg in args
-			switch typeof arg
-				when 'string'
-					opts.name = arg
-				when 'function'
-					opts.method = arg
-				when 'object'
-					for own key,value of arg
-						opts[key] = value
-
 		# Apply configuration
-		@setConfig(opts)
+		@setConfig(args)
 
 		# Chain
 		@
 
 	# Set Configuration
+	# opts = object|array
 	setConfig: (opts={}) ->
+		# Handle arguments
+		if Array.isArray(opts)
+			# Prepare configuration
+			args = opts
+			opts = {}
+
+			# Extract the configuration from the arguments
+			for arg in args
+				switch typeof arg
+					when 'string'
+						opts.name = arg
+					when 'function'
+						opts.method = arg
+					when 'object'
+						for own key,value of arg
+							opts[key] = value
+
 		# Apply the configuration directly to our instance
 		for own key,value of opts
 			switch key
@@ -223,22 +227,8 @@ class TaskGroup extends EventEmitter
 		@remaining ?= []
 		@bubbleEvents ?= ['complete', 'run', 'error']
 
-		# Prepare configuration
-		opts = {}
-
-		# Extract the configuration from the arguments
-		for arg in args
-			switch typeof arg
-				when 'string'
-					opts.name = arg
-				when 'function'
-					opts.method = arg
-				when 'object'
-					for own key,value of arg
-						opts[key] = value
-
 		# Apply configuration
-		@setConfig(opts)
+		@setConfig(args)
 
 		# Give setConfig enough chance to fire
 		# Changing this to setImmediate breaks a lot of things
@@ -254,7 +244,26 @@ class TaskGroup extends EventEmitter
 		# Chain
 		@
 
+	# Set Configuration
+	# opts = object|array
 	setConfig: (opts={}) ->
+		# Handle arguments
+		if Array.isArray(opts)
+			# Prepare configuration
+			args = opts
+			opts = {}
+
+			# Extract the configuration from the arguments
+			for arg in args
+				switch typeof arg
+					when 'string'
+						opts.name = arg
+					when 'function'
+						opts.method = arg
+					when 'object'
+						for own key,value of arg
+							opts[key] = value
+
 		# Apply the configuration directly to our instance
 		for own key,value of opts
 			switch key
@@ -384,9 +393,12 @@ class TaskGroup extends EventEmitter
 
 
 	createTask: (args...) ->
-		return null  unless args[0]
-		return args[0]  if args[0]?.type is 'task'
-		return new Task(args...)
+		if args[0]?.type is 'task' # @TODO: should this even be a supported use case?
+			task = args[0]
+			task.setConfig(args.slice(1))
+		else
+			task = new Task(args...)
+		return task
 
 	addTask: (args...) ->
 		return @addItem @createTask args...
@@ -397,9 +409,12 @@ class TaskGroup extends EventEmitter
 
 
 	createGroup: (args...) ->
-		return null  unless args[0]
-		return args[0]  if args[0]?.type is 'taskgroup'
-		return new TaskGroup(args...)
+		if args[0]?.type is 'taskgroup' # @TODO: should this even be a supported use case?
+			taskgroup = args[0]
+			taskgroup.setConfig(args.slice(1))
+		else
+			taskgroup = new TaskGroup(args...)
+		return taskgroup
 
 	addGroup: (args...) ->
 		return @addItem @createGroup args...

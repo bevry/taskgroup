@@ -1,5 +1,8 @@
 # History
 
+- v3.3.7 January 30, 2014
+	- Improvements around adding tasks to task groups and passing arguments to Task and TaskGroup constructors
+
 - v3.3.6 November 29, 2013
 	- Properly fixed v3.3.3 issue while maintaining node.js v0.8 and browserify support
 		- Thanks to [pflannery](https://github.com/pflannery) for [pull request #11](https://github.com/bevry/taskgroup/pull/11)
