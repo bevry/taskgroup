@@ -154,7 +154,10 @@ class Task extends EventEmitter
 		# Listen for uncaught errors
 		fire = ->
 			try
-				ambi(me.config.method.bind(me), args...)
+				if me.config.method?.bind
+					ambi(me.config.method.bind(me), args...)
+				else
+					throw new Error("The task #{me.config.name} was fired but has no method to fire")
 			catch err
 				me.uncaughtExceptionCallback(err)
 

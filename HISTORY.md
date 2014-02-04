@@ -1,5 +1,8 @@
 # History
 
+- v3.3.8 February 5, 2014
+	- More descriptive error when a task is fired without a method to fire
+
 - v3.3.7 January 30, 2014
 	- Improvements around adding tasks to task groups and passing arguments to Task and TaskGroup constructors
 
