@@ -1,5 +1,11 @@
 # History
 
+- v3.3.9 May 4, 2014
+	- Added [extendonclass](https://github.com/bevry/extendonclass) support
+	- Added `Task.create` and `TaskGroup.create` helpers
+	- Will no longer fall over if an invalid argument is passed as configuration
+	- Updated dependencies
+
 - v3.3.8 February 5, 2014
 	- More descriptive error when a task is fired without a method to fire
 

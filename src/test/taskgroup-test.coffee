@@ -18,7 +18,7 @@ joe.describe 'task', (describe,it) ->
 			checks = 0
 
 			# Create our asynchronous task
-			task = new Task (complete) ->
+			task = Task.create (complete) ->
 				# Wait a while as this is an async test
 				wait delay, ->
 					++checks

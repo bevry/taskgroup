@@ -4,12 +4,16 @@ ambi = require('ambi')
 events = require('events')
 domain = (try require('domain')) ? null
 {EventEmitter} = events
+{extendOnClass} = require('extendonclass')
 
 # Task
 # Events
 # - complete
 # - run
 class Task extends EventEmitter
+	@extend: extendOnClass
+	@create: (a,b,c,d,e,f,g) -> return new Task(a,b,d,e,f,g)
+
 	# Variables
 	type: 'task'  # for duck typing
 	result: null
@@ -53,6 +57,7 @@ class Task extends EventEmitter
 
 			# Extract the configuration from the arguments
 			for arg in args
+				continue  unless arg
 				switch typeof arg
 					when 'string'
 						opts.name = arg
@@ -199,6 +204,10 @@ class Task extends EventEmitter
 # - complete
 # - run
 class TaskGroup extends EventEmitter
+	@extend: extendOnClass
+	@create: (a,b,c,d,e,f,g) -> return new TaskGroup(a,b,d,e,f,g)
+
+	# Variables
 	type: 'taskgroup'  # for duck typing
 	running: 0
 	remaining: null
@@ -258,6 +267,7 @@ class TaskGroup extends EventEmitter
 
 			# Extract the configuration from the arguments
 			for arg in args
+				continue  unless arg
 				switch typeof arg
 					when 'string'
 						opts.name = arg
