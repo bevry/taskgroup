@@ -28,6 +28,7 @@ class Task extends EventEmitter
 		method: null
 		args: null
 		parent: null
+		context: null
 		###
 
 	# Create a new task
@@ -160,7 +161,9 @@ class Task extends EventEmitter
 		fire = ->
 			try
 				if me.config.method?.bind
-					ambi(me.config.method.bind(me), args...)
+					methodToFire = me.config.method.bind(me.config.context or me)
+					methodToIntrospect = me.config.method
+					ambi([methodToFire, methodToIntrospect], args...)
 				else
 					throw new Error("The task #{me.config.name} was fired but has no method to fire")
 			catch err
