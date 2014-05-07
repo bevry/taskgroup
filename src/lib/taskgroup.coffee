@@ -162,8 +162,7 @@ class Task extends EventEmitter
 			try
 				if me.config.method?.bind
 					methodToFire = me.config.method.bind(me.config.context or me)
-					methodToIntrospect = me.config.method
-					ambi([methodToFire, methodToIntrospect], args...)
+					ambi(methodToFire, args...)
 				else
 					throw new Error("The task #{me.config.name} was fired but has no method to fire")
 			catch err

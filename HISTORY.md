@@ -1,5 +1,10 @@
 # History
 
+- v3.4.0 May 8, 2014
+	- Added `context` option for Task, to perform a late bind on the method
+	- Asynchronous task methods can now accept optional arguments thanks to new [ambi](https://github.com/bevry/ambi) version
+	- Updated dependencies
+
 - v3.3.9 May 4, 2014
 	- Added [extendonclass](https://github.com/bevry/extendonclass) support
 	- Added `Task.create` and `TaskGroup.create` helpers
