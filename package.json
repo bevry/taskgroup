@@ -48,8 +48,8 @@
     "node": ">=0.4"
   },
   "dependencies": {
-    "ambi": "~2.1.5",
-    "extendonclass": "~1.0.0"
+    "ambi": "~2.2.0",
+    "extendonclass": "~1.0.1"
   },
   "devDependencies": {
     "coffee-script": "~1.7.1",
