@@ -280,22 +280,38 @@ joe.describe 'taskgroup', (describe,it) ->
 			tasks = new TaskGroup().setConfig({concurrency:1}).on 'complete', (err,results) ->
 				expect(err?.message or null).to.equal(null)
 				expect(results).to.deep.equal([[null,10], [null,5]])
-				expect(tasks.remaining.length).to.equal(0)
-				expect(tasks.running).to.equal(0)
 				expect(tasks.config.concurrency).to.equal(1)
+				expect(tasks.getTotals()).to.deep.equal(
+					remaining: 0
+					running: 0
+					completed: 2
+					total: 2
+				)
 				done()
 
 			tasks.addTask (complete) ->
-				expect(tasks.remaining.length).to.equal(1)
-				expect(tasks.running).to.equal(1)
+				expect(tasks.getTotals()).to.deep.equal(
+					remaining: 1
+					running: 1
+					completed: 0
+					total: 2
+				)
 				wait 500, ->
-					expect(tasks.remaining.length).to.equal(1)
-					expect(tasks.running).to.equal(1)
+					expect(tasks.getTotals()).to.deep.equal(
+						remaining: 1
+						running: 1
+						completed: 0
+						total: 2
+					)
 					complete(null, 10)
 
 			tasks.addTask ->
-				expect(tasks.remaining.length).to.equal(0)
-				expect(tasks.running).to.equal(1)
+				expect(tasks.getTotals()).to.deep.equal(
+					remaining: 0
+					running: 1
+					completed: 1
+					total: 2
+				)
 				return 5
 
 			tasks.run()
@@ -305,22 +321,38 @@ joe.describe 'taskgroup', (describe,it) ->
 			tasks = new TaskGroup().setConfig({concurrency:0}).on 'complete', (err,results) ->
 				expect(err?.message or null).to.equal(null)
 				expect(results).to.deep.equal([[null,5],[null,10]])
-				expect(tasks.remaining.length).to.equal(0)
-				expect(tasks.running).to.equal(0)
 				expect(tasks.config.concurrency).to.equal(0)
+				expect(tasks.getTotals()).to.deep.equal(
+					remaining: 0
+					running: 0
+					completed: 2
+					total: 2
+				)
 				done()
 
 			tasks.addTask (complete) ->
-				expect(tasks.remaining.length).to.equal(0)
-				expect(tasks.running).to.equal(2)
+				expect(tasks.getTotals()).to.deep.equal(
+					remaining: 0
+					running: 2
+					completed: 0
+					total: 2
+				)
 				wait 500, ->
-					expect(tasks.remaining.length).to.equal(0)
-					expect(tasks.running).to.equal(1)
+					expect(tasks.getTotals()).to.deep.equal(
+						remaining: 0
+						running: 1
+						completed: 1
+						total: 2
+					)
 					complete(null,10)
 
 			tasks.addTask ->
-				expect(tasks.remaining.length).to.equal(0)
-				expect(tasks.running).to.equal(2)
+				expect(tasks.getTotals()).to.deep.equal(
+					remaining: 0
+					running: 2
+					completed: 0
+					total: 2
+				)
 				return 5
 
 			tasks.run()
@@ -332,21 +364,37 @@ joe.describe 'taskgroup', (describe,it) ->
 				next: (err,results) ->
 					expect(err?.message or null).to.equal(null)
 					expect(results).to.deep.equal([[null,5],[null,10]])
-					expect(tasks.remaining.length).to.equal(0)
-					expect(tasks.running).to.equal(0)
 					expect(tasks.config.concurrency).to.equal(0)
+					expect(tasks.getTotals()).to.deep.equal(
+						remaining: 0
+						running: 0
+						completed: 2
+						total: 2
+					)
 					done()
 				tasks: [
 					(complete) ->
-						expect(tasks.remaining.length).to.equal(0)
-						expect(tasks.running).to.equal(2)
+						expect(tasks.getTotals()).to.deep.equal(
+							remaining: 0
+							running: 2
+							completed: 0
+							total: 2
+						)
 						wait 500, ->
-							expect(tasks.remaining.length).to.equal(0)
-							expect(tasks.running).to.equal(1)
+							expect(tasks.getTotals()).to.deep.equal(
+								remaining: 0
+								running: 1
+								completed: 1
+								total: 2
+							)
 							complete(null,10)
 					->
-						expect(tasks.remaining.length).to.equal(0)
-						expect(tasks.running).to.equal(2)
+						expect(tasks.getTotals()).to.deep.equal(
+							remaining: 0
+							running: 2
+							completed: 0
+							total: 2
+						)
 						return 5
 				]
 			).run()
@@ -358,15 +406,24 @@ joe.describe 'taskgroup', (describe,it) ->
 			tasks = new TaskGroup().setConfig({concurrency:0}).on 'complete', (err,results) ->
 				expect(err.message).to.equal('deliberate error')
 				expect(results.length).to.equal(1)
-				expect(tasks.remaining.length).to.equal(0)
-				expect(tasks.running).to.equal(1)
 				expect(tasks.config.concurrency).to.equal(0)
+				expect(tasks.getTotals()).to.deep.equal(
+					remaining: 0
+					running: 1
+					completed: 1
+					total: 2
+					# in a new version this should be completed: 2
+				)
 				done()
 
 			# Error via completion callback
 			tasks.addTask (complete) ->
-				expect(tasks.remaining.length).to.equal(0)
-				expect(tasks.running).to.equal(2)
+				expect(tasks.getTotals()).to.deep.equal(
+					remaining: 0
+					running: 2
+					completed: 0
+					total: 2
+				)
 				wait 500, ->
 					err = new Error('deliberate error')
 					complete(err)
@@ -374,8 +431,12 @@ joe.describe 'taskgroup', (describe,it) ->
 
 			# Error via return
 			tasks.addTask ->
-				expect(tasks.remaining.length).to.equal(0)
-				expect(tasks.running).to.equal(2)
+				expect(tasks.getTotals()).to.deep.equal(
+					remaining: 0
+					running: 2
+					completed: 0
+					total: 2
+				)
 				err = new Error('deliberate error')
 				return err
 
@@ -387,14 +448,22 @@ joe.describe 'taskgroup', (describe,it) ->
 			tasks = new TaskGroup().setConfig({concurrency:1}).on 'complete', (err,results) ->
 				expect(err.message).to.equal('deliberate error')
 				expect(results.length).to.equal(1)
-				expect(tasks.remaining.length).to.equal(1)
-				expect(tasks.running).to.equal(0)
 				expect(tasks.config.concurrency).to.equal(1)
+				expect(tasks.getTotals()).to.deep.equal(
+					remaining: 1
+					running: 0
+					completed: 1
+					total: 2
+				)
 				done()
 
 			tasks.addTask (complete) ->
-				expect(tasks.remaining.length).to.equal(1)
-				expect(tasks.running).to.equal(1)
+				expect(tasks.getTotals()).to.deep.equal(
+					remaining: 1
+					running: 1
+					completed: 0
+					total: 2
+				)
 				err = new Error('deliberate error')
 				complete(err)
 
@@ -417,25 +486,45 @@ joe.describe 'nested', (describe,it) ->
 			addTask 'my task', (complete) ->
 				checks.push('my task 1')
 				expect(@config.name).to.equal('my task')
-				expect(tasks.remaining.length).to.equal(1)
-				expect(tasks.running).to.equal(1)
+				expect(tasks.getTotals()).to.deep.equal(
+					remaining: 1
+					running: 1
+					completed: 0
+					total: 2
+				)
 				wait 500, ->
 					checks.push('my task 2')
-					expect(tasks.remaining.length).to.equal(1)
-					expect(tasks.running).to.equal(1)
+					expect(tasks.getTotals()).to.deep.equal(
+						remaining: 1
+						running: 1
+						completed: 0
+						total: 2
+					)
 					complete()
 
 			addGroup 'my group', (addGroup,addTask) ->
 				checks.push('my group')
 				expect(@config.name).to.equal('my group')
-				expect(tasks.remaining.length, 'my group remaining').to.equal(0)
-				expect(tasks.running).to.equal(1)
+				expect(tasks.getTotals()).to.deep.equal(
+					remaining: 0
+					running: 1
+					completed: 1
+					total: 2
+				)
+				# we should probably test the added group
+				# rather than the parent
 
 				addTask 'my second task', ->
 					checks.push('my second task')
 					expect(@config.name).to.equal('my second task')
-					expect(tasks.remaining.length, 'my second task remaining').to.equal(0)
-					expect(tasks.running).to.equal(1)
+					expect(tasks.getTotals()).to.deep.equal(
+						remaining: 0
+						running: 1
+						completed: 1
+						total: 2
+					)
+					# we should probably test the added group
+					# rather than the parent
 
 		tasks.on 'complete', (err) ->
 			console.log(err)  if err
@@ -443,6 +532,13 @@ joe.describe 'nested', (describe,it) ->
 
 			console.log(checks)  if checks.length isnt 4
 			expect(checks.length, 'checks').to.equal(4)
+
+			expect(tasks.getTotals()).to.deep.equal(
+				remaining: 0
+				running: 0
+				completed: 2
+				total: 2
+			)
 
 			done()
 
@@ -455,25 +551,45 @@ joe.describe 'nested', (describe,it) ->
 		tasks.addTask 'my task', (complete) ->
 			checks.push('my task 1')
 			expect(@config.name).to.equal('my task')
-			expect(tasks.remaining.length).to.equal(1)
-			expect(tasks.running).to.equal(1)
+			expect(tasks.getTotals()).to.deep.equal(
+				remaining: 1
+				running: 1
+				completed: 0
+				total: 2
+			)
 			wait 500, ->
 				checks.push('my task 2')
-				expect(tasks.remaining.length).to.equal(1)
-				expect(tasks.running).to.equal(1)
+				expect(tasks.getTotals()).to.deep.equal(
+					remaining: 1
+					running: 1
+					completed: 0
+					total: 2
+				)
 				complete()
 
 		tasks.addGroup 'my group', ->
 			checks.push('my group')
 			expect(@config.name).to.equal('my group')
-			expect(tasks.remaining.length, 'my group remaining').to.equal(0)
-			expect(tasks.running).to.equal(1)
+			expect(tasks.getTotals()).to.deep.equal(
+				remaining: 0
+				running: 1
+				completed: 1
+				total: 2
+			)
+			# we should probably test the added group
+			# rather than the parent
 
 			@addTask 'my second task', ->
 				checks.push('my second task')
 				expect(@config.name).to.equal('my second task')
-				expect(tasks.remaining.length, 'my second task remaining').to.equal(0)
-				expect(tasks.running).to.equal(1)
+				expect(tasks.getTotals()).to.deep.equal(
+					remaining: 0
+					running: 1
+					completed: 1
+					total: 2
+				)
+				# we should probably test the added group
+				# rather than the parent
 
 		tasks.on 'complete', (err) ->
 			console.log(err)  if err
@@ -481,6 +597,13 @@ joe.describe 'nested', (describe,it) ->
 
 			console.log(checks)  if checks.length isnt 4
 			expect(checks.length, 'checks').to.equal(4)
+
+			expect(tasks.getTotals()).to.deep.equal(
+				remaining: 0
+				running: 0
+				completed: 2
+				total: 2
+			)
 
 			done()
 
@@ -493,26 +616,46 @@ joe.describe 'nested', (describe,it) ->
 		tasks.addTask 'my task 1', ->
 			checks.push('my task 1')
 			expect(@config.name).to.equal('my task 1')
-			expect(tasks.remaining.length).to.equal(2)
-			expect(tasks.running).to.equal(1)
+			expect(tasks.getTotals()).to.deep.equal(
+				remaining: 2
+				running: 1
+				completed: 0
+				total: 3
+			)
 
 		tasks.addGroup 'my group 1', ->
 			checks.push('my group 1')
 			expect(@config.name).to.equal('my group 1')
-			expect(tasks.remaining.length, 'my group 1 remaining').to.equal(1)
-			expect(tasks.running).to.equal(1)
+			expect(tasks.getTotals()).to.deep.equal(
+				remaining: 1
+				running: 1
+				completed: 1
+				total: 3
+			)
+			# we should probably test the added group
+			# rather than the parent
 
 			@addTask 'my task 2', ->
 				checks.push('my task 2')
 				expect(@config.name).to.equal('my task 2')
-				expect(tasks.remaining.length, 'my task 2 remaining').to.equal(1)
-				expect(tasks.running).to.equal(1)
+				expect(tasks.getTotals()).to.deep.equal(
+					remaining: 1
+					running: 1
+					completed: 1
+					total: 3
+				)
+				# we should probably test the added group
+				# rather than the parent
 
 		tasks.addTask 'my task 3', ->
 			checks.push('my task 3')
 			expect(@config.name).to.equal('my task 3')
-			expect(tasks.remaining.length).to.equal(0)
-			expect(tasks.running).to.equal(1)
+			expect(tasks.getTotals()).to.deep.equal(
+				remaining: 0
+				running: 1
+				completed: 2
+				total: 3
+			)
 
 		tasks.on 'complete', (err) ->
 			console.log(err)  if err
@@ -520,6 +663,13 @@ joe.describe 'nested', (describe,it) ->
 
 			console.log(checks)  if checks.length isnt 4
 			expect(checks.length, 'checks').to.equal(4)
+
+			expect(tasks.getTotals()).to.deep.equal(
+				remaining: 0
+				running: 0
+				completed: 3
+				total: 3
+			)
 
 			done()
 
