@@ -227,7 +227,7 @@ joe.describe 'task', (describe,it) ->
 			task.on 'complete', (err,result) ->
 				++checks
 				expect(task.result).to.deep.equal([err,result])
-				expect(err).to.equal(null)
+				expect(err?.message or null).to.equal(null)
 				expect(result).to.equal(10)
 
 			# Check
@@ -258,7 +258,7 @@ joe.describe 'task', (describe,it) ->
 			task.on 'complete', (err,result) ->
 				++checks
 				expect(task.result).to.deep.equal([err,result])
-				expect(err).to.equal(null)
+				expect(err?.message or null).to.equal(null)
 				expect(result).to.equal(10)
 
 			# Check
@@ -278,7 +278,7 @@ joe.describe 'taskgroup', (describe,it) ->
 		# Serial
 		it 'should work when running in serial', (done) ->
 			tasks = new TaskGroup().setConfig({concurrency:1}).on 'complete', (err,results) ->
-				expect(err).to.equal(null)
+				expect(err?.message or null).to.equal(null)
 				expect(results).to.deep.equal([[null,10], [null,5]])
 				expect(tasks.remaining.length).to.equal(0)
 				expect(tasks.running).to.equal(0)
@@ -303,7 +303,7 @@ joe.describe 'taskgroup', (describe,it) ->
 		# Parallel with new API
 		it 'should work when running in parallel', (done) ->
 			tasks = new TaskGroup().setConfig({concurrency:0}).on 'complete', (err,results) ->
-				expect(err).to.equal(null)
+				expect(err?.message or null).to.equal(null)
 				expect(results).to.deep.equal([[null,5],[null,10]])
 				expect(tasks.remaining.length).to.equal(0)
 				expect(tasks.running).to.equal(0)
@@ -330,7 +330,7 @@ joe.describe 'taskgroup', (describe,it) ->
 			tasks = new TaskGroup(
 				concurrency: 0
 				next: (err,results) ->
-					expect(err).to.equal(null)
+					expect(err?.message or null).to.equal(null)
 					expect(results).to.deep.equal([[null,5],[null,10]])
 					expect(tasks.remaining.length).to.equal(0)
 					expect(tasks.running).to.equal(0)
@@ -439,7 +439,7 @@ joe.describe 'nested', (describe,it) ->
 
 		tasks.on 'complete', (err) ->
 			console.log(err)  if err
-			expect(err).to.equal(null)
+			expect(err?.message or null).to.equal(null)
 
 			console.log(checks)  if checks.length isnt 4
 			expect(checks.length, 'checks').to.equal(4)
@@ -477,7 +477,7 @@ joe.describe 'nested', (describe,it) ->
 
 		tasks.on 'complete', (err) ->
 			console.log(err)  if err
-			expect(err).to.equal(null)
+			expect(err?.message or null).to.equal(null)
 
 			console.log(checks)  if checks.length isnt 4
 			expect(checks.length, 'checks').to.equal(4)
@@ -516,7 +516,7 @@ joe.describe 'nested', (describe,it) ->
 
 		tasks.on 'complete', (err) ->
 			console.log(err)  if err
-			expect(err).to.equal(null)
+			expect(err?.message or null).to.equal(null)
 
 			console.log(checks)  if checks.length isnt 4
 			expect(checks.length, 'checks').to.equal(4)
@@ -540,7 +540,7 @@ joe.describe 'nested', (describe,it) ->
 
 		tasks.on 'complete', (err) ->
 			console.log(err)  if err
-			expect(err).to.equal(null)
+			expect(err?.message or null).to.equal(null)
 			throw new Error('should never reach here')
 
 		tasks.on 'idle', (item) ->
