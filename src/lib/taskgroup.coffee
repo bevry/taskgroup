@@ -12,7 +12,7 @@ domain = (try require('domain')) ? null
 # - run
 class Task extends EventEmitter
 	@extend: extendOnClass
-	@create: (a,b,c,d,e,f,g) -> return new Task(a,b,d,e,f,g)
+	@create: (args...) -> return new @(args...)
 
 	# Variables
 	type: 'task'  # for duck typing
@@ -207,7 +207,7 @@ class Task extends EventEmitter
 # - run
 class TaskGroup extends EventEmitter
 	@extend: extendOnClass
-	@create: (a,b,c,d,e,f,g) -> return new TaskGroup(a,b,d,e,f,g)
+	@create: (args...) -> return new @(args...)
 
 	# Variables
 	type: 'taskgroup'  # for duck typing
