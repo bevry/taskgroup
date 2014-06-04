@@ -1,3 +1,12 @@
+###
+@TODO
+
+- Get it so if an error occurs, running tasks are waited for, and included in the results and completed tally
+- Only report the first error, clear error upon completion
+- Check promise-attempt1 for anything else
+
+###
+
 # Import
 setImmediate = global?.setImmediate or process.nextTick  # node 0.8 b/c
 queue = process.nextTick
