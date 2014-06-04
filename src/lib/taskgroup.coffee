@@ -323,6 +323,7 @@ class TaskGroup extends Interface
 		concurrency: 1  # use 0 for unlimited
 		pauseOnError: true
 		parent: null
+		run: null
 		###
 
 	constructor: (args...) ->
@@ -333,7 +334,6 @@ class TaskGroup extends Interface
 		@config.name ?= "Task Group #{Math.random()}"
 		@config.concurrency ?= 1
 		@config.pauseOnError ?= true
-		@config.run ?= false
 		@results ?= []
 		@remaining ?= []
 		@running ?= []
@@ -412,10 +412,12 @@ class TaskGroup extends Interface
 			# Add the function as our first unamed task with the extra arguments
 			item = @addMethod()
 
-			# Proceed to run if we are the topmost group
-			@run()  if !@config.parent
+			# If we are the topmost group
+			if @config.parent? is false
+				# then run if possible
+				@config.run ?= true
 
-		# Auto run if we are ocnfigured to
+		# Auto run if we are configured to
 		@run()  if @config.run is true
 
 		# Chain
