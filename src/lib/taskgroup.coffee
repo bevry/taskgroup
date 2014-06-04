@@ -356,6 +356,7 @@ class TaskGroup extends Interface
 		# Chain
 		@
 
+
 	# Set Configuration
 	# opts = object|array
 	setConfig: (opts={}) ->
@@ -396,6 +397,7 @@ class TaskGroup extends Interface
 
 	getConfig: -> @config
 
+
 	# add method
 	# for @internal use only, do not use externally
 	addMethod: (method, config={}) ->
@@ -423,35 +425,6 @@ class TaskGroup extends Interface
 		# Chain
 		@
 
-	itemCompletionCallback: (item, args...) ->
-		# Add the result
-		@results.push(args)  if item.config.includeInResults isnt false
-
-		# Update error if it exists
-		@err = args[0]  if args[0]
-
-		# Mark that one less item is running
-		index = @running.indexOf(item)
-		if index is -1
-			@err ?= new Error("Could not find [#{item.getNames()}] in the running queue")
-		else
-			@running = @running.slice(0, index).concat(@running.slice(index+1))
-
-		# Already exited?
-		return  if @paused
-
-		# Continue or finish up
-		@nextItems()  unless @complete()
-
-		# Chain
-		@
-
-	itemUncaughtExceptionCallback: (item, err) ->
-		# Stop further execution and exit with the error
-		@exit(err)
-
-		# Chain
-		@
 
 	getTotals: ->
 		running = @running.length
@@ -464,6 +437,7 @@ class TaskGroup extends Interface
 			completed
 			total
 		}
+
 
 	# Add an item
 	# also run for groups too
@@ -558,6 +532,18 @@ class TaskGroup extends Interface
 		# Do we have available slots to run
 		return !@config.concurrency or @running.length < @config.concurrency
 
+
+	shouldPause: ->
+		return @config.pauseOnError and @err?
+
+	isEmpty: ->
+		return @hasItems() is false and @running.length is 0
+
+	isDone: ->
+		# Determine completion
+		return @shouldPause() or @isEmpty()
+
+
 	nextItems: ->
 		items = []
 
@@ -590,15 +576,35 @@ class TaskGroup extends Interface
 		# Didn't fire another item
 		return false
 
-	shouldPause: ->
-		return @config.pauseOnError and @err?
+	itemCompletionCallback: (item, args...) ->
+		# Add the result
+		@results.push(args)  if item.config.includeInResults isnt false
 
-	isEmpty: ->
-		return @hasItems() is false and @running.length is 0
+		# Update error if it exists
+		@err = args[0]  if args[0]
 
-	isDone: ->
-		# Determine completion
-		return @shouldPause() or @isEmpty()
+		# Mark that one less item is running
+		index = @running.indexOf(item)
+		if index is -1
+			@err ?= new Error("Could not find [#{item.getNames()}] in the running queue")
+		else
+			@running = @running.slice(0, index).concat(@running.slice(index+1))
+
+		# Already exited?
+		return  if @paused
+
+		# Continue or finish up
+		@nextItems()  unless @complete()
+
+		# Chain
+		@
+
+	itemUncaughtExceptionCallback: (item, err) ->
+		# Stop further execution and exit with the error
+		@exit(err)
+
+		# Chain
+		@
 
 	complete: ->
 		completed = false
