@@ -345,7 +345,7 @@ class TaskGroup extends Interface
 		# Give setConfig enough chance to fire
 		# Changing this to setImmediate breaks a lot of things
 		# As tasks inside nested taskgroups will fire in any order
-		process.nextTick(@fire.bind(@))
+		process.nextTick(@fireMethod.bind(@))
 
 		# Handle item completion
 		@on('item.complete', @itemCompletionCallback.bind(@))
@@ -405,7 +405,8 @@ class TaskGroup extends Interface
 		config.includeInResults ?= false
 		return @addTask(method, config)
 
-	fire: ->
+	# for @internal use only, do not use externally
+	fireMethod: ->
 		# Auto run if we are going the inline style and have no parent
 		if @config.method
 			# Add the function as our first unamed task with the extra arguments
