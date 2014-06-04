@@ -22,26 +22,28 @@ joe.describe 'task', (describe,it) ->
 				# Wait a while as this is an async test
 				wait delay, ->
 					++checks
+					expect(task.status, 'status to be running as we are within the task').to.equal('running')
 					expect(task.result, "result to be null as we haven't set it yet").to.equal(null)
 					# Return no error, and the result to the completion callback completing the task
 					complete(null,10)
 
 			# Check the task completed as expected
-			task.on 'complete', (err,result) ->
+			task.done (err,result) ->
 				++checks
+				expect(task.status, 'status to be completed as we are within the completion callback').to.equal('completed')
 				expect(task.result, "the set result to be as expected as the task has completed").to.deep.equal([err,result])
 				expect(err, "the callback error to be null as we did not error").to.equal(null)
 				expect(result, "the callback result to be as expected").to.equal(10)
 
 			# Check task hasn't run yet
-			expect(task.running, "running to be false as we haven't started running yet").to.equal(false)
+			expect(task.status, "status to be null as we haven't started running yet").to.equal(null)
 			expect(task.result, "result to be null as we haven't started running yet").to.equal(null)
 
 			# Run thet ask
 			task.run()
 
 			# Check that task has started running
-			expect(task.running, 'running to be true as tasks execute asynchronously').to.equal(true)
+			expect(task.status, 'running to be started as tasks execute asynchronously').to.equal('started')
 			expect(task.result, 'result to be null as tasks execute asynchronously').to.equal(null)
 
 			# Check that all our special checks have run
@@ -59,26 +61,28 @@ joe.describe 'task', (describe,it) ->
 			# Create our synchronous task
 			task = new Task ->
 				++checks
+				expect(task.status, 'status to be running as we are within the task').to.equal('running')
 				expect(task.result, "result to be null as we haven't set it yet").to.equal(null)
 				# Return our result completing the task
 				return 10
 
 			# Check the task completed as expected
-			task.on 'complete', (err,result) ->
+			task.done (err,result) ->
 				++checks
+				expect(task.status, 'status to be completed as we are within the completion callback').to.equal('completed')
 				expect(task.result, "the set result to be as expected as the task has completed").to.deep.equal([err,result])
 				expect(err, "the callback error to be null as we did not error").to.equal(null)
 				expect(result, "the callback result to be as expected").to.equal(10)
 
 			# Check task hasn't run yet
-			expect(task.running, "running to be false as we haven't started running yet").to.equal(false)
+			expect(task.status, "status to be null as we haven't started running yet").to.equal(null)
 			expect(task.result, "result to be null as we haven't started running yet").to.equal(null)
 
 			# Run
 			task.run()
 
 			# Check that task has started running
-			expect(task.running, 'running to be true as tasks execute asynchronously').to.equal(true)
+			expect(task.status, 'status to be started as tasks execute asynchronously').to.equal('started')
 			expect(task.result, 'result to be null as tasks execute asynchronously').to.equal(null)
 
 			# Check that all our special checks have run
@@ -98,25 +102,27 @@ joe.describe 'task', (describe,it) ->
 			# Create our synchronous task
 			task = new Task ->
 				++checks
+				expect(task.status, 'status to be running as we are within the task').to.equal('running')
 				expect(task.result, "result to be null as we haven't set it yet").to.equal(null)
 				return err
 
 			# Check the task completed as expected
-			task.on 'complete', (_err,result) ->
+			task.done (_err,result) ->
 				++checks
+				expect(task.status, 'status to be failed as we are within the completion callback').to.equal('failed')
 				expect(task.result, "the set result to be as expected as the task has completed").to.deep.equal([err])
 				expect(_err, "the callback error to be set as we errord").to.equal(err)
 				expect(result, "the callback result to be null we errord").to.not.exist
 
 			# Check task hasn't run yet
-			expect(task.running, "running to be false as we haven't started running yet").to.equal(false)
+			expect(task.status, "status to be null as we haven't started running yet").to.equal(null)
 			expect(task.result, "result to be null as we haven't started running yet").to.equal(null)
 
 			# Run
 			task.run()
 
 			# Check that task has started running
-			expect(task.running, 'running to be true as tasks execute asynchronously').to.equal(true)
+			expect(task.status, 'status to be started as tasks execute asynchronously').to.equal('started')
 			expect(task.result, 'result to be null as tasks execute asynchronously').to.equal(null)
 
 			# Check that all our special checks have run
@@ -135,32 +141,31 @@ joe.describe 'task', (describe,it) ->
 			# Create our synchronous task
 			task = new Task ->
 				++checks
+				expect(task.status, 'status to be running as we are within the task').to.equal('running')
 				expect(task.result, "result to be null as we haven't set it yet").to.equal(null)
 				throw err
 
 			# Check the task completed as expected
-			task.on 'complete', (_err,result) ->
-				neverReached = true
-			task.on 'error', (_err) ->
+			task.done (_err,result) ->
 				++checks
+				expect(task.status, 'status to be failed as we are within the completion callback').to.equal('failed')
 				expect(_err, "the callback error to be set as we errord").to.equal(err)
 
 			# Check task hasn't run yet
-			expect(task.running, "running to be false as we haven't started running yet").to.equal(false)
+			expect(task.status, "status to be null as we haven't started running yet").to.equal(null)
 			expect(task.result, "result to be null as we haven't started running yet").to.equal(null)
 
 			# Run
 			task.run()
 
 			# Check that task has started running
-			expect(task.running, 'running to be true as tasks execute asynchronously').to.equal(true)
+			expect(task.status, 'status to be started as tasks execute asynchronously').to.equal('started')
 			expect(task.result, 'result to be null as tasks execute asynchronously').to.equal(null)
 
 			# Check that all our special checks have run
 			wait delay, ->
 				++checks
 				expect(checks, "all our special checks have run").to.equal(3)
-				expect(neverReached, "never reached to be false").to.equal(false)
 				done()
 
 		it 'should detect async throw error on asynchronous task', (done) ->
@@ -179,25 +184,25 @@ joe.describe 'task', (describe,it) ->
 			task = new Task (done) ->
 				wait delay, ->
 					++checks
+					expect(task.status, 'status to be running as we are within the task').to.equal('running')
 					expect(task.result, "result to be null as we haven't set it yet").to.equal(null)
 					throw err
 
 			# Check the task completed as expected
-			task.on 'complete', (_err,result) ->
-				neverReached = true
-			task.on 'error', (_err) ->
+			task.done (_err,result) ->
 				++checks
+				expect(task.status, 'status to be failed as we are within the completion callback').to.equal('failed')
 				expect(_err, "the callback error to be set as we errord").to.equal(err)
 
 			# Check task hasn't run yet
-			expect(task.running, "running to be false as we haven't started running yet").to.equal(false)
+			expect(task.status, "status to be null as we haven't started running yet").to.equal(null)
 			expect(task.result, "result to be null as we haven't started running yet").to.equal(null)
 
 			# Run
 			task.run()
 
 			# Check that task has started running
-			expect(task.running, 'running to be true as tasks execute asynchronously').to.equal(true)
+			expect(task.status, 'status to be started as tasks execute asynchronously').to.equal('started')
 			expect(task.result, 'result to be null as tasks execute asynchronously').to.equal(null)
 
 			# Check that all our special checks have run
@@ -224,7 +229,7 @@ joe.describe 'task', (describe,it) ->
 			task.setConfig(args:[2,5])
 
 			# Check
-			task.on 'complete', (err,result) ->
+			task.done (err,result) ->
 				++checks
 				expect(task.result).to.deep.equal([err,result])
 				expect(err?.message or null).to.equal(null)
@@ -255,7 +260,7 @@ joe.describe 'task', (describe,it) ->
 			task.setConfig(args:[2,5])
 
 			# Check
-			task.on 'complete', (err,result) ->
+			task.done (err,result) ->
 				++checks
 				expect(task.result).to.deep.equal([err,result])
 				expect(err?.message or null).to.equal(null)
@@ -277,7 +282,7 @@ joe.describe 'taskgroup', (describe,it) ->
 	describe "basic", (suite,it) ->
 		# Serial
 		it 'should work when running in serial', (done) ->
-			tasks = new TaskGroup().setConfig({concurrency:1}).on 'complete', (err,results) ->
+			tasks = new TaskGroup().setConfig({concurrency:1}).done (err,results) ->
 				expect(err?.message or null).to.equal(null)
 				expect(results).to.deep.equal([[null,10], [null,5]])
 				expect(tasks.config.concurrency).to.equal(1)
@@ -318,7 +323,7 @@ joe.describe 'taskgroup', (describe,it) ->
 
 		# Parallel with new API
 		it 'should work when running in parallel', (done) ->
-			tasks = new TaskGroup().setConfig({concurrency:0}).on 'complete', (err,results) ->
+			tasks = new TaskGroup().setConfig({concurrency:0}).done (err,results) ->
 				expect(err?.message or null).to.equal(null)
 				expect(results).to.deep.equal([[null,5],[null,10]])
 				expect(tasks.config.concurrency).to.equal(0)
@@ -403,7 +408,7 @@ joe.describe 'taskgroup', (describe,it) ->
 	describe "errors", (suite,it) ->
 		# Parallel
 		it 'should handle error correctly in parallel', (done) ->
-			tasks = new TaskGroup().setConfig({concurrency:0}).on 'complete', (err,results) ->
+			tasks = new TaskGroup().setConfig({concurrency:0}).done (err,results) ->
 				expect(err.message).to.equal('deliberate error')
 				expect(results.length).to.equal(1)
 				expect(tasks.config.concurrency).to.equal(0)
@@ -445,7 +450,7 @@ joe.describe 'taskgroup', (describe,it) ->
 
 		# Error Serial
 		it 'should handle error correctly in serial', (done) ->
-			tasks = new TaskGroup().setConfig({concurrency:1}).on 'complete', (err,results) ->
+			tasks = new TaskGroup().setConfig({concurrency:1}).done (err,results) ->
 				expect(err.message).to.equal('deliberate error')
 				expect(results.length).to.equal(1)
 				expect(tasks.config.concurrency).to.equal(1)
@@ -526,7 +531,7 @@ joe.describe 'nested', (describe,it) ->
 					# we should probably test the added group
 					# rather than the parent
 
-		tasks.on 'complete', (err) ->
+		tasks.done (err) ->
 			console.log(err)  if err
 			expect(err?.message or null).to.equal(null)
 
@@ -591,7 +596,7 @@ joe.describe 'nested', (describe,it) ->
 				# we should probably test the added group
 				# rather than the parent
 
-		tasks.on 'complete', (err) ->
+		tasks.done (err) ->
 			console.log(err)  if err
 			expect(err?.message or null).to.equal(null)
 
@@ -657,7 +662,7 @@ joe.describe 'nested', (describe,it) ->
 				total: 3
 			)
 
-		tasks.on 'complete', (err) ->
+		tasks.done (err) ->
 			console.log(err)  if err
 			expect(err?.message or null).to.equal(null)
 
@@ -688,7 +693,7 @@ joe.describe 'nested', (describe,it) ->
 			expect(tasks.remaining.length).to.equal(0)
 			expect(tasks.running).to.equal(1)
 
-		tasks.on 'complete', (err) ->
+		tasks.done (err) ->
 			console.log(err)  if err
 			expect(err?.message or null).to.equal(null)
 			throw new Error('should never reach here')

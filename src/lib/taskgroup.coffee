@@ -103,10 +103,10 @@ class Task extends Interface
 	@create: (args...) -> return new @(args...)
 
 	# Variables
+	# for @internal use only, do not use externally
 	type: 'task'  # for duck typing
-	result: null
-	running: false
-	completed: false
+	result: null  # array, [err, ...]
+	status: null  # [null, 'started', 'running', 'completed', 'failed', 'destroyed']
 	taskDomain: null
 
 	# Config
@@ -123,8 +123,9 @@ class Task extends Interface
 	# - new Task(name, method)
 	# - new Task(method)
 	constructor: (args...) ->
-		# Prepare
 		super
+
+		# Prepare
 		@config ?= {}
 		@config.name ?= "Task #{Math.random()}"
 		@config.run ?= false
@@ -170,53 +171,42 @@ class Task extends Interface
 	# Get Config
 	getConfig: -> @config
 
-	# Reset
-	reset: ->
-		# Reset our flags
-		@completed = false
-		@running = false
-		@result = null
-
-		# Chain
-		@
+	# Has Started
+	hasStarted: ->
+		return @status isnt null
 
 	# Has Exited
 	hasExited: ->
-		return @completed is true
+		return @status in ['completed', 'failed', 'destroyed']
 
 	# Is Done
 	isDone: ->
 		return @hasExited() is true
 
-	# Uncaught Exception
-	# Define our uncaught error callback to put the task into its completion state
-	# as well as emit the error event
-	uncaughtExceptionCallback: (args...) ->
-		# Extract the error
-		err = args[0]
-
-		# Apply our completion flags if we have not yet completed
-		@complete(args)  if @hasExited() is false
-
-		# Fire our uncaught error handler
-		@emit('error', err)
-
-		# Chain
-		@
-
-	# Completion Callback
-	completionCallback: (args...) ->
+	# Exit
+	# The completion callback to use when the function completes normally, when it errors, and when whatever else unexpected happens
+	exit: (args...) ->
 		# Complete for the first (and hopefully only) time
 		if @hasExited() is false
-			# Update our flags
-			@complete(args)
+			# Apply the result if it exists
+			if args.length isnt 0
+				@result = args
+
+			# Did we error?
+			if @result?[0]?
+				@status = 'failed'
+			else
+				@status = 'completed'
 
 			# Notify our listeners of our completion
-			@emit('complete', @result...)
+			@done()
 
 		# Error as we have already completed before
 		else
-			err = new Error("A task's completion callback has fired when the task was already in a completed state, this is unexpected")
+			err = new Error """
+				The task [#{@getNames()}] just completed, but it had already completed earlier, this is unexpected.
+				Completed with the arguments: #{args.toString()}
+				"""
 			@emit('error', err)
 
 		# Chain
@@ -228,50 +218,49 @@ class Task extends Interface
 	done: (next) ->
 		super
 		queue =>
-			@emit('complete', (@result or [])...)  if @isDone() is true
+			@emit('complete', (@result or [])...)  if @hasExited() is true
 		@
 
 	# Destroy
 	destroy: ->
+		# Ensure nothing hit here again
+		@status = 'destroyed'
+
 		# Remove all isteners
+		# @TODO should we exit or dispose of the domain?
 		@removeAllListeners()
 
 		# Chain
 		@
 
-	# Complete
-	complete: (result) ->
-		# Apply completion flags
-		@completed = true
-		@running = false
-		@result = result
-
-		# Chain
-		@
-
 	# Fire
+	# for @internal use only, do not use externally
 	fire: ->
 		# Prepare
 		me = @
 
 		# Add our completion callback to our specified arguments to send over to the method
-		args = (@config.args or []).concat([@completionCallback.bind(@)])
+		args = (@config.args or []).concat([@exit.bind(@)])
 
 		# Prepare the task domain if it doesn't already exist
 		if @taskDomain? is false and domain?.create?
 			@taskDomain = domain.create()
-			@taskDomain.on('error', @uncaughtExceptionCallback.bind(@))
+			@taskDomain.on('error', @exit.bind(@))
 
 		# Listen for uncaught errors
 		fire = ->
 			try
 				if me.config.method?.bind
 					methodToFire = me.config.method.bind(me.config.context or me)
+					me.status = 'running'
 					ambi(methodToFire, args...)
 				else
-					throw new Error("The task #{me.config.name} was fired but has no method to fire")
+					err = new Error """
+						The task [#{me.getNames()}] was fired but has no method to fire
+						"""
+					throw err
 			catch err
-				me.uncaughtExceptionCallback(err)
+				me.exit(err)
 
 		if @taskDomain?
 			@taskDomain.run(fire)
@@ -284,25 +273,28 @@ class Task extends Interface
 	# Run
 	run: ->
 		# Already completed?
-		if @hasExited() is true
-			err = new Error("A task was about to run but it has already completed, this is unexpected")
-			@emit('error', err)
+		if @hasStarted() is true
+			err = new Error """
+				The task [#{@getNames()}] was just about to start, but it has already started earlier, this is unexpected.
+				"""
+			@exit(err)
 
 		# Not yet completed, so lets run!
 		else
 			# Reset to a running state
-			@reset()
-			@running = true
+			@status = 'started'
 
 			# Notify our intention
 			@emit('run')
 
-			# Give time for the listeners to complete before continuing
+			# Give time for the listeners in the above event to complete before continuing
 			# This delay is needed for task groups
+			# @TODO IS THIS NECESSARY?
 			setImmediate(@fire.bind(@))
 
 		# Chain
 		@
+
 
 
 # Task Group
