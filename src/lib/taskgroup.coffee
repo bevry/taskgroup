@@ -308,7 +308,7 @@ class TaskGroup extends Interface
 
 	# Variables
 	type: 'taskgroup'  # for duck typing
-	running: 0
+	running: null
 	remaining: null
 	err: null
 	results: null
@@ -336,6 +336,7 @@ class TaskGroup extends Interface
 		@config.run ?= false
 		@results ?= []
 		@remaining ?= []
+		@running ?= []
 		@bubbleEvents ?= ['complete', 'run', 'error']
 
 		# Apply configuration
@@ -427,7 +428,11 @@ class TaskGroup extends Interface
 		@err = args[0]  if args[0]
 
 		# Mark that one less item is running
-		--@running  if @running > 0
+		index = @running.indexOf(item)
+		if index is -1
+			@err ?= new Error("Could not find [#{item.getNames()}] in the running queue")
+		else
+			@running = @running.slice(0, index).concat(@running.slice(index+1))
 
 		# Already exited?
 		return  if @paused
@@ -446,7 +451,7 @@ class TaskGroup extends Interface
 		@
 
 	getTotals: ->
-		running = @running
+		running = @running.length
 		remaining = @remaining.length
 		completed = @results.length
 		total = running + remaining + completed
@@ -548,7 +553,7 @@ class TaskGroup extends Interface
 
 	isReady: ->
 		# Do we have available slots to run
-		return !@config.concurrency or @running < @config.concurrency
+		return !@config.concurrency or @running.length < @config.concurrency
 
 	nextItems: ->
 		items = []
@@ -571,7 +576,7 @@ class TaskGroup extends Interface
 			if @isReady()
 				# Get the next item and remove it from the remaining items
 				nextItem = @remaining.shift()
-				++@running
+				@running.push(nextItem)
 
 				# Run it
 				nextItem.run()
@@ -586,7 +591,7 @@ class TaskGroup extends Interface
 		return @config.pauseOnError and @err?
 
 	isEmpty: ->
-		return @hasItems() is false and @running is 0
+		return @hasItems() is false and @running.length is 0
 
 	isDone: ->
 		# Determine completion
@@ -659,7 +664,9 @@ class TaskGroup extends Interface
 		@stop()
 
 		# Stop running
-		@running = 0
+		@running = []
+		# @TODO we should let them finish
+		# then exit
 
 		# Complete
 		@complete()
