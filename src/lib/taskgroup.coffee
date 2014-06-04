@@ -1,16 +1,104 @@
 # Import
 setImmediate = global?.setImmediate or process.nextTick  # node 0.8 b/c
+queue = process.nextTick
 ambi = require('ambi')
 events = require('events')
 domain = (try require('domain')) ? null
 {EventEmitter} = events
 {extendOnClass} = require('extendonclass')
 
+# Generic Interface with common methods used by both Task and TaskGroup
+class Interface extends EventEmitter
+	constructor: ->
+		super
+
+		# Bind our default error handler
+		# to ensure that errors are caught if the user doesn't catch them
+		@on('error', @defaultErrorHandler)
+		@on('complete', @defaultErrorHandler)
+
+		# Chain
+		@
+
+	# for @internal use only, do not use externally
+	# By default throw the error if present if no other completion callback has been
+	defaultErrorHandler: (err) ->
+		if err
+			console.error(err.stack or err)
+			throw err
+		@
+
+	# Done
+	# Listens to the complete event
+	# But if we are already completed, then fire the complete event
+	done: (handler) ->
+		# PRepare
+		me = @
+
+		# Check if we have a handler
+		# We may not if our parent is a promise and is being used to emit events
+		if handler?
+			# ensure the passed done handler is ever only fired once and once only regardless of which event fires
+			wrappedHandler = (args...) ->
+				# remove our wrapped handler instance so we don't ever fire it again
+				me
+					.removeListener('error', wrappedHandler)
+					.removeListener('complete', wrappedHandler)
+
+				# fire the original handler as expected
+				handler.apply(me, args)
+
+			# ensure the done handler is ever only fired once and once only regardless of which event fires
+			@
+				.on('error', wrappedHandler)
+				.on('complete', wrappedHandler)
+
+		# Chain
+		@
+
+	# Remove our default
+	on: (event, listener) ->
+		if event in ['complete', 'error']
+			EventEmitter::removeListener.call(@, event, @defaultErrorHandler)
+		super
+
+	once: (event, listener) ->
+		if event in ['complete', 'error']
+			EventEmitter::removeListener.call(@, event, @defaultErrorHandler)
+		super
+
+	removeListener: (event, listener) ->
+		result = super
+		if event in ['complete', 'error'] and @listeners(event).length is 0
+			EventEmitter::on.call(@, event, @defaultErrorHandler)
+		return result
+
+	# Get Names
+	getNames: (opts={}) ->
+		# Prepare
+		opts.format ?= 'string'
+		opts.separator ?= ' ➞  '
+
+		# Fetch
+		names = @config.parent?.getNames(format: 'array') or []
+		names.push(name)  if name = @getName()
+
+		# Format
+		if opts.format isnt 'array'
+			names = names.join(opts.separator)
+
+		# Return
+		return names
+
+	# Get Name
+	getName: ->
+		return @config.name
+
 # Task
 # Events
 # - complete
 # - run
-class Task extends EventEmitter
+class Task extends Interface
 	@extend: extendOnClass
 	@create: (args...) -> return new @(args...)
 
@@ -72,7 +160,7 @@ class Task extends EventEmitter
 		for own key,value of opts
 			switch key
 				when 'next'
-					@once('complete', value.bind(@))  if value
+					@done(value)  if value
 				else
 					@config[key] = value
 
@@ -92,6 +180,14 @@ class Task extends EventEmitter
 		# Chain
 		@
 
+	# Has Exited
+	hasExited: ->
+		return @completed is true
+
+	# Is Done
+	isDone: ->
+		return @hasExited() is true
+
 	# Uncaught Exception
 	# Define our uncaught error callback to put the task into its completion state
 	# as well as emit the error event
@@ -100,7 +196,7 @@ class Task extends EventEmitter
 		err = args[0]
 
 		# Apply our completion flags if we have not yet completed
-		@complete(args)  unless @completed
+		@complete(args)  if @hasExited() is false
 
 		# Fire our uncaught error handler
 		@emit('error', err)
@@ -111,7 +207,7 @@ class Task extends EventEmitter
 	# Completion Callback
 	completionCallback: (args...) ->
 		# Complete for the first (and hopefully only) time
-		unless @completed
+		if @hasExited() is false
 			# Update our flags
 			@complete(args)
 
@@ -124,6 +220,15 @@ class Task extends EventEmitter
 			@emit('error', err)
 
 		# Chain
+		@
+
+	# Done
+	# Listens to the complete event
+	# But if we are already completed, then fire the complete event
+	done: (next) ->
+		super
+		queue =>
+			@emit('complete', (@result or [])...)  if @isDone() is true
 		@
 
 	# Destroy
@@ -179,7 +284,7 @@ class Task extends EventEmitter
 	# Run
 	run: ->
 		# Already completed?
-		if @completed
+		if @hasExited() is true
 			err = new Error("A task was about to run but it has already completed, this is unexpected")
 			@emit('error', err)
 
@@ -205,7 +310,7 @@ class Task extends EventEmitter
 # - (task|group|item).(complete|run)
 # - complete
 # - run
-class TaskGroup extends EventEmitter
+class TaskGroup extends Interface
 	@extend: extendOnClass
 	@create: (args...) -> return new @(args...)
 
@@ -283,7 +388,7 @@ class TaskGroup extends EventEmitter
 		for own key,value of opts
 			switch key
 				when 'next'
-					@once('complete', value.bind(@))  if value
+					@done(value)  if value
 				when 'task', 'tasks'
 					@addTasks(value)  if value
 				when 'group', 'groups'
@@ -298,14 +403,20 @@ class TaskGroup extends EventEmitter
 
 	getConfig: -> @config
 
+	# add method
+	# for @internal use only, do not use externally
+	addMethod: (method, config={}) ->
+		method ?= @config.method.bind(@)
+		method.isTaskGroupMethod = true
+		config.args ?= [@addGroup.bind(@), @addTask.bind(@)]
+		config.includeInResults ?= false
+		return @addTask(method, config)
+
 	fire: ->
 		# Auto run if we are going the inline style and have no parent
 		if @config.method
 			# Add the function as our first unamed task with the extra arguments
-			@addTask(@config.method.bind(@), {
-				args: [@addGroup.bind(@), @addTask.bind(@)]
-				includeInResults:false
-			})
+			item = @addMethod()
 
 			# Proceed to run if we are the topmost group
 			@run()  if !@config.parent
@@ -479,16 +590,23 @@ class TaskGroup extends EventEmitter
 		# Didn't fire another item
 		return false
 
-	complete: ->
+	shouldPause: ->
+		return @config.pauseOnError and @err?
+
+	isEmpty: ->
+		return @hasItems() is false and @running is 0
+
+	isDone: ->
 		# Determine completion
-		pause = @config.pauseOnError and @err
-		empty = @hasItems() is false and @running is 0
-		completed = pause or empty
+		return @shouldPause() or @isEmpty()
+
+	complete: ->
+		completed = false
 
 		# Continue with completion
-		if completed
+		if @isDone() is true
 			# Pause if desired
-			@pause()  if pause
+			@pause()  if @shouldPause() is true
 
 			# Notify we've completed and send the error and results if we have them
 			@emit('complete', @err, @results)
@@ -497,8 +615,21 @@ class TaskGroup extends EventEmitter
 			@err = null
 			@results = []
 
+			# Result
+			completed = true
+
 		# Return result
 		return completed
+
+	# Done
+	# Listens to the complete event
+	# But if we are already completed, then fire the complete event
+	done: (handler) ->
+		super
+		queue =>
+			@emit('complete', @err, @results)  if @isDone() is true
+			@err = null
+		@
 
 	clear: ->
 		# Removes all the items from remaining
