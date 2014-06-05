@@ -466,6 +466,7 @@ class TaskGroup extends Interface
 
 	# Add an item
 	# also run for groups too
+	# for @internal use only, do not use externally
 	addItem: (item) ->
 		# Prepare
 		me = @
@@ -512,6 +513,7 @@ class TaskGroup extends Interface
 		# Return the item
 		return item
 
+	# for @internal use only, do not use externally
 	addItems: (items, args...) ->
 		items = [items]  unless Array.isArray(items)
 		return (@addItem(item, args...)  for item in items)
@@ -523,11 +525,17 @@ class TaskGroup extends Interface
 	createTask: (args...) ->
 		defaultConfig =
 			name: 'task '+(@getItemsTotal()+1)+' for '+@getName()
-		if args[0]?.type is 'task' # @TODO: should this even be a supported use case?
+
+		# Support receiving an existing task instance
+		if args[0]?.type is 'task'
 			task = args[0]
 			task.setConfig(defaultConfig, args.slice(1)...)
+
+		# Support receiving arguments to create a task instance
 		else
 			task = new Task(defaultConfig, args...)
+
+		# Return the new task
 		return task
 
 	addTask: (args...) ->
@@ -544,11 +552,17 @@ class TaskGroup extends Interface
 	createGroup: (args...) ->
 		defaultConfig =
 			name: 'task group '+(@getItemsTotal()+1)+' for '+@getName()
-		if args[0]?.type is 'taskgroup' # @TODO: should this even be a supported use case?
+
+		# Support recieving an existing taskgroup instance
+		if args[0]?.type is 'taskgroup'
 			taskgroup = args[0]
 			taskgroup.setConfig(defaultConfig, args.slice(1)...)
+
+		# Support receiving arugments to create a taskgroup intance
 		else
 			taskgroup = new TaskGroup(defaultConfig, args...)
+
+		# Return the taskgroup instance
 		return taskgroup
 
 	addGroup: (args...) ->
@@ -670,7 +684,6 @@ class TaskGroup extends Interface
 		items = []
 
 		# Fire the next items
-		debugger
 		while true
 			item = @fireNextItem()
 			if item
@@ -802,6 +815,7 @@ class TaskGroup extends Interface
 		@
 
 
+	# We now want to exit
 	exit: (err) ->
 		# Update error if set
 		@err ?= err  if err? is true
@@ -819,6 +833,7 @@ class TaskGroup extends Interface
 		# Chain
 		@
 
+	# We want to run
 	run: (args...) ->
 		# Start
 		@status = 'started'
