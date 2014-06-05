@@ -1,4 +1,5 @@
 # Import
+util = require('util')
 {expect} = require('chai')
 joe = require('joe')
 {Task,TaskGroup} = require('../../')
@@ -6,6 +7,9 @@ joe = require('joe')
 # Prepare
 wait = (delay,fn) -> setTimeout(fn,delay)
 delay = 100
+inspect = (args...) ->
+	for arg in args
+		console.log util.inspect(arg, {colors:true})
 
 # Task
 joe.describe 'task', (describe,it) ->
@@ -286,37 +290,44 @@ joe.describe 'taskgroup', (describe,it) ->
 				expect(err?.message or null).to.equal(null)
 				expect(results).to.deep.equal([[null,10], [null,5]])
 				expect(tasks.config.concurrency).to.equal(1)
-				expect(tasks.getTotals()).to.deep.equal(
-					remaining: 0
-					running: 0
-					completed: 2
+
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: []
+					running: []
+					completed: ['task 1', 'task 2']
 					total: 2
-				)
+					results: 2
+				expect(actualItems, 'completion items').to.deep.equal(expectedItems)
+
 				done()
 
-			tasks.addTask (complete) ->
-				expect(tasks.getTotals()).to.deep.equal(
-					remaining: 1
-					running: 1
-					completed: 0
+			tasks.addTask 'task 1', (complete) ->
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: ['task 2']
+					running: ['task 1']
+					completed: []
 					total: 2
-				)
+					results: 0
+				expect(actualItems, 'task 1 items before wait items').to.deep.equal(expectedItems)
+
 				wait 500, ->
-					expect(tasks.getTotals()).to.deep.equal(
-						remaining: 1
-						running: 1
-						completed: 0
-						total: 2
-					)
+					actualItems = tasks.getItemNames()
+					expect(actualItems, 'task 1 items after wait items').to.deep.equal(expectedItems)
+
 					complete(null, 10)
 
-			tasks.addTask ->
-				expect(tasks.getTotals()).to.deep.equal(
-					remaining: 0
-					running: 1
-					completed: 1
+			tasks.addTask 'task 2', ->
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: []
+					running: ['task 2']
+					completed: ['task 1']
 					total: 2
-				)
+					results: 1
+				expect(actualItems, 'task 2 items').to.deep.equal(expectedItems)
+
 				return 5
 
 			tasks.run()
@@ -327,79 +338,108 @@ joe.describe 'taskgroup', (describe,it) ->
 				expect(err?.message or null).to.equal(null)
 				expect(results).to.deep.equal([[null,5],[null,10]])
 				expect(tasks.config.concurrency).to.equal(0)
-				expect(tasks.getTotals()).to.deep.equal(
-					remaining: 0
-					running: 0
-					completed: 2
+
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: []
+					running: []
+					completed: ['task 2', 'task 1']
 					total: 2
-				)
+					results: 2
+				expect(actualItems, 'completion items').to.deep.equal(expectedItems)
+
 				done()
 
-			tasks.addTask (complete) ->
-				expect(tasks.getTotals()).to.deep.equal(
-					remaining: 0
-					running: 2
-					completed: 0
+			tasks.addTask 'task 1', (complete) ->
+
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: []
+					running: ['task 1', 'task 2']
+					completed: []
 					total: 2
-				)
+					results: 0
+				expect(actualItems, 'task 1 before wait items').to.deep.equal(expectedItems)
+
 				wait 500, ->
-					expect(tasks.getTotals()).to.deep.equal(
-						remaining: 0
-						running: 1
-						completed: 1
+
+					actualItems = tasks.getItemNames()
+					expectedItems =
+						remaining: []
+						running: ['task 1']
+						completed: ['task 2']
 						total: 2
-					)
+						results: 1
+					expect(actualItems, 'task 1 after wait items').to.deep.equal(expectedItems)
+
 					complete(null,10)
 
-			tasks.addTask ->
-				expect(tasks.getTotals()).to.deep.equal(
-					remaining: 0
-					running: 2
-					completed: 0
+			tasks.addTask 'task 2', ->
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: []
+					running: ['task 1', 'task 2']
+					completed: []
 					total: 2
-				)
+					results: 0
+				expect(actualItems, 'task 2 items').to.deep.equal(expectedItems)
+
 				return 5
 
 			tasks.run()
 
 		# Parallel
 		it 'should work when running in parallel with new API', (done) ->
-			tasks = new TaskGroup(
+			tasks = TaskGroup.create(
+				name: 'my tasks'
 				concurrency: 0
 				next: (err,results) ->
 					expect(err?.message or null).to.equal(null)
 					expect(results).to.deep.equal([[null,5],[null,10]])
 					expect(tasks.config.concurrency).to.equal(0)
-					expect(tasks.getTotals()).to.deep.equal(
-						remaining: 0
-						running: 0
-						completed: 2
+
+					actualItems = tasks.getItemNames()
+					expectedItems =
+						remaining: []
+						running: []
+						completed: ['task 2 for my tasks', 'task 1 for my tasks']
 						total: 2
-					)
+						results: 2
+					expect(actualItems, 'completion items').to.deep.equal(expectedItems)
+
 					done()
 				tasks: [
 					(complete) ->
-						expect(tasks.getTotals()).to.deep.equal(
-							remaining: 0
-							running: 2
-							completed: 0
+						actualItems = tasks.getItemNames()
+						expectedItems =
+							remaining: []
+							running: ['task 1 for my tasks', 'task 2 for my tasks']
+							completed: []
 							total: 2
-						)
+							results: 0
+						expect(actualItems, 'task 1 before wait items').to.deep.equal(expectedItems)
+
 						wait 500, ->
-							expect(tasks.getTotals()).to.deep.equal(
-								remaining: 0
-								running: 1
-								completed: 1
+							actualItems = tasks.getItemNames()
+							expectedItems =
+								remaining: []
+								running: ['task 1 for my tasks']
+								completed: ['task 2 for my tasks']
 								total: 2
-							)
+								results: 1
+							expect(actualItems, 'task 1 after wait items').to.deep.equal(expectedItems)
+
 							complete(null,10)
 					->
-						expect(tasks.getTotals()).to.deep.equal(
-							remaining: 0
-							running: 2
-							completed: 0
+						actualItems = tasks.getItemNames()
+						expectedItems =
+							remaining: []
+							running: ['task 1 for my tasks', 'task 2 for my tasks']
+							completed: []
 							total: 2
-						)
+							results: 0
+						expect(actualItems, 'task 1 after wait items').to.deep.equal(expectedItems)
+
 						return 5
 				]
 			).run()
@@ -408,41 +448,60 @@ joe.describe 'taskgroup', (describe,it) ->
 	describe "errors", (suite,it) ->
 		# Parallel
 		it 'should handle error correctly in parallel', (done) ->
-			tasks = new TaskGroup().setConfig({concurrency:0}).done (err,results) ->
-				expect(err.message).to.equal('deliberate error')
-				expect(results.length).to.equal(1)
+			tasks = new TaskGroup().setConfig({name:'my tasks', concurrency:0}).done (err,results) ->
+				expect(err.message).to.equal('task 2 deliberate error')
+				expect(tasks.status).to.equal('failed')
+				expect(tasks.err).to.equal(err)
 				expect(tasks.config.concurrency).to.equal(0)
-				expect(tasks.getTotals()).to.deep.equal(
-					remaining: 0
-					running: 1
-					completed: 1
+
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: []
+					running: []
+					completed: ['task 2 for my tasks', 'task 1 for my tasks']
 					total: 2
-					# in a new version this should be completed: 2
-				)
+					results: 2
+				expect(actualItems, 'completion items').to.deep.equal(expectedItems)
+
 				done()
 
 			# Error via completion callback
 			tasks.addTask (complete) ->
-				expect(tasks.getTotals()).to.deep.equal(
-					remaining: 0
-					running: 2
-					completed: 0
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: []
+					running: ['task 1 for my tasks', 'task 2 for my tasks']
+					completed: []
 					total: 2
-				)
+					results: 0
+				expect(actualItems, 'task 1 before wait items').to.deep.equal(expectedItems)
+
 				wait 500, ->
-					err = new Error('deliberate error')
+					actualItems = tasks.getItemNames()
+					expectedItems =
+						remaining: []
+						running: ['task 2 for my tasks']
+						completed: ['task 1 for my tasks']
+						total: 2
+						results: 1
+					expect(actualItems, 'task 1 before wait items').to.deep.equal(expectedItems)
+
+					err = new Error('task 1 deliberate error')
 					complete(err)
 				return null
 
 			# Error via return
 			tasks.addTask ->
-				expect(tasks.getTotals()).to.deep.equal(
-					remaining: 0
-					running: 2
-					completed: 0
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: []
+					running: ['task 1 for my tasks', 'task 2 for my tasks']
+					completed: []
 					total: 2
-				)
-				err = new Error('deliberate error')
+					results: 0
+				expect(actualItems, 'task 1 before wait items').to.deep.equal(expectedItems)
+
+				err = new Error('task 2 deliberate error')
 				return err
 
 			# Run tasks
@@ -450,25 +509,33 @@ joe.describe 'taskgroup', (describe,it) ->
 
 		# Error Serial
 		it 'should handle error correctly in serial', (done) ->
-			tasks = new TaskGroup().setConfig({concurrency:1}).done (err,results) ->
+			tasks = new TaskGroup().setConfig({name:'my tasks', concurrency:1}).done (err,results) ->
 				expect(err.message).to.equal('deliberate error')
-				expect(results.length).to.equal(1)
 				expect(tasks.config.concurrency).to.equal(1)
-				expect(tasks.getTotals()).to.deep.equal(
-					remaining: 1
-					running: 0
-					completed: 1
+				expect(tasks.status).to.equal('failed')
+				expect(tasks.err).to.equal(err)
+
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: ['task 2 for my tasks']
+					running: []
+					completed: ['task 1 for my tasks']
 					total: 2
-				)
+					results: 1
+				expect(actualItems, 'completion items').to.deep.equal(expectedItems)
+
 				done()
 
 			tasks.addTask (complete) ->
-				expect(tasks.getTotals()).to.deep.equal(
-					remaining: 1
-					running: 1
-					completed: 0
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: ['task 2 for my tasks']
+					running: ['task 1 for my tasks']
+					completed: []
 					total: 2
-				)
+					results: 0
+				expect(actualItems, 'task 1 items').to.deep.equal(expectedItems)
+
 				err = new Error('deliberate error')
 				complete(err)
 
@@ -491,45 +558,76 @@ joe.describe 'nested', (describe,it) ->
 			addTask 'my task', (complete) ->
 				checks.push('my task 1')
 				expect(@config.name).to.equal('my task')
-				expect(tasks.getTotals()).to.deep.equal(
-					remaining: 1
-					running: 1
-					completed: 0
-					total: 2
-				)
+
+				# totals for parent group
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: ['my group']
+					running: ['my task']
+					completed: ['taskgroup method for my tests']
+					total: 3
+					results: 0
+				expect(actualItems, 'my task items before wait').to.deep.equal(expectedItems)
+
 				wait 500, ->
 					checks.push('my task 2')
-					expect(tasks.getTotals()).to.deep.equal(
-						remaining: 1
-						running: 1
-						completed: 0
-						total: 2
-					)
-					complete()
+
+					# totals for parent group
+					actualItems = tasks.getItemNames()
+					expect(actualItems, 'my task items after wait').to.deep.equal(expectedItems)
+
+					complete(null, 10)
 
 			addGroup 'my group', (addGroup,addTask) ->
+				myGroup = @
 				checks.push('my group')
 				expect(@config.name).to.equal('my group')
-				expect(tasks.getTotals()).to.deep.equal(
-					remaining: 0
-					running: 1
-					completed: 1
-					total: 2
-				)
-				# we should probably test the added group
-				# rather than the parent
+
+				# totals for parent group
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: []
+					running: ['my group']
+					completed: ['taskgroup method for my tests', 'my task']
+					total: 3
+					results: 1
+				expect(actualItems, 'my group parent items').to.deep.equal(expectedItems)
+
+				# totals for sub group
+				actualItems = myGroup.getItemNames()
+				expectedItems =
+					remaining: []
+					running: ['taskgroup method for my group']
+					completed: []
+					total: 1
+					results: 0
+				expect(actualItems, 'my group items').to.deep.equal(expectedItems)
 
 				addTask 'my second task', ->
 					checks.push('my second task')
 					expect(@config.name).to.equal('my second task')
-					expect(tasks.getTotals()).to.deep.equal(
-						remaining: 0
-						running: 1
-						completed: 1
+
+					# totals for parent group
+					actualItems = tasks.getItemNames()
+					expectedItems =
+						remaining: []
+						running: ['my group']
+						completed: ['taskgroup method for my tests', 'my task']
+						total: 3
+						results: 1
+					expect(actualItems, 'my group parent items').to.deep.equal(expectedItems)
+
+					# totals for sub group
+					actualItems = myGroup.getItemNames()
+					expectedItems =
+						remaining: []
+						running: ['my second task']
+						completed: ['taskgroup method for my group']
 						total: 2
-					)
-					# we should probably test the added group
-					# rather than the parent
+						results: 0
+					expect(actualItems, 'my group items').to.deep.equal(expectedItems)
+
+					return 20
 
 		tasks.done (err) ->
 			console.log(err)  if err
@@ -538,12 +636,17 @@ joe.describe 'nested', (describe,it) ->
 			console.log(checks)  if checks.length isnt 4
 			expect(checks.length, 'checks').to.equal(4)
 
-			expect(tasks.getTotals()).to.deep.equal(
-				remaining: 0
-				running: 0
-				completed: 2
-				total: 2
-			)
+			# @TODO check results
+
+			# totals for parent group
+			actualItems = tasks.getItemNames()
+			expectedItems =
+				remaining: []
+				running: []
+				completed: ['taskgroup method for my tests', 'my task', 'my group']
+				total: 3
+				results: 2
+			expect(actualItems, 'completion items').to.deep.equal(expectedItems)
 
 			done()
 
@@ -551,50 +654,82 @@ joe.describe 'nested', (describe,it) ->
 	it 'traditional format', (done) ->
 		checks = []
 
-		tasks = new TaskGroup().run()
+		tasks = new TaskGroup(name: 'my tests').run()
 
 		tasks.addTask 'my task', (complete) ->
 			checks.push('my task 1')
 			expect(@config.name).to.equal('my task')
-			expect(tasks.getTotals()).to.deep.equal(
-				remaining: 1
-				running: 1
-				completed: 0
+
+			# totals for parent group
+			actualItems = tasks.getItemNames()
+			expectedItems =
+				remaining: ['my group']
+				running: ['my task']
+				completed: []
 				total: 2
-			)
+				results: 0
+			expect(actualItems, 'my task items before wait').to.deep.equal(expectedItems)
+
 			wait 500, ->
 				checks.push('my task 2')
-				expect(tasks.getTotals()).to.deep.equal(
-					remaining: 1
-					running: 1
-					completed: 0
-					total: 2
-				)
-				complete()
+
+				# totals for parent group
+				actualItems = tasks.getItemNames()
+				expect(actualItems, 'my task items after wait').to.deep.equal(expectedItems)
+
+				complete(null, 10)
 
 		tasks.addGroup 'my group', ->
+			myGroup = @
 			checks.push('my group')
 			expect(@config.name).to.equal('my group')
-			expect(tasks.getTotals()).to.deep.equal(
-				remaining: 0
-				running: 1
-				completed: 1
+
+			# totals for parent group
+			actualItems = tasks.getItemNames()
+			expectedItems =
+				remaining: []
+				running: ['my group']
+				completed: ['my task']
 				total: 2
-			)
-			# we should probably test the added group
-			# rather than the parent
+				results: 1
+			expect(actualItems, 'my group parent items').to.deep.equal(expectedItems)
+
+			# totals for sub group
+			actualItems = myGroup.getItemNames()
+			expectedItems =
+				remaining: []
+				running: ['taskgroup method for my group']
+				completed: []
+				total: 1
+				results: 0
+			expect(actualItems, 'my group items').to.deep.equal(expectedItems)
 
 			@addTask 'my second task', ->
 				checks.push('my second task')
 				expect(@config.name).to.equal('my second task')
-				expect(tasks.getTotals()).to.deep.equal(
-					remaining: 0
-					running: 1
-					completed: 1
+
+				# totals for parent group
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: []
+					running: ['my group']
+					completed: ['my task']
 					total: 2
-				)
-				# we should probably test the added group
-				# rather than the parent
+					results: 1
+				expect(actualItems, 'my group parent items').to.deep.equal(expectedItems)
+
+				# totals for sub group
+				actualItems = myGroup.getItemNames()
+				expectedItems =
+					remaining: []
+					running: ['my second task']
+					completed: ['taskgroup method for my group']
+					total: 2
+					results: 0
+				expect(actualItems, 'my group items').to.deep.equal(expectedItems)
+
+				return 20
+
 
 		tasks.done (err) ->
 			console.log(err)  if err
@@ -603,12 +738,17 @@ joe.describe 'nested', (describe,it) ->
 			console.log(checks)  if checks.length isnt 4
 			expect(checks.length, 'checks').to.equal(4)
 
-			expect(tasks.getTotals()).to.deep.equal(
-				remaining: 0
-				running: 0
-				completed: 2
+			# @TODO check results
+
+			# totals for parent group
+			actualItems = tasks.getItemNames()
+			expectedItems =
+				remaining: []
+				running: []
+				completed: ['my task', 'my group']
 				total: 2
-			)
+				results: 2
+			expect(actualItems, 'completion items').to.deep.equal(expectedItems)
 
 			done()
 
@@ -616,51 +756,90 @@ joe.describe 'nested', (describe,it) ->
 	it 'mixed format', (done) ->
 		checks = []
 
-		tasks = new TaskGroup()
+		tasks = new TaskGroup(name: 'my tests')
 
 		tasks.addTask 'my task 1', ->
 			checks.push('my task 1')
-			expect(@config.name).to.equal('my task 1')
-			expect(tasks.getTotals()).to.deep.equal(
-				remaining: 2
-				running: 1
-				completed: 0
+
+			# totals for parent group
+			actualItems = tasks.getItemNames()
+			expectedItems =
+				remaining: ['my group 1', 'my task 3']
+				running: ['my task 1']
+				completed: []
 				total: 3
-			)
+				results: 0
+			expect(actualItems, 'my task 1 items').to.deep.equal(expectedItems)
+
+			return 10
 
 		tasks.addGroup 'my group 1', ->
+			myGroup = @
 			checks.push('my group 1')
 			expect(@config.name).to.equal('my group 1')
-			expect(tasks.getTotals()).to.deep.equal(
-				remaining: 1
-				running: 1
-				completed: 1
+
+			# totals for parent group
+			actualItems = tasks.getItemNames()
+			expectedItems =
+				remaining: ['my task 3']
+				running: ['my group 1']
+				completed: ['my task 1']
 				total: 3
-			)
-			# we should probably test the added group
-			# rather than the parent
+				results: 1
+			expect(actualItems, 'my group 1 parent items').to.deep.equal(expectedItems)
+
+			# totals for sub group
+			actualItems = myGroup.getItemNames()
+			expectedItems =
+				remaining: []
+				running: ['taskgroup method for my group 1']
+				completed: []
+				total: 1
+				results: 0
+			expect(actualItems, 'my group 1 items').to.deep.equal(expectedItems)
+
 
 			@addTask 'my task 2', ->
 				checks.push('my task 2')
 				expect(@config.name).to.equal('my task 2')
-				expect(tasks.getTotals()).to.deep.equal(
-					remaining: 1
-					running: 1
-					completed: 1
+
+				# totals for parent group
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: ['my task 3']
+					running: ['my group 1']
+					completed: ['my task 1']
 					total: 3
-				)
-				# we should probably test the added group
-				# rather than the parent
+					results: 1
+				expect(actualItems, 'my group 1 after wait parent items').to.deep.equal(expectedItems)
+
+				# totals for sub group
+				actualItems = myGroup.getItemNames()
+				expectedItems =
+					remaining: []
+					running: ['my task 2']
+					completed: ['taskgroup method for my group 1']
+					total: 2
+					results: 0
+				expect(actualItems, 'my group 1 items').to.deep.equal(expectedItems)
+
+				return 20
 
 		tasks.addTask 'my task 3', ->
 			checks.push('my task 3')
 			expect(@config.name).to.equal('my task 3')
-			expect(tasks.getTotals()).to.deep.equal(
-				remaining: 0
-				running: 1
-				completed: 2
+
+			# totals for parent group
+			actualItems = tasks.getItemNames()
+			expectedItems =
+				remaining: []
+				running: ['my task 3']
+				completed: ['my task 1', 'my group 1']
 				total: 3
-			)
+				results: 2
+			expect(actualItems, 'my task 3 items').to.deep.equal(expectedItems)
+
+			return 30
 
 		tasks.done (err) ->
 			console.log(err)  if err
@@ -669,12 +848,18 @@ joe.describe 'nested', (describe,it) ->
 			console.log(checks)  if checks.length isnt 4
 			expect(checks.length, 'checks').to.equal(4)
 
-			expect(tasks.getTotals()).to.deep.equal(
-				remaining: 0
-				running: 0
-				completed: 3
+			# @TODO check results
+
+			# totals for parent group
+			actualItems = tasks.getItemNames()
+			expectedItems =
+				remaining: []
+				running: []
+				completed: ['my task 1', 'my group 1', 'my task 3']
 				total: 3
-			)
+				results: 3
+			expect(actualItems, 'completion items').to.deep.equal(expectedItems)
+
 
 			done()
 

@@ -237,7 +237,7 @@ class Task extends Interface
 	done: (next) ->
 		super
 		queue =>
-			@emit('complete', (@result or [])...)  if @hasExited() is true
+			@emit('complete', (@result or [])...)  if @isDone() is true
 		@
 
 	# Destroy
@@ -332,11 +332,12 @@ class TaskGroup extends Interface
 
 	# Variables
 	type: 'taskgroup'  # for duck typing
-	running: null
 	remaining: null
-	err: null
+	running: null
+	completed: null
 	results: null
-	paused: true
+	err: null
+	status: null  # [null, 'started', 'running', 'completed', 'failed', 'destroyed']
 	bubbleEvents: null
 
 	# Config
@@ -345,7 +346,7 @@ class TaskGroup extends Interface
 		name: null
 		method: null
 		concurrency: 1  # use 0 for unlimited
-		pauseOnError: true
+		onError: 'exit'
 		parent: null
 		run: null
 		###
@@ -357,11 +358,13 @@ class TaskGroup extends Interface
 		@config ?= {}
 		@config.name ?= "Task Group #{Math.random()}"
 		@config.concurrency ?= 1
-		@config.pauseOnError ?= true
-		@results ?= []
+		@config.onError ?= 'exit'
 		@remaining ?= []
 		@running ?= []
-		@bubbleEvents ?= ['complete', 'run', 'error']
+		@completed ?= []
+		@results ?= []
+		@bubbleEvents ?= []
+		@bubbleEvents.push('complete', 'run', 'error')
 
 		# Apply configuration
 		@setConfig(args)
@@ -369,7 +372,7 @@ class TaskGroup extends Interface
 		# Give setConfig enough chance to fire
 		# Changing this to setImmediate breaks a lot of things
 		# As tasks inside nested taskgroups will fire in any order
-		process.nextTick(@fireMethod.bind(@))
+		queue(@fireMethod.bind(@))
 
 		# Handle item completion
 		@on('item.complete', @itemCompletionCallback.bind(@))
@@ -380,6 +383,10 @@ class TaskGroup extends Interface
 		# Chain
 		@
 
+
+
+	# ---------------------------------
+	# Configuration
 
 	# Set Configuration
 	# opts = object|array
@@ -422,11 +429,15 @@ class TaskGroup extends Interface
 	getConfig: -> @config
 
 
+	# ---------------------------------
+	# TaskGroup Method
+
 	# add method
 	# for @internal use only, do not use externally
 	addMethod: (method, config={}) ->
 		method ?= @config.method.bind(@)
 		method.isTaskGroupMethod = true
+		config.name ?= 'taskgroup method for '+@getName()
 		config.args ?= [@addGroup.bind(@), @addTask.bind(@)]
 		config.includeInResults ?= false
 		return @addTask(method, config)
@@ -450,18 +461,8 @@ class TaskGroup extends Interface
 		@
 
 
-	getTotals: ->
-		running = @running.length
-		remaining = @remaining.length
-		completed = @results.length
-		total = running + remaining + completed
-		return {
-			running
-			remaining
-			completed
-			total
-		}
-
+	# ---------------------------------
+	# Add Item
 
 	# Add an item
 	# also run for groups too
@@ -505,8 +506,8 @@ class TaskGroup extends Interface
 		# Add the item
 		@remaining.push(item)
 
-		# Run the item right away, unless we are paused
-		@nextItems()  unless @paused
+		# We may be running and expecting items, if so, fire
+		@fire()
 
 		# Return the item
 		return item
@@ -516,12 +517,17 @@ class TaskGroup extends Interface
 		return (@addItem(item, args...)  for item in items)
 
 
+	# ---------------------------------
+	# Add Task
+
 	createTask: (args...) ->
+		defaultConfig =
+			name: 'task '+(@getItemsTotal()+1)+' for '+@getName()
 		if args[0]?.type is 'task' # @TODO: should this even be a supported use case?
 			task = args[0]
-			task.setConfig(args.slice(1))
+			task.setConfig(defaultConfig, args.slice(1)...)
 		else
-			task = new Task(args...)
+			task = new Task(defaultConfig, args...)
 		return task
 
 	addTask: (args...) ->
@@ -532,12 +538,17 @@ class TaskGroup extends Interface
 		return (@addTask(item, args...)  for item in items)
 
 
+	# ---------------------------------
+	# Add Group
+
 	createGroup: (args...) ->
+		defaultConfig =
+			name: 'task group '+(@getItemsTotal()+1)+' for '+@getName()
 		if args[0]?.type is 'taskgroup' # @TODO: should this even be a supported use case?
 			taskgroup = args[0]
-			taskgroup.setConfig(args.slice(1))
+			taskgroup.setConfig(defaultConfig, args.slice(1)...)
 		else
-			taskgroup = new TaskGroup(args...)
+			taskgroup = new TaskGroup(defaultConfig, args...)
 		return taskgroup
 
 	addGroup: (args...) ->
@@ -548,64 +559,165 @@ class TaskGroup extends Interface
 		return (@addGroup(item, args...)  for item in items)
 
 
-	hasItems: ->
-		# Do we have any items left to run
+	# ---------------------------------
+	# Status Indicators
+
+	getItemNames: ->
+		running = @running.map (item) -> item.getName()
+		remaining = @remaining.map (item) -> item.getName()
+		completed = @completed.map (item) -> item.getName()
+		results = @results.length
+		total = running.length + remaining.length + completed.length
+		return {
+			remaining
+			running
+			completed
+			total
+			results
+		}
+
+	getItemsTotal: ->
+		running = @running.length
+		remaining = @remaining.length
+		completed = @completed.length
+		total = running + remaining + completed
+		return total
+
+	getItemTotals: ->
+		running = @running.length
+		remaining = @remaining.length
+		completed = @completed.length
+		results = @results.length
+		total = running + remaining + completed
+		return {
+			remaining
+			running
+			completed
+			total
+			results
+		}
+
+	hasRunning: ->
+		return @running.length isnt 0
+
+	hasRemaining: ->
 		return @remaining.length isnt 0
 
-	isReady: ->
-		# Do we have available slots to run
-		return !@config.concurrency or @running.length < @config.concurrency
+	hasItems: ->
+		return @hasRunning() is true or @hasRemaining() is true
 
+	hasStarted: ->
+		return @status isnt null
+
+	hasExited: ->
+		return @status in ['completed', 'failed', 'destroyed']
+
+	hasSlots: ->
+		return (
+			@config.concurrency is 0 or
+			@running.length < @config.concurrency
+		)
 
 	shouldPause: ->
-		return @config.pauseOnError and @err?
+		return (
+			@config.onError is 'exit' and
+			@err? is true
+		)
+
+	shouldFire: ->
+		return (
+			@shouldPause() is false and
+			@hasRemaining() is true and
+			@hasSlots() is true
+		)
 
 	isEmpty: ->
-		return @hasItems() is false and @running.length is 0
+		return @hasItems() is false
+
+	isPaused: ->
+		return (
+			@shouldPause() is true and
+			@hasRunning() is false
+		)
 
 	isDone: ->
-		# Determine completion
-		return @shouldPause() or @isEmpty()
+		return (
+			@isPaused() is true or
+			@isEmpty() is true
+		)
 
 
-	nextItems: ->
+	# ---------------------------------
+	# Firers
+
+	# Done
+	# Listens to the complete event
+	# But if we are already completed, then fire the complete event
+	done: (handler) ->
+		super
+		queue =>
+			if @isDone() is true
+				@emit('complete', @err, @results)
+				@err = null
+				@results = []  # TODO: should we do this?
+		@
+
+	# Fire the next items
+	# returns the items that were fired
+	# or returns false if no items were fired
+	# for @internal use only, do not use externally
+	fireNextItems: ->
 		items = []
 
 		# Fire the next items
+		debugger
 		while true
-			item = @nextItem()
+			item = @fireNextItem()
 			if item
 				items.push(item)
 			else
 				break
 
-		result = if items.length then items else false
+		result =
+			if items.length isnt 0
+				items
+			else
+				false
+
 		return result
 
-	nextItem: ->
-		# Do we have items to run?
-		if @hasItems()
-			# Do we have available slots to run?
-			if @isReady()
-				# Get the next item and remove it from the remaining items
-				nextItem = @remaining.shift()
-				@running.push(nextItem)
+	# Fire the next item
+	# returns the item that was fired
+	# or returns false if no item was fired
+	# for @internal use only, do not use externally
+	fireNextItem: ->
+		# Prepare
+		result = false
+		fire = @shouldFire() is true
 
-				# Run it
-				nextItem.run()
+		# Can we run the next item?
+		if fire
+			# Fire the next item
+			@status = 'running'
 
-				# Return the item
-				return nextItem
+			# Get the next item and remove it from the remaining items
+			item = @remaining.shift()
+			@running.push(item)
 
-		# Didn't fire another item
-		return false
+			# Run it
+			item.run()
 
+			# Return the item
+			result = item
+
+		# Return
+		return result
+
+	# What to do when an item completes
+	# for @internal use only, do not use externally
 	itemCompletionCallback: (item, args...) ->
-		# Add the result
-		@results.push(args)  if item.config.includeInResults isnt false
-
 		# Update error if it exists
-		@err = args[0]  if args[0]
+		@err ?= args[0]  if args[0]
 
 		# Mark that one less item is running
 		index = @running.indexOf(item)
@@ -614,15 +726,20 @@ class TaskGroup extends Interface
 		else
 			@running = @running.slice(0, index).concat(@running.slice(index+1))
 
-		# Already exited?
-		return  if @paused
+		# Add to the completed queue
+		@completed.push(item)
 
-		# Continue or finish up
-		@nextItems()  unless @complete()
+		# Add the result
+		@results.push(args)  if item.config.includeInResults isnt false
+
+		# Fire
+		@fire()
 
 		# Chain
 		@
 
+	# What to do when an item completes
+	# for @internal use only, do not use externally
 	itemUncaughtExceptionCallback: (item, err) ->
 		# Stop further execution and exit with the error
 		@exit(err)
@@ -630,48 +747,53 @@ class TaskGroup extends Interface
 		# Chain
 		@
 
-	complete: ->
-		completed = false
+	# Fire
+	# for @internal use only, do not use externally
+	fire: ->
+		# Have we actually started?
+		if @hasStarted() is true
+			# Check if we are paused due to failure
+			if @shouldPause() is true
+				# paused true, running false
+				# exit if we are the last running item
+				if @hasRunning() is false
+					@exit()
 
-		# Continue with completion
-		if @isDone() is true
-			# Pause if desired
-			@pause()  if @shouldPause() is true
+				# paused true, running false
+				# wait for running items to complete
 
-			# Notify we've completed and send the error and results if we have them
-			@emit('complete', @err, @results)
+			# We are not paused
+			else
+				# paused false, empty true
+				# exit as we are the last item left that has now finally completed
+				if @isEmpty() is true
+					@exit()
 
-			# Reset the error and results to build up again for the next completion
-			@err = null
-			@results = []
-
-			# Result
-			completed = true
-
-		# Return result
-		return completed
-
-	# Done
-	# Listens to the complete event
-	# But if we are already completed, then fire the complete event
-	done: (handler) ->
-		super
-		queue =>
-			@emit('complete', @err, @results)  if @isDone() is true
-			@err = null
-		@
-
-	clear: ->
-		# Removes all the items from remaining
-		for item in @remaining.splice(0)
-			item.destroy()
+				# paused false, empty false
+				# fire the next items
+				else
+					@fireNextItems()
 
 		# Chain
 		@
 
+	# Clear remaning items
+	clear: ->
+		# Destroy all the items
+		remaining = @remaining
+		@remaining = []
+		item.destroy()  for item in remaining
+
+		# Chain
+		@
+
+	# Destroy all remaining items and remove listeners
 	destroy: ->
-		# Destroy and clear items
-		@stop()
+		# Stop further execution
+		@status = 'destroyed'
+
+		# Destroy all the items
+		@clear()
 
 		# Remove listeners
 		@removeAllListeners()
@@ -679,51 +801,33 @@ class TaskGroup extends Interface
 		# Chain
 		@
 
-	stop: ->
-		# Stop further execution
-		@pause()
-
-		# Clear everything remaining
-		@clear()
-
-		# Chain
-		@
 
 	exit: (err) ->
-		# Apply
-		@err = err  if err
+		# Update error if set
+		@err ?= err  if err? is true
 
-		# Clear
-		@stop()
+		# Update the status
+		@status =
+			if @err? is true
+				'failed'
+			else
+				'completed'
 
-		# Stop running
-		@running = []
-		# @TODO we should let them finish
-		# then exit
-
-		# Complete
-		@complete()
+		# Fire the completion callback
+		@done()
 
 		# Chain
-		@
-
-	pause: ->
-		@paused = true
 		@
 
 	run: (args...) ->
-		# Prepare
-		me = @
-		# Resume
-		@paused = false
+		# Start
+		@status = 'started'
 
 		# Notify our intention to run
 		@emit('run')
 
 		# Give time for the listeners to complete before continuing
-		process.nextTick ->
-			# Continue or finish up
-			me.nextItems()  unless me.complete()
+		queue @fire.bind(@)
 
 		# Chain
 		@
