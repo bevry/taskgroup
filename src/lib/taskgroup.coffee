@@ -17,7 +17,12 @@ domain = (try require('domain')) ? null
 {EventEmitter} = events
 {extendOnClass} = require('extendonclass')
 
+
+# =====================================
+# Interface
 # Generic Interface with common methods used by both Task and TaskGroup
+
+# Definition
 class Interface extends EventEmitter
 	constructor: ->
 		super
@@ -104,10 +109,14 @@ class Interface extends EventEmitter
 	getName: ->
 		return @config.name
 
+
+# =====================================
 # Task
+
 # Events
 # - complete
 # - run
+# - error
 class Task extends Interface
 	@extend: extendOnClass
 	@create: (args...) -> return new @(args...)
@@ -307,11 +316,16 @@ class Task extends Interface
 
 
 
+# =====================================
 # Task Group
+
 # Events
-# - (task|group|item).(complete|run)
 # - complete
 # - run
+# - error
+# - item.*
+# - task.*
+# - group.*
 class TaskGroup extends Interface
 	@extend: extendOnClass
 	@create: (args...) -> return new @(args...)
