@@ -65,5 +65,8 @@
     "preinstall": "node ./cyclic.js",
     "test": "node ./out/test/taskgroup-test.js"
   },
-  "main": "./out/lib/taskgroup.js"
+  "main": "./out/lib/taskgroup.js",
+  "cakeConfiguration": {
+    "COFFEE_SRC_PATH": "src"
+  }
 }
