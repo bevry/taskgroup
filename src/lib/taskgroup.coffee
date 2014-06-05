@@ -40,11 +40,21 @@ class Interface extends EventEmitter
 			throw err
 		@
 
+	# Complete
+	complete: ->
+		err = throw Error('interface should provide this')
+		@emit('error', err)
+		@
+
+	# Completed
+	completed: (handler) ->
+		@on('error', handler).on('complete', handler)
+		queue(@complete.bind(@))
+		@
+
 	# Done
-	# Listens to the complete event
-	# But if we are already completed, then fire the complete event
 	done: (handler) ->
-		# PRepare
+		# Prepare
 		me = @
 
 		# Check if we have a handler
@@ -61,9 +71,10 @@ class Interface extends EventEmitter
 				handler.apply(me, args)
 
 			# ensure the done handler is ever only fired once and once only regardless of which event fires
-			@
-				.on('error', wrappedHandler)
-				.on('complete', wrappedHandler)
+			@on('error', wrappedHandler).on('complete', wrappedHandler)
+
+		# Add promise
+		queue(@complete.bind(@))
 
 		# Chain
 		@
@@ -196,7 +207,7 @@ class Task extends Interface
 		return @status in ['completed', 'failed', 'destroyed']
 
 	# Is Done
-	isDone: ->
+	isComplete: ->
 		return @hasExited() is true
 
 	# Exit
@@ -215,7 +226,7 @@ class Task extends Interface
 				@status = 'completed'
 
 			# Notify our listeners of our completion
-			@done()
+			@complete()
 
 		# Error as we have already completed before
 		else
@@ -228,14 +239,14 @@ class Task extends Interface
 		# Chain
 		@
 
-	# Done
-	# Listens to the complete event
-	# But if we are already completed, then fire the complete event
-	done: (next) ->
-		super
-		queue =>
-			@emit('complete', (@result or [])...)  if @isDone() is true
-		@
+	# Complete
+	# for @internal use only, do not use externally
+	complete: ->
+		result = false
+		if @isComplete() is true
+			@emit('complete', (@result or [])...)
+			result = true
+		return result
 
 	# Destroy
 	destroy: ->
@@ -329,9 +340,9 @@ class TaskGroup extends Interface
 
 	# Variables
 	type: 'taskgroup'  # for duck typing
-	remaining: null
-	running: null
-	completed: null
+	itemsRemaining: null
+	itemsRunning: null
+	itemsCompleted: null
 	results: null
 	err: null
 	status: null  # [null, 'started', 'running', 'completed', 'failed', 'destroyed']
@@ -356,9 +367,9 @@ class TaskGroup extends Interface
 		@config.name ?= "Task Group #{Math.random()}"
 		@config.concurrency ?= 1
 		@config.onError ?= 'exit'
-		@remaining ?= []
-		@running ?= []
-		@completed ?= []
+		@itemsRemaining ?= []
+		@itemsRunning ?= []
+		@itemsCompleted ?= []
 		@results ?= []
 		@bubbleEvents ?= []
 		@bubbleEvents.push('complete', 'run', 'error')
@@ -502,7 +513,7 @@ class TaskGroup extends Interface
 		@emit('item.add', item)
 
 		# Add the item
-		@remaining.push(item)
+		@itemsRemaining.push(item)
 
 		# We may be running and expecting items, if so, fire
 		@fire()
@@ -574,9 +585,9 @@ class TaskGroup extends Interface
 	# Status Indicators
 
 	getItemNames: ->
-		running = @running.map (item) -> item.getName()
-		remaining = @remaining.map (item) -> item.getName()
-		completed = @completed.map (item) -> item.getName()
+		running = @itemsRunning.map (item) -> item.getName()
+		remaining = @itemsRemaining.map (item) -> item.getName()
+		completed = @itemsCompleted.map (item) -> item.getName()
 		results = @results.length
 		total = running.length + remaining.length + completed.length
 		return {
@@ -588,16 +599,16 @@ class TaskGroup extends Interface
 		}
 
 	getItemsTotal: ->
-		running = @running.length
-		remaining = @remaining.length
-		completed = @completed.length
+		running = @itemsRunning.length
+		remaining = @itemsRemaining.length
+		completed = @itemsCompleted.length
 		total = running + remaining + completed
 		return total
 
 	getItemTotals: ->
-		running = @running.length
-		remaining = @remaining.length
-		completed = @completed.length
+		running = @itemsRunning.length
+		remaining = @itemsRemaining.length
+		completed = @itemsCompleted.length
 		results = @results.length
 		total = running + remaining + completed
 		return {
@@ -609,10 +620,10 @@ class TaskGroup extends Interface
 		}
 
 	hasRunning: ->
-		return @running.length isnt 0
+		return @itemsRunning.length isnt 0
 
 	hasRemaining: ->
-		return @remaining.length isnt 0
+		return @itemsRemaining.length isnt 0
 
 	hasItems: ->
 		return @hasRunning() is true or @hasRemaining() is true
@@ -626,7 +637,7 @@ class TaskGroup extends Interface
 	hasSlots: ->
 		return (
 			@config.concurrency is 0 or
-			@running.length < @config.concurrency
+			@itemsRunning.length < @config.concurrency
 		)
 
 	shouldPause: ->
@@ -651,7 +662,7 @@ class TaskGroup extends Interface
 			@hasRunning() is false
 		)
 
-	isDone: ->
+	isComplete: ->
 		return (
 			@isPaused() is true or
 			@isEmpty() is true
@@ -661,17 +672,15 @@ class TaskGroup extends Interface
 	# ---------------------------------
 	# Firers
 
-	# Done
-	# Listens to the complete event
-	# But if we are already completed, then fire the complete event
-	done: (handler) ->
-		super
-		queue =>
-			if @isDone() is true
-				@emit('complete', @err, @results)
-				@err = null
-				@results = []  # TODO: should we do this?
-		@
+	# Complete
+	complete: (handler) ->
+		result = false
+		if @isComplete() is true
+			@emit('complete', @err, @results)
+			@err = null
+			@results = []
+			result = true
+		return result
 
 	# Fire the next items
 	# returns the items that were fired
@@ -711,8 +720,8 @@ class TaskGroup extends Interface
 			@status = 'running'
 
 			# Get the next item and remove it from the remaining items
-			item = @remaining.shift()
-			@running.push(item)
+			item = @itemsRemaining.shift()
+			@itemsRunning.push(item)
 
 			# Run it
 			item.run()
@@ -730,14 +739,14 @@ class TaskGroup extends Interface
 		@err ?= args[0]  if args[0]
 
 		# Mark that one less item is running
-		index = @running.indexOf(item)
+		index = @itemsRunning.indexOf(item)
 		if index is -1
 			@err ?= new Error("Could not find [#{item.getNames()}] in the running queue")
 		else
-			@running = @running.slice(0, index).concat(@running.slice(index+1))
+			@itemsRunning = @itemsRunning.slice(0, index).concat(@itemsRunning.slice(index+1))
 
 		# Add to the completed queue
-		@completed.push(item)
+		@itemsCompleted.push(item)
 
 		# Add the result
 		@results.push(args)  if item.config.includeInResults isnt false
@@ -790,8 +799,8 @@ class TaskGroup extends Interface
 	# Clear remaning items
 	clear: ->
 		# Destroy all the items
-		remaining = @remaining
-		@remaining = []
+		remaining = @itemsRemaining
+		@itemsRemaining = []
 		item.destroy()  for item in remaining
 
 		# Chain
@@ -825,7 +834,7 @@ class TaskGroup extends Interface
 				'completed'
 
 		# Fire the completion callback
-		@done()
+		@complete()
 
 		# Chain
 		@
@@ -839,7 +848,7 @@ class TaskGroup extends Interface
 		@emit('run')
 
 		# Give time for the listeners to complete before continuing
-		queue @fire.bind(@)
+		queue(@fire.bind(@))
 
 		# Chain
 		@
