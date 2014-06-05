@@ -288,7 +288,7 @@ joe.describe 'taskgroup', (describe,it) ->
 		it 'should work when running in serial', (done) ->
 			tasks = new TaskGroup().setConfig({concurrency:1}).done (err,results) ->
 				expect(err?.message or null).to.equal(null)
-				expect(results).to.deep.equal([[null,10], [null,5]])
+				expect(results).to.deep.equal([[null,10], [null,20]])
 				expect(tasks.config.concurrency).to.equal(1)
 
 				actualItems = tasks.getItemNames()
@@ -328,7 +328,7 @@ joe.describe 'taskgroup', (describe,it) ->
 					results: 1
 				expect(actualItems, 'task 2 items').to.deep.equal(expectedItems)
 
-				return 5
+				return 20
 
 			tasks.run()
 
@@ -336,7 +336,7 @@ joe.describe 'taskgroup', (describe,it) ->
 		it 'should work when running in parallel', (done) ->
 			tasks = new TaskGroup().setConfig({concurrency:0}).done (err,results) ->
 				expect(err?.message or null).to.equal(null)
-				expect(results).to.deep.equal([[null,5],[null,10]])
+				expect(results).to.deep.equal([[null,20], [null,10]])
 				expect(tasks.config.concurrency).to.equal(0)
 
 				actualItems = tasks.getItemNames()
@@ -384,7 +384,7 @@ joe.describe 'taskgroup', (describe,it) ->
 					results: 0
 				expect(actualItems, 'task 2 items').to.deep.equal(expectedItems)
 
-				return 5
+				return 20
 
 			tasks.run()
 
@@ -395,7 +395,7 @@ joe.describe 'taskgroup', (describe,it) ->
 				concurrency: 0
 				next: (err,results) ->
 					expect(err?.message or null).to.equal(null)
-					expect(results).to.deep.equal([[null,5],[null,10]])
+					expect(results).to.deep.equal([[null,20], [null,10]])
 					expect(tasks.config.concurrency).to.equal(0)
 
 					actualItems = tasks.getItemNames()
@@ -429,7 +429,7 @@ joe.describe 'taskgroup', (describe,it) ->
 								results: 1
 							expect(actualItems, 'task 1 after wait items').to.deep.equal(expectedItems)
 
-							complete(null,10)
+							complete(null, 10)
 					->
 						actualItems = tasks.getItemNames()
 						expectedItems =
@@ -440,9 +440,59 @@ joe.describe 'taskgroup', (describe,it) ->
 							results: 0
 						expect(actualItems, 'task 1 after wait items').to.deep.equal(expectedItems)
 
-						return 5
+						return 20
 				]
 			).run()
+
+		###
+		# Serial, Twice
+		it 'should clear results when running again', (done) ->
+			tasks = new TaskGroup().setConfig({concurrency:1}).done (err,results) ->
+				expect(err?.message or null).to.equal(null)
+				expect(results).to.deep.equal([[null,10], [null,20]])
+				expect(tasks.config.concurrency).to.equal(1)
+
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: []
+					running: []
+					completed: ['task 1', 'task 2']
+					total: 2
+					results: 2
+				expect(actualItems, 'completion items').to.deep.equal(expectedItems)
+
+				done()
+
+			tasks.addTask 'task 1', (complete) ->
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: ['task 2']
+					running: ['task 1']
+					completed: []
+					total: 2
+					results: 0
+				expect(actualItems, 'task 1 items before wait items').to.deep.equal(expectedItems)
+
+				wait 500, ->
+					actualItems = tasks.getItemNames()
+					expect(actualItems, 'task 1 items after wait items').to.deep.equal(expectedItems)
+
+					complete(null, 10)
+
+			tasks.addTask 'task 2', ->
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: []
+					running: ['task 2']
+					completed: ['task 1']
+					total: 2
+					results: 1
+				expect(actualItems, 'task 2 items').to.deep.equal(expectedItems)
+
+				return 20
+
+			tasks.run()
+		###
 
 	# Basic
 	describe "errors", (suite,it) ->

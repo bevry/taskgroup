@@ -1,9 +1,6 @@
 ###
 @TODO
 
-- Get it so if an error occurs, running tasks are waited for, and included in the results and completed tally
-- Only report the first error, clear error upon completion
-- Check promise-attempt1 for anything else
 - Use eventemittergrouped for events
 
 ###
