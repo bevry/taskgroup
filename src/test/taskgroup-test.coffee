@@ -530,11 +530,12 @@ joe.describe 'taskgroup', (describe,it) ->
 					actualItems = tasks.getItemNames()
 					expectedItems =
 						remaining: []
-						running: ['task 2 for my tasks']
-						completed: ['task 1 for my tasks']
+						running: ['task 1 for my tasks']
+						completed: ['task 2 for my tasks']
 						total: 2
 						results: 1
-					expect(actualItems, 'task 1 before wait items').to.deep.equal(expectedItems)
+					inspect 'actual', actualItems, 'expected', expectedItems
+					expect(actualItems, 'task 1 after wait items').to.deep.equal(expectedItems)
 
 					err = new Error('task 1 deliberate error')
 					complete(err)
