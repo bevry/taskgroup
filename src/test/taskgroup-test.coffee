@@ -286,7 +286,7 @@ joe.describe 'taskgroup', (describe,it) ->
 	describe "basic", (suite,it) ->
 		# Serial
 		it 'should work when running in serial', (done) ->
-			tasks = new TaskGroup().setConfig({concurrency:1}).done (err,results) ->
+			tasks = new TaskGroup().setConfig({name:'my tests',concurrency:1}).done (err,results) ->
 				expect(err?.message or null).to.equal(null)
 				expect(tasks.config.concurrency).to.equal(1)
 
@@ -445,7 +445,7 @@ joe.describe 'taskgroup', (describe,it) ->
 						return 20
 				]
 			).run()
-
+		
 		###
 		# Serial, Twice
 		it 'should clear results when running again', (done) ->

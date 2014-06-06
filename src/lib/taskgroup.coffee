@@ -243,18 +243,41 @@ class Task extends Interface
 	# for @internal use only, do not use externally
 	complete: ->
 		complete = @isComplete()
+
 		if complete
 			@emit('complete', (@result or [])...)
+
+			# Should we reset results?
+			# @results = []
+			# no, it would break the promise nature of done
+			# as it would mean that if multiple done handlers are added, they would each get different results
+			# if they wish to reset the results, they should do so manually via resetResults
+
+			# Should we reset the status?
+			# @status = null
+			# no, it would break the promise nature of done
+			# as it would mean that once a done is fired, no more can be fired, until run is called again
+
 		return complete
+
+	# Reset the results
+	resetResults: ->
+		@result = []
+		@
 
 	# Destroy
 	destroy: ->
-		# Ensure nothing hit here again
-		@status = 'destroyed'
+		@done =>
+			# Ensure nothing hit here again
+			@status = 'destroyed'
 
-		# Remove all isteners
-		# @TODO should we exit or dispose of the domain?
-		@removeAllListeners()
+			# Clear results
+			@resetResults()
+			# item arrays should already be wiped due to done completion
+
+			# Remove all isteners
+			# @TODO should we exit or dispose of the domain?
+			@removeAllListeners()
 
 		# Chain
 		@
@@ -633,6 +656,9 @@ class TaskGroup extends Interface
 	hasExited: ->
 		return @status in ['completed', 'failed', 'destroyed']
 
+	hasResult: ->
+		return @err? or @results.length isnt 0
+
 	hasSlots: ->
 		return (
 			@config.concurrency is 0 or
@@ -663,8 +689,11 @@ class TaskGroup extends Interface
 
 	isComplete: ->
 		return (
-			@isPaused() or
-			@isEmpty()
+			@hasStarted() and
+			(
+				@isPaused() or
+				@isEmpty()
+			)
 		)
 
 
@@ -678,12 +707,36 @@ class TaskGroup extends Interface
 		if complete
 			@emit('complete', @err, @results)
 			
-			# Reset
+			# Prevent the error from persisting
 			@err = null
-			@results = []
+
+			###
+			This should be here, but it currently causes failing tests
+			@TODO look into why
+			# Cleanup the items that will now go unused
+			for item in @itemsCompleted
+				console.log 'destroying', item.getNames(), @status, (new Error()).stack
+				item.destroy()
 			@itemsCompleted = []
+			###
+
+			# Should we reset results?
+			# @results = []
+			# no, it would break the promise nature of done
+			# as it would mean that if multiple done handlers are added, they would each get different results
+			# if they wish to reset the results, they should do so manually via resetResults
+
+			# Should we reset the status?
+			# @status = null
+			# no, it would break the promise nature of done
+			# as it would mean that once a done is fired, no more can be fired, until run is called again
 
 		return complete
+
+	# Reset the results
+	resetResults: ->
+		@results = []
+		@
 
 	# Fire the next items
 	# returns the items that were fired
@@ -744,7 +797,8 @@ class TaskGroup extends Interface
 		# Mark that one less item is running
 		index = @itemsRunning.indexOf(item)
 		if index is -1
-			@err ?= new Error("Could not find [#{item.getNames()}] in the running queue")
+			@err ?= indexError = new Error("Could not find [#{item.getNames()}] in the running queue")
+			console.log(indexError.message)
 		else
 			@itemsRunning = @itemsRunning.slice(0, index).concat(@itemsRunning.slice(index+1))
 
@@ -774,27 +828,13 @@ class TaskGroup extends Interface
 	fire: ->
 		# Have we actually started?
 		if @hasStarted()
-			# Check if we are paused due to failure
-			if @shouldPause()
-				# paused true, running false
-				# exit if we are the last running item
-				if @hasRunning() is false
-					@exit()
+			# Check if we are complete, if so, exit
+			if @isComplete()
+				@exit()
 
-				# paused true, running false
-				# wait for running items to complete
-
-			# We are not paused
-			else
-				# paused false, empty true
-				# exit as we are the last item left that has now finally completed
-				if @isEmpty()
-					@exit()
-
-				# paused false, empty false
-				# fire the next items
-				else
-					@fireNextItems()
+			# Otherwise continue firing items if we are wanting to pause
+			else if @shouldPause() is false
+				@fireNextItems()
 
 		# Chain
 		@
@@ -802,23 +842,29 @@ class TaskGroup extends Interface
 	# Clear remaning items
 	clear: ->
 		# Destroy all the items
-		remaining = @itemsRemaining
+		for item in @itemsRemaining
+			item.destroy()  
 		@itemsRemaining = []
-		item.destroy()  for item in remaining
 
 		# Chain
 		@
 
 	# Destroy all remaining items and remove listeners
 	destroy: ->
-		# Stop further execution
-		@status = 'destroyed'
-
 		# Destroy all the items
 		@clear()
 
-		# Remove listeners
-		@removeAllListeners()
+		# Once finished, destroy it
+		@done =>
+			# Stop from executing ever again
+			@status = 'destroyed'
+
+			# Clear results
+			@resetResults()
+			# item arrays should already be wiped due to done completion
+
+			# Remove listeners
+			@removeAllListeners()
 
 		# Chain
 		@
