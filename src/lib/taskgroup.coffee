@@ -208,7 +208,7 @@ class Task extends Interface
 
 	# Is Done
 	isComplete: ->
-		return @hasExited() is true
+		return @hasExited()
 
 	# Exit
 	# The completion callback to use when the function completes normally, when it errors, and when whatever else unexpected happens
@@ -242,11 +242,10 @@ class Task extends Interface
 	# Complete
 	# for @internal use only, do not use externally
 	complete: ->
-		result = false
-		if @isComplete() is true
+		complete = @isComplete()
+		if complete
 			@emit('complete', (@result or [])...)
-			result = true
-		return result
+		return complete
 
 	# Destroy
 	destroy: ->
@@ -300,7 +299,7 @@ class Task extends Interface
 	# Run
 	run: ->
 		# Already completed?
-		if @hasStarted() is true
+		if @hasStarted()
 			err = new Error """
 				The task [#{@getNames()}] was just about to start, but it has already started earlier, this is unexpected.
 				"""
@@ -626,7 +625,7 @@ class TaskGroup extends Interface
 		return @itemsRemaining.length isnt 0
 
 	hasItems: ->
-		return @hasRunning() is true or @hasRemaining() is true
+		return @hasRunning() or @hasRemaining()
 
 	hasStarted: ->
 		return @status isnt null
@@ -643,14 +642,14 @@ class TaskGroup extends Interface
 	shouldPause: ->
 		return (
 			@config.onError is 'exit' and
-			@err? is true
+			@err?
 		)
 
 	shouldFire: ->
 		return (
 			@shouldPause() is false and
-			@hasRemaining() is true and
-			@hasSlots() is true
+			@hasRemaining() and
+			@hasSlots()
 		)
 
 	isEmpty: ->
@@ -658,14 +657,14 @@ class TaskGroup extends Interface
 
 	isPaused: ->
 		return (
-			@shouldPause() is true and
+			@shouldPause() and
 			@hasRunning() is false
 		)
 
 	isComplete: ->
 		return (
-			@isPaused() is true or
-			@isEmpty() is true
+			@isPaused() or
+			@isEmpty()
 		)
 
 
@@ -674,13 +673,17 @@ class TaskGroup extends Interface
 
 	# Complete
 	complete: (handler) ->
-		result = false
-		if @isComplete() is true
+		complete = @isComplete()
+
+		if complete
 			@emit('complete', @err, @results)
+			
+			# Reset
 			@err = null
 			@results = []
-			result = true
-		return result
+			@itemsCompleted = []
+
+		return complete
 
 	# Fire the next items
 	# returns the items that were fired
@@ -712,7 +715,7 @@ class TaskGroup extends Interface
 	fireNextItem: ->
 		# Prepare
 		result = false
-		fire = @shouldFire() is true
+		fire = @shouldFire()
 
 		# Can we run the next item?
 		if fire
@@ -770,9 +773,9 @@ class TaskGroup extends Interface
 	# for @internal use only, do not use externally
 	fire: ->
 		# Have we actually started?
-		if @hasStarted() is true
+		if @hasStarted()
 			# Check if we are paused due to failure
-			if @shouldPause() is true
+			if @shouldPause()
 				# paused true, running false
 				# exit if we are the last running item
 				if @hasRunning() is false
@@ -785,7 +788,7 @@ class TaskGroup extends Interface
 			else
 				# paused false, empty true
 				# exit as we are the last item left that has now finally completed
-				if @isEmpty() is true
+				if @isEmpty()
 					@exit()
 
 				# paused false, empty false
@@ -824,11 +827,11 @@ class TaskGroup extends Interface
 	# We now want to exit
 	exit: (err) ->
 		# Update error if set
-		@err ?= err  if err? is true
+		@err ?= err  if err?
 
 		# Update the status
 		@status =
-			if @err? is true
+			if @err?
 				'failed'
 			else
 				'completed'
