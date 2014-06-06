@@ -498,6 +498,45 @@ joe.describe 'taskgroup', (describe,it) ->
 
 	# Basic
 	describe "errors", (suite,it) ->
+		# Error Serial
+		it 'should handle error correctly in serial', (done) ->
+			err1 = new Error('deliberate error')
+			err2 = new Error('unexpected error')
+			tasks = new TaskGroup().setConfig({name:'my tasks', concurrency:1}).done (err,results) ->
+				expect(err.message).to.equal('deliberate error')
+				expect(tasks.config.concurrency).to.equal(1)
+				expect(tasks.status).to.equal('failed')
+				expect(tasks.err).to.equal(err)
+
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: ['task 2 for my tasks']
+					running: []
+					completed: ['task 1 for my tasks']
+					total: 2
+					results: [[err1]]
+				expect(results).to.deep.equal(expectedItems.results)
+				expect(actualItems, 'completion items').to.deep.equal(expectedItems)
+
+				done()
+
+			tasks.addTask (complete) ->
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: ['task 2 for my tasks']
+					running: ['task 1 for my tasks']
+					completed: []
+					total: 2
+					results: []
+				expect(actualItems, 'task 1 items').to.deep.equal(expectedItems)
+
+				complete(err1)
+
+			tasks.addTask ->
+				throw err2
+
+			tasks.run()
+
 		# Parallel
 		it 'should handle error correctly in parallel', (done) ->
 			err1 = new Error('task 1 deliberate error')
@@ -558,45 +597,6 @@ joe.describe 'taskgroup', (describe,it) ->
 				return err2
 
 			# Run tasks
-			tasks.run()
-
-		# Error Serial
-		it 'should handle error correctly in serial', (done) ->
-			err1 = new Error('deliberate error')
-			err2 = new Error('unexpected error')
-			tasks = new TaskGroup().setConfig({name:'my tasks', concurrency:1}).done (err,results) ->
-				expect(err.message).to.equal('deliberate error')
-				expect(tasks.config.concurrency).to.equal(1)
-				expect(tasks.status).to.equal('failed')
-				expect(tasks.err).to.equal(err)
-
-				actualItems = tasks.getItemNames()
-				expectedItems =
-					remaining: ['task 2 for my tasks']
-					running: []
-					completed: ['task 1 for my tasks']
-					total: 2
-					results: [[err1]]
-				expect(results).to.deep.equal(expectedItems.results)
-				expect(actualItems, 'completion items').to.deep.equal(expectedItems)
-
-				done()
-
-			tasks.addTask (complete) ->
-				actualItems = tasks.getItemNames()
-				expectedItems =
-					remaining: ['task 2 for my tasks']
-					running: ['task 1 for my tasks']
-					completed: []
-					total: 2
-					results: []
-				expect(actualItems, 'task 1 items').to.deep.equal(expectedItems)
-
-				complete(err1)
-
-			tasks.addTask ->
-				throw err2
-
 			tasks.run()
 
 
