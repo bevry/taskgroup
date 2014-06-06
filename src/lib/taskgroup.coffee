@@ -40,41 +40,34 @@ class Interface extends EventEmitter
 			throw err
 		@
 
-	# Complete
+	# Complete emitter
 	complete: ->
 		err = throw Error('interface should provide this')
 		@emit('error', err)
 		@
 
-	# Completed
+	# Completed listener
 	completed: (handler) ->
-		@on('error', handler).on('complete', handler)
-		queue(@complete.bind(@))
+		@on('error', handler.bind(@)).on('complete', handler.bind(@))
 		@
 
-	# Done
+	# Done listener
 	done: (handler) ->
 		# Prepare
 		me = @
 
-		# Check if we have a handler
-		# We may not if our parent is a promise and is being used to emit events
-		if handler?
-			# ensure the passed done handler is ever only fired once and once only regardless of which event fires
-			wrappedHandler = (args...) ->
-				# remove our wrapped handler instance so we don't ever fire it again
-				me
-					.removeListener('error', wrappedHandler)
-					.removeListener('complete', wrappedHandler)
+		# ensure the passed done handler is ever only fired once and once only regardless of which event fires
+		wrappedHandler = (args...) ->
+			# remove our wrapped handler instance so we don't ever fire it again
+			me
+				.removeListener('error', wrappedHandler)
+				.removeListener('complete', wrappedHandler)
 
-				# fire the original handler as expected
-				handler.apply(me, args)
+			# fire the original handler as expected
+			handler.apply(me, args)
 
-			# ensure the done handler is ever only fired once and once only regardless of which event fires
-			@on('error', wrappedHandler).on('complete', wrappedHandler)
-
-		# Add promise
-		queue(@complete.bind(@))
+		# ensure the done handler is ever only fired once and once only regardless of which event fires
+		@on('error', wrappedHandler).on('complete', wrappedHandler)
 
 		# Chain
 		@
@@ -239,7 +232,7 @@ class Task extends Interface
 		# Chain
 		@
 
-	# Complete
+	# Complete Emitter
 	# for @internal use only, do not use externally
 	complete: ->
 		complete = @isComplete()
@@ -259,6 +252,24 @@ class Task extends Interface
 			# as it would mean that once a done is fired, no more can be fired, until run is called again
 
 		return complete
+
+	# Completed Promise
+	completed: (handler) ->
+		queue =>
+			if @isComplete()
+				handler.call(@, @result)
+			else
+				super(handler)
+		@
+
+	# Done Promise
+	done: (handler) ->
+		queue =>
+			if @isComplete()
+				handler.call(@, @result)
+			else
+				super(handler)
+		@
 
 	# Reset the results
 	resetResults: ->
@@ -404,12 +415,6 @@ class TaskGroup extends Interface
 		# As tasks inside nested taskgroups will fire in any order
 		queue(@fireMethod.bind(@))
 
-		# Handle item completion
-		@on('item.complete', @itemCompletionCallback.bind(@))
-
-		# Handle item error
-		@on('item.error', @itemUncaughtExceptionCallback.bind(@))
-
 		# Chain
 		@
 
@@ -533,6 +538,10 @@ class TaskGroup extends Interface
 
 		# Notify our intention
 		@emit('item.add', item)
+
+		# Handle item completion and errors once
+		item.done (args...) ->
+			me.itemCompletionCallback(item, args...)
 
 		# Add the item
 		@itemsRemaining.push(item)
@@ -713,12 +722,11 @@ class TaskGroup extends Interface
 			###
 			This should be here, but it currently causes failing tests
 			@TODO look into why
+			###
 			# Cleanup the items that will now go unused
 			for item in @itemsCompleted
-				console.log 'destroying', item.getNames(), @status, (new Error()).stack
 				item.destroy()
 			@itemsCompleted = []
-			###
 
 			# Should we reset results?
 			# @results = []
@@ -732,6 +740,24 @@ class TaskGroup extends Interface
 			# as it would mean that once a done is fired, no more can be fired, until run is called again
 
 		return complete
+
+	# Completed Promise
+	completed: (handler) ->
+		queue =>
+			if @isComplete()
+				handler.call(@, @err, @results)
+			else
+				super(handler)
+		@
+
+	# Done Promise
+	done: (handler) ->
+		queue =>
+			if @isComplete()
+				handler.call(@, @err, @results)
+			else
+				super(handler)
+		@
 
 	# Reset the results
 	resetResults: ->
@@ -810,15 +836,6 @@ class TaskGroup extends Interface
 
 		# Fire
 		@fire()
-
-		# Chain
-		@
-
-	# What to do when an item completes
-	# for @internal use only, do not use externally
-	itemUncaughtExceptionCallback: (item, err) ->
-		# Stop further execution and exit with the error
-		@exit(err)
 
 		# Chain
 		@
