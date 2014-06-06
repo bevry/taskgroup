@@ -588,7 +588,7 @@ class TaskGroup extends Interface
 		running = @itemsRunning.map (item) -> item.getName()
 		remaining = @itemsRemaining.map (item) -> item.getName()
 		completed = @itemsCompleted.map (item) -> item.getName()
-		results = @results.length
+		results = @results
 		total = running.length + remaining.length + completed.length
 		return {
 			remaining

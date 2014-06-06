@@ -288,7 +288,6 @@ joe.describe 'taskgroup', (describe,it) ->
 		it 'should work when running in serial', (done) ->
 			tasks = new TaskGroup().setConfig({concurrency:1}).done (err,results) ->
 				expect(err?.message or null).to.equal(null)
-				expect(results).to.deep.equal([[null,10], [null,20]])
 				expect(tasks.config.concurrency).to.equal(1)
 
 				actualItems = tasks.getItemNames()
@@ -297,7 +296,9 @@ joe.describe 'taskgroup', (describe,it) ->
 					running: []
 					completed: ['task 1', 'task 2']
 					total: 2
-					results: 2
+					results: [[null,10], [null,20]]
+
+				expect(results).to.deep.equal(expectedItems.results)
 				expect(actualItems, 'completion items').to.deep.equal(expectedItems)
 
 				done()
@@ -309,7 +310,7 @@ joe.describe 'taskgroup', (describe,it) ->
 					running: ['task 1']
 					completed: []
 					total: 2
-					results: 0
+					results: []
 				expect(actualItems, 'task 1 items before wait items').to.deep.equal(expectedItems)
 
 				wait 500, ->
@@ -325,7 +326,7 @@ joe.describe 'taskgroup', (describe,it) ->
 					running: ['task 2']
 					completed: ['task 1']
 					total: 2
-					results: 1
+					results:  [[null,10]]
 				expect(actualItems, 'task 2 items').to.deep.equal(expectedItems)
 
 				return 20
@@ -336,7 +337,6 @@ joe.describe 'taskgroup', (describe,it) ->
 		it 'should work when running in parallel', (done) ->
 			tasks = new TaskGroup().setConfig({concurrency:0}).done (err,results) ->
 				expect(err?.message or null).to.equal(null)
-				expect(results).to.deep.equal([[null,20], [null,10]])
 				expect(tasks.config.concurrency).to.equal(0)
 
 				actualItems = tasks.getItemNames()
@@ -345,7 +345,9 @@ joe.describe 'taskgroup', (describe,it) ->
 					running: []
 					completed: ['task 2', 'task 1']
 					total: 2
-					results: 2
+					results: [[null,20], [null,10]]
+
+				expect(results).to.deep.equal(expectedItems.results)
 				expect(actualItems, 'completion items').to.deep.equal(expectedItems)
 
 				done()
@@ -358,7 +360,7 @@ joe.describe 'taskgroup', (describe,it) ->
 					running: ['task 1', 'task 2']
 					completed: []
 					total: 2
-					results: 0
+					results: []
 				expect(actualItems, 'task 1 before wait items').to.deep.equal(expectedItems)
 
 				wait 500, ->
@@ -369,7 +371,7 @@ joe.describe 'taskgroup', (describe,it) ->
 						running: ['task 1']
 						completed: ['task 2']
 						total: 2
-						results: 1
+						results: [[null,20]]
 					expect(actualItems, 'task 1 after wait items').to.deep.equal(expectedItems)
 
 					complete(null,10)
@@ -381,7 +383,7 @@ joe.describe 'taskgroup', (describe,it) ->
 					running: ['task 1', 'task 2']
 					completed: []
 					total: 2
-					results: 0
+					results: []
 				expect(actualItems, 'task 2 items').to.deep.equal(expectedItems)
 
 				return 20
@@ -395,7 +397,6 @@ joe.describe 'taskgroup', (describe,it) ->
 				concurrency: 0
 				next: (err,results) ->
 					expect(err?.message or null).to.equal(null)
-					expect(results).to.deep.equal([[null,20], [null,10]])
 					expect(tasks.config.concurrency).to.equal(0)
 
 					actualItems = tasks.getItemNames()
@@ -404,7 +405,8 @@ joe.describe 'taskgroup', (describe,it) ->
 						running: []
 						completed: ['task 2 for my tasks', 'task 1 for my tasks']
 						total: 2
-						results: 2
+						results: [[null,20], [null,10]]
+					expect(results).to.deep.equal(expectedItems.results)
 					expect(actualItems, 'completion items').to.deep.equal(expectedItems)
 
 					done()
@@ -416,7 +418,7 @@ joe.describe 'taskgroup', (describe,it) ->
 							running: ['task 1 for my tasks', 'task 2 for my tasks']
 							completed: []
 							total: 2
-							results: 0
+							results: []
 						expect(actualItems, 'task 1 before wait items').to.deep.equal(expectedItems)
 
 						wait 500, ->
@@ -426,7 +428,7 @@ joe.describe 'taskgroup', (describe,it) ->
 								running: ['task 1 for my tasks']
 								completed: ['task 2 for my tasks']
 								total: 2
-								results: 1
+								results: [[null,20]]
 							expect(actualItems, 'task 1 after wait items').to.deep.equal(expectedItems)
 
 							complete(null, 10)
@@ -437,7 +439,7 @@ joe.describe 'taskgroup', (describe,it) ->
 							running: ['task 1 for my tasks', 'task 2 for my tasks']
 							completed: []
 							total: 2
-							results: 0
+							results: []
 						expect(actualItems, 'task 1 after wait items').to.deep.equal(expectedItems)
 
 						return 20
@@ -498,6 +500,8 @@ joe.describe 'taskgroup', (describe,it) ->
 	describe "errors", (suite,it) ->
 		# Parallel
 		it 'should handle error correctly in parallel', (done) ->
+			err1 = new Error('task 1 deliberate error')
+			err2 = new Error('task 2 deliberate error')
 			tasks = new TaskGroup().setConfig({name:'my tasks', concurrency:0}).done (err,results) ->
 				expect(err.message).to.equal('task 2 deliberate error')
 				expect(tasks.status).to.equal('failed')
@@ -510,7 +514,8 @@ joe.describe 'taskgroup', (describe,it) ->
 					running: []
 					completed: ['task 2 for my tasks', 'task 1 for my tasks']
 					total: 2
-					results: 2
+					results: [[err2], [err1]]
+				expect(results).to.deep.equal(expectedItems.results)
 				expect(actualItems, 'completion items').to.deep.equal(expectedItems)
 
 				done()
@@ -523,7 +528,7 @@ joe.describe 'taskgroup', (describe,it) ->
 					running: ['task 1 for my tasks', 'task 2 for my tasks']
 					completed: []
 					total: 2
-					results: 0
+					results: []
 				expect(actualItems, 'task 1 before wait items').to.deep.equal(expectedItems)
 
 				wait 500, ->
@@ -533,12 +538,10 @@ joe.describe 'taskgroup', (describe,it) ->
 						running: ['task 1 for my tasks']
 						completed: ['task 2 for my tasks']
 						total: 2
-						results: 1
-					inspect 'actual', actualItems, 'expected', expectedItems
+						results: [[err2]]
 					expect(actualItems, 'task 1 after wait items').to.deep.equal(expectedItems)
 
-					err = new Error('task 1 deliberate error')
-					complete(err)
+					complete(err1)
 				return null
 
 			# Error via return
@@ -549,17 +552,18 @@ joe.describe 'taskgroup', (describe,it) ->
 					running: ['task 1 for my tasks', 'task 2 for my tasks']
 					completed: []
 					total: 2
-					results: 0
+					results: []
 				expect(actualItems, 'task 1 before wait items').to.deep.equal(expectedItems)
 
-				err = new Error('task 2 deliberate error')
-				return err
+				return err2
 
 			# Run tasks
 			tasks.run()
 
 		# Error Serial
 		it 'should handle error correctly in serial', (done) ->
+			err1 = new Error('deliberate error')
+			err2 = new Error('unexpected error')
 			tasks = new TaskGroup().setConfig({name:'my tasks', concurrency:1}).done (err,results) ->
 				expect(err.message).to.equal('deliberate error')
 				expect(tasks.config.concurrency).to.equal(1)
@@ -572,7 +576,8 @@ joe.describe 'taskgroup', (describe,it) ->
 					running: []
 					completed: ['task 1 for my tasks']
 					total: 2
-					results: 1
+					results: [[err1]]
+				expect(results).to.deep.equal(expectedItems.results)
 				expect(actualItems, 'completion items').to.deep.equal(expectedItems)
 
 				done()
@@ -584,14 +589,13 @@ joe.describe 'taskgroup', (describe,it) ->
 					running: ['task 1 for my tasks']
 					completed: []
 					total: 2
-					results: 0
+					results: []
 				expect(actualItems, 'task 1 items').to.deep.equal(expectedItems)
 
-				err = new Error('deliberate error')
-				complete(err)
+				complete(err1)
 
 			tasks.addTask ->
-				throw 'unexpected'
+				throw err2
 
 			tasks.run()
 
@@ -617,7 +621,7 @@ joe.describe 'nested', (describe,it) ->
 					running: ['my task']
 					completed: ['taskgroup method for my tests']
 					total: 3
-					results: 0
+					results: []
 				expect(actualItems, 'my task items before wait').to.deep.equal(expectedItems)
 
 				wait 500, ->
@@ -641,7 +645,7 @@ joe.describe 'nested', (describe,it) ->
 					running: ['my group']
 					completed: ['taskgroup method for my tests', 'my task']
 					total: 3
-					results: 1
+					results: [[null,10]]
 				expect(actualItems, 'my group parent items').to.deep.equal(expectedItems)
 
 				# totals for sub group
@@ -651,7 +655,7 @@ joe.describe 'nested', (describe,it) ->
 					running: ['taskgroup method for my group']
 					completed: []
 					total: 1
-					results: 0
+					results: []
 				expect(actualItems, 'my group items').to.deep.equal(expectedItems)
 
 				addTask 'my second task', ->
@@ -665,7 +669,7 @@ joe.describe 'nested', (describe,it) ->
 						running: ['my group']
 						completed: ['taskgroup method for my tests', 'my task']
 						total: 3
-						results: 1
+						results: [[null,10]]
 					expect(actualItems, 'my group parent items').to.deep.equal(expectedItems)
 
 					# totals for sub group
@@ -675,19 +679,17 @@ joe.describe 'nested', (describe,it) ->
 						running: ['my second task']
 						completed: ['taskgroup method for my group']
 						total: 2
-						results: 0
+						results: []
 					expect(actualItems, 'my group items').to.deep.equal(expectedItems)
 
 					return 20
 
-		tasks.done (err) ->
+		tasks.done (err, results) ->
 			console.log(err)  if err
 			expect(err?.message or null).to.equal(null)
 
 			console.log(checks)  if checks.length isnt 4
 			expect(checks.length, 'checks').to.equal(4)
-
-			# @TODO check results
 
 			# totals for parent group
 			actualItems = tasks.getItemNames()
@@ -696,7 +698,13 @@ joe.describe 'nested', (describe,it) ->
 				running: []
 				completed: ['taskgroup method for my tests', 'my task', 'my group']
 				total: 3
-				results: 2
+				results: [
+					[null,10],
+					[null, [
+						[null,20]
+					]]
+				]
+			expect(results).to.deep.equal(expectedItems.results)
 			expect(actualItems, 'completion items').to.deep.equal(expectedItems)
 
 			done()
@@ -718,7 +726,7 @@ joe.describe 'nested', (describe,it) ->
 				running: ['my task']
 				completed: []
 				total: 2
-				results: 0
+				results: []
 			expect(actualItems, 'my task items before wait').to.deep.equal(expectedItems)
 
 			wait 500, ->
@@ -742,7 +750,7 @@ joe.describe 'nested', (describe,it) ->
 				running: ['my group']
 				completed: ['my task']
 				total: 2
-				results: 1
+				results: [[null,10]]
 			expect(actualItems, 'my group parent items').to.deep.equal(expectedItems)
 
 			# totals for sub group
@@ -752,7 +760,7 @@ joe.describe 'nested', (describe,it) ->
 				running: ['taskgroup method for my group']
 				completed: []
 				total: 1
-				results: 0
+				results: []
 			expect(actualItems, 'my group items').to.deep.equal(expectedItems)
 
 			@addTask 'my second task', ->
@@ -766,7 +774,7 @@ joe.describe 'nested', (describe,it) ->
 					running: ['my group']
 					completed: ['my task']
 					total: 2
-					results: 1
+					results: [[null,10]]
 				expect(actualItems, 'my group parent items').to.deep.equal(expectedItems)
 
 				# totals for sub group
@@ -776,20 +784,18 @@ joe.describe 'nested', (describe,it) ->
 					running: ['my second task']
 					completed: ['taskgroup method for my group']
 					total: 2
-					results: 0
+					results: []
 				expect(actualItems, 'my group items').to.deep.equal(expectedItems)
 
 				return 20
 
 
-		tasks.done (err) ->
+		tasks.done (err, results) ->
 			console.log(err)  if err
 			expect(err?.message or null).to.equal(null)
 
 			console.log(checks)  if checks.length isnt 4
 			expect(checks.length, 'checks').to.equal(4)
-
-			# @TODO check results
 
 			# totals for parent group
 			actualItems = tasks.getItemNames()
@@ -798,7 +804,13 @@ joe.describe 'nested', (describe,it) ->
 				running: []
 				completed: ['my task', 'my group']
 				total: 2
-				results: 2
+				results: [
+					[null,10],
+					[null, [
+						[null,20]
+					]]
+				]
+			expect(results).to.deep.equal(expectedItems.results)
 			expect(actualItems, 'completion items').to.deep.equal(expectedItems)
 
 			done()
@@ -819,7 +831,7 @@ joe.describe 'nested', (describe,it) ->
 				running: ['my task 1']
 				completed: []
 				total: 3
-				results: 0
+				results: []
 			expect(actualItems, 'my task 1 items').to.deep.equal(expectedItems)
 
 			return 10
@@ -836,7 +848,7 @@ joe.describe 'nested', (describe,it) ->
 				running: ['my group 1']
 				completed: ['my task 1']
 				total: 3
-				results: 1
+				results: [[null,10]]
 			expect(actualItems, 'my group 1 parent items').to.deep.equal(expectedItems)
 
 			# totals for sub group
@@ -846,7 +858,7 @@ joe.describe 'nested', (describe,it) ->
 				running: ['taskgroup method for my group 1']
 				completed: []
 				total: 1
-				results: 0
+				results: []
 			expect(actualItems, 'my group 1 items').to.deep.equal(expectedItems)
 
 
@@ -861,7 +873,7 @@ joe.describe 'nested', (describe,it) ->
 					running: ['my group 1']
 					completed: ['my task 1']
 					total: 3
-					results: 1
+					results: [[null,10]]
 				expect(actualItems, 'my group 1 after wait parent items').to.deep.equal(expectedItems)
 
 				# totals for sub group
@@ -871,7 +883,7 @@ joe.describe 'nested', (describe,it) ->
 					running: ['my task 2']
 					completed: ['taskgroup method for my group 1']
 					total: 2
-					results: 0
+					results: []
 				expect(actualItems, 'my group 1 items').to.deep.equal(expectedItems)
 
 				return 20
@@ -887,19 +899,22 @@ joe.describe 'nested', (describe,it) ->
 				running: ['my task 3']
 				completed: ['my task 1', 'my group 1']
 				total: 3
-				results: 2
+				results: [
+					[null,10],
+					[null, [
+						[null,20]
+					]]
+				]
 			expect(actualItems, 'my task 3 items').to.deep.equal(expectedItems)
 
 			return 30
 
-		tasks.done (err) ->
+		tasks.done (err, results) ->
 			console.log(err)  if err
 			expect(err?.message or null).to.equal(null)
 
 			console.log(checks)  if checks.length isnt 4
 			expect(checks.length, 'checks').to.equal(4)
-
-			# @TODO check results
 
 			# totals for parent group
 			actualItems = tasks.getItemNames()
@@ -908,7 +923,14 @@ joe.describe 'nested', (describe,it) ->
 				running: []
 				completed: ['my task 1', 'my group 1', 'my task 3']
 				total: 3
-				results: 3
+				results: [
+					[null,10],
+					[null, [
+						[null,20]
+					]]
+					[null,30],
+				]
+			expect(results).to.deep.equal(expectedItems.results)
 			expect(actualItems, 'completion items').to.deep.equal(expectedItems)
 
 
