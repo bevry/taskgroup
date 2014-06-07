@@ -20,6 +20,17 @@ expectResult = (argsExpected...) -> (argsActual...) ->
 	catch err
 		inspect 'actual:', argsActual, 'expected:', argsExpected
 		throw err
+expectError = (message, next) -> (err) ->
+	try
+		expect(err?.message).to.contain(message)
+		next?()
+	catch err
+		inspect 'actual:', err, 'expected:', message
+		if next?
+			next(err)
+		else
+			throw err
+
 
 # ====================================
 # Task
@@ -37,11 +48,16 @@ joe.describe 'task', (describe, it) ->
 	# success: done then run
 	it 'Task.create(...).done(...).run() should fire the completion callback with the expected result', (complete) ->
 		Task.create(returnResult(5)).run().done(expectResult(null, 5)).done(complete)
-	
-###
+
 	# failure: run then run then done
 	it 'Task.create(...).run().run().done(...) should fail as a task is not allowed to run twice', (complete) ->
-		Task.create(returnResult(5)).run().run().done (err) ->
-			expect(err.message).to.contain('but it has already started earlier')
-			complete()
-###
+		Task.create(returnResult(5))
+			.run().run()
+			.on('error', expectError('started earlier', complete))
+
+	# failure: done then run then run
+	it 'Task.create(...).done(...).run().run() should fail as a task is not allowed to run twice', (complete) ->
+		task = Task.create(returnResult(5))
+			.on('error', expectError('started earlier', complete))
+			.run().run()
+			

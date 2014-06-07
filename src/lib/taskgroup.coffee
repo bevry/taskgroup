@@ -11,6 +11,7 @@ queue = process.nextTick
 ambi = require('ambi')
 events = require('events')
 domain = (try require('domain')) ? null
+util = require('util')
 {EventEmitter} = events
 {extendOnClass} = require('extendonclass')
 
@@ -125,6 +126,7 @@ class Task extends Interface
 	# Variables
 	# for @internal use only, do not use externally
 	type: 'task'  # for duck typing
+	err: null
 	result: null  # array, [err, ...]
 	status: null  # [null, 'started', 'running', 'completed', 'failed', 'destroyed']
 	taskDomain: null
@@ -206,6 +208,9 @@ class Task extends Interface
 	# Exit
 	# The completion callback to use when the function completes normally, when it errors, and when whatever else unexpected happens
 	exit: (args...) ->
+		# Store the first error
+		@err ?= args[0]  if args[0]?
+		
 		# Complete for the first (and hopefully only) time
 		if @hasExited() is false
 			# Apply the result if it exists
@@ -213,7 +218,7 @@ class Task extends Interface
 				@result = args
 
 			# Did we error?
-			if @result?[0]?
+			if @err?
 				@status = 'failed'
 			else
 				@status = 'completed'
@@ -224,8 +229,8 @@ class Task extends Interface
 		# Error as we have already completed before
 		else
 			err = new Error """
-				The task [#{@getNames()}] just completed, but it had already completed earlier, this is unexpected.
-				Completed with the arguments: #{args.toString()}
+				The task [#{@getNames()}] just completed, but it had already completed earlier, this is unexpected. Results of earlier execution are:
+				#{util.inspect({error:@err, arguments:args})}
 				"""
 			@emit('error', err)
 
@@ -238,7 +243,10 @@ class Task extends Interface
 		complete = @isComplete()
 
 		if complete
-			@emit('complete', (@result or [])...)
+			@emit.apply(@, ['complete'].concat @result or [])
+
+			# Prevent the error from persisting
+			@err = null
 
 			# Should we reset results?
 			# @results = []
@@ -255,20 +263,20 @@ class Task extends Interface
 
 	# Completed Promise
 	completed: (handler) ->
-		queue =>
-			if @isComplete()
-				handler.call(@, @result)
-			else
-				super(handler)
+		if @isComplete()
+			queue =>  # avoid zalgo
+				handler.apply(@, @result or [])
+		else
+			super(handler)
 		@
 
 	# Done Promise
 	done: (handler) ->
-		queue =>
-			if @isComplete()
-				handler.call(@, @result)
-			else
-				super(handler)
+		if @isComplete()
+			queue =>  # avoid zalgo
+				handler.apply(@, @result or [])
+		else
+			super(handler)
 		@
 
 	# Reset the results
@@ -298,7 +306,7 @@ class Task extends Interface
 	fire: ->
 		# Prepare
 		me = @
-
+		
 		# Add our completion callback to our specified arguments to send over to the method
 		args = (@config.args or []).concat([@exit.bind(@)])
 
@@ -335,9 +343,9 @@ class Task extends Interface
 		# Already completed?
 		if @hasStarted()
 			err = new Error """
-				The task [#{@getNames()}] was just about to start, but it has already started earlier, this is unexpected.
+				The task [#{@getNames()}] was just about to start, but it already started earlier, this is unexpected.
 				"""
-			@exit(err)
+			queue => @exit(err)
 
 		# Not yet completed, so lets run!
 		else
@@ -346,11 +354,9 @@ class Task extends Interface
 
 			# Notify our intention
 			@emit('run')
-
-			# Give time for the listeners in the above event to complete before continuing
-			# This delay is needed for task groups
-			# @TODO IS THIS NECESSARY?
-			setImmediate(@fire.bind(@))
+			
+			# Start
+			queue => @fire()
 
 		# Chain
 		@
@@ -714,7 +720,7 @@ class TaskGroup extends Interface
 		complete = @isComplete()
 
 		if complete
-			@emit('complete', @err, @results)
+			@emit.call(@, 'complete', @err, @results)
 			
 			# Prevent the error from persisting
 			@err = null
@@ -743,20 +749,20 @@ class TaskGroup extends Interface
 
 	# Completed Promise
 	completed: (handler) ->
-		queue =>
-			if @isComplete()
+		if @isComplete()
+			queue =>  # avoid zalgo
 				handler.call(@, @err, @results)
-			else
-				super(handler)
+		else
+			super(handler)
 		@
 
 	# Done Promise
 	done: (handler) ->
-		queue =>
-			if @isComplete()
+		if @isComplete()
+			queue =>  # avoid zalgo
 				handler.call(@, @err, @results)
-			else
-				super(handler)
+		else
+			super(handler)
 		@
 
 	# Reset the results
@@ -860,7 +866,7 @@ class TaskGroup extends Interface
 	clear: ->
 		# Destroy all the items
 		for item in @itemsRemaining
-			item.destroy()  
+			item.destroy()
 		@itemsRemaining = []
 
 		# Chain
