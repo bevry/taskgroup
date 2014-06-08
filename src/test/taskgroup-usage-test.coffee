@@ -41,7 +41,7 @@ joe.describe 'task', (describe, it) ->
 	# failure: done with no run
 	it 'Task.create(...).done(...) should time out when run was not called', (complete) ->
 		Task.create(returnResult(5)).done(throwUnexpected)
-		wait(1000, complete)
+		wait(delay, complete)
 
 	# failure: done with no task method
 	it 'Task.create().run().done(...) should fail as there was no task method defined', (complete) ->
@@ -73,7 +73,7 @@ joe.describe 'taskgroup', (describe, it) ->
 		tasks = TaskGroup.create()
 		tasks.addTask(returnResult(5))
 		tasks.done(throwUnexpected)
-		wait(1000, complete)
+		wait(delay, complete)
 
 	# success: done with no tasks then run
 	it 'TaskGroup.create().run().done(...) should complete with no results', (complete) ->
@@ -116,8 +116,22 @@ joe.describe 'taskgroup', (describe, it) ->
 		tasks.addTask(returnResult(5))
 		tasks.run()
 		tasks.done(expectResult(null, [[null,5]]))
-		wait 1000, ->
+		wait delay, ->
 			tasks.addTask(returnResult(10))
 			tasks.done(expectResult(null, [[null,5],[null,10]]))
+			tasks.done(complete)
+	
+	# success: resume after error
+	it 'Taskgroup should be able to resume after an error', (complete) ->
+		tasks = TaskGroup.create()
+		err = new Error('fail after 5')
+		tasks.addTask(returnResult(5))
+		tasks.addTask(returnResult(err))
+		tasks.addTask(returnResult(10))
+		tasks.run()
+		tasks.done(expectResult(err, [[null,5], [err]]))
+		wait delay, ->
+			tasks.addTask(returnResult(15))
+			tasks.done(expectResult(null, [[null,5], [err], [null,10], [null,15]]))
 			tasks.done(complete)
 	
