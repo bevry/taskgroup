@@ -82,7 +82,6 @@ joe.describe 'taskgroup', (describe, it) ->
 			.done(expectResult(null, []))
 			.done(complete)
 	
-	###
 	# success: run then done then add
 	it 'TaskGroup.create().run().done(...).addTask(...) should complete with the tasks results', (complete) ->
 		tasks = TaskGroup.create()
@@ -90,7 +89,6 @@ joe.describe 'taskgroup', (describe, it) ->
 			.done(expectResult(null, [[null,5]]))
 			.done(complete)
 			.addTask(returnResult(5))
-	###
 
 	# success: done then task then run then done
 	it 'TaskGroup.create().run().done(...) should complete correctly', (complete) ->

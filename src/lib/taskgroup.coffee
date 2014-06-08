@@ -1,10 +1,3 @@
-###
-@TODO
-
-- Use eventemittergrouped for events
-
-###
-
 # Import
 setImmediate = global?.setImmediate or process.nextTick  # node 0.8 b/c
 queue = process.nextTick
@@ -12,7 +5,7 @@ ambi = require('ambi')
 events = require('events')
 domain = (try require('domain')) ? null
 util = require('util')
-{EventEmitter} = events
+{EventEmitter} = require('events')
 {extendOnClass} = require('extendonclass')
 
 
@@ -128,7 +121,8 @@ class Task extends Interface
 	type: 'task'  # for duck typing
 	err: null
 	result: null  # array, [err, ...]
-	status: null  # [null, 'started', 'running', 'completed', 'failed', 'destroyed']
+	status: null  # [null, 'started', 'running', 'failed', 'passed', 'destroyed']
+	events: null  # ['error', 'started', 'running', 'failed', 'passed', 'completed', 'destroyed']
 	taskDomain: null
 
 	# Config
@@ -151,6 +145,8 @@ class Task extends Interface
 		@config ?= {}
 		@config.name ?= "Task #{Math.random()}"
 		@config.run ?= false
+		@events ?= []
+		@events.push('error', 'started', 'running', 'failed', 'passed', 'completed', 'destroyed')
 
 		# Apply configuration
 		@setConfig(args)
@@ -199,7 +195,7 @@ class Task extends Interface
 
 	# Has Exited
 	hasExited: ->
-		return @status in ['completed', 'failed', 'destroyed']
+		return @status in ['failed', 'passed', 'destroyed']
 
 	# Is Done
 	isComplete: ->
@@ -221,9 +217,12 @@ class Task extends Interface
 			if @err?
 				@status = 'failed'
 			else
-				@status = 'completed'
+				@status = 'passed'
 
-			# Notify our listeners of our completion
+			# Notify our listeners of our status
+			@emit(@status)
+			
+			# Finish up
 			@complete()
 
 		# Error as we have already completed before
@@ -243,8 +242,9 @@ class Task extends Interface
 		complete = @isComplete()
 
 		if complete
-			@emit.apply(@, ['complete'].concat @result or [])
-
+			# Notify our listeners we have completed
+			@emit 'complete', (@result or [])...
+		
 			# Prevent the error from persisting
 			@err = null
 
@@ -289,7 +289,10 @@ class Task extends Interface
 		@done =>
 			# Ensure nothing hit here again
 			@status = 'destroyed'
-
+			
+			# Notify our listeners we are now destroyed
+			@emit(@status)
+		
 			# Clear results
 			@resetResults()
 			# item arrays should already be wiped due to done completion
@@ -312,7 +315,7 @@ class Task extends Interface
 			err = new Error """
 				The task [#{me.getNames()}] failed to run as no method was defined for it.
 				"""
-			me.exit(err)
+			me.emit('error', err)
 			return @
 		
 		# Add our completion callback to our specified arguments to send over to the method
@@ -329,6 +332,7 @@ class Task extends Interface
 				if me.config.method?.bind
 					methodToFire = me.config.method.bind(me.config.context or me)
 					me.status = 'running'
+					me.emit(me.status)
 					ambi(methodToFire, args...)
 				else
 					err = new Error """
@@ -348,23 +352,24 @@ class Task extends Interface
 
 	# Run
 	run: ->
-		# Already completed?
-		if @hasStarted()
-			err = new Error """
-				The task [#{@getNames()}] was just about to start, but it already started earlier, this is unexpected.
-				"""
-			queue => @exit(err)
+		queue =>
+			# Already completed?
+			if @hasStarted()
+				err = new Error """
+					The task [#{@getNames()}] was just about to start, but it already started earlier, this is unexpected.
+					"""
+				@emit('error', err)
 
-		# Not yet completed, so lets run!
-		else
-			# Reset to a running state
-			@status = 'started'
+			# Not yet completed, so lets run!
+			else
+				# Reset to a running state
+				@status = 'started'
 
-			# Notify our intention
-			@emit('run')
-			
-			# Start
-			queue => @fire()
+				# Notify our listeners of our updated status
+				@emit(@status)
+				
+				# Fire the task
+				@fire()
 
 		# Chain
 		@
@@ -392,9 +397,11 @@ class TaskGroup extends Interface
 	itemsCompleted: null
 	results: null
 	err: null
-	status: null  # [null, 'started', 'running', 'completed', 'failed', 'destroyed']
-	bubbleEvents: null
-
+	status: null  # [null, 'started', 'running', 'passed', 'failed', 'destroyed']
+	events: null  # ['error', 'started', 'running', 'passed', 'failed', 'completed', 'destroyed', 'item.*', 'group.*', 'task.*']
+	bubbleEvents: null  # ['add', 'error', 'started', 'running', 'passed', 'failed', 'completed', 'destroyed']
+	bubbleType: null  # ['task', 'group', 'item']
+	
 	# Config
 	config: null
 		###
@@ -418,8 +425,19 @@ class TaskGroup extends Interface
 		@itemsRunning ?= []
 		@itemsCompleted ?= []
 		@results ?= []
+		
+		# Events
+		@events ?= []
+		@events.push('error', 'started', 'running', 'passed', 'failed', 'completed', 'destroyed')
 		@bubbleEvents ?= []
-		@bubbleEvents.push('complete', 'run', 'error')
+		@bubbleEvents.push('add', 'error', 'started', 'running', 'passed', 'failed', 'completed', 'destroyed')
+		@bubbleTypes ?= []
+		@bubbleTypes.push('task', 'group', 'item')
+		
+		# Bubble events
+		for bubbleEvent in @bubbleEvents
+			for bubbleType in @bubbleTypes
+				@events.push(bubbleType+'.'+bubbleEvent)
 
 		# Apply configuration
 		@setConfig(args)
@@ -527,7 +545,7 @@ class TaskGroup extends Interface
 		item.setConfig({parent: @})
 
 		# Bubble task events
-		if item.type is 'task'
+		if item.type is 'task' or item instanceof Task
 			@bubbleEvents.forEach (bubbleEvent) ->
 				item.on bubbleEvent, (args...) ->
 					me.emit("task.#{bubbleEvent}", item, args...)
@@ -536,7 +554,7 @@ class TaskGroup extends Interface
 			@emit('task.add', item)
 
 		# Bubble group events
-		if item.type is 'taskgroup'
+		else if item.type is 'taskgroup' or item instanceof TaskGroup
 			# Bubble item events
 			@bubbleEvents.forEach (bubbleEvent) ->
 				item.on bubbleEvent, (args...) ->
@@ -689,7 +707,7 @@ class TaskGroup extends Interface
 		return @status isnt null
 
 	hasExited: ->
-		return @status in ['completed', 'failed', 'destroyed']
+		return @status in ['passed', 'failed', 'destroyed']
 
 	hasResult: ->
 		return @err? or @results.length isnt 0
@@ -740,8 +758,9 @@ class TaskGroup extends Interface
 		complete = @isComplete()
 
 		if complete
-			@emit.call(@, 'complete', @err, @results)
-			
+			# Notity our listners we have completed
+			@emit('complete', @err, @results)
+		
 			# Prevent the error from persisting
 			@err = null
 
@@ -825,7 +844,12 @@ class TaskGroup extends Interface
 		# Can we run the next item?
 		if fire
 			# Fire the next item
+			
+			# Update our status
 			@status = 'running'
+			
+			# and notify our listeners of it
+			@emit(@status)
 
 			# Get the next item and remove it from the remaining items
 			item = @itemsRemaining.shift()
@@ -901,7 +925,10 @@ class TaskGroup extends Interface
 		@done =>
 			# Stop from executing ever again
 			@status = 'destroyed'
-
+			
+			# And notify our listeners
+			@emit(@status)
+			
 			# Clear results
 			@resetResults()
 			# item arrays should already be wiped due to done completion
@@ -923,7 +950,10 @@ class TaskGroup extends Interface
 			if @err?
 				'failed'
 			else
-				'completed'
+				'passed'
+			
+		# Notify our listeners
+		@emit(@status)
 
 		# Fire the completion callback
 		@complete()
@@ -933,14 +963,15 @@ class TaskGroup extends Interface
 
 	# We want to run
 	run: (args...) ->
-		# Start
-		@status = 'started'
+		queue =>
+			# Start
+			@status = 'started'
 
-		# Notify our intention to run
-		@emit('run')
+			# Notify our intention to run
+			@emit(@status)
 
-		# Give time for the listeners to complete before continuing
-		queue(@fire.bind(@))
+			# Give time for the listeners to complete before continuing
+			queue(@fire.bind(@))
 
 		# Chain
 		@

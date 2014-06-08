@@ -34,7 +34,7 @@ joe.describe 'task', (describe,it) ->
 			# Check the task completed as expected
 			task.done (err,result) ->
 				++checks
-				expect(task.status, 'status to be completed as we are within the completion callback').to.equal('completed')
+				expect(task.status, 'status to be passed as we are within the completion callback').to.equal('passed')
 				expect(task.result, "the set result to be as expected as the task has completed").to.deep.equal([err,result])
 				expect(err, "the callback error to be null as we did not error").to.equal(null)
 				expect(result, "the callback result to be as expected").to.equal(10)
@@ -46,8 +46,8 @@ joe.describe 'task', (describe,it) ->
 			# Run thet ask
 			task.run()
 
-			# Check that task has started running
-			expect(task.status, 'running to be started as tasks execute asynchronously').to.equal('started')
+			# Check task hasn't run yet
+			expect(task.status, "status to be null as we haven't started running yet").to.equal(null)
 			expect(task.result, 'result to be null as tasks execute asynchronously').to.equal(null)
 
 			# Check that all our special checks have run
@@ -73,7 +73,7 @@ joe.describe 'task', (describe,it) ->
 			# Check the task completed as expected
 			task.done (err,result) ->
 				++checks
-				expect(task.status, 'status to be completed as we are within the completion callback').to.equal('completed')
+				expect(task.status, 'status to be passed as we are within the completion callback').to.equal('passed')
 				expect(task.result, "the set result to be as expected as the task has completed").to.deep.equal([err,result])
 				expect(err, "the callback error to be null as we did not error").to.equal(null)
 				expect(result, "the callback result to be as expected").to.equal(10)
@@ -85,8 +85,8 @@ joe.describe 'task', (describe,it) ->
 			# Run
 			task.run()
 
-			# Check that task has started running
-			expect(task.status, 'status to be started as tasks execute asynchronously').to.equal('started')
+			# Check task hasn't run yet
+			expect(task.status, "status to be null as we haven't started running yet").to.equal(null)
 			expect(task.result, 'result to be null as tasks execute asynchronously').to.equal(null)
 
 			# Check that all our special checks have run
@@ -125,8 +125,8 @@ joe.describe 'task', (describe,it) ->
 			# Run
 			task.run()
 
-			# Check that task has started running
-			expect(task.status, 'status to be started as tasks execute asynchronously').to.equal('started')
+			# Check task hasn't run yet
+			expect(task.status, "status to be null as we haven't started running yet").to.equal(null)
 			expect(task.result, 'result to be null as tasks execute asynchronously').to.equal(null)
 
 			# Check that all our special checks have run
@@ -162,8 +162,8 @@ joe.describe 'task', (describe,it) ->
 			# Run
 			task.run()
 
-			# Check that task has started running
-			expect(task.status, 'status to be started as tasks execute asynchronously').to.equal('started')
+			# Check task hasn't run yet
+			expect(task.status, "status to be null as we haven't started running yet").to.equal(null)
 			expect(task.result, 'result to be null as tasks execute asynchronously').to.equal(null)
 
 			# Check that all our special checks have run
@@ -205,8 +205,8 @@ joe.describe 'task', (describe,it) ->
 			# Run
 			task.run()
 
-			# Check that task has started running
-			expect(task.status, 'status to be started as tasks execute asynchronously').to.equal('started')
+			# Check task hasn't run yet
+			expect(task.status, "status to be null as we haven't started running yet").to.equal(null)
 			expect(task.result, 'result to be null as tasks execute asynchronously').to.equal(null)
 
 			# Check that all our special checks have run
@@ -288,6 +288,7 @@ joe.describe 'taskgroup', (describe,it) ->
 		it 'should work when running in serial', (done) ->
 			tasks = new TaskGroup().setConfig({name:'my tests',concurrency:1}).done (err,results) ->
 				expect(err?.message or null).to.equal(null)
+				expect(tasks.status, 'status to be passed as we are within the completion callback').to.equal('passed')
 				expect(tasks.config.concurrency).to.equal(1)
 
 				actualItems = tasks.getItemNames()
@@ -337,6 +338,7 @@ joe.describe 'taskgroup', (describe,it) ->
 		it 'should work when running in parallel', (done) ->
 			tasks = new TaskGroup().setConfig({concurrency:0}).done (err,results) ->
 				expect(err?.message or null).to.equal(null)
+				expect(tasks.status, 'status to be passed as we are within the completion callback').to.equal('passed')
 				expect(tasks.config.concurrency).to.equal(0)
 
 				actualItems = tasks.getItemNames()
@@ -397,6 +399,7 @@ joe.describe 'taskgroup', (describe,it) ->
 				concurrency: 0
 				next: (err,results) ->
 					expect(err?.message or null).to.equal(null)
+					expect(tasks.status, 'status to be passed as we are within the completion callback').to.equal('passed')
 					expect(tasks.config.concurrency).to.equal(0)
 
 					actualItems = tasks.getItemNames()
