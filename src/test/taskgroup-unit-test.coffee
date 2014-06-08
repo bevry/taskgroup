@@ -413,6 +413,7 @@ joe.describe 'taskgroup', (describe,it) ->
 					expect(actualItems, 'completion items').to.deep.equal(expectedItems)
 
 					done()
+
 				tasks: [
 					(complete) ->
 						actualItems = tasks.getItemNames()
@@ -435,6 +436,7 @@ joe.describe 'taskgroup', (describe,it) ->
 							expect(actualItems, 'task 1 after wait items').to.deep.equal(expectedItems)
 
 							complete(null, 10)
+
 					->
 						actualItems = tasks.getItemNames()
 						expectedItems =
@@ -448,7 +450,7 @@ joe.describe 'taskgroup', (describe,it) ->
 						return 20
 				]
 			).run()
-		
+
 		###
 		# Serial, Twice
 		it 'should clear results when running again', (done) ->

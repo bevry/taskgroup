@@ -102,7 +102,7 @@ class Interface extends EventEmitter
 
 	# Get Name
 	getName: ->
-		return @config.name
+		return @config.name ?= "#{@type} #{Math.random()}"
 
 
 # =====================================
@@ -143,7 +143,6 @@ class Task extends Interface
 
 		# Prepare
 		@config ?= {}
-		@config.name ?= "Task #{Math.random()}"
 		@config.run ?= false
 		@events ?= []
 		@events.push('error', 'started', 'running', 'failed', 'passed', 'completed', 'destroyed')
@@ -416,7 +415,6 @@ class TaskGroup extends Interface
 		me = @
 		super
 		@config ?= {}
-		@config.name ?= "Task Group #{Math.random()}"
 		@config.concurrency ?= 1
 		@config.onError ?= 'exit'
 		@itemsRemaining ?= []
@@ -531,6 +529,7 @@ class TaskGroup extends Interface
 
 		# Link our item to ourself
 		item.setConfig({parent: @})
+		item.config.name ?= "#{item.type} #{@getItemsTotal()+1} for #{@getName()}"
 
 		# Bubble task events
 		if item.type is 'task' or item instanceof Task
@@ -582,17 +581,14 @@ class TaskGroup extends Interface
 	# Add Task
 
 	createTask: (args...) ->
-		defaultConfig =
-			name: 'task '+(@getItemsTotal()+1)+' for '+@getName()
-
 		# Support receiving an existing task instance
-		if args[0]?.type is 'task'
+		if args[0]?.type is 'task' or args[0] instanceof Task
 			task = args[0]
-			task.setConfig(defaultConfig, args.slice(1)...)
+			task.setConfig(args.slice(1)...)
 
 		# Support receiving arguments to create a task instance
 		else
-			task = new Task(defaultConfig, args...)
+			task = new Task(args...)
 
 		# Return the new task
 		return task
@@ -615,17 +611,14 @@ class TaskGroup extends Interface
 	# Add Group
 
 	createGroup: (args...) ->
-		defaultConfig =
-			name: 'task group '+(@getItemsTotal()+1)+' for '+@getName()
-
 		# Support recieving an existing taskgroup instance
-		if args[0]?.type is 'taskgroup'
+		if args[0]?.type is 'taskgroup' or args[0] instanceof TaskGroup
 			taskgroup = args[0]
-			taskgroup.setConfig(defaultConfig, args.slice(1)...)
+			taskgroup.setConfig(args.slice(1)...)
 
 		# Support receiving arugments to create a taskgroup intance
 		else
-			taskgroup = new TaskGroup(defaultConfig, args...)
+			taskgroup = new TaskGroup(args...)
 
 		# Return the taskgroup instance
 		return taskgroup
