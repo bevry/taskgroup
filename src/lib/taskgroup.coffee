@@ -307,6 +307,14 @@ class Task extends Interface
 		# Prepare
 		me = @
 		
+		# Check that we have a method to fire
+		if me.config.method? is false
+			err = new Error """
+				The task [#{me.getNames()}] failed to run as no method was defined for it.
+				"""
+			me.exit(err)
+			return @
+		
 		# Add our completion callback to our specified arguments to send over to the method
 		args = (@config.args or []).concat([@exit.bind(@)])
 

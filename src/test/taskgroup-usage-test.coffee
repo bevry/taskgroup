@@ -40,6 +40,10 @@ joe.describe 'task', (describe, it) ->
 	it 'Task.create(...).done(...) should time out when run was not called', (complete) ->
 		Task.create(returnResult(5)).done(throwUnexpected)
 		wait(1000, complete)
+
+	# failure: done with no task method
+	it 'Task.create().run().done(...) should fail as there was no task method defined', (complete) ->
+		Task.create().run().done(expectError('no method', complete))
 	
 	# success: run then done
 	it 'Task.create(...).run().done(...) should fire the completion callback with the expected result', (complete) ->
@@ -61,3 +65,12 @@ joe.describe 'task', (describe, it) ->
 			.on('error', expectError('started earlier', complete))
 			.run().run()
 			
+joe.describe 'taskgroup', (describe, it) ->
+	# failure: done with no run
+	it 'TaskGroup.create().addTask(...).done(...) should time out when run was not called', (complete) ->
+		TaskGroup.create().addTask(returnResult(5)).done(throwUnexpected)
+		wait(1000, complete)
+
+	# success: done with no tasks then run
+	it 'TaskGroup.create().run().done(...) should complete with no results', (complete) ->
+		TaskGroup.create().run().done(expectResult(null, [])).done(complete)
