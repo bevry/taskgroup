@@ -71,67 +71,69 @@ joe.describe 'taskgroup', (describe, it) ->
 	# failure: done with no run
 	it 'TaskGroup.create().addTask(...).done(...) should time out when run was not called', (complete) ->
 		tasks = TaskGroup.create()
-		tasks.addTask(returnResult(5))
-		tasks.done(throwUnexpected)
+			.addTask(returnResult(5))
+			.done(throwUnexpected)
 		wait(delay, complete)
 
 	# success: done with no tasks then run
 	it 'TaskGroup.create().run().done(...) should complete with no results', (complete) ->
 		tasks = TaskGroup.create()
-		tasks.run()
-		tasks.done(expectResult(null, []))
-		tasks.done(complete)
+			.run()
+			.done(expectResult(null, []))
+			.done(complete)
 	
 	###
 	# success: run then done then add
 	it 'TaskGroup.create().run().done(...).addTask(...) should complete with the tasks results', (complete) ->
 		tasks = TaskGroup.create()
-		tasks.run()
-		tasks.done(expectResult(null, [[null,5]]))
-		tasks.done(complete)
-		tasks.addTask(returnResult(5))
+			.run()
+			.done(expectResult(null, [[null,5]]))
+			.done(complete)
+			.addTask(returnResult(5))
 	###
 
 	# success: done then task then run then done
 	it 'TaskGroup.create().run().done(...) should complete correctly', (complete) ->
 		tasks = TaskGroup.create()
-		tasks.done(expectResult(null, [[null,5], [null,10]]))
-		tasks.addTask(returnResult(5))
-		tasks.run()
-		tasks.addTask(returnResult(10))
-		tasks.done(complete)
+			.done(expectResult(null, [[null,5], [null,10]]))
+			.addTask(returnResult(5))
+			.run()
+			.addTask(returnResult(10))
+			.done(complete)
 
 	# success: done then task then run then done
 	it 'TaskGroup.create().run().run().done(...) should complete only once', (complete) ->
 		tasks = TaskGroup.create()
-		tasks.done(expectResult(null, [[null,5],[null,10]]))
-		tasks.addTask(returnResult(5))
-		tasks.run().run()
-		tasks.addTask(returnResult(10))
-		tasks.done(complete)
+			.done(expectResult(null, [[null,5],[null,10]]))
+			.addTask(returnResult(5))
+			.run().run()
+			.addTask(returnResult(10))
+			.done(complete)
 
 	# success: multiple runs
 	it 'Taskgroup should be able to complete multiple times', (complete) ->
 		tasks = TaskGroup.create()
-		tasks.addTask(returnResult(5))
-		tasks.run()
-		tasks.done(expectResult(null, [[null,5]]))
+			.addTask(returnResult(5))
+			.run()
+			.done(expectResult(null, [[null,5]]))
 		wait delay, ->
-			tasks.addTask(returnResult(10))
-			tasks.done(expectResult(null, [[null,5],[null,10]]))
-			tasks.done(complete)
+			tasks
+				.addTask(returnResult(10))
+				.done(expectResult(null, [[null,5],[null,10]]))
+				.done(complete)
 	
 	# success: resume after error
 	it 'Taskgroup should be able to resume after an error', (complete) ->
-		tasks = TaskGroup.create()
 		err = new Error('fail after 5')
-		tasks.addTask(returnResult(5))
-		tasks.addTask(returnResult(err))
-		tasks.addTask(returnResult(10))
-		tasks.run()
-		tasks.done(expectResult(err, [[null,5], [err]]))
+		tasks = TaskGroup.create()
+			.addTask(returnResult(5))
+			.addTask(returnResult(err))
+			.addTask(returnResult(10))
+			.run()
+			.done(expectResult(err, [[null,5], [err]]))
 		wait delay, ->
-			tasks.addTask(returnResult(15))
-			tasks.done(expectResult(null, [[null,5], [err], [null,10], [null,15]]))
-			tasks.done(complete)
+			tasks
+				.addTask(returnResult(15))
+				.done(expectResult(null, [[null,5], [err], [null,10], [null,15]]))
+				.done(complete)
 	

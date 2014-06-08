@@ -592,11 +592,17 @@ class TaskGroup extends Interface
 		return task
 
 	addTask: (args...) ->
-		return @addItem @createTask args...
+		task = @addItem @createTask args...
+		
+		# Chain
+		@
 
 	addTasks: (items, args...) ->
 		items = [items]  unless Array.isArray(items)
-		return (@addTask(item, args...)  for item in items)
+		tasks = (@addTask(item, args...)  for item in items)
+		
+		# Chain
+		@
 
 
 	# ---------------------------------
@@ -619,11 +625,17 @@ class TaskGroup extends Interface
 		return taskgroup
 
 	addGroup: (args...) ->
-		return @addItem @createGroup args...
+		group = @addItem @createGroup args...
+		
+		# Chain
+		@
 
 	addGroups: (items, args...) ->
 		items = [items]  unless Array.isArray(items)
-		return (@addGroup(item, args...)  for item in items)
+		groups = (@addGroup(item, args...)  for item in items)
+		
+		# Chain
+		@
 
 
 	# ---------------------------------
