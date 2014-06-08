@@ -14,12 +14,14 @@ throwUnexpected = ->
 	throw new Error('this error is unexpected')
 returnResult = (number) -> -> number
 returnError = (message) -> -> new Error(message)
-expectResult = (argsExpected...) -> (argsActual...) ->
+expectDeep = (argsActual, argsExpected) ->
 	try
 		expect(argsActual).to.deep.equal(argsExpected)
 	catch err
 		inspect 'actual:', argsActual, 'expected:', argsExpected
 		throw err
+expectResult = (argsExpected...) -> (argsActual...) ->
+	expectDeep(argsActual, argsExpected)
 expectError = (message, next) -> (err) ->
 	try
 		expect(err?.message).to.contain(message)
@@ -68,9 +70,54 @@ joe.describe 'task', (describe, it) ->
 joe.describe 'taskgroup', (describe, it) ->
 	# failure: done with no run
 	it 'TaskGroup.create().addTask(...).done(...) should time out when run was not called', (complete) ->
-		TaskGroup.create().addTask(returnResult(5)).done(throwUnexpected)
+		tasks = TaskGroup.create()
+		tasks.addTask(returnResult(5))
+		tasks.done(throwUnexpected)
 		wait(1000, complete)
 
 	# success: done with no tasks then run
 	it 'TaskGroup.create().run().done(...) should complete with no results', (complete) ->
-		TaskGroup.create().run().done(expectResult(null, [])).done(complete)
+		tasks = TaskGroup.create()
+		tasks.run()
+		tasks.done(expectResult(null, []))
+		tasks.done(complete)
+	
+	###
+	# success: run then done then add
+	it 'TaskGroup.create().run().done(...).addTask(...) should complete with the tasks results', (complete) ->
+		tasks = TaskGroup.create()
+		tasks.run()
+		tasks.done(expectResult(null, [[null,5]]))
+		tasks.done(complete)
+		tasks.addTask(returnResult(5))
+	###
+
+	# success: done then task then run then done
+	it 'TaskGroup.create().run().done(...) should complete correctly', (complete) ->
+		tasks = TaskGroup.create()
+		tasks.done(expectResult(null, [[null,5], [null,10]]))
+		tasks.addTask(returnResult(5))
+		tasks.run()
+		tasks.addTask(returnResult(10))
+		tasks.done(complete)
+
+	# success: done then task then run then done
+	it 'TaskGroup.create().run().run().done(...) should complete only once', (complete) ->
+		tasks = TaskGroup.create()
+		tasks.done(expectResult(null, [[null,5],[null,10]]))
+		tasks.addTask(returnResult(5))
+		tasks.run().run()
+		tasks.addTask(returnResult(10))
+		tasks.done(complete)
+
+	# success: multiple runs
+	it 'Taskgroup should be able to complete multiple times', (complete) ->
+		tasks = TaskGroup.create()
+		tasks.addTask(returnResult(5))
+		tasks.run()
+		tasks.done(expectResult(null, [[null,5]]))
+		wait 1000, ->
+			tasks.addTask(returnResult(10))
+			tasks.done(expectResult(null, [[null,5],[null,10]]))
+			tasks.done(complete)
+	
