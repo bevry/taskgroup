@@ -1,5 +1,22 @@
 # History
 
+## v4.0.0 June X, 2014
+- Signficant rewrite with b/c breaks
+	- Completion listeners should now be accomplish via `.done(listener)` (listens once) or `.completed(listener)` (listener persists)
+		- These methods are promises in that they will execute the listener if the item is already complete. They a
+		- These methods will listen on the `completed` and `error` events
+	- The execution of tasks and groups have had a great deal of investment to ensure execution is intuitive and consistent across different use cases
+		- Refer to to `src/lib/test/taskgroup-usage-test.coffee` for the guaranteed expectations across different scenarios
+- Changes
+	- `complete` event is now `completed`
+	- `run` event is now `started`
+	- A lot of internal variables and methods have had their functionality changed or removed, if a method or variable is not in the public api, do not use it
+	- There is now a default `error` and `completed` listener that will fire if you have not added your own, to ensure errors are not lost
+	- Tasks and groups will now only receive a default name when required, this is to prevent set names from being over-written by the default
+	- Adding of tasks and groups to a group instance will now return the group instance rather than the added tasks to ensure chainability, if you want the created tasks, use `.createTask(...)` and `.createGroup(...)` instead, then add the result manually
+- Introductions
+	- `passed`, `failed`, `destroyed` events are new
+
 ## v3.4.0 May 8, 2014
 - Added `context` option for Task, to perform a late bind on the method
 - Asynchronous task methods can now accept optional arguments thanks to new [ambi](https://github.com/bevry/ambi) version

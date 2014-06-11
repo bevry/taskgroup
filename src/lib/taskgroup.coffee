@@ -132,7 +132,6 @@ class Task extends Interface
 		method: null
 		args: null
 		parent: null
-		context: null
 		###
 
 	# Create a new task
@@ -329,7 +328,7 @@ class Task extends Interface
 		fire = ->
 			try
 				if me.config.method?.bind
-					methodToFire = me.config.method.bind(me.config.context or me)
+					methodToFire = me.config.method.bind(me)
 					me.status = 'running'
 					me.emit(me.status)
 					ambi(methodToFire, args...)
@@ -379,12 +378,6 @@ class Task extends Interface
 # Task Group
 
 # Events
-# - complete
-# - run
-# - error
-# - item.*
-# - task.*
-# - group.*
 class TaskGroup extends Interface
 	@extend: extendOnClass
 	@create: (args...) -> return new @(args...)
@@ -405,7 +398,7 @@ class TaskGroup extends Interface
 		name: null
 		method: null
 		concurrency: 1  # use 0 for unlimited
-		onError: 'exit'
+		onError: 'exit'  # ['exit', 'ignore']
 		parent: null
 		run: null
 		###
@@ -845,7 +838,7 @@ class TaskGroup extends Interface
 	# for @internal use only, do not use externally
 	itemCompletionCallback: (item, args...) ->
 		# Update error if it exists
-		@err ?= args[0]  if args[0]
+		@err ?= args[0]  if @config.onError is 'exit' and args[0]
 
 		# Mark that one less item is running
 		index = @itemsRunning.indexOf(item)
