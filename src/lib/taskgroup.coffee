@@ -104,7 +104,7 @@ class Interface extends EventEmitter
 	setNestedConfig: (config={}) ->
 		@setConfig(config)
 		for own key,value of config
-			config.nested[key] = value
+			@config.nested[key] = value
 		@
 
 
