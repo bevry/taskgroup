@@ -40,8 +40,8 @@ class Interface extends EventEmitter
 		@emit('error', err)
 		@
 
-	# Completed listener
-	completed: (handler) ->
+	# When Done Listener
+	whenDone: (handler) ->
 		# check if we have a handler
 		if typeof handler is 'function'
 			@on('error', handler.bind(@)).on('completed', handler.bind(@))
@@ -49,8 +49,8 @@ class Interface extends EventEmitter
 		# Chain
 		@
 
-	# Done listener
-	done: (handler) ->
+	# Once Done Listener
+	onceDone: (handler) ->
 		# Prepare
 		me = @
 
@@ -71,6 +71,10 @@ class Interface extends EventEmitter
 
 		# Chain
 		@
+
+	# Done Alias
+	done: (args...) ->
+		return @onceDone(args...)
 
 	# Remove our default
 	on: (event, listener) ->
@@ -261,8 +265,8 @@ class Task extends Interface
 
 		return complete
 
-	# Completed Promise
-	completed: (handler) ->
+	# When Done Promise
+	whenDone: (handler) ->
 		if @isComplete()
 			queue =>  # avoid zalgo
 				handler.apply(@, @result or [])
@@ -270,8 +274,8 @@ class Task extends Interface
 			super(handler)
 		@
 
-	# Done Promise
-	done: (handler) ->
+	# Once Done Promise
+	onceDone: (handler) ->
 		if @isComplete()
 			queue =>  # avoid zalgo
 				handler.apply(@, @result or [])
@@ -755,8 +759,8 @@ class TaskGroup extends Interface
 
 		return complete
 
-	# Completed Promise
-	completed: (handler) ->
+	# When Done Promise
+	whenDone: (handler) ->
 		if @isComplete()
 			queue =>  # avoid zalgo
 				handler.call(@, @err, @results)
@@ -764,8 +768,8 @@ class TaskGroup extends Interface
 			super(handler)
 		@
 
-	# Done Promise
-	done: (handler) ->
+	# Once Done Promise
+	onceDone: (handler) ->
 		if @isComplete()
 			queue =>  # avoid zalgo
 				handler.call(@, @err, @results)
