@@ -61,7 +61,7 @@ class Interface extends EventEmitter
 		# check if we have a listener
 		if typeof listener is 'function'
 			@on('done', listener.bind(@))
-		
+
 		# Chain
 		@
 
@@ -116,12 +116,13 @@ class Interface extends EventEmitter
 # - run
 # - error
 class Task extends Interface
+	type: 'task'  # for duck typing
 	@extend: extendOnClass
 	@create: (args...) -> return new @(args...)
+	@isTask: (task) -> return task?.type is 'task' or task instanceof Task
 
 	# Variables
 	# for @internal use only, do not use externally
-	type: 'task'  # for duck typing
 	err: null
 	result: null  # array, [err, ...]
 	status: null  # [null, 'started', 'running', 'failed', 'passed', 'destroyed']
@@ -379,11 +380,12 @@ class Task extends Interface
 
 # Events
 class TaskGroup extends Interface
+	type: 'taskgroup'  # for duck typing
 	@extend: extendOnClass
 	@create: (args...) -> return new @(args...)
+	@isTaskGroup: (group) -> return group?.type is 'taskgroup' or group instanceof TaskGroup
 
 	# Variables
-	type: 'taskgroup'  # for duck typing
 	itemsRemaining: null
 	itemsRunning: null
 	itemsCompleted: null
@@ -526,7 +528,7 @@ class TaskGroup extends Interface
 		item.config.name ?= "#{item.type} #{@getItemsTotal()+1} for #{@getName()}"
 
 		# Bubble task events
-		if item.type is 'task' or item instanceof Task
+		if Task.isTask(item)
 			item.events.forEach (event) ->
 				item.on event, (args...) ->
 					me.emit("task.#{event}", item, args...)
@@ -535,7 +537,7 @@ class TaskGroup extends Interface
 			@emit('task.add', item)
 
 		# Bubble group events
-		else if item.type is 'taskgroup' or item instanceof TaskGroup
+		else if TaskGroup.isTaskGroup(item)
 			# Bubble item events
 			item.events.forEach (event) ->
 				item.on event, (args...) ->
@@ -577,7 +579,7 @@ class TaskGroup extends Interface
 
 	createTask: (args...) ->
 		# Support receiving an existing task instance
-		if args[0]?.type is 'task' or args[0] instanceof Task
+		if Task.isTask(args[0])
 			task = args[0]
 			task.setConfig(args.slice(1)...)
 
@@ -607,7 +609,7 @@ class TaskGroup extends Interface
 
 	createGroup: (args...) ->
 		# Support recieving an existing taskgroup instance
-		if args[0]?.type is 'taskgroup' or args[0] instanceof TaskGroup
+		if TaskGroup.isTaskGroup(args[0])
 			taskgroup = args[0]
 			taskgroup.setConfig(args.slice(1)...)
 
