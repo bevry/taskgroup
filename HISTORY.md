@@ -7,6 +7,7 @@
 		- These methods will listen on the `completed` and `error` events
 	- The execution of tasks and groups have had a great deal of investment to ensure execution is intuitive and consistent across different use cases
 		- Refer to to `src/lib/test/taskgroup-usage-test.coffee` for the guaranteed expectations across different scenarios
+	- Before you could use `tasks.exit()` inside a taskgroup task to clear remaning items, stop execution, and exit, you can no longer do this, instead use the completion callback with an error, or call `tasks.clear()` then the completion callback
 - Changes
 	- `complete` event is now `completed`
 	- `run` event is now `started`
