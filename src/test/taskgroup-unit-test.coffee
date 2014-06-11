@@ -1,3 +1,9 @@
+###
+@TODO
+
+- Add tests for nested configuration
+###
+
 # Import
 util = require('util')
 {expect} = require('chai')
