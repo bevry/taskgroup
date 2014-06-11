@@ -27,21 +27,30 @@ util = require('util')
 class Interface extends EventEmitter
 	constructor: ->
 		super
+		me = @
 
-		# Bind our default error handler
-		# to ensure that errors are caught if the user doesn't catch them
-		@on('error', @defaultErrorHandler)
-		@on('completed', @defaultErrorHandler)
+		# Add support for the done event
+		# it is a combination of the error and completed events
+		# If we do have an error, then throw it if there is no existing or done listeners
+		@on 'error', (args...) ->
+			err = args[0]
+			if me.listeners('done').length isnt 0  # has done listener, forward to that
+				@emit('done', args...)
+			else if err and me.listeners('error').length is 1  # has error, but no done listener and no event listener, throw err
+				# this isn't good enough, throw the error
+				console.error(err.stack or err)
+				throw err
+
+		@on 'completed', (args...) ->
+			err = args[0]
+			if me.listeners('done').length isnt 0  # has done listener, forward to that
+				@emit('done', args...)
+			else if err and me.listeners('completed').length is 1  # has error, but no done listener and no event listener, throw err
+				# this isn't good enough, throw the error
+				console.error(err.stack or err)
+				throw err
 
 		# Chain
-		@
-
-	# for @internal use only, do not use externally
-	# By default throw the error if present if no other completion callback has been
-	defaultErrorHandler: (err) ->
-		if err
-			console.error(err.stack or err)
-			throw err
 		@
 
 	# Complete emitter
@@ -51,33 +60,19 @@ class Interface extends EventEmitter
 		@
 
 	# When Done Listener
-	whenDone: (handler) ->
-		# check if we have a handler
-		if typeof handler is 'function'
-			@on('error', handler.bind(@)).on('completed', handler.bind(@))
+	whenDone: (listener) ->
+		# check if we have a listener
+		if typeof listener is 'function'
+			@on('done', listener.bind(@))
 		
 		# Chain
 		@
 
 	# Once Done Listener
-	onceDone: (handler) ->
-		# Prepare
-		me = @
-
-		# check if we have a handler
-		if typeof handler is 'function'
-			# ensure the passed done handler is ever only fired once and once only regardless of which event fires
-			wrappedHandler = (args...) ->
-				# remove our wrapped handler instance so we don't ever fire it again
-				me
-					.removeListener('error', wrappedHandler)
-					.removeListener('completed', wrappedHandler)
-
-				# fire the original handler as expected
-				handler.apply(me, args)
-
-			# ensure the done handler is ever only fired once and once only regardless of which event fires
-			@on('error', wrappedHandler).on('completed', wrappedHandler)
+	onceDone: (listener) ->
+		# check if we have a listener
+		if typeof listener is 'function'
+			@once('done', listener)
 
 		# Chain
 		@
@@ -85,23 +80,6 @@ class Interface extends EventEmitter
 	# Done Alias
 	done: (args...) ->
 		return @onceDone(args...)
-
-	# Remove our default
-	on: (event, listener) ->
-		if event in ['completed', 'error']
-			EventEmitter::removeListener.call(@, event, @defaultErrorHandler)
-		super
-
-	once: (event, listener) ->
-		if event in ['completed', 'error']
-			EventEmitter::removeListener.call(@, event, @defaultErrorHandler)
-		super
-
-	removeListener: (event, listener) ->
-		result = super
-		if event in ['completed', 'error'] and @listeners(event).length is 0
-			EventEmitter::on.call(@, event, @defaultErrorHandler)
-		return result
 
 	# Get Names
 	getNames: (opts={}) ->
@@ -142,7 +120,7 @@ class Task extends Interface
 	err: null
 	result: null  # array, [err, ...]
 	status: null  # [null, 'started', 'running', 'failed', 'passed', 'destroyed']
-	events: null  # ['error', 'started', 'running', 'failed', 'passed', 'completed', 'destroyed']
+	events: null  # ['done', 'error', 'started', 'running', 'failed', 'passed', 'completed', 'destroyed']
 	taskDomain: null
 
 	# Config
@@ -234,7 +212,7 @@ class Task extends Interface
 				@status = 'passed'
 
 			# Notify our listeners of our status
-			@emit(@status)
+			@emit(@status, @err)
 
 			# Finish up
 			@complete()
@@ -406,7 +384,7 @@ class TaskGroup extends Interface
 	results: null
 	err: null
 	status: null  # [null, 'started', 'running', 'passed', 'failed', 'destroyed']
-	events: null  # ['error', 'started', 'running', 'passed', 'failed', 'completed', 'destroyed', 'item.*', 'group.*', 'task.*']
+	events: null  # ['done', 'error', 'started', 'running', 'passed', 'failed', 'completed', 'destroyed', 'item.*', 'group.*', 'task.*']
 
 	# Config
 	config: null
@@ -568,6 +546,7 @@ class TaskGroup extends Interface
 		@emit('item.add', item)
 
 		# Handle item completion and errors once
+		# we can't just do item.done, or item.once('done'), because we need the item to be the argument, rather than `this`
 		item.done (args...) ->
 			me.itemCompletionCallback(item, args...)
 
@@ -936,7 +915,7 @@ class TaskGroup extends Interface
 				'passed'
 
 		# Notify our listeners
-		@emit(@status)
+		@emit(@status, @err)
 
 		# Fire the completion callback
 		@complete()

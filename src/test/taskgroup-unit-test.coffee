@@ -10,6 +10,14 @@ delay = 100
 inspect = (args...) ->
 	for arg in args
 		console.log util.inspect(arg, {colors:true})
+expectDeep = (argsActual, argsExpected) ->
+	try
+		expect(argsActual).to.deep.equal(argsExpected)
+	catch err
+		inspect 'actual:', argsActual, 'expected:', argsExpected
+		throw err
+expectResult = (argsExpected...) -> (argsActual...) ->
+	expectDeep(argsActual, argsExpected)
 
 # Task
 joe.describe 'task', (describe,it) ->
@@ -19,13 +27,14 @@ joe.describe 'task', (describe,it) ->
 		# Test that the task executes correctly asynchronously
 		it 'should work with async', (done) ->
 			# Specify how many special checks we are expecting
-			checks = 0
+			checks = []
 
 			# Create our asynchronous task
 			task = Task.create (complete) ->
+				checks.push 'task 1 - before wait'
 				# Wait a while as this is an async test
 				wait delay, ->
-					++checks
+					checks.push 'task 1 - after wait'
 					expect(task.status, 'status to be running as we are within the task').to.equal('running')
 					expect(task.result, "result to be null as we haven't set it yet").to.equal(null)
 					# Return no error, and the result to the completion callback completing the task
@@ -33,7 +42,7 @@ joe.describe 'task', (describe,it) ->
 
 			# Check the task completed as expected
 			task.done (err,result) ->
-				++checks
+				checks.push 'completion callback'
 				expect(task.status, 'status to be passed as we are within the completion callback').to.equal('passed')
 				expect(task.result, "the set result to be as expected as the task has completed").to.deep.equal([err,result])
 				expect(err, "the callback error to be null as we did not error").to.equal(null)
@@ -52,8 +61,11 @@ joe.describe 'task', (describe,it) ->
 
 			# Check that all our special checks have run
 			wait delay*2, ->
-				++checks
-				expect(checks, "all our special checks have run").to.equal(3)
+				expectDeep(checks, [
+					'task 1 - before wait'
+					'task 1 - after wait'
+					'completion callback'
+				])
 				done()
 
 		# Sync
