@@ -42,7 +42,11 @@ class Interface extends EventEmitter
 
 	# Completed listener
 	completed: (handler) ->
-		@on('error', handler.bind(@)).on('completed', handler.bind(@))
+		# check if we have a handler
+		if typeof handler is 'function'
+			@on('error', handler.bind(@)).on('completed', handler.bind(@))
+		
+		# Chain
 		@
 
 	# Done listener
@@ -50,18 +54,20 @@ class Interface extends EventEmitter
 		# Prepare
 		me = @
 
-		# ensure the passed done handler is ever only fired once and once only regardless of which event fires
-		wrappedHandler = (args...) ->
-			# remove our wrapped handler instance so we don't ever fire it again
-			me
-				.removeListener('error', wrappedHandler)
-				.removeListener('completed', wrappedHandler)
+		# check if we have a handler
+		if typeof handler is 'function'
+			# ensure the passed done handler is ever only fired once and once only regardless of which event fires
+			wrappedHandler = (args...) ->
+				# remove our wrapped handler instance so we don't ever fire it again
+				me
+					.removeListener('error', wrappedHandler)
+					.removeListener('completed', wrappedHandler)
 
-			# fire the original handler as expected
-			handler.apply(me, args)
+				# fire the original handler as expected
+				handler.apply(me, args)
 
-		# ensure the done handler is ever only fired once and once only regardless of which event fires
-		@on('error', wrappedHandler).on('completed', wrappedHandler)
+			# ensure the done handler is ever only fired once and once only regardless of which event fires
+			@on('error', wrappedHandler).on('completed', wrappedHandler)
 
 		# Chain
 		@
@@ -191,13 +197,9 @@ class Task extends Interface
 	hasStarted: ->
 		return @status isnt null
 
-	# Has Exited
-	hasExited: ->
-		return @status in ['failed', 'passed', 'destroyed']
-
 	# Is Done
 	isComplete: ->
-		return @hasExited()
+		return @status in ['failed', 'passed', 'destroyed']
 
 	# Exit
 	# The completion callback to use when the function completes normally, when it errors, and when whatever else unexpected happens
@@ -206,7 +208,7 @@ class Task extends Interface
 		@err ?= args[0]  if args[0]?
 
 		# Complete for the first (and hopefully only) time
-		if @hasExited() is false
+		if @isComplete() is false
 			# Apply the result if it exists
 			if args.length isnt 0
 				@result = args
@@ -679,9 +681,6 @@ class TaskGroup extends Interface
 
 	hasStarted: ->
 		return @status isnt null
-
-	hasExited: ->
-		return @status in ['passed', 'failed', 'destroyed']
 
 	hasResult: ->
 		return @err? or @results.length isnt 0
