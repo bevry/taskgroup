@@ -189,6 +189,10 @@ class Task extends Interface
 	hasStarted: ->
 		return @status isnt null
 
+	# Has Exited
+	hasExited: ->
+		return @status in ['completed', 'destroyed']
+
 	# Is Done
 	isComplete: ->
 		return @status in ['failed', 'passed', 'destroyed']
@@ -677,6 +681,9 @@ class TaskGroup extends Interface
 
 	hasResult: ->
 		return @err? or @results.length isnt 0
+
+	hasExited: ->
+		return @status in ['completed', 'destroyed']
 
 	hasSlots: ->
 		return (
