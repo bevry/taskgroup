@@ -1,10 +1,7 @@
 ###
 @TODO
 
-- See about combing the completed and error events into a done event
-	- Have a listener that checks to see if we have a done listner, if we do, then emit it, if not, then output the error
-	- whenDone, and onceDone would then become promises around the item.done event
-	- This will allow for things like group.on('item.done', listener)
+- Add a timeout option to tests only at this point
 ###
 
 
