@@ -131,6 +131,7 @@ class Task extends Interface
 		args: null
 		parent: null
 		timeout: null
+		onError: 'exit'  # ['ignore', 'exit']
 		###
 
 	# Create a new task
@@ -142,6 +143,7 @@ class Task extends Interface
 		# Prepare
 		@config ?= {}
 		@config.run ?= false
+		@config.onError ?= 'exit'
 		@events ?= []
 		@events.push('error', 'started', 'running', 'failed', 'passed', 'completed', 'destroyed')
 
@@ -220,7 +222,7 @@ class Task extends Interface
 			@complete()
 
 		# Error as we have already completed before
-		else
+		else if @config.onError isnt 'ignore'
 			err = new Error """
 				The task [#{@getNames()}] just completed, but it had already completed earlier, this is unexpected. State information is:
 				#{util.inspect({error:@err, previousResult:@result, currentArguments:args})}
