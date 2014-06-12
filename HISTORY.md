@@ -1,7 +1,7 @@
 # History
 
 ## v4.0.0 June X, 2014
-- Signficant rewrite with b/c breaks
+- Significant rewrite with b/c breaks
 	- Completion listeners should now be accomplish via `.done(listener)` (listens once) or `.completed(listener)` (listener persists)
 		- These methods are promises in that they will execute the listener if the item is already complete. They a
 		- These methods will listen on the `completed` and `error` events
@@ -17,6 +17,12 @@
 	- Adding of tasks and groups to a group instance will now return the group instance rather than the added tasks to ensure chainability, if you want the created tasks, use `.createTask(...)` and `.createGroup(...)` instead, then add the result manually
 - Introductions
 	- `passed`, `failed`, `destroyed` events are new
+	- Task only
+		- new `timeout` option that accepts a number of milliseconds to wait before throwing an error
+		- new `onError` option that defaults to `'exit'` but can also accept `'ignore'` which will ignore duplicated exit errors (useful when combined with timeout event)
+	- TaskGroup only
+		- new `onError` option that defaults to `'exit'` but can also accept `'ignore'` which will ignore all task errors
+		- new `setNestedConfig(config)` and `setNestedTaskConfig(config)` options to set configuration for all children
 
 ## v3.4.0 May 8, 2014
 - Added `context` option for Task, to perform a late bind on the method

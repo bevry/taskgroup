@@ -1,10 +1,3 @@
-###
-@TODO
-
-- Add a timeout option to tests only at this point
-###
-
-
 # Import
 setImmediate = global?.setImmediate or process.nextTick  # node 0.8 b/c
 queue = process.nextTick
@@ -561,6 +554,7 @@ class TaskGroup extends Interface
 		else if TaskGroup.isTaskGroup(item)
 			# Nested configuration
 			item.setNestedConfig(@config.nestedConfig)  if @config.nestedConfig?
+			item.setConfig(nestedTaskConfig: @config.nestedTaskConfig)  if @config.nestedTaskConfig?
 
 			# Bubble item events
 			item.events.forEach (event) ->
