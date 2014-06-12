@@ -264,11 +264,11 @@ joe.describe 'task', (describe,it) ->
 		# Sync
 		it 'should work with arguments in sync', (done) ->
 			# Prepare
-			checks = 0
+			checks = []
 
 			# Create
 			task = new Task (a,b) ->
-				++checks
+				checks.push('my task')
 				expect(task.result).to.equal(null)
 				return a*b
 
@@ -277,15 +277,14 @@ joe.describe 'task', (describe,it) ->
 
 			# Check
 			task.done (err,result) ->
-				++checks
+				checks.push('completion callback')
 				expect(task.result).to.deep.equal([err,result])
 				expect(err?.message or null).to.equal(null)
 				expect(result).to.equal(10)
 
 			# Check
-			wait 1000, ->
-				++checks
-				expect(checks).to.equal(3)
+			wait delay, ->
+				expectDeep(checks, ['my task', 'completion callback'])
 				done()
 
 			# Run
@@ -294,29 +293,29 @@ joe.describe 'task', (describe,it) ->
 		# Async
 		it 'should work with arguments in async', (done) ->
 			# Prepare
-			checks = 0
+			checks = []
 
 			# Create
 			task = new Task (a,b,complete) ->
-				wait 500, ->
-					++checks
+				checks.push('my task - before wait')
+				wait delay, ->
+					checks.push('my task - after wait')
 					expect(task.result).to.equal(null)
-					complete(null,a*b)
+					complete(null, a*b)
 
 			# Apply the arguments
 			task.setConfig(args:[2,5])
 
 			# Check
 			task.done (err,result) ->
-				++checks
+				checks.push('completion callback')
 				expect(task.result).to.deep.equal([err,result])
 				expect(err?.message or null).to.equal(null)
 				expect(result).to.equal(10)
 
 			# Check
-			wait 1000, ->
-				++checks
-				expect(checks).to.equal(3)
+			wait delay*2, ->
+				expectDeep(checks, ['my task - before wait', 'my task - after wait', 'completion callback'])
 				done()
 
 			# Run
@@ -357,7 +356,7 @@ joe.describe 'taskgroup', (describe,it) ->
 					results: []
 				expect(actualItems, 'task 1 items before wait items').to.deep.equal(expectedItems)
 
-				wait 500, ->
+				wait delay, ->
 					actualItems = tasks.getItemNames()
 					expect(actualItems, 'task 1 items after wait items').to.deep.equal(expectedItems)
 
@@ -408,7 +407,7 @@ joe.describe 'taskgroup', (describe,it) ->
 					results: []
 				expect(actualItems, 'task 1 before wait items').to.deep.equal(expectedItems)
 
-				wait 500, ->
+				wait delay, ->
 
 					actualItems = tasks.getItemNames()
 					expectedItems =
@@ -468,7 +467,7 @@ joe.describe 'taskgroup', (describe,it) ->
 							results: []
 						expect(actualItems, 'task 1 before wait items').to.deep.equal(expectedItems)
 
-						wait 500, ->
+						wait delay, ->
 							actualItems = tasks.getItemNames()
 							expectedItems =
 								remaining: []
@@ -493,56 +492,6 @@ joe.describe 'taskgroup', (describe,it) ->
 						return 20
 				]
 			).run()
-
-		###
-		# Serial, Twice
-		it 'should clear results when running again', (done) ->
-			tasks = new TaskGroup().setConfig({concurrency:1}).done (err,results) ->
-				expect(err?.message or null).to.equal(null)
-				expect(results).to.deep.equal([[null,10], [null,20]])
-				expect(tasks.config.concurrency).to.equal(1)
-
-				actualItems = tasks.getItemNames()
-				expectedItems =
-					remaining: []
-					running: []
-					completed: ['task 1', 'task 2']
-					total: 2
-					results: 2
-				expect(actualItems, 'completion items').to.deep.equal(expectedItems)
-
-				done()
-
-			tasks.addTask 'task 1', (complete) ->
-				actualItems = tasks.getItemNames()
-				expectedItems =
-					remaining: ['task 2']
-					running: ['task 1']
-					completed: []
-					total: 2
-					results: 0
-				expect(actualItems, 'task 1 items before wait items').to.deep.equal(expectedItems)
-
-				wait 500, ->
-					actualItems = tasks.getItemNames()
-					expect(actualItems, 'task 1 items after wait items').to.deep.equal(expectedItems)
-
-					complete(null, 10)
-
-			tasks.addTask 'task 2', ->
-				actualItems = tasks.getItemNames()
-				expectedItems =
-					remaining: []
-					running: ['task 2']
-					completed: ['task 1']
-					total: 2
-					results: 1
-				expect(actualItems, 'task 2 items').to.deep.equal(expectedItems)
-
-				return 20
-
-			tasks.run()
-		###
 
 	# Basic
 	describe "errors", (suite,it) ->
@@ -618,7 +567,7 @@ joe.describe 'taskgroup', (describe,it) ->
 					results: []
 				expect(actualItems, 'task 1 before wait items').to.deep.equal(expectedItems)
 
-				wait 500, ->
+				wait delay, ->
 					actualItems = tasks.getItemNames()
 					expectedItems =
 						remaining: []
@@ -672,7 +621,7 @@ joe.describe 'nested', (describe,it) ->
 					results: []
 				expect(actualItems, 'my task items before wait').to.deep.equal(expectedItems)
 
-				wait 500, ->
+				wait delay, ->
 					checks.push('my task 2')
 
 					# totals for parent group
@@ -777,7 +726,7 @@ joe.describe 'nested', (describe,it) ->
 				results: []
 			expect(actualItems, 'my task items before wait').to.deep.equal(expectedItems)
 
-			wait 500, ->
+			wait delay, ->
 				checks.push('my task 2')
 
 				# totals for parent group
