@@ -235,11 +235,26 @@ joe.describe 'task', (describe,it) ->
 			task.whenDone (err,result) ->
 				if checks.length is 0
 					checks.push('timeout')
-					expectError(err, 'timeout')
+					expectError(err, 'timed out')
 				else if checks.length is 1
 					checks.push('completed twice')
 					expectError(err, 'already completed')
 					done()
+
+			# Run
+			task.run()
+
+		it 'should not error when a timeout has not exceeded', (done) ->
+			# Specify how many special checks we are expecting
+			checks = []
+
+			# Create our asynchronous task
+			task = Task.create timeout:delay*2, (complete) ->
+				wait delay, ->
+					complete()
+
+			# Check the task completed as expected
+			task.whenDone(done)
 
 			# Run
 			task.run()

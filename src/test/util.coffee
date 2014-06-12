@@ -1,3 +1,6 @@
+util = require('util')
+{expect} = require('chai')
+
 delay = 100
 
 wait = (delay,fn) -> setTimeout(fn,delay)
@@ -16,29 +19,29 @@ returnError = (message) -> -> new Error(message)
 expectDeep = (argsActual, argsExpected) ->
 	try
 		expect(argsActual).to.deep.equal(argsExpected)
-	catch err
+	catch checkError
 		inspect 'actual:', argsActual, 'expected:', argsExpected
-		throw err
+		throw checkError
 
 expectResult = (argsExpected...) -> (argsActual...) ->
 	expectDeep(argsActual, argsExpected)
 
-expectError = (err, message) ->
+expectError = (inputError, message) ->
 	try
-		expect(err?.message).to.contain(message)
-	catch err
-		inspect 'actual:', err, 'expected:', message
-		return err
+		expect(inputError?.message).to.contain(message)
+	catch checkError
+		inspect 'actual:', inputError, 'expected:', message
+		throw checkError
 	return null
 
-completeWithError = (message, next) -> (err) ->
-	result = expectError(err, message)
-	unless result
-		next?()
-	else
+completeWithError = (message, next) -> (inputError) ->
+	try
+		expectError(inputError, message)
+	catch checkError
 		if next?
-			next(err)
+			return next(checkError)
 		else
-			throw err
+			throw checkError
+	return next?()
 
-module.exports = {delay, wait, inspect, throwUnexpected, returnResult, returnError, expectDeep, expectResult, expectError}
+module.exports = {delay, wait, inspect, throwUnexpected, returnResult, returnError, expectDeep, expectResult, expectError, completeWithError}
