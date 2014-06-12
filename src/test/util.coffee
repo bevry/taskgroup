@@ -12,7 +12,9 @@ inspect = (args...) ->
 throwUnexpected = ->
 	throw new Error('this error is unexpected')
 
-returnResult = (number) -> -> number
+returnResult = (result) -> -> result
+
+returnResultAfterDelay = (result, delay) -> (complete) -> wait delay, -> complete(null, result)
 
 returnError = (message) -> -> new Error(message)
 
@@ -44,4 +46,4 @@ completeWithError = (message, next) -> (inputError) ->
 			throw checkError
 	return next?()
 
-module.exports = {delay, wait, inspect, throwUnexpected, returnResult, returnError, expectDeep, expectResult, expectError, completeWithError}
+module.exports = {delay, wait, inspect, throwUnexpected, returnResult, returnError, expectDeep, expectResult, expectError, completeWithError, returnResultAfterDelay}

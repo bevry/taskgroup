@@ -5,7 +5,7 @@ joe = require('joe')
 {Task,TaskGroup} = require('../../')
 
 # Prepare
-{wait, delay, inspect, throwUnexpected, returnResult, returnError, expectDeep, expectResult, completeWithError} = require('./util')
+{wait, delay, inspect, throwUnexpected, returnResult, returnResultAfterDelay, returnError, expectError, expectDeep, expectResult, completeWithError} = require('./util')
 
 
 # ====================================
@@ -132,3 +132,14 @@ joe.describe 'taskgroup', (describe, it) ->
 				[null,5], [err], [null,10]
 			]))
 			.done(-> complete())
+
+	# failure: nested timeouts
+	it 'Taskgroup should apply nested configuration to tasks', (complete) ->
+		tasks = TaskGroup.create(nestedConfig: timeout: delay)
+			.addTask(returnResult(5))
+			.addTask(returnResultAfterDelay(10, delay*2))
+			.addTask(returnResult(15))
+			.run()
+			.done(completeWithError('timed out', complete))
+			.on 'error', (err) ->
+				expectError(err, 'already completed')

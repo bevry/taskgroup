@@ -103,6 +103,7 @@ class Interface extends EventEmitter
 
 	setNestedConfig: (config={}) ->
 		@setConfig(config)
+		@config.nestedConfig ?= {}
 		for own key,value of config
 			@config.nestedConfig[key] = value
 		@
@@ -228,8 +229,8 @@ class Task extends Interface
 		# Error as we have already completed before
 		else
 			err = new Error """
-				The task [#{@getNames()}] just completed, but it had already completed earlier, this is unexpected. Results of earlier execution are:
-				#{util.inspect({error:@err, arguments:args})}
+				The task [#{@getNames()}] just completed, but it had already completed earlier, this is unexpected. State information is:
+				#{util.inspect({error:@err, previousResult:@result, currentArguments:args})}
 				"""
 			@emit('error', err)
 
@@ -421,7 +422,6 @@ class TaskGroup extends Interface
 		@config ?= {}
 		@config.concurrency ?= 1
 		@config.onError ?= 'exit'
-		@config.nestedConfig ?= {}
 		@itemsRemaining ?= []
 		@itemsRunning ?= []
 		@itemsCompleted ?= []
@@ -532,7 +532,7 @@ class TaskGroup extends Interface
 
 		# Link our item to ourself
 		item.setConfig({parent: @})
-		item.setNestedConfig(@config.nestedConfig)
+		item.setNestedConfig(@config.nestedConfig)  if @config.nestedConfig?
 		item.config.name ?= "#{item.type} #{@getItemsTotal()+1} for #{@getName()}"
 
 		# Bubble task events
@@ -558,6 +558,12 @@ class TaskGroup extends Interface
 		item.events.forEach (event) ->
 			item.on event, (args...) ->
 				me.emit("item.#{event}", item, args...)
+
+		###
+		# Bubble item error event directly
+		item.on 'error', (args...) ->
+			me.emit('error', args...)
+		###
 
 		# Notify our intention
 		@emit('item.add', item)
