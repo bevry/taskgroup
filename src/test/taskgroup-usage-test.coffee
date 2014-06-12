@@ -5,7 +5,7 @@ joe = require('joe')
 {Task,TaskGroup} = require('../../')
 
 # Prepare
-{wait, delay, inspect, throwUnexpected, returnResult, returnError, expectDeep, expectResult, expectError} = require('./util')
+{wait, delay, inspect, throwUnexpected, returnResult, returnError, expectDeep, expectResult, completeWithError} = require('./util')
 
 
 # ====================================
@@ -19,7 +19,7 @@ joe.describe 'task', (describe, it) ->
 
 	# failure: done with no task method
 	it 'Task.create().run().done(...) should fail as there was no task method defined', (complete) ->
-		Task.create().run().done(expectError('no method', complete))
+		Task.create().run().done(completeWithError('no method', complete))
 
 	# success: run then done
 	it 'Task.create(...).run().done(...) should fire the completion callback with the expected result', (complete) ->
@@ -33,12 +33,12 @@ joe.describe 'task', (describe, it) ->
 	it 'Task.create(...).run().run().done(...) should fail as a task is not allowed to run twice', (complete) ->
 		Task.create(returnResult(5))
 			.run().run()
-			.on('error', expectError('started earlier', complete))
+			.on('error', completeWithError('started earlier', complete))
 
 	# failure: done then run then run
 	it 'Task.create(...).done(...).run().run() should fail as a task is not allowed to run twice', (complete) ->
 		task = Task.create(returnResult(5))
-			.on('error', expectError('started earlier', complete))
+			.on('error', completeWithError('started earlier', complete))
 			.run().run()
 
 joe.describe 'taskgroup', (describe, it) ->

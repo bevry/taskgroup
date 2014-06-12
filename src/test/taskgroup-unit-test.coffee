@@ -222,6 +222,28 @@ joe.describe 'task', (describe,it) ->
 				expect(neverReached, "never reached to be false").to.equal(false)
 				done()
 
+		it 'should error when a timeout has exceeded', (done) ->
+			# Specify how many special checks we are expecting
+			checks = []
+
+			# Create our asynchronous task
+			task = Task.create timeout:delay, (complete) ->
+				wait delay*2, ->
+					complete()
+
+			# Check the task completed as expected
+			task.whenDone (err,result) ->
+				if checks.length is 0
+					checks.push('timeout')
+					expectError(err, 'timeout')
+				else if checks.length is 1
+					checks.push('completed twice')
+					expectError(err, 'already completed')
+					done()
+
+			# Run
+			task.run()
+
 	# Basic
 	describe "arguments", (suite,it) ->
 		# Sync
