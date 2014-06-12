@@ -104,7 +104,7 @@ class Interface extends EventEmitter
 	setNestedConfig: (config={}) ->
 		@setConfig(config)
 		for own key,value of config
-			@config.nested[key] = value
+			@config.nestedConfig[key] = value
 		@
 
 
@@ -403,7 +403,7 @@ class TaskGroup extends Interface
 		onError: 'exit'  # ['exit', 'ignore']
 		parent: null
 		run: null
-		nested: null  # configuration to add to child items
+		nestedConfig: null  # configuration to add to child items
 		###
 
 	constructor: (args...) ->
@@ -413,7 +413,7 @@ class TaskGroup extends Interface
 		@config ?= {}
 		@config.concurrency ?= 1
 		@config.onError ?= 'exit'
-		@config.nested ?= {}
+		@config.nestedConfig ?= {}
 		@itemsRemaining ?= []
 		@itemsRunning ?= []
 		@itemsCompleted ?= []
@@ -524,7 +524,7 @@ class TaskGroup extends Interface
 
 		# Link our item to ourself
 		item.setConfig({parent: @})
-		item.setNestedConfig(@config.nested)
+		item.setNestedConfig(@config.nestedConfig)
 		item.config.name ?= "#{item.type} #{@getItemsTotal()+1} for #{@getName()}"
 
 		# Bubble task events
