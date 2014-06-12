@@ -136,6 +136,7 @@ class Task extends Interface
 		method: null
 		args: null
 		parent: null
+		timeout: null
 		###
 
 	# Create a new task
@@ -332,6 +333,13 @@ class Task extends Interface
 					methodToFire = me.config.method.bind(me)
 					me.status = 'running'
 					me.emit(me.status)
+					me.timeout = setTimeout(->
+						if me.isComplete() is false
+							err = new Error """
+								The task [#{me.getNames()}] has timed out.
+								"""
+							me.exit(err)
+					, me.config.timeout)  if me.config.timeout
 					ambi(methodToFire, args...)
 				else
 					err = new Error """

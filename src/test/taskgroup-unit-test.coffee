@@ -11,19 +11,7 @@ joe = require('joe')
 {Task,TaskGroup} = require('../../')
 
 # Prepare
-wait = (delay,fn) -> setTimeout(fn,delay)
-delay = 100
-inspect = (args...) ->
-	for arg in args
-		console.log util.inspect(arg, {colors:true})
-expectDeep = (argsActual, argsExpected) ->
-	try
-		expect(argsActual).to.deep.equal(argsExpected)
-	catch err
-		inspect 'actual:', argsActual, 'expected:', argsExpected
-		throw err
-expectResult = (argsExpected...) -> (argsActual...) ->
-	expectDeep(argsActual, argsExpected)
+{wait, delay, inspect, throwUnexpected, returnResult, returnError, expectDeep, expectResult, expectError} = require('./util')
 
 # Task
 joe.describe 'task', (describe,it) ->
