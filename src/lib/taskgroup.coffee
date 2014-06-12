@@ -101,13 +101,6 @@ class Interface extends EventEmitter
 
 	getConfig: -> @config
 
-	setNestedConfig: (config={}) ->
-		@setConfig(config)
-		@config.nestedConfig ?= {}
-		for own key,value of config
-			@config.nestedConfig[key] = value
-		@
-
 
 # =====================================
 # Task
@@ -445,6 +438,21 @@ class TaskGroup extends Interface
 	# ---------------------------------
 	# Configuration
 
+	# Set Nested Task Config
+	setNestedTaskConfig: (config={}) ->
+		@config.nestedTaskConfig ?= {}
+		for own key,value of config
+			@config.nestedTaskConfig[key] = value
+		@
+
+	# Set Nested Config
+	setNestedConfig: (config={}) ->
+		@setConfig(config)
+		@config.nestedConfig ?= {}
+		for own key,value of config
+			@config.nestedConfig[key] = value
+		@
+
 	# Set Configuration
 	# opts = object|array
 	setConfig: (opts={}) ->
@@ -532,11 +540,14 @@ class TaskGroup extends Interface
 
 		# Link our item to ourself
 		item.setConfig({parent: @})
-		item.setNestedConfig(@config.nestedConfig)  if @config.nestedConfig?
 		item.config.name ?= "#{item.type} #{@getItemsTotal()+1} for #{@getName()}"
 
 		# Bubble task events
 		if Task.isTask(item)
+			# Nested configuration
+			item.setConfig(@config.nestedConfig)  if @config.nestedConfig?
+			item.setConfig(@config.nestedTaskConfig)  if @config.nestedTaskConfig?
+
 			item.events.forEach (event) ->
 				item.on event, (args...) ->
 					me.emit("task.#{event}", item, args...)
@@ -546,6 +557,9 @@ class TaskGroup extends Interface
 
 		# Bubble group events
 		else if TaskGroup.isTaskGroup(item)
+			# Nested configuration
+			item.setNestedConfig(@config.nestedConfig)  if @config.nestedConfig?
+
 			# Bubble item events
 			item.events.forEach (event) ->
 				item.on event, (args...) ->

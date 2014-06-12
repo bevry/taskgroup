@@ -135,11 +135,13 @@ joe.describe 'taskgroup', (describe, it) ->
 
 	# failure: nested timeouts
 	it 'Taskgroup should apply nested configuration to tasks', (complete) ->
-		tasks = TaskGroup.create(nestedConfig: timeout: delay)
+		tasks = TaskGroup.create()
+			.setNestedTaskConfig(
+				timeout: delay
+				onError: 'ignore'
+			)
 			.addTask(returnResult(5))
 			.addTask(returnResultAfterDelay(10, delay*2))
 			.addTask(returnResult(15))
 			.run()
 			.done(completeWithError('timed out', complete))
-			.on 'error', (err) ->
-				expectError(err, 'already completed')
