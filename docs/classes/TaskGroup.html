@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset='UTF-8'>
+  <title>CoffeeScript API Documentation</title>
+  <link rel='stylesheet' href='..&#47;assets/biscotto.css' type='text/css'>
+  <script src='..&#47;assets/biscotto.js'></script>
+  <script src='..&#47;assets/search_data.js'></script>
+</head>
+  <body>
+    <div id='base' data-path='..&#47;'></div>
+<div id='header'>
+  <div id='menu'>
+    <a href='..&#47;README.md.html' title='TaskGroup'>TaskGroup</a>
+    &raquo;
+    <a href='..&#47;class_index.html' title='Index'>Index</a>
+    &raquo;
+    <span class='title'>TaskGroup</span>
+    <nav>
+      <ul>
+        <li class='noframes'>
+          (<a class='noframes' href='#'>no frames</a>)
+        </li>
+      </ul>
+    </nav>
+    <div id='search'>
+      <a id='class_list_link' href='..&#47;class_list.html'>Classes</a>
+      <a id='method_list_link' href='..&#47;method_list.html'>Methods</a>
+      <a id='extra_list_link' href='..&#47;extra_list.html'>Extras</a>
+    </div>
+  </div>
+  <iframe id='search_frame'></iframe>
+  <div id='fuzzySearch'>
+    <input type='text'>
+    <ol></ol>
+  </div>
+  <div id='help'>
+    <p>
+      Quickly fuzzy find classes, mixins, methods, file:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-T</span>
+        Open fuzzy finder dialog
+      </li>
+    </ul>
+    <p>
+      In frame mode you can toggle the list naviation frame on the left side:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-L</span>
+        Toggle list view
+      </li>
+    </ul>
+    <p>
+      You can focus a list in frame mode or toggle a tab in frameless mode:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-C</span>
+        Class list
+      </li>
+      <li>
+        <span>Ctrl-I</span>
+        Mixin list
+      </li>
+      <li>
+        <span>Ctrl-F</span>
+        File list
+      </li>
+      <li>
+        <span>Ctrl-M</span>
+        Method list
+      </li>
+      <li>
+        <span>Ctrl-E</span>
+        Extras list
+      </li>
+    </ul>
+    <p>
+      You can focus and blur the search input:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-S</span>
+        Focus search input
+      </li>
+      <li>
+        <span>Esc</span>
+        Blur search input
+      </li>
+    </ul>
+    <p>
+      In frameless mode you can close the list tab:
+    </p>
+    <ul>
+      <li>
+        <span>Esc</span>
+        Close list tab
+      </li>
+    </ul>
+  </div>
+</div>
+    <div id='content'>
+      <h1>
+        Class
+        TaskGroup
+      </h1>
+      <table class='box'>
+        <tr>
+          <td>Defined in:</td>
+          <td>src&#47;lib&#47;taskgroup.coffee</td>
+        </tr>
+        <tr>
+          <td>Inherits:</td>
+          <td>
+            <a href='..&#47;classes/Interface.html'>Interface</a>
+          </td>
+        </tr>
+      </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <p>Events</p>
+</div>
+<div class='tags'>
+</div>
+      <h2>Class Method Summary</h2>
+      <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#create-class'>
+        .<strong>create</strong>(args...)
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#isTaskGroup-class'>
+        .<strong>isTaskGroup</strong>(group)
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+</ul>
+      <h2>Instance Method Summary</h2>
+      <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#addGroup-instance'>
+        ::<strong>addGroup</strong>(args...)
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#addGroups-instance'>
+        ::<strong>addGroups</strong>(items, args...)
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#addItem-instance'>
+        ::<strong>addItem</strong>(item)
+      </a>
+    </span>
+    <span class='desc'>
+      Add an item also run for groups too for @internal use only, do not use externally
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#addItems-instance'>
+        ::<strong>addItems</strong>(items, args...)
+      </a>
+    </span>
+    <span class='desc'>
+      for @internal use only, do not use externally
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#addMethod-instance'>
+        ::<strong>addMethod</strong>(method, config = {})
+      </a>
+    </span>
+    <span class='desc'>
+      add method for @internal use only, do not use externally
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#addTask-instance'>
+        ::<strong>addTask</strong>(args...)
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#addTasks-instance'>
+        ::<strong>addTasks</strong>(items, args...)
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#clear-instance'>
+        ::<strong>clear</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Clear remaning items
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#complete-instance'>
+        ::<strong>complete</strong>(handler)
+      </a>
+    </span>
+    <span class='desc'>
+      Complete
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#constructor-instance'>
+        ::<strong>constructor</strong>(args...)
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#createGroup-instance'>
+        ::<strong>createGroup</strong>(args...)
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#createTask-instance'>
+        ::<strong>createTask</strong>(args...)
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#destroy-instance'>
+        ::<strong>destroy</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Destroy all remaining items and remove listeners
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#exit-instance'>
+        ::<strong>exit</strong>(err)
+      </a>
+    </span>
+    <span class='desc'>
+      We now want to exit
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#fire-instance'>
+        ::<strong>fire</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Fire for @internal use only, do not use externally
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#fireMethod-instance'>
+        ::<strong>fireMethod</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      for @internal use only, do not use externally
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#fireNextItem-instance'>
+        ::<strong>fireNextItem</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Fire the next item returns the item that was fired or returns false if no item was fired for @internal use only, do not use externally
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#fireNextItems-instance'>
+        ::<strong>fireNextItems</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Fire the next items returns the items that were fired or returns false if no items were fired for @internal use only, do not use externally
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getItemNames-instance'>
+        ::<strong>getItemNames</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getItemTotals-instance'>
+        ::<strong>getItemTotals</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getItemsTotal-instance'>
+        ::<strong>getItemsTotal</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#hasExited-instance'>
+        ::<strong>hasExited</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#hasItems-instance'>
+        ::<strong>hasItems</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#hasRemaining-instance'>
+        ::<strong>hasRemaining</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#hasResult-instance'>
+        ::<strong>hasResult</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#hasRunning-instance'>
+        ::<strong>hasRunning</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#hasSlots-instance'>
+        ::<strong>hasSlots</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#hasStarted-instance'>
+        ::<strong>hasStarted</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#isComplete-instance'>
+        ::<strong>isComplete</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#isEmpty-instance'>
+        ::<strong>isEmpty</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#isPaused-instance'>
+        ::<strong>isPaused</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#itemCompletionCallback-instance'>
+        ::<strong>itemCompletionCallback</strong>(item, args...)
+      </a>
+    </span>
+    <span class='desc'>
+      What to do when an item completes for @internal use only, do not use externally
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onceDone-instance'>
+        ::<strong>onceDone</strong>(handler)
+      </a>
+    </span>
+    <span class='desc'>
+      Once Done Promise
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#resetResults-instance'>
+        ::<strong>resetResults</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Reset the results
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#run-instance'>
+        ::<strong>run</strong>(args...)
+      </a>
+    </span>
+    <span class='desc'>
+      We want to run
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setConfig-instance'>
+        ::<strong>setConfig</strong>(opts = {})
+      </a>
+    </span>
+    <span class='desc'>
+      Set Configuration opts = object|array
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setNestedConfig-instance'>
+        ::<strong>setNestedConfig</strong>(config = {})
+      </a>
+    </span>
+    <span class='desc'>
+      Set Nested Config
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setNestedTaskConfig-instance'>
+        ::<strong>setNestedTaskConfig</strong>(config = {})
+      </a>
+    </span>
+    <span class='desc'>
+      Set Nested Task Config
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#shouldFire-instance'>
+        ::<strong>shouldFire</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#shouldPause-instance'>
+        ::<strong>shouldPause</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#whenDone-instance'>
+        ::<strong>whenDone</strong>(handler)
+      </a>
+    </span>
+    <span class='desc'>
+      When Done Promise
+    </span>
+  </li>
+</ul>
+      <h2>
+        <small>Inherited Method Summary</small>
+      </h2>
+      <h3 class='inherited'>
+        Methods inherited from
+        <a href='..&#47;classes/Interface.html'>Interface</a>
+      </h3>
+      <p class='inherited'>
+                <a href='..&#47;classes/Interface.html#constructor-instance'>.constructor</a>,
+                <a href='..&#47;classes/Interface.html#complete-instance'>.complete</a>,
+                <a href='..&#47;classes/Interface.html#whenDone-instance'>.whenDone</a>,
+                <a href='..&#47;classes/Interface.html#onceDone-instance'>.onceDone</a>,
+                <a href='..&#47;classes/Interface.html#done-instance'>.done</a>,
+                <a href='..&#47;classes/Interface.html#getNames-instance'>.getNames</a>,
+                <a href='..&#47;classes/Interface.html#getName-instance'>.getName</a>,
+        <a href='..&#47;classes/Interface.html#getConfig-instance'>.getConfig</a>
+      </p>
+      <h2>Class Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='create-class'>
+      .<strong>create</strong>(args...)
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L357'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='isTaskGroup-class'>
+      .<strong>isTaskGroup</strong>(group)
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L358'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+</div>
+      <h2>Constructor Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='constructor-instance'>
+      ::<strong>constructor</strong>(args...)
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L382'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+</div>
+      <h2>Instance Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='addGroup-instance'>
+      ::<strong>addGroup</strong>(args...)
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L579'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='addGroups-instance'>
+      ::<strong>addGroups</strong>(items, args...)
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L585'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='addItem-instance'>
+      ::<strong>addItem</strong>(item)
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L484'>Source</a>
+    </p>
+    <div class='docstring'>
+  <p>Add an item also run for groups too for @internal use only, do not use externally</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='addItems-instance'>
+      ::<strong>addItems</strong>(items, args...)
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L535'>Source</a>
+    </p>
+    <div class='docstring'>
+  <p>for @internal use only, do not use externally</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='addMethod-instance'>
+      ::<strong>addMethod</strong>(method, config = {})
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L457'>Source</a>
+    </p>
+    <div class='docstring'>
+  <p>add method for @internal use only, do not use externally</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='addTask-instance'>
+      ::<strong>addTask</strong>(args...)
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L553'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='addTasks-instance'>
+      ::<strong>addTasks</strong>(items, args...)
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L559'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='clear-instance'>
+      ::<strong>clear</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L802'>Source</a>
+    </p>
+    <div class='docstring'>
+  <p>Clear remaning items</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='complete-instance'>
+      ::<strong>complete</strong>(handler)
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L695'>Source</a>
+    </p>
+    <div class='docstring'>
+  <p>Complete</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='createGroup-instance'>
+      ::<strong>createGroup</strong>(args...)
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L568'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='createTask-instance'>
+      ::<strong>createTask</strong>(args...)
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L542'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='destroy-instance'>
+      ::<strong>destroy</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L810'>Source</a>
+    </p>
+    <div class='docstring'>
+  <p>Destroy all remaining items and remove listeners</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='exit-instance'>
+      ::<strong>exit</strong>(err)
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L826'>Source</a>
+    </p>
+    <div class='docstring'>
+  <p>We now want to exit</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='fire-instance'>
+      ::<strong>fire</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L791'>Source</a>
+    </p>
+    <div class='docstring'>
+  <p>Fire for @internal use only, do not use externally</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='fireMethod-instance'>
+      ::<strong>fireMethod</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L466'>Source</a>
+    </p>
+    <div class='docstring'>
+  <p>for @internal use only, do not use externally</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='fireNextItem-instance'>
+      ::<strong>fireNextItem</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L753'>Source</a>
+    </p>
+    <div class='docstring'>
+  <p>Fire the next item returns the item that was fired or returns false if no item was fired for @internal use only, do not use externally</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='fireNextItems-instance'>
+      ::<strong>fireNextItems</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L735'>Source</a>
+    </p>
+    <div class='docstring'>
+  <p>Fire the next items returns the items that were fired or returns false if no items were fired for @internal use only, do not use externally</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getItemNames-instance'>
+      ::<strong>getItemNames</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L594'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getItemTotals-instance'>
+      ::<strong>getItemTotals</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L617'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getItemsTotal-instance'>
+      ::<strong>getItemsTotal</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L609'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='hasExited-instance'>
+      ::<strong>hasExited</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L651'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='hasItems-instance'>
+      ::<strong>hasItems</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L640'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='hasRemaining-instance'>
+      ::<strong>hasRemaining</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L636'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='hasResult-instance'>
+      ::<strong>hasResult</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L647'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='hasRunning-instance'>
+      ::<strong>hasRunning</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L632'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='hasSlots-instance'>
+      ::<strong>hasSlots</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L655'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='hasStarted-instance'>
+      ::<strong>hasStarted</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L644'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='isComplete-instance'>
+      ::<strong>isComplete</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L685'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='isEmpty-instance'>
+      ::<strong>isEmpty</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L674'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='isPaused-instance'>
+      ::<strong>isPaused</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L678'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='itemCompletionCallback-instance'>
+      ::<strong>itemCompletionCallback</strong>(item, args...)
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L773'>Source</a>
+    </p>
+    <div class='docstring'>
+  <p>What to do when an item completes for @internal use only, do not use externally</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onceDone-instance'>
+      ::<strong>onceDone</strong>(handler)
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L719'>Source</a>
+    </p>
+    <div class='docstring'>
+  <p>Once Done Promise</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='resetResults-instance'>
+      ::<strong>resetResults</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L727'>Source</a>
+    </p>
+    <div class='docstring'>
+  <p>Reset the results</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='run-instance'>
+      ::<strong>run</strong>(args...)
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L842'>Source</a>
+    </p>
+    <div class='docstring'>
+  <p>We want to run</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setConfig-instance'>
+      ::<strong>setConfig</strong>(opts = {})
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L422'>Source</a>
+    </p>
+    <div class='docstring'>
+  <p>Set Configuration opts = object|array</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setNestedConfig-instance'>
+      ::<strong>setNestedConfig</strong>(config = {})
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L413'>Source</a>
+    </p>
+    <div class='docstring'>
+  <p>Set Nested Config</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setNestedTaskConfig-instance'>
+      ::<strong>setNestedTaskConfig</strong>(config = {})
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L406'>Source</a>
+    </p>
+    <div class='docstring'>
+  <p>Set Nested Task Config</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='shouldFire-instance'>
+      ::<strong>shouldFire</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L667'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='shouldPause-instance'>
+      ::<strong>shouldPause</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L661'>Source</a>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='whenDone-instance'>
+      ::<strong>whenDone</strong>(handler)
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L711'>Source</a>
+    </p>
+    <div class='docstring'>
+  <p>When Done Promise</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+</div>
+    </div>
+    <div id='footer'>
+  Generated on
+  Sun Jun 15 2014 09:00:08 GMT+0200 (CEST)
+  by
+  <a href='https://github.com/gjtorikian/biscotto' title='TomDoc-CoffeeScript API documentation generator'>Biscotto</a>
+  v2.1.2
+  (Node.js v0.10.28).
+  &#10034;
+  Press Ctrl-h to see the keyboard shortcuts
+</div>
+  </body>
+</html>

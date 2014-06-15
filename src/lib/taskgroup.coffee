@@ -11,16 +11,22 @@ util = require('util')
 
 # =====================================
 # Interface
-# Generic Interface with common methods used by both Task and TaskGroup
 
-# Definition
+# Internal: Base class containing common functionality for {Task} and {TaskGroup}.
 class Interface extends EventEmitter
+
+	# Adds support for the done event while
+	# ensuring that errors are always handled correctly.
+	#
+	# It does this by listening to the `error` and `completed` events,
+	# and when the emit, we check if there is a `done` listener:
+	# - if there is, then emit the done event with the original event arguments
+	# - if there isn't, then output the error to stderr and throw it.
 	constructor: ->
 		super
 		me = @
 
 		# Add support for the done event
-		# it is a combination of the error and completed events
 		# If we do have an error, then throw it if there is no existing or done listeners
 		@on 'error', (args...) ->
 			err = args[0]
@@ -43,13 +49,15 @@ class Interface extends EventEmitter
 		# Chain
 		@
 
-	# Complete emitter
+	# Internal: Fire our completion event.
 	complete: ->
 		err = throw Error('interface should provide this')
 		@emit('error', err)
 		@
 
-	# When Done Listener
+	# Public: Attaches the listener to the `done` event to be emitted each time.
+	#
+	# listener - The {Function} to attach to the `done` event.
 	whenDone: (listener) ->
 		# check if we have a listener
 		if typeof listener is 'function'
@@ -58,7 +66,9 @@ class Interface extends EventEmitter
 		# Chain
 		@
 
-	# Once Done Listener
+	# Public: Attaches the listener to the `done` event to be emitted only once, then removed to not fire again.
+	#
+	# listener - The {Function} to attach to the `done` event.
 	onceDone: (listener) ->
 		# check if we have a listener
 		if typeof listener is 'function'
@@ -67,11 +77,17 @@ class Interface extends EventEmitter
 		# Chain
 		@
 
-	# Done Alias
+	# Public: Alias for {::onceDone}
 	done: (args...) ->
 		return @onceDone(args...)
 
-	# Get Names
+	# Public: Get our name with all of our parent names into a {String} or {Array}.
+	#
+	# opts - The options
+	#        :format - (default: 'string') A {String} that determines the format that we return, when `string` it will output a string of all our names, when `array` it will return the names as an array
+	#        :seperator - (default: ' ➞  ') A {String} that is used to join our array when returning a joined {String}
+	#
+	# Returns either a joined {String} or an {Array} based on the value of the `format` option.
 	getNames: (opts={}) ->
 		# Prepare
 		opts.format ?= 'string'
@@ -88,25 +104,49 @@ class Interface extends EventEmitter
 		# Return
 		return names
 
-	# Get Name
+	# Public: Get the name of our instance.
+	#
+	# If the name was never configured, then return the name in the format of
+	# `'#{@type} #{Math.random()}'` to output something like `task 0.2123`
+	#
+	# Returns the configured name {String}.
 	getName: ->
 		return @config.name ?= "#{@type} #{Math.random()}"
 
+	# Public: Get the configuration of our instance.
+	#
+	# Returns our configuration {Object} directly.
 	getConfig: -> @config
 
 
 # =====================================
-# Task
 
-# Events
-# - complete
-# - run
-# - error
+# Public: Our Task Class.
 class Task extends Interface
-	type: 'task'  # for duck typing
-	@extend: extendOnClass
+	# Internal: The type of our class for the purpose of duck typing
+	# which is needed when working with node virtual machines
+	# as instanceof will not work in those environments.
+	type: 'task'
+
+	# Public: A helper method to check if the passed argument is an instanceof
+	# a {Task}.
+	#
+	# item - The possible instance of the {Task} that we want to check
+	#
+	# Returns a {Boolean} of whether or not the item is a {Task} instance.
+	@isTask: (item) -> return item?.type is 'task' or item instanceof Task
+
+	# Public: A helper method to create a new subclass with our extensions.
+	#
+	# extensions - An {Object} of extensions to apply to the new subclass
+	#
+	# Returns the new sub {Class};
+	@subclass: extendOnClass
+
+	# Public: Creates a {Task} instance via our constructor {::constructor}.
+	#
+	# Returns our new {Task} instance.
 	@create: (args...) -> return new @(args...)
-	@isTask: (task) -> return task?.type is 'task' or task instanceof Task
 
 	# Variables
 	# for @internal use only, do not use externally
@@ -116,20 +156,10 @@ class Task extends Interface
 	events: null  # ['done', 'error', 'started', 'running', 'failed', 'passed', 'completed', 'destroyed']
 	taskDomain: null
 
-	# Config
+	# Internal: The configuration for our {Task} instance. See {::setConfig} for details.
 	config: null
-		###
-		name: null
-		method: null
-		args: null
-		parent: null
-		timeout: null
-		onError: 'exit'  # ['ignore', 'exit']
-		###
 
-	# Create a new task
-	# - new Task(name, method)
-	# - new Task(method)
+	# Public: Creates a new task. Forwards arguments onto {::setConfig}.
 	constructor: (args...) ->
 		super
 
@@ -146,8 +176,18 @@ class Task extends Interface
 		# Chain
 		@
 
-	# Set Configuration
-	# opts = object|array
+	# Public: Set the configuration for our instance.
+	#
+	# Despite accepting an {Object} of configuration, we can also accept an {Array} of configuration.
+	# When using an array, a {String} becomes the :name, a {Function} becoes the :method, and an {Object} becomes the :config
+	#
+	# config - Our configuration {Object} can contain the following fields:
+	#   :name - (default: null) A {String} for what we would like our name to be, useful for debugging.
+	#   :method - (default: null) The {Function} that we would like to execute within our task.
+	#   :args - (default: null) An {Array} of arguments that we would like to forward onto our method when we execute it.
+	#   :parent - (default: null) A parent {TaskGroup} that we may be attached to.
+	#   :timeout - (default: null) A {Number} of millesconds that we would like to wait before timing out the method.
+	#   :onError - (default: 'exit') A {String} that is either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.
 	setConfig: (opts={}) ->
 		# Handle arguments
 		if Array.isArray(opts)
