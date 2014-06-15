@@ -122,6 +122,25 @@ class Interface extends EventEmitter
 # =====================================
 
 # Public: Our Task Class.
+#
+# Available configuration is documented in {::setConfig}.
+#
+# Available events:
+# - `started()` - emitted when executing starts
+# - `running()` - emitted when the method is running
+# - `failed(err)` - emitted when execution finished with a failure
+# - `passed()` - emitted when execution finished with a success
+# - `completed(err, args...)` - emitted when execution finished, `args` are the result arguments from the method
+# - `error(err)` - emtited if an unexpected error occurs within our task
+# - `done(err, args...)` - emitted when either exucution finishes (the `completed` event) or when an unexpected error occurs (the `error` event)
+#
+# Available internal statuses:
+# - `null` - execution has not yet started
+# - `'started'` - execution of our task has begun
+# - `'running'` - execution of our task method has begun
+# - `'failed'` - execution of our task method has failed
+# - `'passed'` - execution of our task method has passed
+# - `'destroyed'` - our task has been destroyed and can no longer execute
 class Task extends Interface
 	# Internal: The type of our class for the purpose of duck typing
 	# which is needed when working with node virtual machines
@@ -160,10 +179,7 @@ class Task extends Interface
 	# Valid values are: null, 'started', 'running', 'failed', 'passed', 'destroyed'
 	status: null
 
-	# Internal: An {Array} of the events that we may emit.
-	#
-	# Our {::constructor} sets this to:
-	# ['done', 'error', 'started', 'running', 'failed', 'passed', 'completed', 'destroyed']
+	# Internal: An {Array} of the events that we may emit. Events that will be executed can be found in the {Task} description.
 	events: null
 
 	# Internal: The {Domain} that we create to capture errors for our method.
@@ -231,29 +247,35 @@ class Task extends Interface
 		# Chain
 		@
 
-	# Public: Has the task started execution yet?
+	# Public: Have we started execution yet?
 	#
 	# Returns a {Boolean}
 	hasStarted: ->
 		return @status isnt null
 
-	# Public: Has the task finished its execution yet?
+	# Public: Have we finished its execution yet?
 	#
 	# Returns a {Boolean}
 	hasExited: ->
 		return @status in ['completed', 'destroyed']
 
-	# Public: Has the task completed its execution yet?
+	# Public: Have we been destroyed?
+	#
+	# Returns a {Boolean}
+	isDestroyed: ->
+		return @status is 'destroyed'
+
+	# Public: Have we completed its execution yet?
 	#
 	# Returns a {Boolean}
 	isComplete: ->
 		return @status in ['failed', 'passed', 'destroyed']
 
-	# Internal: Handles the completion and error conditions for our task.
+	# Internal: Handles the completion and error conditions for ourself.
 	#
 	# Should only ever execute once, if it executes more than once, then we error.
 	#
-	# args... - The arguments array that will be applied to the {::result} variable. First argument is the {Error} if it exists.
+	# args - The arguments {Array} that will be applied to the {::result} variable. First argument is the {Error} if it exists.
 	exit: (args...) ->
 		# Store the first error
 		@err ?= args[0]  if args[0]?
@@ -301,7 +323,7 @@ class Task extends Interface
 			# Should we reset results?
 			# @results = []
 			# no, it would break the promise nature of done
-			# as it would mean that if multiple done handlers are added, they would each get different results
+			# as it would mean that if multiple done listener are added, they would each get different results
 			# if they wish to reset the results, they should do so manually via resetResults
 
 			# Should we reset the status?
@@ -312,36 +334,44 @@ class Task extends Interface
 		return complete
 
 	# Public: When Done Promise.
-	whenDone: (handler) ->
+	# Fires the listener, either on the next tick if we are already done, or if not, each time the `done` event fires.
+	#
+	# listener - The {Function} to attach or execute.
+	whenDone: (listener) ->
 		if @isComplete()
 			queue =>  # avoid zalgo
-				handler.apply(@, @result or [])
+				listener.apply(@, @result or [])
 		else
-			super(handler)
+			super(listener)
 		@
 
 	# Public: Once Done Promise.
-	onceDone: (handler) ->
+	# Fires the listener once, either on the next tick if we are already done, or if not, once the `done` event fires.
+	#
+	# listener - The {Function} to attach or execute.
+	onceDone: (listener) ->
 		if @isComplete()
 			queue =>  # avoid zalgo
-				handler.apply(@, @result or [])
+				listener.apply(@, @result or [])
 		else
-			super(handler)
+			super(listener)
 		@
 
 	# Internal: Reset the results.
+	#
+	# At this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.
 	resetResults: ->
 		@result = []
 		@
 
-	# Public: Destroy.
+	# Public: Destroy the task and prevent it from executing ever again.
 	destroy: ->
 		@done =>
-			# Ensure nothing hit here again
-			@status = 'destroyed'
+			# Are we already destroyed?
+			return  if @status is 'destroyed'
 
-			# Notify our listeners we are now destroyed
-			@emit(@status)
+			# Update our status and notify our listeners
+			@emit(@status = 'destroyed')
 
 			# Clear results
 			@resetResults()
@@ -354,7 +384,7 @@ class Task extends Interface
 		# Chain
 		@
 
-	# Internal: Fire.
+	# Internal: Fire the task method with our config arguments and wrapped in a domain.
 	fire: ->
 		# Prepare
 		me = @
@@ -406,10 +436,12 @@ class Task extends Interface
 		# Chain
 		@
 
-	# Public: Run.
+	# Public: Start the execution of the task.
+	#
+	# Will emit an `error` event if the task has already started before.
 	run: ->
 		queue =>
-			# Already completed?
+			# Already completed or even destroyed?
 			if @hasStarted()
 				err = new Error """
 					The task [#{@getNames()}] was just about to start, but it already started earlier, this is unexpected.
@@ -435,7 +467,26 @@ class Task extends Interface
 # =====================================
 # Task Group
 
-# Public: Our TaskGroup class
+# Public: Our TaskGroup class.
+#
+# Available configuration is documented in {::setConfig}.
+#
+# Available events:
+# - `started()` - emitted when we start execution
+# - `running()` - emitted when the first item starts execution
+# - `failed(err)` - emitted when execution exited with a failure
+# - `passed()` - emitted when execution exited with a success
+# - `completed(err, results)` - emitted when execution exited, `results` is an {Array} of the result arguments for each item that executed
+# - `error(err)` - emtited if an unexpected error occured within the execution
+# - `done(err, results)` - emitted when either the execution finishes (the `completed` event) or when an unexpected error occurs (the `error` event)
+#
+# Available internal statuses:
+# - `null` - execution has not yet started
+# - `'started'` - execution of our task has begun
+# - `'running'` - execution of our task method has begun
+# - `'failed'` - execution of our task method has failed
+# - `'passed'` - execution of our task method has passed
+# - `'destroyed'` - our task has been destroyed and can no longer execute
 class TaskGroup extends Interface
 	type: 'taskgroup'  # for duck typing
 	@extend: extendOnClass
@@ -920,11 +971,8 @@ class TaskGroup extends Interface
 		if fire
 			# Fire the next item
 
-			# Update our status
-			@status = 'running'
-
-			# and notify our listeners of it
-			@emit(@status)
+			# Update our status and notify our listeners
+			@emit(@status = 'running')  if @status isnt 'running'
 
 			# Get the next item and remove it from the remaining items
 			item = @itemsRemaining.shift()
