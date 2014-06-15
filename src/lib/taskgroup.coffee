@@ -148,12 +148,25 @@ class Task extends Interface
 	# Returns our new {Task} instance.
 	@create: (args...) -> return new @(args...)
 
-	# Variables
-	# for @internal use only, do not use externally
+	# Internal: The first {Error} that has occured.
 	err: null
-	result: null  # array, [err, ...]
-	status: null  # [null, 'started', 'running', 'failed', 'passed', 'destroyed']
-	events: null  # ['done', 'error', 'started', 'running', 'failed', 'passed', 'completed', 'destroyed']
+
+	# Internal: An {Array} of the result arguments of our method.
+	# The first item in the array should be the {Error} if it exists.
+	result: null
+
+	# Internal: A {String} containing our current status.
+	#
+	# Valid values are: null, 'started', 'running', 'failed', 'passed', 'destroyed'
+	status: null
+
+	# Internal: An {Array} of the events that we may emit.
+	#
+	# Our {::constructor} sets this to:
+	# ['done', 'error', 'started', 'running', 'failed', 'passed', 'completed', 'destroyed']
+	events: null
+
+	# Internal: The {Domain} that we create to capture errors for our method.
 	taskDomain: null
 
 	# Internal: The configuration for our {Task} instance. See {::setConfig} for details.
@@ -218,20 +231,29 @@ class Task extends Interface
 		# Chain
 		@
 
-	# Has Started
+	# Public: Has the task started execution yet?
+	#
+	# Returns a {Boolean}
 	hasStarted: ->
 		return @status isnt null
 
-	# Has Exited
+	# Public: Has the task finished its execution yet?
+	#
+	# Returns a {Boolean}
 	hasExited: ->
 		return @status in ['completed', 'destroyed']
 
-	# Is Done
+	# Public: Has the task completed its execution yet?
+	#
+	# Returns a {Boolean}
 	isComplete: ->
 		return @status in ['failed', 'passed', 'destroyed']
 
-	# Exit
-	# The completion callback to use when the function completes normally, when it errors, and when whatever else unexpected happens
+	# Internal: Handles the completion and error conditions for our task.
+	#
+	# Should only ever execute once, if it executes more than once, then we error.
+	#
+	# args... - The arguments array that will be applied to the {::result} variable. First argument is the {Error} if it exists.
 	exit: (args...) ->
 		# Store the first error
 		@err ?= args[0]  if args[0]?
@@ -265,8 +287,7 @@ class Task extends Interface
 		# Chain
 		@
 
-	# Complete Emitter
-	# for @internal use only, do not use externally
+	# Internal: Completetion Emitter. Used to emit the `completed` event and to cleanup our state.
 	complete: ->
 		complete = @isComplete()
 
@@ -290,7 +311,7 @@ class Task extends Interface
 
 		return complete
 
-	# When Done Promise
+	# Public: When Done Promise.
 	whenDone: (handler) ->
 		if @isComplete()
 			queue =>  # avoid zalgo
@@ -299,7 +320,7 @@ class Task extends Interface
 			super(handler)
 		@
 
-	# Once Done Promise
+	# Public: Once Done Promise.
 	onceDone: (handler) ->
 		if @isComplete()
 			queue =>  # avoid zalgo
@@ -308,12 +329,12 @@ class Task extends Interface
 			super(handler)
 		@
 
-	# Reset the results
+	# Internal: Reset the results.
 	resetResults: ->
 		@result = []
 		@
 
-	# Destroy
+	# Public: Destroy.
 	destroy: ->
 		@done =>
 			# Ensure nothing hit here again
@@ -333,8 +354,7 @@ class Task extends Interface
 		# Chain
 		@
 
-	# Fire
-	# for @internal use only, do not use externally
+	# Internal: Fire.
 	fire: ->
 		# Prepare
 		me = @
@@ -386,7 +406,7 @@ class Task extends Interface
 		# Chain
 		@
 
-	# Run
+	# Public: Run.
 	run: ->
 		queue =>
 			# Already completed?
@@ -415,7 +435,6 @@ class Task extends Interface
 # =====================================
 # Task Group
 
-# Events
 class TaskGroup extends Interface
 	type: 'taskgroup'  # for duck typing
 	@extend: extendOnClass

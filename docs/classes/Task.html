@@ -157,7 +157,7 @@
       </a>
     </span>
     <span class='desc'>
-      Complete Emitter for @internal use only, do not use externally
+      Completetion Emitter.
     </span>
   </li>
   <li>
@@ -177,7 +177,7 @@
       </a>
     </span>
     <span class='desc'>
-      Destroy
+      Destroy.
     </span>
   </li>
   <li>
@@ -187,7 +187,7 @@
       </a>
     </span>
     <span class='desc'>
-      Exit The completion callback to use when the function completes normally, when it errors, and when whatever else unexpected happens
+      Handles the completion and error conditions for our task.
     </span>
   </li>
   <li>
@@ -197,37 +197,37 @@
       </a>
     </span>
     <span class='desc'>
-      Fire for @internal use only, do not use externally
+      Fire.
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#hasExited-instance'>
-        ::<strong>hasExited</strong>()
+        Boolean ::<strong>hasExited</strong>()
       </a>
     </span>
     <span class='desc'>
-      Has Exited
+      Has the task finished its execution yet?
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#hasStarted-instance'>
-        ::<strong>hasStarted</strong>()
+        Boolean ::<strong>hasStarted</strong>()
       </a>
     </span>
     <span class='desc'>
-      Has Started
+      Has the task started execution yet?
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#isComplete-instance'>
-        ::<strong>isComplete</strong>()
+        Boolean ::<strong>isComplete</strong>()
       </a>
     </span>
     <span class='desc'>
-      Is Done
+      Has the task completed its execution yet?
     </span>
   </li>
   <li>
@@ -237,7 +237,7 @@
       </a>
     </span>
     <span class='desc'>
-      Once Done Promise
+      Once Done Promise.
     </span>
   </li>
   <li>
@@ -247,7 +247,7 @@
       </a>
     </span>
     <span class='desc'>
-      Reset the results
+      Reset the results.
     </span>
   </li>
   <li>
@@ -257,7 +257,7 @@
       </a>
     </span>
     <span class='desc'>
-      Run
+      Run.
     </span>
   </li>
   <li>
@@ -277,7 +277,7 @@
       </a>
     </span>
     <span class='desc'>
-      When Done Promise
+      When Done Promise.
     </span>
   </li>
 </ul>
@@ -361,7 +361,7 @@
       ::<strong>constructor</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L143'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L156'>Source</a>
     </p>
     <div class='docstring'>
   <p>Creates a new task. Forwards arguments onto <a href='../classes/Task.html#setConfig-instance'>::setConfig</a>.</p>
@@ -377,10 +377,10 @@
       ::<strong>complete</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L234'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L255'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Complete Emitter for @internal use only, do not use externally</p>
+  <p>Completetion Emitter. Used to emit the <code>completed</code> event and to cleanup our state.</p>
 </div>
 <div class='tags'>
 </div>
@@ -390,10 +390,10 @@
       ::<strong>destroy</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L270'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L291'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Destroy</p>
+  <p>Destroy.</p>
 </div>
 <div class='tags'>
 </div>
@@ -403,10 +403,10 @@
       ::<strong>exit</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L208'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L230'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Exit The completion callback to use when the function completes normally, when it errors, and when whatever else unexpected happens</p>
+  <p>Handles the completion and error conditions for our task.</p><p>Should only ever execute once, if it executes more than once, then we error.</p><p>args... - The arguments array that will be applied to the {::result} variable. First argument is the <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Error'>Error</a> if it exists. </p>
 </div>
 <div class='tags'>
 </div>
@@ -416,51 +416,78 @@
       ::<strong>fire</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L284'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L304'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Fire for @internal use only, do not use externally</p>
+  <p>Fire.</p>
 </div>
 <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='hasExited-instance'>
-      ::<strong>hasExited</strong>()
+      Boolean ::<strong>hasExited</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L199'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L216'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Has Exited</p>
+  <p>Has the task finished its execution yet?</p>
 </div>
 <div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Boolean</tt>)
+      &mdash;
+      <span class='desc'>Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a></span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='hasStarted-instance'>
-      ::<strong>hasStarted</strong>()
+      Boolean ::<strong>hasStarted</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L195'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L210'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Has Started</p>
+  <p>Has the task started execution yet?</p>
 </div>
 <div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Boolean</tt>)
+      &mdash;
+      <span class='desc'>Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a></span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='isComplete-instance'>
-      ::<strong>isComplete</strong>()
+      Boolean ::<strong>isComplete</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L203'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L222'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Is Done</p>
+  <p>Has the task completed its execution yet?</p>
 </div>
 <div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Boolean</tt>)
+      &mdash;
+      <span class='desc'>Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a></span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -468,10 +495,10 @@
       ::<strong>onceDone</strong>(handler)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L256'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L277'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Once Done Promise</p>
+  <p>Once Done Promise.</p>
 </div>
 <div class='tags'>
 </div>
@@ -481,10 +508,10 @@
       ::<strong>resetResults</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L265'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L286'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Reset the results</p>
+  <p>Reset the results.</p>
 </div>
 <div class='tags'>
 </div>
@@ -494,10 +521,10 @@
       ::<strong>run</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L333'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L353'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Run</p>
+  <p>Run.</p>
 </div>
 <div class='tags'>
 </div>
@@ -507,7 +534,7 @@
       ::<strong>setConfig</strong>(opts = {})
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L168'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L181'>Source</a>
     </p>
     <div class='docstring'>
   <p>Set the configuration for our instance.</p><p>Despite accepting an <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> of configuration, we can also accept an <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of configuration.
@@ -568,10 +595,10 @@ When using an array, a <a href='https://developer.mozilla.org/en-US/docs/JavaScr
       ::<strong>whenDone</strong>(handler)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L247'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L268'>Source</a>
     </p>
     <div class='docstring'>
-  <p>When Done Promise</p>
+  <p>When Done Promise.</p>
 </div>
 <div class='tags'>
 </div>
@@ -580,7 +607,7 @@ When using an array, a <a href='https://developer.mozilla.org/en-US/docs/JavaScr
     </div>
     <div id='footer'>
   Generated on
-  Sun Jun 15 2014 09:00:08 GMT+0200 (CEST)
+  Sun Jun 15 2014 21:34:30 GMT+0200 (CEST)
   by
   <a href='https://github.com/gjtorikian/biscotto' title='TomDoc-CoffeeScript API documentation generator'>Biscotto</a>
   v2.1.2
