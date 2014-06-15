@@ -435,6 +435,7 @@ class Task extends Interface
 # =====================================
 # Task Group
 
+# Public: Our TaskGroup class
 class TaskGroup extends Interface
 	type: 'taskgroup'  # for duck typing
 	@extend: extendOnClass
@@ -492,14 +493,14 @@ class TaskGroup extends Interface
 	# ---------------------------------
 	# Configuration
 
-	# Set Nested Task Config
+	# Public: Set Nested Task Config
 	setNestedTaskConfig: (config={}) ->
 		@config.nestedTaskConfig ?= {}
 		for own key,value of config
 			@config.nestedTaskConfig[key] = value
 		@
 
-	# Set Nested Config
+	# Public: Set Nested Config
 	setNestedConfig: (config={}) ->
 		@setConfig(config)
 		@config.nestedConfig ?= {}
@@ -507,7 +508,7 @@ class TaskGroup extends Interface
 			@config.nestedConfig[key] = value
 		@
 
-	# Set Configuration
+	# Public: Set Configuration
 	# opts = object|array
 	setConfig: (opts={}) ->
 		# Handle arguments
@@ -549,8 +550,7 @@ class TaskGroup extends Interface
 	# ---------------------------------
 	# TaskGroup Method
 
-	# add method
-	# for @internal use only, do not use externally
+	# Internal: Add method
 	addMethod: (method, config={}) ->
 		method ?= @config.method.bind(@)
 		method.isTaskGroupMethod = true
@@ -559,7 +559,7 @@ class TaskGroup extends Interface
 		config.includeInResults ?= false
 		return @addTask(method, config)
 
-	# for @internal use only, do not use externally
+	# Internal: Fire method.
 	fireMethod: ->
 		# Auto run if we are going the inline style and have no parent
 		if @config.method
@@ -582,7 +582,7 @@ class TaskGroup extends Interface
 	# ---------------------------------
 	# Add Item
 
-	# Add an item
+	# Internal: Add an item
 	# also run for groups too
 	# for @internal use only, do not use externally
 	addItem: (item) ->
@@ -651,7 +651,7 @@ class TaskGroup extends Interface
 		# Return the item
 		return item
 
-	# for @internal use only, do not use externally
+	# Internal: Add items
 	addItems: (items, args...) ->
 		items = [items]  unless Array.isArray(items)
 		return (@addItem(item, args...)  for item in items)
@@ -690,6 +690,7 @@ class TaskGroup extends Interface
 	# ---------------------------------
 	# Add Group
 
+	# Public
 	createGroup: (args...) ->
 		# Support recieving an existing taskgroup instance
 		if TaskGroup.isTaskGroup(args[0])
@@ -703,12 +704,14 @@ class TaskGroup extends Interface
 		# Return the taskgroup instance
 		return taskgroup
 
+	# Public
 	addGroup: (args...) ->
 		group = @addItem @createGroup args...
 
 		# Chain
 		@
 
+	# Public
 	addGroups: (items, args...) ->
 		items = [items]  unless Array.isArray(items)
 		groups = (@addGroup(item, args...)  for item in items)
@@ -720,6 +723,7 @@ class TaskGroup extends Interface
 	# ---------------------------------
 	# Status Indicators
 
+	# Public
 	getItemNames: ->
 		running = @itemsRunning.map (item) -> item.getName()
 		remaining = @itemsRemaining.map (item) -> item.getName()
@@ -734,6 +738,7 @@ class TaskGroup extends Interface
 			results
 		}
 
+	# Public
 	getItemsTotal: ->
 		running = @itemsRunning.length
 		remaining = @itemsRemaining.length
@@ -741,6 +746,7 @@ class TaskGroup extends Interface
 		total = running + remaining + completed
 		return total
 
+	# Public
 	getItemTotals: ->
 		running = @itemsRunning.length
 		remaining = @itemsRemaining.length
@@ -755,36 +761,45 @@ class TaskGroup extends Interface
 			results
 		}
 
+	# Public
 	hasRunning: ->
 		return @itemsRunning.length isnt 0
 
+	# Public
 	hasRemaining: ->
 		return @itemsRemaining.length isnt 0
 
+	# Public
 	hasItems: ->
 		return @hasRunning() or @hasRemaining()
 
+	# Public
 	hasStarted: ->
 		return @status isnt null
 
+	# Public
 	hasResult: ->
 		return @err? or @results.length isnt 0
 
+	# Public
 	hasExited: ->
 		return @status in ['completed', 'destroyed']
 
+	# Internal
 	hasSlots: ->
 		return (
 			@config.concurrency is 0 or
 			@itemsRunning.length < @config.concurrency
 		)
 
+	# Internal
 	shouldPause: ->
 		return (
 			@config.onError is 'exit' and
 			@err?
 		)
 
+	# Internal
 	shouldFire: ->
 		return (
 			@shouldPause() is false and
@@ -792,15 +807,18 @@ class TaskGroup extends Interface
 			@hasSlots()
 		)
 
+	# Public
 	isEmpty: ->
 		return @hasItems() is false
 
+	# Public
 	isPaused: ->
 		return (
 			@shouldPause() and
 			@hasRunning() is false
 		)
 
+	# Public
 	isComplete: ->
 		return (
 			@hasStarted() and
@@ -814,7 +832,7 @@ class TaskGroup extends Interface
 	# ---------------------------------
 	# Firers
 
-	# Complete
+	# Internal: Complete
 	complete: (handler) ->
 		complete = @isComplete()
 
@@ -843,7 +861,7 @@ class TaskGroup extends Interface
 
 		return complete
 
-	# When Done Promise
+	# Public: When Done Promise
 	whenDone: (handler) ->
 		if @isComplete()
 			queue =>  # avoid zalgo
@@ -852,7 +870,7 @@ class TaskGroup extends Interface
 			super(handler)
 		@
 
-	# Once Done Promise
+	# Public: Once Done Promise
 	onceDone: (handler) ->
 		if @isComplete()
 			queue =>  # avoid zalgo
@@ -861,12 +879,12 @@ class TaskGroup extends Interface
 			super(handler)
 		@
 
-	# Reset the results
+	# Internal: Reset the results
 	resetResults: ->
 		@results = []
 		@
 
-	# Fire the next items
+	# Internal: Fire the next items
 	# returns the items that were fired
 	# or returns false if no items were fired
 	# for @internal use only, do not use externally
@@ -889,7 +907,7 @@ class TaskGroup extends Interface
 
 		return result
 
-	# Fire the next item
+	# Internal: Fire the next item
 	# returns the item that was fired
 	# or returns false if no item was fired
 	# for @internal use only, do not use externally
@@ -921,8 +939,7 @@ class TaskGroup extends Interface
 		# Return
 		return result
 
-	# What to do when an item completes
-	# for @internal use only, do not use externally
+	# Internal: What to do when an item completes
 	itemCompletionCallback: (item, args...) ->
 		# Update error if it exists
 		@err ?= args[0]  if @config.onError is 'exit' and args[0]
@@ -947,8 +964,7 @@ class TaskGroup extends Interface
 		# Chain
 		@
 
-	# Fire
-	# for @internal use only, do not use externally
+	# Internal: Fire.
 	fire: ->
 		# Have we actually started?
 		if @hasStarted()
@@ -963,7 +979,7 @@ class TaskGroup extends Interface
 		# Chain
 		@
 
-	# Clear remaning items
+	# Public: Clear remaning items.
 	clear: ->
 		# Destroy all the items
 		for item in @itemsRemaining
@@ -973,7 +989,7 @@ class TaskGroup extends Interface
 		# Chain
 		@
 
-	# Destroy all remaining items and remove listeners
+	# Public: Destroy all remaining items and remove listeners.
 	destroy: ->
 		# Destroy all the items
 		@clear()
@@ -997,7 +1013,7 @@ class TaskGroup extends Interface
 		@
 
 
-	# We now want to exit
+	# Internal: We now want to exit.
 	exit: (err) ->
 		# Update error if set
 		@err ?= err  if err?
@@ -1018,7 +1034,7 @@ class TaskGroup extends Interface
 		# Chain
 		@
 
-	# We want to run
+	# Public: We want to run.
 	run: (args...) ->
 		queue =>
 			# Start
