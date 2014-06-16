@@ -262,11 +262,11 @@
   <li>
     <span class='signature'>
       <a href='#complete-instance'>
-        ::<strong>complete</strong>(handler)
+        ::<strong>complete</strong>()
       </a>
     </span>
     <span class='desc'>
-      Complete
+      Completetion Emitter.
     </span>
   </li>
   <li>
@@ -276,7 +276,7 @@
       </a>
     </span>
     <span class='desc'>
-      
+      Initialize our new <a href='../classes/TaskGroup.html'>TaskGroup</a> instance.
     </span>
   </li>
   <li>
@@ -326,7 +326,7 @@
       </a>
     </span>
     <span class='desc'>
-      Fire.
+      Either execute the reamining items we are not paused, or complete execution by exiting.
     </span>
   </li>
   <li>
@@ -336,77 +336,77 @@
       </a>
     </span>
     <span class='desc'>
-      Fire the next item returns the item that was fired or returns false if no item was fired for @internal use only, do not use externally
+      Fire the next item.
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#fireNextItems-instance'>
-        ::<strong>fireNextItems</strong>()
+        Array ::<strong>fireNextItems</strong>()
       </a>
     </span>
     <span class='desc'>
-      Fire the next items returns the items that were fired or returns false if no items were fired for @internal use only, do not use externally
+      Fire the next items.
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#getItemNames-instance'>
-        ::<strong>getItemNames</strong>()
+        Object ::<strong>getItemNames</strong>()
       </a>
     </span>
     <span class='desc'>
-      Public
+      Gets the names of the items, the total number of items, and their results for the purpose of debugging.
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#getItemTotals-instance'>
-        ::<strong>getItemTotals</strong>()
+        Object ::<strong>getItemTotals</strong>()
       </a>
     </span>
     <span class='desc'>
-      Public
+      Gets the total number count of each of our item lists.
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#getItemsTotal-instance'>
-        ::<strong>getItemsTotal</strong>()
+        Number ::<strong>getItemsTotal</strong>()
       </a>
     </span>
     <span class='desc'>
-      Public
+      Gets the total number of items
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#hasExited-instance'>
-        ::<strong>hasExited</strong>()
+        Boolean ::<strong>hasExited</strong>()
       </a>
     </span>
     <span class='desc'>
-      Public
+      Have we finished its execution yet?
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#hasItems-instance'>
-        ::<strong>hasItems</strong>()
+        Boolean ::<strong>hasItems</strong>()
       </a>
     </span>
     <span class='desc'>
-      Public
+      Whether or not we have any items
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#hasRemaining-instance'>
-        ::<strong>hasRemaining</strong>()
+        Boolean ::<strong>hasRemaining</strong>()
       </a>
     </span>
     <span class='desc'>
-      Public
+      Whether or not we have any items that are yet to execute
     </span>
   </li>
   <li>
@@ -422,51 +422,51 @@
   <li>
     <span class='signature'>
       <a href='#hasRunning-instance'>
-        ::<strong>hasRunning</strong>()
+        Boolean ::<strong>hasRunning</strong>()
       </a>
     </span>
     <span class='desc'>
-      Public
+      Whether or not we have any running items
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#hasSlots-instance'>
-        ::<strong>hasSlots</strong>()
+        Boolean ::<strong>hasSlots</strong>()
       </a>
     </span>
     <span class='desc'>
-      Internal
+      Whether or not we have any available slots to execute more items.
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#hasStarted-instance'>
-        ::<strong>hasStarted</strong>()
+        Boolean ::<strong>hasStarted</strong>()
       </a>
     </span>
     <span class='desc'>
-      Public
+      Have we started execution yet?
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#isComplete-instance'>
-        ::<strong>isComplete</strong>()
+        Boolean ::<strong>isComplete</strong>()
       </a>
     </span>
     <span class='desc'>
-      Public
+      Have we completed its execution yet? Completion of executed is determined of whether or not we have started, and whether or not we are currently paused or have no remaining and running items left
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#isEmpty-instance'>
-        ::<strong>isEmpty</strong>()
+        Boolean ::<strong>isEmpty</strong>()
       </a>
     </span>
     <span class='desc'>
-      Public
+      Whether or not we have no items left
     </span>
   </li>
   <li>
@@ -496,7 +496,7 @@
       </a>
     </span>
     <span class='desc'>
-      Once Done Promise
+      Once Done Promise.
     </span>
   </li>
   <li>
@@ -506,7 +506,7 @@
       </a>
     </span>
     <span class='desc'>
-      Reset the results
+      Reset the results.
     </span>
   </li>
   <li>
@@ -516,7 +516,7 @@
       </a>
     </span>
     <span class='desc'>
-      We want to run.
+      Start the execution.
     </span>
   </li>
   <li>
@@ -552,21 +552,21 @@
   <li>
     <span class='signature'>
       <a href='#shouldFire-instance'>
-        ::<strong>shouldFire</strong>()
+        Boolean ::<strong>shouldFire</strong>()
       </a>
     </span>
     <span class='desc'>
-      Internal
+      Whether or not we are capable of firing more items.
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#shouldPause-instance'>
-        ::<strong>shouldPause</strong>()
+        Boolean ::<strong>shouldPause</strong>()
       </a>
     </span>
     <span class='desc'>
-      Internal
+      Whether or not we have errord and want to pause when we have an error.
     </span>
   </li>
   <li>
@@ -576,7 +576,7 @@
       </a>
     </span>
     <span class='desc'>
-      When Done Promise
+      When Done Promise.
     </span>
   </li>
 </ul>
@@ -669,9 +669,12 @@
       ::<strong>constructor</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L481'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L493'>Source</a>
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Initialize our new <a href='../classes/TaskGroup.html'>TaskGroup</a> instance. Forwards arguments onto <a href='../classes/TaskGroup.html#setConfig-instance'>::setConfig</a>.</p>
+</div>
+<div class='tags'>
 </div>
   </div>
 </div>
@@ -682,7 +685,7 @@
       ::<strong>addGroup</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L726'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L739'>Source</a>
     </p>
     <div class='docstring'>
   <p>Add a <a href='../classes/TaskGroup.html'>TaskGroup</a> with some configuration to ourself, create it if needed.</p>
@@ -704,7 +707,7 @@
       ::<strong>addGroups</strong>(items, args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L735'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L748'>Source</a>
     </p>
     <div class='docstring'>
   <p>Add <a href='../classes/TaskGroup.html'>TaskGroup</a>s with some configuration to ourself, create it if needed.</p>
@@ -732,7 +735,7 @@
       ::<strong>addItem</strong>(item, args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L608'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L621'>Source</a>
     </p>
     <div class='docstring'>
   <p>Add an item to ourself and configure it accordingly</p>
@@ -760,7 +763,7 @@
       ::<strong>addItems</strong>(items, args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L663'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L676'>Source</a>
     </p>
     <div class='docstring'>
   <p>Add items to ourself and configure them accordingly</p>
@@ -788,7 +791,7 @@
       ::<strong>addMethod</strong>(method, config = {})
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L574'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L587'>Source</a>
     </p>
     <div class='docstring'>
   <p>Prepare the method and it&#39;s configuration, and add it as a task to be executed.</p>
@@ -816,7 +819,7 @@
       ::<strong>addTask</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L689'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L702'>Source</a>
     </p>
     <div class='docstring'>
   <p>Add a <a href='../classes/Task.html'>Task</a> with some configuration to ourself, create it if needed.</p>
@@ -838,7 +841,7 @@
       ::<strong>addTasks</strong>(items, args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L698'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L711'>Source</a>
     </p>
     <div class='docstring'>
   <p>Add <a href='../classes/Task.html'>Task</a>s with some configuration to ourself, create it if needed.</p>
@@ -866,7 +869,7 @@
       ::<strong>autoRun</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L589'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L602'>Source</a>
     </p>
     <div class='docstring'>
   <p>Autorun ourself under certain conditions.</p><p>Those conditions being:</p><ul>
@@ -882,7 +885,7 @@
       ::<strong>clear</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L969'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L1028'>Source</a>
     </p>
     <div class='docstring'>
   <p>Clear remaning items.</p>
@@ -892,13 +895,13 @@
   </div>
   <div class='method_details'>
     <p class='signature' id='complete-instance'>
-      ::<strong>complete</strong>(handler)
+      ::<strong>complete</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L851'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L904'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Complete</p>
+  <p>Completetion Emitter. Used to emit the <code>completed</code> event and to cleanup our state.</p>
 </div>
 <div class='tags'>
 </div>
@@ -908,7 +911,7 @@
       TaskGroup ::<strong>createGroup</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L713'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L726'>Source</a>
     </p>
     <div class='docstring'>
   <p>Create a <a href='../classes/TaskGroup.html'>TaskGroup</a> instance from some configuration.</p><p>If the first argument is already a <a href='../classes/TaskGroup.html'>TaskGroup</a> instance, then just update it&#39;s configuration with the remaning arguments.</p>
@@ -939,7 +942,7 @@
       Task ::<strong>createTask</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L676'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L689'>Source</a>
     </p>
     <div class='docstring'>
   <p>Create a <a href='../classes/Task.html'>Task</a> instance from some configuration.</p><p>If the first argument is already a <a href='../classes/Task.html'>Task</a> instance, then just update it&#39;s configuration with the remaning arguments.</p>
@@ -970,7 +973,7 @@
       ::<strong>destroy</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L977'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L1036'>Source</a>
     </p>
     <div class='docstring'>
   <p>Destroy all remaining items and remove listeners.</p>
@@ -983,7 +986,7 @@
       ::<strong>exit</strong>(err)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L993'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L1052'>Source</a>
     </p>
     <div class='docstring'>
   <p>We now want to exit.</p>
@@ -996,10 +999,10 @@
       ::<strong>fire</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L958'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L1017'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Fire.</p>
+  <p>Either execute the reamining items we are not paused, or complete execution by exiting.</p>
 </div>
 <div class='tags'>
 </div>
@@ -1009,103 +1012,237 @@
       ::<strong>fireNextItem</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L917'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L976'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Fire the next item returns the item that was fired or returns false if no item was fired for @internal use only, do not use externally</p>
+  <p>Fire the next item.</p>
 </div>
 <div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      <span class='desc'>Returns either the item that was fired, or <code>false</code> if no item was fired.</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='fireNextItems-instance'>
-      ::<strong>fireNextItems</strong>()
+      Array ::<strong>fireNextItems</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L894'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L954'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Fire the next items returns the items that were fired or returns false if no items were fired for @internal use only, do not use externally</p>
+  <p>Fire the next items.</p>
 </div>
 <div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Array</tt>)
+      &mdash;
+      <span class='desc'>Returns either an <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> items that was fired, or <code>false</code> if no items were fired.</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='getItemNames-instance'>
-      ::<strong>getItemNames</strong>()
+      Object ::<strong>getItemNames</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L744'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L774'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Public</p>
+  <p>Gets the names of the items, the total number of items, and their results for the purpose of debugging.</p>
 </div>
 <div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Object</tt>)
+      &mdash;
+      <span class='desc'>Returns an <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> containg the hashes:</span>
+      <ul class='options'>
+        <li>
+          <span class='type'>(Array)</span>
+          <span class='name'>remaining</span>
+          &mdash;
+          <span class='desc'>An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of the names of the remaining items</span>
+        </li>
+        <li>
+          <span class='type'>(Array)</span>
+          <span class='name'>running</span>
+          &mdash;
+          <span class='desc'>An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of the names of the running items</span>
+        </li>
+        <li>
+          <span class='type'>(Array)</span>
+          <span class='name'>completed</span>
+          &mdash;
+          <span class='desc'>An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of the names of the completed items</span>
+        </li>
+        <li>
+          <span class='type'>(Number)</span>
+          <span class='name'>total</span>
+          &mdash;
+          <span class='desc'>A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number'>Number</a> of the total items we have</span>
+        </li>
+        <li>
+          <span class='type'>(Array)</span>
+          <span class='name'>results</span>
+          &mdash;
+          <span class='desc'>An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of the results of the compelted items</span>
+        </li>
+      </ul>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='getItemTotals-instance'>
-      ::<strong>getItemTotals</strong>()
+      Object ::<strong>getItemTotals</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L767'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L796'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Public</p>
+  <p>Gets the total number count of each of our item lists.</p>
 </div>
 <div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Object</tt>)
+      &mdash;
+      <span class='desc'>Returns an <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> containg the hashes:</span>
+      <ul class='options'>
+        <li>
+          <span class='type'>(Number)</span>
+          <span class='name'>remaining</span>
+          &mdash;
+          <span class='desc'>A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number'>Number</a> of the total remaining items</span>
+        </li>
+        <li>
+          <span class='type'>(Number)</span>
+          <span class='name'>running</span>
+          &mdash;
+          <span class='desc'>A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number'>Number</a> of the total running items</span>
+        </li>
+        <li>
+          <span class='type'>(Number)</span>
+          <span class='name'>completed</span>
+          &mdash;
+          <span class='desc'>A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number'>Number</a> of the total completed items</span>
+        </li>
+        <li>
+          <span class='type'>(Number)</span>
+          <span class='name'>total</span>
+          &mdash;
+          <span class='desc'>A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number'>Number</a> of the total items we have</span>
+        </li>
+        <li>
+          <span class='type'>(Number)</span>
+          <span class='name'>results</span>
+          &mdash;
+          <span class='desc'>A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number'>Number</a> of the total results we have</span>
+        </li>
+      </ul>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='getItemsTotal-instance'>
-      ::<strong>getItemsTotal</strong>()
+      Number ::<strong>getItemsTotal</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
 /src&#47;lib&#47;taskgroup.coffee#L759'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Public</p>
+  <p>Gets the total number of items</p>
 </div>
 <div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Number</tt>)
+      &mdash;
+      <span class='desc'>Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number'>Number</a> of the total items we have</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='hasExited-instance'>
-      ::<strong>hasExited</strong>()
+      Boolean ::<strong>hasExited</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L802'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L841'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Public</p>
+  <p>Have we finished its execution yet?</p>
 </div>
 <div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Boolean</tt>)
+      &mdash;
+      <span class='desc'>Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> which is <code>true</code> if we have finished execution</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='hasItems-instance'>
-      ::<strong>hasItems</strong>()
+      Boolean ::<strong>hasItems</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L790'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L825'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Public</p>
+  <p>Whether or not we have any items</p>
 </div>
 <div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Boolean</tt>)
+      &mdash;
+      <span class='desc'>Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> which is <code>true</code> if we have any running or remaining items</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='hasRemaining-instance'>
-      ::<strong>hasRemaining</strong>()
+      Boolean ::<strong>hasRemaining</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L786'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L819'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Public</p>
+  <p>Whether or not we have any items that are yet to execute</p>
 </div>
 <div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Boolean</tt>)
+      &mdash;
+      <span class='desc'>Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> which is <code>true</code> if we have any items that are still yet to be executed</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -1113,7 +1250,7 @@
       ::<strong>hasResult</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L798'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L835'>Source</a>
     </p>
     <div class='docstring'>
   <p>Public</p>
@@ -1123,67 +1260,112 @@
   </div>
   <div class='method_details'>
     <p class='signature' id='hasRunning-instance'>
-      ::<strong>hasRunning</strong>()
+      Boolean ::<strong>hasRunning</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L782'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L813'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Public</p>
+  <p>Whether or not we have any running items</p>
 </div>
 <div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Boolean</tt>)
+      &mdash;
+      <span class='desc'>Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> which is <code>true</code> if we have any items that are currently running</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='hasSlots-instance'>
-      ::<strong>hasSlots</strong>()
+      Boolean ::<strong>hasSlots</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L806'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L847'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Internal</p>
+  <p>Whether or not we have any available slots to execute more items.</p>
 </div>
 <div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Boolean</tt>)
+      &mdash;
+      <span class='desc'>Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> which is <code>true</code> if we have available slots.</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='hasStarted-instance'>
-      ::<strong>hasStarted</strong>()
+      Boolean ::<strong>hasStarted</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L794'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L831'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Public</p>
+  <p>Have we started execution yet?</p>
 </div>
 <div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Boolean</tt>)
+      &mdash;
+      <span class='desc'>Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> which is <code>true</code> if we have commenced execution</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='isComplete-instance'>
-      ::<strong>isComplete</strong>()
+      Boolean ::<strong>isComplete</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L839'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L892'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Public</p>
+  <p>Have we completed its execution yet?</p><p>Completion of executed is determined of whether or not we have started, and whether or not we are currently paused or have no remaining and running items left</p>
 </div>
 <div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Boolean</tt>)
+      &mdash;
+      <span class='desc'>Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> which is <code>true</code> if we have completed execution</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='isEmpty-instance'>
-      ::<strong>isEmpty</strong>()
+      Boolean ::<strong>isEmpty</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L828'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L877'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Public</p>
+  <p>Whether or not we have no items left</p>
 </div>
 <div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Boolean</tt>)
+      &mdash;
+      <span class='desc'>Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> which is <code>true</code> if we have no more running or remaining items</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -1191,7 +1373,7 @@
       ::<strong>isPaused</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L832'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L881'>Source</a>
     </p>
     <div class='docstring'>
   <p>Public</p>
@@ -1204,7 +1386,7 @@
       ::<strong>itemCompletionCallback</strong>(item, args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L938'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L997'>Source</a>
     </p>
     <div class='docstring'>
   <p>What to do when an item completes</p>
@@ -1217,12 +1399,21 @@
       ::<strong>onceDone</strong>(handler)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L877'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L936'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Once Done Promise</p>
+  <p>Once Done Promise. Fires the listener once, either on the next tick if we are already done, or if not, once the <code>done</code> event fires.</p>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='type'>(Function)</span>
+      <span class='name'>listener</span>
+      &mdash;
+      <span class='desc'>The <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> to attach or execute.</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -1230,10 +1421,10 @@
       ::<strong>resetResults</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L886'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L947'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Reset the results</p>
+  <p>Reset the results.</p><p>At this point this method is internal, as it&#39;s functionality may change in the future, and it&#39;s outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker. </p>
 </div>
 <div class='tags'>
 </div>
@@ -1243,10 +1434,10 @@
       ::<strong>run</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L1009'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L1068'>Source</a>
     </p>
     <div class='docstring'>
-  <p>We want to run.</p>
+  <p>Start the execution.</p>
 </div>
 <div class='tags'>
 </div>
@@ -1256,7 +1447,7 @@
       ::<strong>setConfig</strong>(opts = {})
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L537'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L549'>Source</a>
     </p>
     <div class='docstring'>
   <p>Set the configuration for our instance.</p><p>Despite accepting an <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> of configuration, we can also accept an <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of configuration.
@@ -1353,7 +1544,7 @@ When using an array, a <a href='https://developer.mozilla.org/en-US/docs/JavaScr
       ::<strong>setNestedConfig</strong>(config = {})
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L512'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L524'>Source</a>
     </p>
     <div class='docstring'>
   <p>Set Nested Config</p>
@@ -1366,7 +1557,7 @@ When using an array, a <a href='https://developer.mozilla.org/en-US/docs/JavaScr
       ::<strong>setNestedTaskConfig</strong>(config = {})
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L505'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L517'>Source</a>
     </p>
     <div class='docstring'>
   <p>Set Nested Task Config</p>
@@ -1376,28 +1567,46 @@ When using an array, a <a href='https://developer.mozilla.org/en-US/docs/JavaScr
   </div>
   <div class='method_details'>
     <p class='signature' id='shouldFire-instance'>
-      ::<strong>shouldFire</strong>()
+      Boolean ::<strong>shouldFire</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L820'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L867'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Internal</p>
+  <p>Whether or not we are capable of firing more items.</p><p>This is determined whether or not we are not paused, and we have remaning items, and we have slots able to execute those remaning items.</p>
 </div>
 <div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Boolean</tt>)
+      &mdash;
+      <span class='desc'>Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> which is <code>true</code> if we can fire more items.</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='shouldPause-instance'>
-      ::<strong>shouldPause</strong>()
+      Boolean ::<strong>shouldPause</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L813'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L856'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Internal</p>
+  <p>Whether or not we have errord and want to pause when we have an error.</p>
 </div>
 <div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Boolean</tt>)
+      &mdash;
+      <span class='desc'>Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> which is <code>true</code> if we are paused.</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -1405,19 +1614,28 @@ When using an array, a <a href='https://developer.mozilla.org/en-US/docs/JavaScr
       ::<strong>whenDone</strong>(handler)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L868'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L924'>Source</a>
     </p>
     <div class='docstring'>
-  <p>When Done Promise</p>
+  <p>When Done Promise. Fires the listener, either on the next tick if we are already done, or if not, each time the <code>done</code> event fires.</p>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='type'>(Function)</span>
+      <span class='name'>listener</span>
+      &mdash;
+      <span class='desc'>The <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> to attach or execute.</span>
+    </li>
+  </ul>
 </div>
   </div>
 </div>
     </div>
     <div id='footer'>
   Generated on
-  Mon Jun 16 2014 03:30:43 GMT+0200 (CEST)
+  Mon Jun 16 2014 11:46:31 GMT+0200 (CEST)
   by
   <a href='https://github.com/gjtorikian/biscotto' title='TomDoc-CoffeeScript API documentation generator'>Biscotto</a>
   v2.1.2

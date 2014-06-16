@@ -204,7 +204,7 @@ class Task extends Interface
 	# Internal: The configuration for our {Task} instance. See {::setConfig} for available configuration.
 	config: null
 
-	# Public: Creates a new task. Forwards arguments onto {::setConfig}.
+	# Public: Initialize our new {Task} instance. Forwards arguments onto {::setConfig}.
 	constructor: (args...) ->
 		super
 
@@ -266,25 +266,25 @@ class Task extends Interface
 
 	# Public: Have we started execution yet?
 	#
-	# Returns a {Boolean}
+	# Returns a {Boolean} which is `true` if we have commenced execution
 	hasStarted: ->
 		return @status isnt null
 
 	# Public: Have we finished its execution yet?
 	#
-	# Returns a {Boolean}
+	# Returns a {Boolean} which is `true` if we have finished execution
 	hasExited: ->
 		return @status in ['completed', 'destroyed']
 
 	# Public: Have we been destroyed?
 	#
-	# Returns a {Boolean}
+	# Returns a {Boolean} which is `true` if we have bene destroyed
 	isDestroyed: ->
 		return @status is 'destroyed'
 
 	# Public: Have we completed its execution yet?
 	#
-	# Returns a {Boolean}
+	# Returns a {Boolean} which is `true` if we have completed
 	isComplete: ->
 		return @status in ['failed', 'passed', 'destroyed']
 
@@ -535,18 +535,31 @@ class TaskGroup extends Interface
 	# Returns the new {TaskGroup} instance.
 	@create: (args...) -> return new @(args...)
 
-	# Variables
+	# Internal: An {Array} of the items that are still yet to execute
 	itemsRemaining: null
+
+	# Internal: An {Array} of the items that are currently running
 	itemsRunning: null
+
+	# Internal: An {Array} of the items that have completed
 	itemsCompleted: null
+
+	# Internal: An {Array} of the result {Arguments} for each completed item when their :includeInResults configuration option is not `false`
 	results: null
+
+	# Internal: An {Error} object if execution has failed at some point
 	err: null
-	status: null  # [null, 'started', 'running', 'passed', 'failed', 'destroyed']
-	events: null  # ['done', 'error', 'started', 'running', 'passed', 'failed', 'completed', 'destroyed', 'item.*', 'group.*', 'task.*']
+
+	# Internal: A {String} containing our current status. See our {Task} description for available values.
+	status: null
+
+	# Internal: An {Array} of the events that we may emit. Events that will be executed can be found in the {Task} description.
+	events: null
 
 	# Internal: The configuration for our {Task} instance. See {::setConfig} for available configuration.
 	config: null
 
+	# Public: Initialize our new {TaskGroup} instance. Forwards arguments onto {::setConfig}.
 	constructor: (args...) ->
 		# Init
 		me = @
@@ -862,7 +875,24 @@ class TaskGroup extends Interface
 	# ---------------------------------
 	# Status Indicators
 
-	# Public
+	# Public: Gets the total number of items
+	#
+	# Returns a {Number} of the total items we have
+	getItemsTotal: ->
+		running = @itemsRunning.length
+		remaining = @itemsRemaining.length
+		completed = @itemsCompleted.length
+		total = running + remaining + completed
+		return total
+
+	# Public: Gets the names of the items, the total number of items, and their results for the purpose of debugging.
+	#
+	# Returns an {Object} containg the hashes:
+	#   :remaining - An {Array} of the names of the remaining items
+	#   :running - An {Array} of the names of the running items
+	#   :completed - An {Array} of the names of the completed items
+	#   :total - A {Number} of the total items we have
+	#   :results - An {Array} of the results of the compelted items
 	getItemNames: ->
 		running = @itemsRunning.map (item) -> item.getName()
 		remaining = @itemsRemaining.map (item) -> item.getName()
@@ -877,15 +907,14 @@ class TaskGroup extends Interface
 			results
 		}
 
-	# Public
-	getItemsTotal: ->
-		running = @itemsRunning.length
-		remaining = @itemsRemaining.length
-		completed = @itemsCompleted.length
-		total = running + remaining + completed
-		return total
-
-	# Public
+	# Public: Gets the total number count of each of our item lists.
+	#
+	# Returns an {Object} containg the hashes:
+	#   :remaining - A {Number} of the total remaining items
+	#   :running - A {Number} of the total running items
+	#   :completed - A {Number} of the total completed items
+	#   :total - A {Number} of the total items we have
+	#   :results - A {Number} of the total results we have
 	getItemTotals: ->
 		running = @itemsRunning.length
 		remaining = @itemsRemaining.length
@@ -900,19 +929,27 @@ class TaskGroup extends Interface
 			results
 		}
 
-	# Public
+	# Public: Whether or not we have any running items
+	#
+	# Returns a {Boolean} which is `true` if we have any items that are currently running
 	hasRunning: ->
 		return @itemsRunning.length isnt 0
 
-	# Public
+	# Public: Whether or not we have any items that are yet to execute
+	#
+	# Returns a {Boolean} which is `true` if we have any items that are still yet to be executed
 	hasRemaining: ->
 		return @itemsRemaining.length isnt 0
 
-	# Public
+	# Public: Whether or not we have any items
+	#
+	# Returns a {Boolean} which is `true` if we have any running or remaining items
 	hasItems: ->
 		return @hasRunning() or @hasRemaining()
 
-	# Public
+	# Public: Have we started execution yet?
+	#
+	# Returns a {Boolean} which is `true` if we have commenced execution
 	hasStarted: ->
 		return @status isnt null
 
@@ -920,25 +957,35 @@ class TaskGroup extends Interface
 	hasResult: ->
 		return @err? or @results.length isnt 0
 
-	# Public
+	# Public: Have we finished its execution yet?
+	#
+	# Returns a {Boolean} which is `true` if we have finished execution
 	hasExited: ->
 		return @status in ['completed', 'destroyed']
 
-	# Internal
+	# Internal: Whether or not we have any available slots to execute more items.
+	#
+	# Returns a {Boolean} which is `true` if we have available slots.
 	hasSlots: ->
 		return (
 			@config.concurrency is 0 or
 			@itemsRunning.length < @config.concurrency
 		)
 
-	# Internal
+	# Internal: Whether or not we have errord and want to pause when we have an error.
+	#
+	# Returns a {Boolean} which is `true` if we are paused.
 	shouldPause: ->
 		return (
 			@config.onError is 'exit' and
 			@err?
 		)
 
-	# Internal
+	# Internal: Whether or not we are capable of firing more items.
+	#
+	# This is determined whether or not we are not paused, and we have remaning items, and we have slots able to execute those remaning items.
+	#
+	# Returns a {Boolean} which is `true` if we can fire more items.
 	shouldFire: ->
 		return (
 			@shouldPause() is false and
@@ -946,7 +993,9 @@ class TaskGroup extends Interface
 			@hasSlots()
 		)
 
-	# Public
+	# Public: Whether or not we have no items left
+	#
+	# Returns a {Boolean} which is `true` if we have no more running or remaining items
 	isEmpty: ->
 		return @hasItems() is false
 
@@ -957,7 +1006,11 @@ class TaskGroup extends Interface
 			@hasRunning() is false
 		)
 
-	# Public
+	# Public: Have we completed its execution yet?
+	#
+	# Completion of executed is determined of whether or not we have started, and whether or not we are currently paused or have no remaining and running items left
+	#
+	# Returns a {Boolean} which is `true` if we have completed execution
 	isComplete: ->
 		return (
 			@hasStarted() and
@@ -971,8 +1024,8 @@ class TaskGroup extends Interface
 	# ---------------------------------
 	# Firers
 
-	# Internal: Complete
-	complete: (handler) ->
+	# Internal: Completetion Emitter. Used to emit the `completed` event and to cleanup our state.
+	complete: ->
 		complete = @isComplete()
 
 		if complete
@@ -1000,7 +1053,10 @@ class TaskGroup extends Interface
 
 		return complete
 
-	# Public: When Done Promise
+	# Public: When Done Promise.
+	# Fires the listener, either on the next tick if we are already done, or if not, each time the `done` event fires.
+	#
+	# listener - The {Function} to attach or execute.
 	whenDone: (handler) ->
 		if @isComplete()
 			queue =>  # avoid zalgo
@@ -1009,7 +1065,10 @@ class TaskGroup extends Interface
 			super(handler)
 		@
 
-	# Public: Once Done Promise
+	# Public: Once Done Promise.
+	# Fires the listener once, either on the next tick if we are already done, or if not, once the `done` event fires.
+	#
+	# listener - The {Function} to attach or execute.
 	onceDone: (handler) ->
 		if @isComplete()
 			queue =>  # avoid zalgo
@@ -1018,15 +1077,16 @@ class TaskGroup extends Interface
 			super(handler)
 		@
 
-	# Internal: Reset the results
+	# Internal: Reset the results.
+	#
+	# At this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.
 	resetResults: ->
 		@results = []
 		@
 
-	# Internal: Fire the next items
-	# returns the items that were fired
-	# or returns false if no items were fired
-	# for @internal use only, do not use externally
+	# Internal: Fire the next items.
+	#
+	# Returns either an {Array} items that was fired, or `false` if no items were fired.
 	fireNextItems: ->
 		items = []
 
@@ -1046,10 +1106,9 @@ class TaskGroup extends Interface
 
 		return result
 
-	# Internal: Fire the next item
-	# returns the item that was fired
-	# or returns false if no item was fired
-	# for @internal use only, do not use externally
+	# Internal: Fire the next item.
+	#
+	# Returns either the item that was fired, or `false` if no item was fired.
 	fireNextItem: ->
 		# Prepare
 		result = false
@@ -1100,7 +1159,7 @@ class TaskGroup extends Interface
 		# Chain
 		@
 
-	# Internal: Fire.
+	# Internal: Either execute the reamining items we are not paused, or complete execution by exiting.
 	fire: ->
 		# Have we actually started?
 		if @hasStarted()
@@ -1170,7 +1229,7 @@ class TaskGroup extends Interface
 		# Chain
 		@
 
-	# Public: We want to run.
+	# Public: Start the execution.
 	run: (args...) ->
 		queue =>
 			# Start
