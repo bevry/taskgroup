@@ -1239,7 +1239,7 @@ class TaskGroup extends Interface
 			@emit(@status)
 
 			# Give time for the listeners to complete before continuing
-			queue(@fire.bind(@))
+			@fire()
 
 		# Chain
 		@
