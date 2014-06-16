@@ -115,26 +115,27 @@
       </nav>
       <div id='filecontents'>
         <h1 id="history">History</h1>
-<h2 id="v4-0-0-june-x-2014">v4.0.0 June X, 2014</h2>
+<h2 id="v4-0-0-june-16-2014">v4.0.0 June 16, 2014</h2>
 <ul>
 <li>Significant rewrite with b/c breaks<ul>
-<li>Completion listeners should now be accomplish via <code>.done(listener)</code> (listens once) or <code>.completed(listener)</code> (listener persists)<ul>
-<li>These methods are promises in that they will execute the listener if the item is already complete. They a</li>
-<li>These methods will listen on the <code>completed</code> and <code>error</code> events</li>
+<li>Completion listeners should now be accomplished via <code>.done(listener)</code> (listens once) or <code>.whenDone(listener)</code> (listener persists)<ul>
+<li>These methods are promises in that they will execute the listener if the item is already complete</li>
+<li>They listen for the <code>done</code> event</li>
 </ul>
 </li>
 <li>The execution of tasks and groups have had a great deal of investment to ensure execution is intuitive and consistent across different use cases<ul>
 <li>Refer to to <code>src/lib/test/taskgroup-usage-test.coffee</code> for the guaranteed expectations across different scenarios</li>
 </ul>
 </li>
-<li>Before you could use <code>tasks.exit()</code> inside a taskgroup task to clear remaning items, stop execution, and exit, you can no longer do this, instead use the completion callback with an error, or call <code>tasks.clear()</code> then the completion callback</li>
+<li>In earlier versions you could use <code>tasks.exit()</code> during execution to clear remaning items, stop execution, and exit, you can no longer do this, instead use the completion callback with an error, or call <code>tasks.clear()</code> then the completion callback</li>
+<li>Refer to the <a href="http://learn.bevry.me/taskgroup/api">new public api docs</a> for the latest usage</li>
 </ul>
 </li>
 <li>Changes<ul>
-<li><code>complete</code> event is now <code>completed</code></li>
+<li><code>complete</code> event is now <code>completed</code>, but you really should be using the new <code>done</code> event or the promise methods</li>
 <li><code>run</code> event is now <code>started</code></li>
-<li>A lot of internal variables and methods have had their functionality changed or removed, if a method or variable is not in the public api, do not use it</li>
-<li>There is now a default <code>error</code> and <code>completed</code> listener that will fire if you have not added your own, to ensure errors are not lost</li>
+<li>A lot of internal variables and methods have had their functionality changed or removed, if a method or variable is not in the <a href="http://learn.bevry.me/taskgroup/api">public api</a>, do not use it</li>
+<li>There is now a default <code>error</code> and <code>completed</code> listener that will emit the <code>done</code> event if there are listeners for it, if there is no <code>done</code> event listeners, and an error has occured, we will throw the error</li>
 <li>Tasks and groups will now only receive a default name when required, this is to prevent set names from being over-written by the default</li>
 <li>Adding of tasks and groups to a group instance will now return the group instance rather than the added tasks to ensure chainability, if you want the created tasks, use <code>.createTask(...)</code> and <code>.createGroup(...)</code> instead, then add the result manually</li>
 </ul>
@@ -1060,7 +1061,7 @@
     </div>
     <div id='footer'>
   Generated on
-  Mon Jun 16 2014 11:51:31 GMT+0200 (CEST)
+  Mon Jun 16 2014 12:08:06 GMT+0200 (CEST)
   by
   <a href='https://github.com/gjtorikian/biscotto' title='TomDoc-CoffeeScript API documentation generator'>Biscotto</a>
   v2.1.2
