@@ -1,18 +1,19 @@
 # History
 
-## v4.0.0 June X, 2014
+## v4.0.0 June 16, 2014
 - Significant rewrite with b/c breaks
-	- Completion listeners should now be accomplish via `.done(listener)` (listens once) or `.completed(listener)` (listener persists)
-		- These methods are promises in that they will execute the listener if the item is already complete. They a
-		- These methods will listen on the `completed` and `error` events
+	- Completion listeners should now be accomplished via `.done(listener)` (listens once) or `.whenDone(listener)` (listener persists)
+		- These methods are promises in that they will execute the listener if the item is already complete
+		- They listen for the `done` event
 	- The execution of tasks and groups have had a great deal of investment to ensure execution is intuitive and consistent across different use cases
 		- Refer to to `src/lib/test/taskgroup-usage-test.coffee` for the guaranteed expectations across different scenarios
-	- Before you could use `tasks.exit()` inside a taskgroup task to clear remaning items, stop execution, and exit, you can no longer do this, instead use the completion callback with an error, or call `tasks.clear()` then the completion callback
+	- In earlier versions you could use `tasks.exit()` during execution to clear remaning items, stop execution, and exit, you can no longer do this, instead use the completion callback with an error, or call `tasks.clear()` then the completion callback
+	- Refer to the [new public api docs](http://learn.bevry.me/taskgroup/api) for the latest usage
 - Changes
-	- `complete` event is now `completed`
+	- `complete` event is now `completed`, but you really should be using the new `done` event or the promise methods
 	- `run` event is now `started`
-	- A lot of internal variables and methods have had their functionality changed or removed, if a method or variable is not in the public api, do not use it
-	- There is now a default `error` and `completed` listener that will fire if you have not added your own, to ensure errors are not lost
+	- A lot of internal variables and methods have had their functionality changed or removed, if a method or variable is not in the [public api](http://learn.bevry.me/taskgroup/api), do not use it
+	- There is now a default `error` and `completed` listener that will emit the `done` event if there are listeners for it, if there is no `done` event listeners, and an error has occured, we will throw the error
 	- Tasks and groups will now only receive a default name when required, this is to prevent set names from being over-written by the default
 	- Adding of tasks and groups to a group instance will now return the group instance rather than the added tasks to ensure chainability, if you want the created tasks, use `.createTask(...)` and `.createGroup(...)` instead, then add the result manually
 - Introductions
