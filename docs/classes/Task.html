@@ -2,7 +2,7 @@
 <html>
   <head>
   <meta charset='UTF-8'>
-  <title>CoffeeScript API Documentation</title>
+  <title>TaskGroup API Documentation</title>
   <link rel='stylesheet' href='..&#47;assets/biscotto.css' type='text/css'>
   <script src='..&#47;assets/biscotto.js'></script>
   <script src='..&#47;assets/search_data.js'></script>
@@ -135,9 +135,24 @@
 <li><code>&#39;running&#39;</code> - execution of our method has begun</li>
 <li><code>&#39;failed&#39;</code> - execution of our method has failed</li>
 <li><code>&#39;passed&#39;</code> - execution of our method has succeeded</li>
-<li><code>&#39;destroyed&#39;</code> - we&#39;ve been destroyed and can no longer execute </li>
+<li><code>&#39;destroyed&#39;</code> - we&#39;ve been destroyed and can no longer execute</li>
 </ul>
 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'></code></pre>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'></code></pre>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'></code></pre>
+  </div>
 </div>
 <div class='tags'>
 </div>
@@ -331,7 +346,7 @@
       Task .<strong>create</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L149'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L166'>Source</a>
     </p>
     <div class='docstring'>
   <p>Creates a new <a href='../classes/Task.html'>Task</a> instance.</p>
@@ -362,7 +377,7 @@
       Boolean .<strong>isTask</strong>(item)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L140'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L157'>Source</a>
     </p>
     <div class='docstring'>
   <p>A helper method to check if the passed argument is an instanceof a <a href='../classes/Task.html'>Task</a>.</p>
@@ -396,7 +411,7 @@
       ::<strong>constructor</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L171'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L188'>Source</a>
     </p>
     <div class='docstring'>
   <p>Creates a new task. Forwards arguments onto <a href='../classes/Task.html#setConfig-instance'>::setConfig</a>.</p>
@@ -412,7 +427,7 @@
       ::<strong>complete</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L277'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L294'>Source</a>
     </p>
     <div class='docstring'>
   <p>Completetion Emitter. Used to emit the <code>completed</code> event and to cleanup our state.</p>
@@ -425,7 +440,7 @@
       ::<strong>destroy</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L321'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L338'>Source</a>
     </p>
     <div class='docstring'>
   <p>Destroy the task and prevent it from executing ever again.</p>
@@ -438,7 +453,7 @@
       ::<strong>exit</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L252'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L269'>Source</a>
     </p>
     <div class='docstring'>
   <p>Handles the completion and error conditions for ourself.</p><p>Should only ever execute once, if it executes more than once, then we error.</p>
@@ -460,7 +475,7 @@
       ::<strong>fire</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L334'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L351'>Source</a>
     </p>
     <div class='docstring'>
   <p>Fire the task method with our config arguments and wrapped in a domain.</p>
@@ -473,7 +488,7 @@
       Boolean ::<strong>hasExited</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L232'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L249'>Source</a>
     </p>
     <div class='docstring'>
   <p>Have we finished its execution yet?</p>
@@ -495,7 +510,7 @@
       Boolean ::<strong>hasStarted</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L226'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L243'>Source</a>
     </p>
     <div class='docstring'>
   <p>Have we started execution yet?</p>
@@ -517,7 +532,7 @@
       Boolean ::<strong>isComplete</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L244'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L261'>Source</a>
     </p>
     <div class='docstring'>
   <p>Have we completed its execution yet?</p>
@@ -539,7 +554,7 @@
       Boolean ::<strong>isDestroyed</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L238'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L255'>Source</a>
     </p>
     <div class='docstring'>
   <p>Have we been destroyed?</p>
@@ -561,7 +576,7 @@
       ::<strong>onceDone</strong>(listener)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L305'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L322'>Source</a>
     </p>
     <div class='docstring'>
   <p>Once Done Promise. Fires the listener once, either on the next tick if we are already done, or if not, once the <code>done</code> event fires.</p>
@@ -583,7 +598,7 @@
       ::<strong>resetResults</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L316'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L333'>Source</a>
     </p>
     <div class='docstring'>
   <p>Reset the results.</p><p>At this point this method is internal, as it&#39;s functionality may change in the future, and it&#39;s outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker. </p>
@@ -596,7 +611,7 @@
       ::<strong>run</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L385'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L402'>Source</a>
     </p>
     <div class='docstring'>
   <p>Start the execution of the task.</p><p>Will emit an <code>error</code> event if the task has already started before. </p>
@@ -609,7 +624,7 @@
       ::<strong>setConfig</strong>(opts = {})
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L197'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L214'>Source</a>
     </p>
     <div class='docstring'>
   <p>Set the configuration for our instance.</p><p>Despite accepting an <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> of configuration, we can also accept an <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of configuration.
@@ -676,7 +691,7 @@ When using an array, a <a href='https://developer.mozilla.org/en-US/docs/JavaScr
       ::<strong>whenDone</strong>(listener)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L293'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L310'>Source</a>
     </p>
     <div class='docstring'>
   <p>When Done Promise. Fires the listener, either on the next tick if we are already done, or if not, each time the <code>done</code> event fires.</p>
@@ -697,7 +712,7 @@ When using an array, a <a href='https://developer.mozilla.org/en-US/docs/JavaScr
     </div>
     <div id='footer'>
   Generated on
-  Mon Jun 16 2014 03:08:42 GMT+0200 (CEST)
+  Mon Jun 16 2014 03:24:33 GMT+0200 (CEST)
   by
   <a href='https://github.com/gjtorikian/biscotto' title='TomDoc-CoffeeScript API documentation generator'>Biscotto</a>
   v2.1.2

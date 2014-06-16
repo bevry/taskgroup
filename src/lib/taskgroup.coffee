@@ -141,6 +141,23 @@ class Interface extends EventEmitter
 # - `'failed'` - execution of our method has failed
 # - `'passed'` - execution of our method has succeeded
 # - `'destroyed'` - we've been destroyed and can no longer execute
+#
+# Examples
+#
+#  task = require('taskgroup').Task.create('my synchronous task', function(){
+#    return 5
+#  }).done(console.log)  // [null, 5]
+#
+#  task = require('taskgroup').Task.create('my asynchronous task', function(complete){
+#    complete(null, 5)
+#  }).done(console.log)  // [null, 5]
+#
+#  task = require('taskgroup').Task.create('my task that errors', function(){
+#    var err = new Error('deliberate error')
+#    return err;  // if asynchronous, can also do: complete(err)
+#    // thrown and uncaught errors are also caught thanks to domains, but that should be avoided
+#    // as it would put your app in an unknown state
+#  }).done(console.log)  // [Error('deliberator error')]
 class Task extends Interface
 	# Internal: The type of our class for the purpose of duck typing
 	# which is needed when working with node virtual machines
