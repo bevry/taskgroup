@@ -121,7 +121,23 @@
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>Our Task Class.</p>
+  <p>Our Task Class.</p><p>Available configuration is documented in <a href='../classes/Task.html#setConfig-instance'>::setConfig</a>.</p><p>Available events:</p><ul>
+<li><code>started()</code> - emitted when we start execution</li>
+<li><code>running()</code> - emitted when the method starts execution</li>
+<li><code>failed(err)</code> - emitted when execution exited with a failure</li>
+<li><code>passed()</code> - emitted when execution exited with a success</li>
+<li><code>completed(err, args...)</code> - emitted when execution exited, <code>args</code> are the result arguments from the method</li>
+<li><code>error(err)</code> - emtited if an unexpected error occurs without ourself</li>
+<li><code>done(err, args...)</code> - emitted when either execution completes (the <code>completed</code> event) or when an unexpected error occurs (the <code>error</code> event)</li>
+</ul><p>Available internal statuses:</p><ul>
+<li><code>null</code> - execution has not yet started</li>
+<li><code>&#39;started&#39;</code> - execution has begun</li>
+<li><code>&#39;running&#39;</code> - execution of our method has begun</li>
+<li><code>&#39;failed&#39;</code> - execution of our method has failed</li>
+<li><code>&#39;passed&#39;</code> - execution of our method has succeeded</li>
+<li><code>&#39;destroyed&#39;</code> - we&#39;ve been destroyed and can no longer execute </li>
+</ul>
+
 </div>
 <div class='tags'>
 </div>
@@ -134,7 +150,7 @@
       </a>
     </span>
     <span class='desc'>
-      Creates a <a href='../classes/Task.html'>Task</a> instance via our constructor <a href='../classes/Task.html#constructor-instance'>::constructor</a>.
+      Creates a new <a href='../classes/Task.html'>Task</a> instance.
     </span>
   </li>
   <li>
@@ -177,7 +193,7 @@
       </a>
     </span>
     <span class='desc'>
-      Destroy.
+      Destroy the task and prevent it from executing ever again.
     </span>
   </li>
   <li>
@@ -187,7 +203,7 @@
       </a>
     </span>
     <span class='desc'>
-      Handles the completion and error conditions for our task.
+      Handles the completion and error conditions for ourself.
     </span>
   </li>
   <li>
@@ -197,7 +213,7 @@
       </a>
     </span>
     <span class='desc'>
-      Fire.
+      Fire the task method with our config arguments and wrapped in a domain.
     </span>
   </li>
   <li>
@@ -207,7 +223,7 @@
       </a>
     </span>
     <span class='desc'>
-      Has the task finished its execution yet?
+      Have we finished its execution yet?
     </span>
   </li>
   <li>
@@ -217,7 +233,7 @@
       </a>
     </span>
     <span class='desc'>
-      Has the task started execution yet?
+      Have we started execution yet?
     </span>
   </li>
   <li>
@@ -227,13 +243,23 @@
       </a>
     </span>
     <span class='desc'>
-      Has the task completed its execution yet?
+      Have we completed its execution yet?
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#isDestroyed-instance'>
+        Boolean ::<strong>isDestroyed</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Have we been destroyed?
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#onceDone-instance'>
-        ::<strong>onceDone</strong>(handler)
+        ::<strong>onceDone</strong>(listener)
       </a>
     </span>
     <span class='desc'>
@@ -257,7 +283,7 @@
       </a>
     </span>
     <span class='desc'>
-      Run.
+      Start the execution of the task.
     </span>
   </li>
   <li>
@@ -273,7 +299,7 @@
   <li>
     <span class='signature'>
       <a href='#whenDone-instance'>
-        ::<strong>whenDone</strong>(handler)
+        ::<strong>whenDone</strong>(listener)
       </a>
     </span>
     <span class='desc'>
@@ -305,19 +331,28 @@
       Task .<strong>create</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L129'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L149'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Creates a <a href='../classes/Task.html'>Task</a> instance via our constructor <a href='../classes/Task.html#constructor-instance'>::constructor</a>.</p>
+  <p>Creates a new <a href='../classes/Task.html'>Task</a> instance.</p>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='type'>(Arguments)</span>
+      <span class='name'>args</span>
+      &mdash;
+      <span class='desc'>The {Arguments} to forwarded along to the <a href='../classes/Task.html#constructor-instance'>::constructor</a>.</span>
+    </li>
+  </ul>
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
       <span class='type'></span>
       (<tt><a href='../classes/Task.html'>Task</a></tt>)
       &mdash;
-      <span class='desc'>Returns our new <a href='../classes/Task.html'>Task</a> instance.</span>
+      <span class='desc'>Returns the new <a href='../classes/Task.html'>Task</a> instance.</span>
     </li>
   </ul>
 </div>
@@ -327,7 +362,7 @@
       Boolean .<strong>isTask</strong>(item)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L122'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L140'>Source</a>
     </p>
     <div class='docstring'>
   <p>A helper method to check if the passed argument is an instanceof a <a href='../classes/Task.html'>Task</a>.</p>
@@ -361,7 +396,7 @@
       ::<strong>constructor</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L156'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L171'>Source</a>
     </p>
     <div class='docstring'>
   <p>Creates a new task. Forwards arguments onto <a href='../classes/Task.html#setConfig-instance'>::setConfig</a>.</p>
@@ -377,7 +412,7 @@
       ::<strong>complete</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L255'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L277'>Source</a>
     </p>
     <div class='docstring'>
   <p>Completetion Emitter. Used to emit the <code>completed</code> event and to cleanup our state.</p>
@@ -390,10 +425,10 @@
       ::<strong>destroy</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L291'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L321'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Destroy.</p>
+  <p>Destroy the task and prevent it from executing ever again.</p>
 </div>
 <div class='tags'>
 </div>
@@ -403,12 +438,21 @@
       ::<strong>exit</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L230'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L252'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Handles the completion and error conditions for our task.</p><p>Should only ever execute once, if it executes more than once, then we error.</p><p>args... - The arguments array that will be applied to the {::result} variable. First argument is the <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Error'>Error</a> if it exists. </p>
+  <p>Handles the completion and error conditions for ourself.</p><p>Should only ever execute once, if it executes more than once, then we error.</p>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='type'>(Array)</span>
+      <span class='name'>args</span>
+      &mdash;
+      <span class='desc'>The arguments <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> that will be applied to the {::result} variable. First argument is the <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Error'>Error</a> if it exists.</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -416,10 +460,10 @@
       ::<strong>fire</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L304'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L334'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Fire.</p>
+  <p>Fire the task method with our config arguments and wrapped in a domain.</p>
 </div>
 <div class='tags'>
 </div>
@@ -429,10 +473,10 @@
       Boolean ::<strong>hasExited</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L216'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L232'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Has the task finished its execution yet?</p>
+  <p>Have we finished its execution yet?</p>
 </div>
 <div class='tags'>
   <h3>Returns:</h3>
@@ -451,10 +495,10 @@
       Boolean ::<strong>hasStarted</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L210'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L226'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Has the task started execution yet?</p>
+  <p>Have we started execution yet?</p>
 </div>
 <div class='tags'>
   <h3>Returns:</h3>
@@ -473,10 +517,32 @@
       Boolean ::<strong>isComplete</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L222'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L244'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Has the task completed its execution yet?</p>
+  <p>Have we completed its execution yet?</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Boolean</tt>)
+      &mdash;
+      <span class='desc'>Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a></span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='isDestroyed-instance'>
+      Boolean ::<strong>isDestroyed</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L238'>Source</a>
+    </p>
+    <div class='docstring'>
+  <p>Have we been destroyed?</p>
 </div>
 <div class='tags'>
   <h3>Returns:</h3>
@@ -492,15 +558,24 @@
   </div>
   <div class='method_details'>
     <p class='signature' id='onceDone-instance'>
-      ::<strong>onceDone</strong>(handler)
+      ::<strong>onceDone</strong>(listener)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L277'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L305'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Once Done Promise.</p>
+  <p>Once Done Promise. Fires the listener once, either on the next tick if we are already done, or if not, once the <code>done</code> event fires.</p>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='type'>(Function)</span>
+      <span class='name'>listener</span>
+      &mdash;
+      <span class='desc'>The <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> to attach or execute.</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -508,10 +583,10 @@
       ::<strong>resetResults</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L286'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L316'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Reset the results.</p>
+  <p>Reset the results.</p><p>At this point this method is internal, as it&#39;s functionality may change in the future, and it&#39;s outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker. </p>
 </div>
 <div class='tags'>
 </div>
@@ -521,10 +596,10 @@
       ::<strong>run</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L353'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L385'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Run.</p>
+  <p>Start the execution of the task.</p><p>Will emit an <code>error</code> event if the task has already started before. </p>
 </div>
 <div class='tags'>
 </div>
@@ -534,11 +609,11 @@
       ::<strong>setConfig</strong>(opts = {})
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L181'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L197'>Source</a>
     </p>
     <div class='docstring'>
   <p>Set the configuration for our instance.</p><p>Despite accepting an <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> of configuration, we can also accept an <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of configuration.
-When using an array, a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/String'>String</a> becomes the :name, a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> becoes the :method, and an <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> becomes the :config</p>
+When using an array, a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/String'>String</a> becomes the :name, a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> becomes the :method, and an <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> becomes the :config</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -558,15 +633,15 @@ When using an array, a <a href='https://developer.mozilla.org/en-US/docs/JavaScr
       </li>
       <li>
         <span class='type'>(Function)</span>
+        <span class='name'>next</span>
+        &mdash;
+        <span class='desc'>(defualt: null) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> that we would like bound to the <code>done</code> event once.</span>
+      </li>
+      <li>
+        <span class='type'>(Function)</span>
         <span class='name'>method</span>
         &mdash;
         <span class='desc'>(default: null) The <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> that we would like to execute within our task.</span>
-      </li>
-      <li>
-        <span class='type'>(Array)</span>
-        <span class='name'>args</span>
-        &mdash;
-        <span class='desc'>(default: null) An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of arguments that we would like to forward onto our method when we execute it.</span>
       </li>
       <li>
         <span class='type'>(TaskGroup)</span>
@@ -575,16 +650,22 @@ When using an array, a <a href='https://developer.mozilla.org/en-US/docs/JavaScr
         <span class='desc'>(default: null) A parent <a href='../classes/TaskGroup.html'>TaskGroup</a> that we may be attached to.</span>
       </li>
       <li>
-        <span class='type'>(Number)</span>
-        <span class='name'>timeout</span>
-        &mdash;
-        <span class='desc'>(default: null) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number'>Number</a> of millesconds that we would like to wait before timing out the method.</span>
-      </li>
-      <li>
         <span class='type'>(String)</span>
         <span class='name'>onError</span>
         &mdash;
         <span class='desc'>(default: &#39;exit&#39;) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/String'>String</a> that is either <code>&#39;exit&#39;</code> or <code>&#39;ignore&#39;</code>, when <code>&#39;ignore&#39;</code> duplicate run errors are not reported, useful when combined with the timeout option.</span>
+      </li>
+      <li>
+        <span class='type'>(Array)</span>
+        <span class='name'>args</span>
+        &mdash;
+        <span class='desc'>(default: null) An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of arguments that we would like to forward onto our method when we execute it.</span>
+      </li>
+      <li>
+        <span class='type'>(Number)</span>
+        <span class='name'>timeout</span>
+        &mdash;
+        <span class='desc'>(default: null) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number'>Number</a> of millesconds that we would like to wait before timing out the method.</span>
       </li>
     </ul>
   </ul>
@@ -592,22 +673,31 @@ When using an array, a <a href='https://developer.mozilla.org/en-US/docs/JavaScr
   </div>
   <div class='method_details'>
     <p class='signature' id='whenDone-instance'>
-      ::<strong>whenDone</strong>(handler)
+      ::<strong>whenDone</strong>(listener)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L268'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L293'>Source</a>
     </p>
     <div class='docstring'>
-  <p>When Done Promise.</p>
+  <p>When Done Promise. Fires the listener, either on the next tick if we are already done, or if not, each time the <code>done</code> event fires.</p>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='type'>(Function)</span>
+      <span class='name'>listener</span>
+      &mdash;
+      <span class='desc'>The <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> to attach or execute.</span>
+    </li>
+  </ul>
 </div>
   </div>
 </div>
     </div>
     <div id='footer'>
   Generated on
-  Sun Jun 15 2014 21:38:55 GMT+0200 (CEST)
+  Mon Jun 16 2014 03:08:42 GMT+0200 (CEST)
   by
   <a href='https://github.com/gjtorikian/biscotto' title='TomDoc-CoffeeScript API documentation generator'>Biscotto</a>
   v2.1.2

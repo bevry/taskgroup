@@ -121,7 +121,26 @@
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>Our TaskGroup class</p>
+  <p>Our TaskGroup class.</p><p>Available configuration is documented in <a href='../classes/TaskGroup.html#setConfig-instance'>::setConfig</a>.</p><p>Available events:</p><ul>
+<li><code>started()</code> - emitted when we start execution</li>
+<li><code>running()</code> - emitted when the first item starts execution</li>
+<li><code>failed(err)</code> - emitted when execution exited with a failure</li>
+<li><code>passed()</code> - emitted when execution exited with a success</li>
+<li><code>completed(err, results)</code> - emitted when execution exited, <code>results</code> is an <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of the result arguments for each item that executed</li>
+<li><code>error(err)</code> - emtited if an unexpected error occured within ourself</li>
+<li><code>done(err, results)</code> - emitted when either the execution completes (the <code>completed</code> event) or when an unexpected error occurs (the <code>error</code> event)</li>
+<li><code>item.*(...)</code> - bubbled events from an added item</li>
+<li><code>task.*(...)</code> - bubbled events from an added <a href='../classes/Task.html'>Task</a></li>
+<li><code>group.*(...)</code> - bubbled events from an added <a href='../classes/TaskGroup.html'>TaskGroup</a></li>
+</ul><p>Available internal statuses:</p><ul>
+<li><code>null</code> - execution has not yet started</li>
+<li><code>&#39;started&#39;</code> - execution has begun</li>
+<li><code>&#39;running&#39;</code> - execution of items has begun</li>
+<li><code>&#39;failed&#39;</code> - execution has exited with failure status</li>
+<li><code>&#39;passed&#39;</code> - execution has exited with success status</li>
+<li><code>&#39;destroyed&#39;</code> - we&#39;ve been destroyed and can no longer execute </li>
+</ul>
+
 </div>
 <div class='tags'>
 </div>
@@ -130,21 +149,21 @@
   <li>
     <span class='signature'>
       <a href='#create-class'>
-        .<strong>create</strong>(args...)
+        TaskGroup .<strong>create</strong>(args...)
       </a>
     </span>
     <span class='desc'>
-      
+      Creates a new <a href='../classes/TaskGroup.html'>TaskGroup</a> instance.
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#isTaskGroup-class'>
-        .<strong>isTaskGroup</strong>(group)
+        Boolean .<strong>isTaskGroup</strong>(group)
       </a>
     </span>
     <span class='desc'>
-      
+      A helper method to check if the passed argument is an instanceof a <a href='../classes/TaskGroup.html'>TaskGroup</a>.
     </span>
   </li>
 </ul>
@@ -157,7 +176,7 @@
       </a>
     </span>
     <span class='desc'>
-      Public
+      Add a <a href='../classes/TaskGroup.html'>TaskGroup</a> with some configuration to ourself, create it if needed.
     </span>
   </li>
   <li>
@@ -167,17 +186,17 @@
       </a>
     </span>
     <span class='desc'>
-      Public
+      Add <a href='../classes/TaskGroup.html'>TaskGroup</a>s with some configuration to ourself, create it if needed.
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#addItem-instance'>
-        ::<strong>addItem</strong>(item)
+        ::<strong>addItem</strong>(item, args...)
       </a>
     </span>
     <span class='desc'>
-      Add an item also run for groups too for @internal use only, do not use externally
+      Add an item to ourself and configure it accordingly
     </span>
   </li>
   <li>
@@ -187,7 +206,7 @@
       </a>
     </span>
     <span class='desc'>
-      Add items
+      Add items to ourself and configure them accordingly
     </span>
   </li>
   <li>
@@ -197,7 +216,7 @@
       </a>
     </span>
     <span class='desc'>
-      Add method
+      Prepare the method and it&#39;s configuration, and add it as a task to be executed.
     </span>
   </li>
   <li>
@@ -207,7 +226,7 @@
       </a>
     </span>
     <span class='desc'>
-      
+      Add a <a href='../classes/Task.html'>Task</a> with some configuration to ourself, create it if needed.
     </span>
   </li>
   <li>
@@ -217,7 +236,17 @@
       </a>
     </span>
     <span class='desc'>
-      
+      Add <a href='../classes/Task.html'>Task</a>s with some configuration to ourself, create it if needed.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#autoRun-instance'>
+        ::<strong>autoRun</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Autorun ourself under certain conditions.
     </span>
   </li>
   <li>
@@ -253,21 +282,21 @@
   <li>
     <span class='signature'>
       <a href='#createGroup-instance'>
-        ::<strong>createGroup</strong>(args...)
+        TaskGroup ::<strong>createGroup</strong>(args...)
       </a>
     </span>
     <span class='desc'>
-      Public
+      Create a <a href='../classes/TaskGroup.html'>TaskGroup</a> instance from some configuration.
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#createTask-instance'>
-        ::<strong>createTask</strong>(args...)
+        Task ::<strong>createTask</strong>(args...)
       </a>
     </span>
     <span class='desc'>
-      
+      Create a <a href='../classes/Task.html'>Task</a> instance from some configuration.
     </span>
   </li>
   <li>
@@ -298,16 +327,6 @@
     </span>
     <span class='desc'>
       Fire.
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#fireMethod-instance'>
-        ::<strong>fireMethod</strong>()
-      </a>
-    </span>
-    <span class='desc'>
-      Fire method.
     </span>
   </li>
   <li>
@@ -507,7 +526,7 @@
       </a>
     </span>
     <span class='desc'>
-      Set Configuration opts = object|array
+      Set the configuration for our instance.
     </span>
   </li>
   <li>
@@ -582,22 +601,64 @@
       <div class='methods'>
   <div class='method_details'>
     <p class='signature' id='create-class'>
-      .<strong>create</strong>(args...)
+      TaskGroup .<strong>create</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L377'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L449'>Source</a>
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Creates a new <a href='../classes/TaskGroup.html'>TaskGroup</a> instance.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='type'>(Arguments)</span>
+      <span class='name'>args</span>
+      &mdash;
+      <span class='desc'>The {Arguments} to be forwarded along to the <a href='../classes/TaskGroup.html#constructor-instance'>::constructor</a>.</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt><a href='../classes/TaskGroup.html'>TaskGroup</a></tt>)
+      &mdash;
+      <span class='desc'>Returns the new <a href='../classes/TaskGroup.html'>TaskGroup</a> instance.</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='isTaskGroup-class'>
-      .<strong>isTaskGroup</strong>(group)
+      Boolean .<strong>isTaskGroup</strong>(group)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L378'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L439'>Source</a>
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>A helper method to check if the passed argument is an instanceof a <a href='../classes/TaskGroup.html'>TaskGroup</a>.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='type'>(TaskGroup)</span>
+      <span class='name'>item</span>
+      &mdash;
+      <span class='desc'>The possible instance of the <a href='../classes/TaskGroup.html'>TaskGroup</a> that we want to check</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Boolean</tt>)
+      &mdash;
+      <span class='desc'>Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> of whether or not the item is a <a href='../classes/TaskGroup.html'>TaskGroup</a> instance.</span>
+    </li>
+  </ul>
 </div>
   </div>
 </div>
@@ -608,7 +669,7 @@
       ::<strong>constructor</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L402'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L464'>Source</a>
     </p>
     <div class='tags'>
 </div>
@@ -621,12 +682,21 @@
       ::<strong>addGroup</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L598'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L709'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Public</p>
+  <p>Add a <a href='../classes/TaskGroup.html'>TaskGroup</a> with some configuration to ourself, create it if needed.</p>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='type'>(Arguments)</span>
+      <span class='name'>args</span>
+      &mdash;
+      <span class='desc'>{Arguments} to configure (and if needed, create) the <a href='../classes/TaskGroup.html'>TaskGroup</a></span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -634,25 +704,55 @@
       ::<strong>addGroups</strong>(items, args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L604'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L718'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Public</p>
+  <p>Add <a href='../classes/TaskGroup.html'>TaskGroup</a>s with some configuration to ourself, create it if needed.</p>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='type'>(Array)</span>
+      <span class='name'>items</span>
+      &mdash;
+      <span class='desc'>An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of <a href='../classes/TaskGroup.html'>TaskGroup</a> items to add to ourself</span>
+    </li>
+    <li>
+      <span class='type'>(Arguments)</span>
+      <span class='name'>args</span>
+      &mdash;
+      <span class='desc'>Optional {Arguments} to configure each added <a href='../classes/TaskGroup.html'>TaskGroup</a></span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='addItem-instance'>
-      ::<strong>addItem</strong>(item)
+      ::<strong>addItem</strong>(item, args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L503'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L591'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Add an item also run for groups too for @internal use only, do not use externally</p>
+  <p>Add an item to ourself and configure it accordingly</p>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='type'>(Task)</span>
+      <span class='name'>item</span>
+      &mdash;
+      <span class='desc'>A <a href='../classes/Task.html'>Task</a> or <a href='../classes/TaskGroup.html'>TaskGroup</a> instance that we would like added to ourself</span>
+    </li>
+    <li>
+      <span class='type'>(Arguments)</span>
+      <span class='name'>args</span>
+      &mdash;
+      <span class='desc'>Additional configuration {Arguments} to apply to each item</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -660,12 +760,27 @@
       ::<strong>addItems</strong>(items, args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L554'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L646'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Add items</p>
+  <p>Add items to ourself and configure them accordingly</p>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='type'>(Array)</span>
+      <span class='name'>items</span>
+      &mdash;
+      <span class='desc'>An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of <a href='../classes/Task.html'>Task</a> and/or <a href='../classes/TaskGroup.html'>TaskGroup</a> instances to add to ourself</span>
+    </li>
+    <li>
+      <span class='type'>(Arguments)</span>
+      <span class='name'>args</span>
+      &mdash;
+      <span class='desc'>Optional {Arguments} to configure each added item</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -673,12 +788,27 @@
       ::<strong>addMethod</strong>(method, config = {})
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L476'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L557'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Add method</p>
+  <p>Prepare the method and it&#39;s configuration, and add it as a task to be executed.</p>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='type'>(Function)</span>
+      <span class='name'>method</span>
+      &mdash;
+      <span class='desc'>The <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> of our method</span>
+    </li>
+    <li>
+      <span class='type'>(Object)</span>
+      <span class='name'>config</span>
+      &mdash;
+      <span class='desc'>An optional <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> of configuration for the task to be created for our method</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -686,9 +816,21 @@
       ::<strong>addTask</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L572'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L672'>Source</a>
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Add a <a href='../classes/Task.html'>Task</a> with some configuration to ourself, create it if needed.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='type'>(Arguments)</span>
+      <span class='name'>args</span>
+      &mdash;
+      <span class='desc'>{Arguments} to configure (and if needed, create) the task</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -696,9 +838,43 @@
       ::<strong>addTasks</strong>(items, args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L578'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L681'>Source</a>
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Add <a href='../classes/Task.html'>Task</a>s with some configuration to ourself, create it if needed.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='type'>(Array)</span>
+      <span class='name'>items</span>
+      &mdash;
+      <span class='desc'>An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of <a href='../classes/Task.html'>Task</a> items to add to ourself</span>
+    </li>
+    <li>
+      <span class='type'>(Arguments)</span>
+      <span class='name'>args</span>
+      &mdash;
+      <span class='desc'>Optional {Arguments} to configure each added <a href='../classes/Task.html'>Task</a></span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='autoRun-instance'>
+      ::<strong>autoRun</strong>()
+      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
+&#47;blob&#47;v3.4.0
+/src&#47;lib&#47;taskgroup.coffee#L572'>Source</a>
+    </p>
+    <div class='docstring'>
+  <p>Autorun ourself under certain conditions.</p><p>Those conditions being:</p><ul>
+<li>if we the :method configuration is defined, and we have no :parent</li>
+<li>if we the :run configuration is <code>true</code></li>
+</ul><p>Used primarily to cause the :method to fire at the appropriate time when using inline style. </p>
+</div>
+<div class='tags'>
 </div>
   </div>
   <div class='method_details'>
@@ -706,7 +882,7 @@
       ::<strong>clear</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L837'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L952'>Source</a>
     </p>
     <div class='docstring'>
   <p>Clear remaning items.</p>
@@ -719,7 +895,7 @@
       ::<strong>complete</strong>(handler)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L717'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L834'>Source</a>
     </p>
     <div class='docstring'>
   <p>Complete</p>
@@ -729,25 +905,64 @@
   </div>
   <div class='method_details'>
     <p class='signature' id='createGroup-instance'>
-      ::<strong>createGroup</strong>(args...)
+      TaskGroup ::<strong>createGroup</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L587'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L696'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Public</p>
+  <p>Create a <a href='../classes/TaskGroup.html'>TaskGroup</a> instance from some configuration.</p><p>If the first argument is already a <a href='../classes/TaskGroup.html'>TaskGroup</a> instance, then just update it&#39;s configuration with the remaning arguments.</p>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='type'>(Arguments)</span>
+      <span class='name'>args</span>
+      &mdash;
+      <span class='desc'>{Arguments} to use to configure the <a href='../classes/TaskGroup.html'>TaskGroup</a> instance</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt><a href='../classes/TaskGroup.html'>TaskGroup</a></tt>)
+      &mdash;
+      <span class='desc'>Returns the new <a href='../classes/TaskGroup.html'>TaskGroup</a> instance</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='createTask-instance'>
-      ::<strong>createTask</strong>(args...)
+      Task ::<strong>createTask</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L561'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L659'>Source</a>
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Create a <a href='../classes/Task.html'>Task</a> instance from some configuration.</p><p>If the first argument is already a <a href='../classes/Task.html'>Task</a> instance, then just update it&#39;s configuration with the remaning arguments.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='type'>(Arguments)</span>
+      <span class='name'>args</span>
+      &mdash;
+      <span class='desc'>{Arguments} to use to configure the <a href='../classes/Task.html'>Task</a> instance</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt><a href='../classes/Task.html'>Task</a></tt>)
+      &mdash;
+      <span class='desc'>Returns the new <a href='../classes/Task.html'>Task</a> instance</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -755,7 +970,7 @@
       ::<strong>destroy</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L845'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L960'>Source</a>
     </p>
     <div class='docstring'>
   <p>Destroy all remaining items and remove listeners.</p>
@@ -768,7 +983,7 @@
       ::<strong>exit</strong>(err)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L861'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L976'>Source</a>
     </p>
     <div class='docstring'>
   <p>We now want to exit.</p>
@@ -781,23 +996,10 @@
       ::<strong>fire</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L826'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L941'>Source</a>
     </p>
     <div class='docstring'>
   <p>Fire.</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='fireMethod-instance'>
-      ::<strong>fireMethod</strong>()
-      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L485'>Source</a>
-    </p>
-    <div class='docstring'>
-  <p>Fire method.</p>
 </div>
 <div class='tags'>
 </div>
@@ -807,7 +1009,7 @@
       ::<strong>fireNextItem</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L783'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L900'>Source</a>
     </p>
     <div class='docstring'>
   <p>Fire the next item returns the item that was fired or returns false if no item was fired for @internal use only, do not use externally</p>
@@ -820,7 +1022,7 @@
       ::<strong>fireNextItems</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L760'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L877'>Source</a>
     </p>
     <div class='docstring'>
   <p>Fire the next items returns the items that were fired or returns false if no items were fired for @internal use only, do not use externally</p>
@@ -833,7 +1035,7 @@
       ::<strong>getItemNames</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L613'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L727'>Source</a>
     </p>
     <div class='docstring'>
   <p>Public</p>
@@ -846,7 +1048,7 @@
       ::<strong>getItemTotals</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L636'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L750'>Source</a>
     </p>
     <div class='docstring'>
   <p>Public</p>
@@ -859,7 +1061,7 @@
       ::<strong>getItemsTotal</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L628'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L742'>Source</a>
     </p>
     <div class='docstring'>
   <p>Public</p>
@@ -872,7 +1074,7 @@
       ::<strong>hasExited</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L670'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L785'>Source</a>
     </p>
     <div class='docstring'>
   <p>Public</p>
@@ -885,7 +1087,7 @@
       ::<strong>hasItems</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L659'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L773'>Source</a>
     </p>
     <div class='docstring'>
   <p>Public</p>
@@ -898,7 +1100,7 @@
       ::<strong>hasRemaining</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L655'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L769'>Source</a>
     </p>
     <div class='docstring'>
   <p>Public</p>
@@ -911,7 +1113,7 @@
       ::<strong>hasResult</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L666'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L781'>Source</a>
     </p>
     <div class='docstring'>
   <p>Public</p>
@@ -924,7 +1126,7 @@
       ::<strong>hasRunning</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L651'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L765'>Source</a>
     </p>
     <div class='docstring'>
   <p>Public</p>
@@ -937,7 +1139,7 @@
       ::<strong>hasSlots</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L674'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L789'>Source</a>
     </p>
     <div class='docstring'>
   <p>Internal</p>
@@ -950,7 +1152,7 @@
       ::<strong>hasStarted</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L663'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L777'>Source</a>
     </p>
     <div class='docstring'>
   <p>Public</p>
@@ -963,7 +1165,7 @@
       ::<strong>isComplete</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L705'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L822'>Source</a>
     </p>
     <div class='docstring'>
   <p>Public</p>
@@ -976,7 +1178,7 @@
       ::<strong>isEmpty</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L694'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L811'>Source</a>
     </p>
     <div class='docstring'>
   <p>Public</p>
@@ -989,7 +1191,7 @@
       ::<strong>isPaused</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L698'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L815'>Source</a>
     </p>
     <div class='docstring'>
   <p>Public</p>
@@ -1002,7 +1204,7 @@
       ::<strong>itemCompletionCallback</strong>(item, args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L806'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L921'>Source</a>
     </p>
     <div class='docstring'>
   <p>What to do when an item completes</p>
@@ -1015,7 +1217,7 @@
       ::<strong>onceDone</strong>(handler)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L743'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L860'>Source</a>
     </p>
     <div class='docstring'>
   <p>Once Done Promise</p>
@@ -1028,7 +1230,7 @@
       ::<strong>resetResults</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L752'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L869'>Source</a>
     </p>
     <div class='docstring'>
   <p>Reset the results</p>
@@ -1041,7 +1243,7 @@
       ::<strong>run</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L877'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L992'>Source</a>
     </p>
     <div class='docstring'>
   <p>We want to run.</p>
@@ -1054,12 +1256,96 @@
       ::<strong>setConfig</strong>(opts = {})
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L442'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L520'>Source</a>
     </p>
     <div class='docstring'>
-  <p>Set Configuration opts = object|array</p>
+  <p>Set the configuration for our instance.</p><p>Despite accepting an <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> of configuration, we can also accept an <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of configuration.
+When using an array, a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/String'>String</a> becomes the :name, a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> becomes the :method, and an <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> becomes the :config</p>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='type'>(Object)</span>
+      <span class='name'>config</span>
+      &mdash;
+      <span class='desc'>Our configuration <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> can contain the following fields:</span>
+    </li>
+    <ul class='options'>
+      <li>
+        <span class='type'>(String)</span>
+        <span class='name'>name</span>
+        &mdash;
+        <span class='desc'>(default: null) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/String'>String</a> for what we would like our name to be, useful for debugging.</span>
+      </li>
+      <li>
+        <span class='type'>(Function)</span>
+        <span class='name'>next</span>
+        &mdash;
+        <span class='desc'>(defualt: null) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> that we would like bound to the <code>done</code> event once.</span>
+      </li>
+      <li>
+        <span class='type'>(Function)</span>
+        <span class='name'>method</span>
+        &mdash;
+        <span class='desc'>(default: null) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> that we would like to use to created nested groups and tasks using an inline style.</span>
+      </li>
+      <li>
+        <span class='type'>(TaskGroup)</span>
+        <span class='name'>parent</span>
+        &mdash;
+        <span class='desc'>(default: null) A parent <a href='../classes/TaskGroup.html'>TaskGroup</a> that we may be attached to.</span>
+      </li>
+      <li>
+        <span class='type'>(String)</span>
+        <span class='name'>onError</span>
+        &mdash;
+        <span class='desc'>(default: &#39;exit&#39;) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/String'>String</a> that is either <code>&#39;exit&#39;</code> or <code>&#39;ignore&#39;</code>, when <code>&#39;ignore&#39;</code> errors that occur within items will not halt execution and will not be reported in the completion callbacks <code>err</code> argument (but will still be in the <code>results</code> argument).</span>
+      </li>
+      <li>
+        <span class='type'>(Number)</span>
+        <span class='name'>concurrency</span>
+        &mdash;
+        <span class='desc'>(default: 1) The <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number'>Number</a> of items that we would like to execute at the same time. Use <code>0</code> for unlimited. <code>1</code> accomplishes serial execution, everything else accomplishes parallel execution.</span>
+      </li>
+      <li>
+        <span class='type'>(Boolean)</span>
+        <span class='name'>run</span>
+        &mdash;
+        <span class='desc'>(default: true) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> for whether or not to the :method (if specified) automatically.</span>
+      </li>
+      <li>
+        <span class='type'>(Object)</span>
+        <span class='name'>nestedConfig</span>
+        &mdash;
+        <span class='desc'>(default: null) An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> of nested configuration to be applied to all items of this group.</span>
+      </li>
+      <li>
+        <span class='type'>(Object)</span>
+        <span class='name'>nestedTaskConfig</span>
+        &mdash;
+        <span class='desc'>(default: null) An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> of nested configuration to be applied to all <a href='../classes/Task.html'>Task</a>s of this group.</span>
+      </li>
+      <li>
+        <span class='type'>(Array)</span>
+        <span class='name'>tasks</span>
+        &mdash;
+        <span class='desc'>(default: null) An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of tasks to be added as children.</span>
+      </li>
+      <li>
+        <span class='type'>(Array)</span>
+        <span class='name'>groups</span>
+        &mdash;
+        <span class='desc'>(default: null) An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of groups to be added as children.</span>
+      </li>
+      <li>
+        <span class='type'>(Array)</span>
+        <span class='name'>items</span>
+        &mdash;
+        <span class='desc'>(default: null) An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of <a href='../classes/Task.html'>Task</a> and/or <a href='../classes/TaskGroup.html'>TaskGroup</a> instances to be added to this group.</span>
+      </li>
+    </ul>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -1067,7 +1353,7 @@
       ::<strong>setNestedConfig</strong>(config = {})
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L433'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L495'>Source</a>
     </p>
     <div class='docstring'>
   <p>Set Nested Config</p>
@@ -1080,7 +1366,7 @@
       ::<strong>setNestedTaskConfig</strong>(config = {})
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L426'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L488'>Source</a>
     </p>
     <div class='docstring'>
   <p>Set Nested Task Config</p>
@@ -1093,7 +1379,7 @@
       ::<strong>shouldFire</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L686'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L803'>Source</a>
     </p>
     <div class='docstring'>
   <p>Internal</p>
@@ -1106,7 +1392,7 @@
       ::<strong>shouldPause</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L680'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L796'>Source</a>
     </p>
     <div class='docstring'>
   <p>Internal</p>
@@ -1119,7 +1405,7 @@
       ::<strong>whenDone</strong>(handler)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L734'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L851'>Source</a>
     </p>
     <div class='docstring'>
   <p>When Done Promise</p>
@@ -1131,7 +1417,7 @@
     </div>
     <div id='footer'>
   Generated on
-  Sun Jun 15 2014 21:38:55 GMT+0200 (CEST)
+  Mon Jun 16 2014 03:08:42 GMT+0200 (CEST)
   by
   <a href='https://github.com/gjtorikian/biscotto' title='TomDoc-CoffeeScript API documentation generator'>Biscotto</a>
   v2.1.2
