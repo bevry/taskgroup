@@ -1,5 +1,8 @@
 # History
 
+## v4.0.1 June 16, 2014
+- Fixed `Recursive process.nextTick detected` error (regression since v4.0.0)
+
 ## v4.0.0 June 16, 2014
 - Significant rewrite with b/c breaks
 	- Completion listeners should now be accomplished via `.done(listener)` (listens once) or `.whenDone(listener)` (listener persists)
