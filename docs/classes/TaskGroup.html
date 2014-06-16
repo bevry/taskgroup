@@ -191,36 +191,6 @@
   </li>
   <li>
     <span class='signature'>
-      <a href='#addItem-instance'>
-        ::<strong>addItem</strong>(item, args...)
-      </a>
-    </span>
-    <span class='desc'>
-      Add an item to ourself and configure it accordingly
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#addItems-instance'>
-        ::<strong>addItems</strong>(items, args...)
-      </a>
-    </span>
-    <span class='desc'>
-      Add items to ourself and configure them accordingly
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#addMethod-instance'>
-        ::<strong>addMethod</strong>(method, config = {})
-      </a>
-    </span>
-    <span class='desc'>
-      Prepare the method and it&#39;s configuration, and add it as a task to be executed.
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
       <a href='#addTask-instance'>
         ::<strong>addTask</strong>(args...)
       </a>
@@ -241,32 +211,12 @@
   </li>
   <li>
     <span class='signature'>
-      <a href='#autoRun-instance'>
-        ::<strong>autoRun</strong>()
-      </a>
-    </span>
-    <span class='desc'>
-      Autorun ourself under certain conditions.
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
       <a href='#clear-instance'>
         ::<strong>clear</strong>()
       </a>
     </span>
     <span class='desc'>
       Clear remaning items.
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#complete-instance'>
-        ::<strong>complete</strong>()
-      </a>
-    </span>
-    <span class='desc'>
-      Completetion Emitter.
     </span>
   </li>
   <li>
@@ -307,46 +257,6 @@
     </span>
     <span class='desc'>
       Destroy all remaining items and remove listeners.
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#exit-instance'>
-        ::<strong>exit</strong>(err)
-      </a>
-    </span>
-    <span class='desc'>
-      We now want to exit.
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#fire-instance'>
-        ::<strong>fire</strong>()
-      </a>
-    </span>
-    <span class='desc'>
-      Either execute the reamining items we are not paused, or complete execution by exiting.
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#fireNextItem-instance'>
-        ::<strong>fireNextItem</strong>()
-      </a>
-    </span>
-    <span class='desc'>
-      Fire the next item.
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#fireNextItems-instance'>
-        Array ::<strong>fireNextItems</strong>()
-      </a>
-    </span>
-    <span class='desc'>
-      Fire the next items.
     </span>
   </li>
   <li>
@@ -411,32 +321,12 @@
   </li>
   <li>
     <span class='signature'>
-      <a href='#hasResult-instance'>
-        ::<strong>hasResult</strong>()
-      </a>
-    </span>
-    <span class='desc'>
-      Public
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
       <a href='#hasRunning-instance'>
         Boolean ::<strong>hasRunning</strong>()
       </a>
     </span>
     <span class='desc'>
       Whether or not we have any running items
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#hasSlots-instance'>
-        Boolean ::<strong>hasSlots</strong>()
-      </a>
-    </span>
-    <span class='desc'>
-      Whether or not we have any available slots to execute more items.
     </span>
   </li>
   <li>
@@ -471,42 +361,12 @@
   </li>
   <li>
     <span class='signature'>
-      <a href='#isPaused-instance'>
-        ::<strong>isPaused</strong>()
-      </a>
-    </span>
-    <span class='desc'>
-      Public
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#itemCompletionCallback-instance'>
-        ::<strong>itemCompletionCallback</strong>(item, args...)
-      </a>
-    </span>
-    <span class='desc'>
-      What to do when an item completes
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
       <a href='#onceDone-instance'>
         ::<strong>onceDone</strong>(handler)
       </a>
     </span>
     <span class='desc'>
       Once Done Promise.
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#resetResults-instance'>
-        ::<strong>resetResults</strong>()
-      </a>
-    </span>
-    <span class='desc'>
-      Reset the results.
     </span>
   </li>
   <li>
@@ -551,26 +411,6 @@
   </li>
   <li>
     <span class='signature'>
-      <a href='#shouldFire-instance'>
-        Boolean ::<strong>shouldFire</strong>()
-      </a>
-    </span>
-    <span class='desc'>
-      Whether or not we are capable of firing more items.
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#shouldPause-instance'>
-        Boolean ::<strong>shouldPause</strong>()
-      </a>
-    </span>
-    <span class='desc'>
-      Whether or not we have errord and want to pause when we have an error.
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
       <a href='#whenDone-instance'>
         ::<strong>whenDone</strong>(handler)
       </a>
@@ -588,8 +428,6 @@
         <a href='..&#47;classes/Interface.html'>Interface</a>
       </h3>
       <p class='inherited'>
-                <a href='..&#47;classes/Interface.html#constructor-instance'>.constructor</a>,
-                <a href='..&#47;classes/Interface.html#complete-instance'>.complete</a>,
                 <a href='..&#47;classes/Interface.html#whenDone-instance'>.whenDone</a>,
                 <a href='..&#47;classes/Interface.html#onceDone-instance'>.onceDone</a>,
                 <a href='..&#47;classes/Interface.html#done-instance'>.done</a>,
@@ -731,90 +569,6 @@
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='addItem-instance'>
-      ::<strong>addItem</strong>(item, args...)
-      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L621'>Source</a>
-    </p>
-    <div class='docstring'>
-  <p>Add an item to ourself and configure it accordingly</p>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='type'>(Task)</span>
-      <span class='name'>item</span>
-      &mdash;
-      <span class='desc'>A <a href='../classes/Task.html'>Task</a> or <a href='../classes/TaskGroup.html'>TaskGroup</a> instance that we would like added to ourself</span>
-    </li>
-    <li>
-      <span class='type'>(Arguments)</span>
-      <span class='name'>args</span>
-      &mdash;
-      <span class='desc'>Additional configuration {Arguments} to apply to each item</span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='addItems-instance'>
-      ::<strong>addItems</strong>(items, args...)
-      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L676'>Source</a>
-    </p>
-    <div class='docstring'>
-  <p>Add items to ourself and configure them accordingly</p>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='type'>(Array)</span>
-      <span class='name'>items</span>
-      &mdash;
-      <span class='desc'>An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of <a href='../classes/Task.html'>Task</a> and/or <a href='../classes/TaskGroup.html'>TaskGroup</a> instances to add to ourself</span>
-    </li>
-    <li>
-      <span class='type'>(Arguments)</span>
-      <span class='name'>args</span>
-      &mdash;
-      <span class='desc'>Optional {Arguments} to configure each added item</span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='addMethod-instance'>
-      ::<strong>addMethod</strong>(method, config = {})
-      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L587'>Source</a>
-    </p>
-    <div class='docstring'>
-  <p>Prepare the method and it&#39;s configuration, and add it as a task to be executed.</p>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='type'>(Function)</span>
-      <span class='name'>method</span>
-      &mdash;
-      <span class='desc'>The <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> of our method</span>
-    </li>
-    <li>
-      <span class='type'>(Object)</span>
-      <span class='name'>config</span>
-      &mdash;
-      <span class='desc'>An optional <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> of configuration for the task to be created for our method</span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
     <p class='signature' id='addTask-instance'>
       ::<strong>addTask</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
@@ -865,22 +619,6 @@
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='autoRun-instance'>
-      ::<strong>autoRun</strong>()
-      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L602'>Source</a>
-    </p>
-    <div class='docstring'>
-  <p>Autorun ourself under certain conditions.</p><p>Those conditions being:</p><ul>
-<li>if we the :method configuration is defined, and we have no :parent</li>
-<li>if we the :run configuration is <code>true</code></li>
-</ul><p>Used primarily to cause the :method to fire at the appropriate time when using inline style. </p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
     <p class='signature' id='clear-instance'>
       ::<strong>clear</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
@@ -889,19 +627,6 @@
     </p>
     <div class='docstring'>
   <p>Clear remaning items.</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='complete-instance'>
-      ::<strong>complete</strong>()
-      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L904'>Source</a>
-    </p>
-    <div class='docstring'>
-  <p>Completetion Emitter. Used to emit the <code>completed</code> event and to cleanup our state.</p>
 </div>
 <div class='tags'>
 </div>
@@ -979,74 +704,6 @@
   <p>Destroy all remaining items and remove listeners.</p>
 </div>
 <div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='exit-instance'>
-      ::<strong>exit</strong>(err)
-      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L1052'>Source</a>
-    </p>
-    <div class='docstring'>
-  <p>We now want to exit.</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='fire-instance'>
-      ::<strong>fire</strong>()
-      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L1017'>Source</a>
-    </p>
-    <div class='docstring'>
-  <p>Either execute the reamining items we are not paused, or complete execution by exiting.</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='fireNextItem-instance'>
-      ::<strong>fireNextItem</strong>()
-      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L976'>Source</a>
-    </p>
-    <div class='docstring'>
-  <p>Fire the next item.</p>
-</div>
-<div class='tags'>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      <span class='desc'>Returns either the item that was fired, or <code>false</code> if no item was fired.</span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='fireNextItems-instance'>
-      Array ::<strong>fireNextItems</strong>()
-      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L954'>Source</a>
-    </p>
-    <div class='docstring'>
-  <p>Fire the next items.</p>
-</div>
-<div class='tags'>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (<tt>Array</tt>)
-      &mdash;
-      <span class='desc'>Returns either an <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> items that was fired, or <code>false</code> if no items were fired.</span>
-    </li>
-  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -1246,19 +903,6 @@
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='hasResult-instance'>
-      ::<strong>hasResult</strong>()
-      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L835'>Source</a>
-    </p>
-    <div class='docstring'>
-  <p>Public</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
     <p class='signature' id='hasRunning-instance'>
       Boolean ::<strong>hasRunning</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
@@ -1276,28 +920,6 @@
       (<tt>Boolean</tt>)
       &mdash;
       <span class='desc'>Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> which is <code>true</code> if we have any items that are currently running</span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='hasSlots-instance'>
-      Boolean ::<strong>hasSlots</strong>()
-      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L847'>Source</a>
-    </p>
-    <div class='docstring'>
-  <p>Whether or not we have any available slots to execute more items.</p>
-</div>
-<div class='tags'>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (<tt>Boolean</tt>)
-      &mdash;
-      <span class='desc'>Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> which is <code>true</code> if we have available slots.</span>
     </li>
   </ul>
 </div>
@@ -1369,32 +991,6 @@
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='isPaused-instance'>
-      ::<strong>isPaused</strong>()
-      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L881'>Source</a>
-    </p>
-    <div class='docstring'>
-  <p>Public</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='itemCompletionCallback-instance'>
-      ::<strong>itemCompletionCallback</strong>(item, args...)
-      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L997'>Source</a>
-    </p>
-    <div class='docstring'>
-  <p>What to do when an item completes</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
     <p class='signature' id='onceDone-instance'>
       ::<strong>onceDone</strong>(handler)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
@@ -1414,19 +1010,6 @@
       <span class='desc'>The <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> to attach or execute.</span>
     </li>
   </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='resetResults-instance'>
-      ::<strong>resetResults</strong>()
-      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L947'>Source</a>
-    </p>
-    <div class='docstring'>
-  <p>Reset the results.</p><p>At this point this method is internal, as it&#39;s functionality may change in the future, and it&#39;s outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker. </p>
-</div>
-<div class='tags'>
 </div>
   </div>
   <div class='method_details'>
@@ -1566,50 +1149,6 @@ When using an array, a <a href='https://developer.mozilla.org/en-US/docs/JavaScr
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='shouldFire-instance'>
-      Boolean ::<strong>shouldFire</strong>()
-      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L867'>Source</a>
-    </p>
-    <div class='docstring'>
-  <p>Whether or not we are capable of firing more items.</p><p>This is determined whether or not we are not paused, and we have remaning items, and we have slots able to execute those remaning items.</p>
-</div>
-<div class='tags'>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (<tt>Boolean</tt>)
-      &mdash;
-      <span class='desc'>Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> which is <code>true</code> if we can fire more items.</span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='shouldPause-instance'>
-      Boolean ::<strong>shouldPause</strong>()
-      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L856'>Source</a>
-    </p>
-    <div class='docstring'>
-  <p>Whether or not we have errord and want to pause when we have an error.</p>
-</div>
-<div class='tags'>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (<tt>Boolean</tt>)
-      &mdash;
-      <span class='desc'>Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> which is <code>true</code> if we are paused.</span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
     <p class='signature' id='whenDone-instance'>
       ::<strong>whenDone</strong>(handler)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
@@ -1635,7 +1174,7 @@ When using an array, a <a href='https://developer.mozilla.org/en-US/docs/JavaScr
     </div>
     <div id='footer'>
   Generated on
-  Mon Jun 16 2014 11:46:31 GMT+0200 (CEST)
+  Mon Jun 16 2014 11:51:31 GMT+0200 (CEST)
   by
   <a href='https://github.com/gjtorikian/biscotto' title='TomDoc-CoffeeScript API documentation generator'>Biscotto</a>
   v2.1.2

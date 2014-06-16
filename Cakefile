@@ -203,7 +203,7 @@ actions =
 		step4 = ->
 			return step5()  if !config.BISCOTTO_SRC_PATH or !fsUtil.existsSync(BISCOTTO)
 			console.log('biscotto compile')
-			exec("""#{BISCOTTO} --private --internal --name #{PACKAGE_DATA.title or PACKAGE_DATA.name} --title "#{PACKAGE_DATA.title or PACKAGE_DATA.name} API Documentation" --readme README.md --output-dir #{config.BISCOTTO_OUT_PATH} #{config.BISCOTTO_SRC_PATH} - LICENSE.md HISTORY.md""", {stdio:'inherit', cwd:APP_PATH}, safe next, step5)
+			exec("""#{BISCOTTO} --name #{PACKAGE_DATA.title or PACKAGE_DATA.name} --title "#{PACKAGE_DATA.title or PACKAGE_DATA.name} API Documentation" --readme README.md --output-dir #{config.BISCOTTO_OUT_PATH} #{config.BISCOTTO_SRC_PATH} - LICENSE.md HISTORY.md""", {stdio:'inherit', cwd:APP_PATH}, safe next, step5)
 		step5 = ->
 			console.log('cake test')
 			actions.test(opts, safe next, step5)

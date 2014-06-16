@@ -183,16 +183,6 @@
       <ul class='summary'>
   <li>
     <span class='signature'>
-      <a href='#complete-instance'>
-        ::<strong>complete</strong>()
-      </a>
-    </span>
-    <span class='desc'>
-      Completetion Emitter.
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
       <a href='#constructor-instance'>
         ::<strong>constructor</strong>(args...)
       </a>
@@ -209,26 +199,6 @@
     </span>
     <span class='desc'>
       Destroy the task and prevent it from executing ever again.
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#exit-instance'>
-        ::<strong>exit</strong>(args...)
-      </a>
-    </span>
-    <span class='desc'>
-      Handles the completion and error conditions for ourself.
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#fire-instance'>
-        ::<strong>fire</strong>()
-      </a>
-    </span>
-    <span class='desc'>
-      Fire the task method with our config arguments and wrapped in a domain.
     </span>
   </li>
   <li>
@@ -283,16 +253,6 @@
   </li>
   <li>
     <span class='signature'>
-      <a href='#resetResults-instance'>
-        ::<strong>resetResults</strong>()
-      </a>
-    </span>
-    <span class='desc'>
-      Reset the results.
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
       <a href='#run-instance'>
         ::<strong>run</strong>()
       </a>
@@ -330,8 +290,6 @@
         <a href='..&#47;classes/Interface.html'>Interface</a>
       </h3>
       <p class='inherited'>
-                <a href='..&#47;classes/Interface.html#constructor-instance'>.constructor</a>,
-                <a href='..&#47;classes/Interface.html#complete-instance'>.complete</a>,
                 <a href='..&#47;classes/Interface.html#whenDone-instance'>.whenDone</a>,
                 <a href='..&#47;classes/Interface.html#onceDone-instance'>.onceDone</a>,
                 <a href='..&#47;classes/Interface.html#done-instance'>.done</a>,
@@ -423,19 +381,6 @@
       <h2>Instance Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
-    <p class='signature' id='complete-instance'>
-      ::<strong>complete</strong>()
-      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L294'>Source</a>
-    </p>
-    <div class='docstring'>
-  <p>Completetion Emitter. Used to emit the <code>completed</code> event and to cleanup our state.</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
     <p class='signature' id='destroy-instance'>
       ::<strong>destroy</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
@@ -444,41 +389,6 @@
     </p>
     <div class='docstring'>
   <p>Destroy the task and prevent it from executing ever again.</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='exit-instance'>
-      ::<strong>exit</strong>(args...)
-      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L269'>Source</a>
-    </p>
-    <div class='docstring'>
-  <p>Handles the completion and error conditions for ourself.</p><p>Should only ever execute once, if it executes more than once, then we error.</p>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='type'>(Array)</span>
-      <span class='name'>args</span>
-      &mdash;
-      <span class='desc'>The arguments <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> that will be applied to the {::result} variable. First argument is the <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Error'>Error</a> if it exists.</span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='fire-instance'>
-      ::<strong>fire</strong>()
-      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L351'>Source</a>
-    </p>
-    <div class='docstring'>
-  <p>Fire the task method with our config arguments and wrapped in a domain.</p>
 </div>
 <div class='tags'>
 </div>
@@ -594,19 +504,6 @@
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='resetResults-instance'>
-      ::<strong>resetResults</strong>()
-      <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v3.4.0
-/src&#47;lib&#47;taskgroup.coffee#L333'>Source</a>
-    </p>
-    <div class='docstring'>
-  <p>Reset the results.</p><p>At this point this method is internal, as it&#39;s functionality may change in the future, and it&#39;s outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker. </p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
     <p class='signature' id='run-instance'>
       ::<strong>run</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
@@ -712,7 +609,7 @@ When using an array, a <a href='https://developer.mozilla.org/en-US/docs/JavaScr
     </div>
     <div id='footer'>
   Generated on
-  Mon Jun 16 2014 11:46:31 GMT+0200 (CEST)
+  Mon Jun 16 2014 11:51:31 GMT+0200 (CEST)
   by
   <a href='https://github.com/gjtorikian/biscotto' title='TomDoc-CoffeeScript API documentation generator'>Biscotto</a>
   v2.1.2
