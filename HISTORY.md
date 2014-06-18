@@ -1,5 +1,8 @@
 # History
 
+## v4.0.2 June 18, 2014
+- Added support for `done`, `whenDone`, `onceDone`, `once`, and `on` configuration options
+
 ## v4.0.1 June 16, 2014
 - Fixed `Recursive process.nextTick detected` error (regression since v4.0.0)
 

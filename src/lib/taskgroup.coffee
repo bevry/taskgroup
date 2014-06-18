@@ -213,7 +213,7 @@ class Task extends Interface
 		@config.run ?= false
 		@config.onError ?= 'exit'
 		@events ?= []
-		@events.push('error', 'started', 'running', 'failed', 'passed', 'completed', 'destroyed')
+		@events.push('error', 'started', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed')
 
 		# Apply configuration
 		@setConfig(args)
@@ -228,7 +228,10 @@ class Task extends Interface
 	#
 	# config - Our configuration {Object} can contain the following fields:
 	#   :name - (default: null) A {String} for what we would like our name to be, useful for debugging.
-	#   :next - (defualt: null) A {Function} that we would like bound to the `done` event once.
+	#   :done - (default: null) A {Function} that we would like passed to {::onceDone} (aliases are :onceDone, and :next)
+	#   :whenDone - (default: null) A {Function} that we would like passed to {::whenDone}
+	#   :on - (default: null) An {Object} of (eventName => listener) that we would like bound via {EventEmitter:on}.
+	#   :once - (default: null) An {Object} of (eventName => listener) that we would like bound via {EventEmitter:once}.
 	#   :method - (default: null) The {Function} that we would like to execute within our task.
 	#   :parent - (default: null) A parent {TaskGroup} that we may be attached to.
 	#   :onError - (default: 'exit') A {String} that is either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.
@@ -256,8 +259,20 @@ class Task extends Interface
 		# Apply the configuration directly to our instance
 		for own key,value of opts
 			switch key
-				when 'next'
+				when 'on'
+					for own _key,_value of value
+						@on(_key, _value)  if value
+
+				when 'once'
+					for own _key,_value of value
+						@once(_key, _value)  if value
+
+				when 'whenDone'
+					@whenDone(value)  if value
+
+				when 'onceDone', 'done', 'next'
 					@done(value)  if value
+				
 				else
 					@config[key] = value
 
@@ -304,10 +319,7 @@ class Task extends Interface
 				@result = args
 
 			# Did we error?
-			if @err?
-				@status = 'failed'
-			else
-				@status = 'passed'
+			@status = (if @err? then 'failed' else 'passed')
 
 			# Notify our listeners of our status
 			@emit(@status, @err)
@@ -416,7 +428,7 @@ class Task extends Interface
 
 		# Add our completion callback to our specified arguments to send over to the method
 		args = (@config.args or []).concat([@exit.bind(@)])
-
+		
 		# Prepare the task domain if it doesn't already exist
 		if @taskDomain? is false and domain?.create?
 			@taskDomain = domain.create()
@@ -427,8 +439,7 @@ class Task extends Interface
 			try
 				if me.config.method?.bind
 					methodToFire = me.config.method.bind(me)
-					me.status = 'running'
-					me.emit(me.status)
+					me.emit(me.status = 'running')
 					me.timeout = setTimeout(->
 						if me.isComplete() is false
 							err = new Error """
@@ -467,11 +478,8 @@ class Task extends Interface
 
 			# Not yet completed, so lets run!
 			else
-				# Reset to a running state
-				@status = 'started'
-
-				# Notify our listeners of our updated status
-				@emit(@status)
+				# Apply our new status and notify our listeners
+				@emit(@status = 'started')
 
 				# Fire the task
 				@fire()
@@ -572,7 +580,7 @@ class TaskGroup extends Interface
 		@itemsCompleted ?= []
 		@results ?= []
 		@events ?= []
-		@events.push('error', 'started', 'running', 'passed', 'failed', 'completed', 'destroyed')
+		@events.push('error', 'started', 'running', 'passed', 'failed', 'completed', 'done', 'destroyed')
 
 		# Apply configuration
 		@setConfig(args)
@@ -612,8 +620,10 @@ class TaskGroup extends Interface
 	#
 	# config - Our configuration {Object} can contain the following fields:
 	#   :name - (default: null) A {String} for what we would like our name to be, useful for debugging.
-	#   :next - (defualt: null) A {Function} that we would like bound to the `done` event once.
-	#   :method - (default: null) A {Function} that we would like to use to created nested groups and tasks using an inline style.
+	#   :done - (default: null) A {Function} that we would like passed to {::onceDone} (aliases are :onceDone, and :next)
+	#   :whenDone - (default: null) A {Function} that we would like passed to {::whenDone}
+	#   :on - (default: null) An {Object} of (eventName => listener) that we would like bound via {EventEmitter:on}.
+	#   :once - (default: null) An {Object} of (eventName => listener) that we would like bound via {EventEmitter:once}.	#   :method - (default: null) A {Function} that we would like to use to created nested groups and tasks using an inline style.
 	#   :parent - (default: null) A parent {TaskGroup} that we may be attached to.
 	#   :onError - (default: 'exit') A {String} that is either `'exit'` or `'ignore'`, when `'ignore'` errors that occur within items will not halt execution and will not be reported in the completion callbacks `err` argument (but will still be in the `results` argument).
 	#   :concurrency - (default: 1) The {Number} of items that we would like to execute at the same time. Use `0` for unlimited. `1` accomplishes serial execution, everything else accomplishes parallel execution.
@@ -645,14 +655,29 @@ class TaskGroup extends Interface
 		# Apply the configuration directly to our instance
 		for own key,value of opts
 			switch key
-				when 'next'
+				when 'on'
+					for own _key,_value of value
+						@on(_key, _value)  if value
+
+				when 'once'
+					for own _key,_value of value
+						@once(_key, _value)  if value
+
+				when 'whenDone'
+					@whenDone(value)  if value
+
+				when 'onceDone', 'done', 'next'
 					@done(value)  if value
+				
 				when 'task', 'tasks'
 					@addTasks(value)  if value
+				
 				when 'group', 'groups'
 					@addGroups(value)  if value
+				
 				when 'item', 'items'
 					@addItems(value)  if value
+				
 				else
 					@config[key] = value
 
@@ -1191,11 +1216,11 @@ class TaskGroup extends Interface
 
 		# Once finished, destroy it
 		@done =>
-			# Stop from executing ever again
-			@status = 'destroyed'
+			# Are we already destroyed?
+			return  if @status is 'destroyed'
 
-			# And notify our listeners
-			@emit(@status)
+			# Apply our new status and notify our listeners
+			@emit(@status = 'destroyed')
 
 			# Clear results
 			@resetResults()
@@ -1214,11 +1239,7 @@ class TaskGroup extends Interface
 		@err ?= err  if err?
 
 		# Update the status
-		@status =
-			if @err?
-				'failed'
-			else
-				'passed'
+		@status = (if @err? then 'failed' else 'passed')
 
 		# Notify our listeners
 		@emit(@status, @err)
@@ -1232,11 +1253,8 @@ class TaskGroup extends Interface
 	# Public: Start the execution.
 	run: (args...) ->
 		queue =>
-			# Start
-			@status = 'started'
-
-			# Notify our intention to run
-			@emit(@status)
+			# Apply our new status and notify our intention to run
+			@emit(@status = 'started')
 
 			# Give time for the listeners to complete before continuing
 			@fire()

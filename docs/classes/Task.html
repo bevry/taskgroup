@@ -385,7 +385,7 @@
       ::<strong>destroy</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v4.0.0
-/src&#47;lib&#47;taskgroup.coffee#L338'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L350'>Source</a>
     </p>
     <div class='docstring'>
   <p>Destroy the task and prevent it from executing ever again.</p>
@@ -398,7 +398,7 @@
       Boolean ::<strong>hasExited</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v4.0.0
-/src&#47;lib&#47;taskgroup.coffee#L249'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L264'>Source</a>
     </p>
     <div class='docstring'>
   <p>Have we finished its execution yet?</p>
@@ -420,7 +420,7 @@
       Boolean ::<strong>hasStarted</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v4.0.0
-/src&#47;lib&#47;taskgroup.coffee#L243'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L258'>Source</a>
     </p>
     <div class='docstring'>
   <p>Have we started execution yet?</p>
@@ -442,7 +442,7 @@
       Boolean ::<strong>isComplete</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v4.0.0
-/src&#47;lib&#47;taskgroup.coffee#L261'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L276'>Source</a>
     </p>
     <div class='docstring'>
   <p>Have we completed its execution yet?</p>
@@ -464,7 +464,7 @@
       Boolean ::<strong>isDestroyed</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v4.0.0
-/src&#47;lib&#47;taskgroup.coffee#L255'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L270'>Source</a>
     </p>
     <div class='docstring'>
   <p>Have we been destroyed?</p>
@@ -486,7 +486,7 @@
       ::<strong>onceDone</strong>(listener)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v4.0.0
-/src&#47;lib&#47;taskgroup.coffee#L322'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L334'>Source</a>
     </p>
     <div class='docstring'>
   <p>Once Done Promise. Fires the listener once, either on the next tick if we are already done, or if not, once the <code>done</code> event fires.</p>
@@ -508,7 +508,7 @@
       ::<strong>run</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v4.0.0
-/src&#47;lib&#47;taskgroup.coffee#L402'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L413'>Source</a>
     </p>
     <div class='docstring'>
   <p>Start the execution of the task.</p><p>Will emit an <code>error</code> event if the task has already started before. </p>
@@ -521,7 +521,7 @@
       ::<strong>setConfig</strong>(opts = {})
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v4.0.0
-/src&#47;lib&#47;taskgroup.coffee#L214'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L217'>Source</a>
     </p>
     <div class='docstring'>
   <p>Set the configuration for our instance.</p><p>Despite accepting an <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> of configuration, we can also accept an <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of configuration.
@@ -545,9 +545,27 @@ When using an array, a <a href='https://developer.mozilla.org/en-US/docs/JavaScr
       </li>
       <li>
         <span class='type'>(Function)</span>
-        <span class='name'>next</span>
+        <span class='name'>done</span>
         &mdash;
-        <span class='desc'>(defualt: null) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> that we would like bound to the <code>done</code> event once.</span>
+        <span class='desc'>(default: null) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> that we would like passed to <a href='../classes/Task.html#onceDone-instance'>::onceDone</a> (aliases are :onceDone, and :next)</span>
+      </li>
+      <li>
+        <span class='type'>(Function)</span>
+        <span class='name'>whenDone</span>
+        &mdash;
+        <span class='desc'>(default: null) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> that we would like passed to <a href='../classes/Task.html#whenDone-instance'>::whenDone</a></span>
+      </li>
+      <li>
+        <span class='type'>(Object)</span>
+        <span class='name'>on</span>
+        &mdash;
+        <span class='desc'>(default: null) An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> of (eventName =&gt; listener) that we would like bound via {EventEmitter:on}.</span>
+      </li>
+      <li>
+        <span class='type'>(Object)</span>
+        <span class='name'>once</span>
+        &mdash;
+        <span class='desc'>(default: null) An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> of (eventName =&gt; listener) that we would like bound via {EventEmitter:once}.</span>
       </li>
       <li>
         <span class='type'>(Function)</span>
@@ -588,7 +606,7 @@ When using an array, a <a href='https://developer.mozilla.org/en-US/docs/JavaScr
       ::<strong>whenDone</strong>(listener)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v4.0.0
-/src&#47;lib&#47;taskgroup.coffee#L310'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L322'>Source</a>
     </p>
     <div class='docstring'>
   <p>When Done Promise. Fires the listener, either on the next tick if we are already done, or if not, each time the <code>done</code> event fires.</p>
@@ -609,7 +627,7 @@ When using an array, a <a href='https://developer.mozilla.org/en-US/docs/JavaScr
     </div>
     <div id='footer'>
   Generated on
-  Mon Jun 16 2014 14:21:29 GMT+0200 (CEST)
+  Wed Jun 18 2014 17:15:49 GMT+0200 (CEST)
   by
   <a href='https://github.com/gjtorikian/biscotto' title='TomDoc-CoffeeScript API documentation generator'>Biscotto</a>
   v2.1.2
