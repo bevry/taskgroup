@@ -1,12 +1,11 @@
 # Import
-setImmediate = global?.setImmediate or process.nextTick  # node 0.8 b/c
-queue = process.nextTick
-ambi = require('ambi')
+queue = global?.setImmediate or process.nextTick  # node 0.8 b/c
 events = require('events')
 domain = (try require('domain')) ? null
 util = require('util')
 {EventEmitter} = require('events')
-{extendOnClass} = require('extendonclass')
+ambi = require('ambi')
+csextends = require('csextends')
 
 
 # =====================================
@@ -176,7 +175,7 @@ class Task extends Interface
 	# extensions - An {Object} of extensions to apply to the new subclass
 	#
 	# Returns the new sub {Class}
-	@subclass: extendOnClass
+	@subclass: csextends
 
 	# Public: Creates a new {Task} instance.
 	#
@@ -272,7 +271,7 @@ class Task extends Interface
 
 				when 'onceDone', 'done', 'next'
 					@done(value)  if value
-				
+
 				else
 					@config[key] = value
 
@@ -428,7 +427,7 @@ class Task extends Interface
 
 		# Add our completion callback to our specified arguments to send over to the method
 		args = (@config.args or []).concat([@exit.bind(@)])
-		
+
 		# Prepare the task domain if it doesn't already exist
 		if @taskDomain? is false and domain?.create?
 			@taskDomain = domain.create()
@@ -533,7 +532,7 @@ class TaskGroup extends Interface
 	# extensions - An {Object} of extensions to apply to the new subclass
 	#
 	# Returns the new sub {Class}
-	@subclass: extendOnClass
+	@subclass: csextends
 
 
 	# Public: Creates a new {TaskGroup} instance.
@@ -668,16 +667,16 @@ class TaskGroup extends Interface
 
 				when 'onceDone', 'done', 'next'
 					@done(value)  if value
-				
+
 				when 'task', 'tasks'
 					@addTasks(value)  if value
-				
+
 				when 'group', 'groups'
 					@addGroups(value)  if value
-				
+
 				when 'item', 'items'
 					@addItems(value)  if value
-				
+
 				else
 					@config[key] = value
 

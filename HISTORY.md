@@ -1,5 +1,9 @@
 # History
 
+## v4.0.3 July 11, 2014
+- Use `setImmediate` instead of `nextTick` to avoid `(node) warning: Recursive process.nextTick detected. This will break in the next version of node. Please use setImmediate for recursive deferral.` errors
+- Updated dependencies
+
 ## v4.0.2 June 18, 2014
 - Added support for `done`, `whenDone`, `onceDone`, `once`, and `on` configuration options
 
