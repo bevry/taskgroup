@@ -1,7 +1,7 @@
 {
   "title": "TaskGroup",
   "name": "taskgroup",
-  "version": "4.0.3",
+  "version": "4.0.4",
   "description": "Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.",
   "homepage": "https://github.com/bevry/taskgroup",
   "license": {
@@ -44,6 +44,7 @@
     "type": "git",
     "url": "http://github.com/bevry/taskgroup.git"
   },
+  "browsers": true,
   "engines": {
     "node": ">=0.8"
   },
@@ -53,11 +54,11 @@
   },
   "devDependencies": {
     "coffee-script": "~1.7.1",
-    "joe": "~1.4.0",
+    "joe": "~1.5.0",
     "joe-reporter-console": "~1.2.1",
     "chai": "~1.9.1",
-    "projectz": "~0.3.11",
-    "biscotto": "^2.1.2"
+    "projectz": "~0.3.15",
+    "biscotto": "^2.2.1"
   },
   "directories": {
     "lib": "./out/lib"

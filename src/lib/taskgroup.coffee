@@ -6,6 +6,7 @@ util = require('util')
 {EventEmitter} = require('events')
 ambi = require('ambi')
 csextends = require('csextends')
+wait = (delay, fn) -> setTimeout(fn, delay)
 
 
 # =====================================
@@ -211,6 +212,8 @@ class Task extends Interface
 		@config ?= {}
 		@config.run ?= false
 		@config.onError ?= 'exit'
+		@config.ambi ?= true
+		@config.domain ?= true
 		@events ?= []
 		@events.push('error', 'started', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed')
 
@@ -236,6 +239,8 @@ class Task extends Interface
 	#   :onError - (default: 'exit') A {String} that is either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.
 	#   :args - (default: null) An {Array} of arguments that we would like to forward onto our method when we execute it.
 	#   :timeout - (default: null) A {Number} of millesconds that we would like to wait before timing out the method.
+	#   :ambi - (default: true) A {Boolean} for whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately
+	#   :domain - (default: true) A {Boolean} for whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution)
 	setConfig: (opts={}) ->
 		# Handle arguments
 		if Array.isArray(opts)
@@ -429,7 +434,7 @@ class Task extends Interface
 		args = (@config.args or []).concat([@exit.bind(@)])
 
 		# Prepare the task domain if it doesn't already exist
-		if @taskDomain? is false and domain?.create?
+		if @config.domain isnt false and @taskDomain? is false and domain?.create?
 			@taskDomain = domain.create()
 			@taskDomain.on('error', @exit.bind(@))
 
@@ -439,14 +444,23 @@ class Task extends Interface
 				if me.config.method?.bind
 					methodToFire = me.config.method.bind(me)
 					me.emit(me.status = 'running')
-					me.timeout = setTimeout(->
-						if me.isComplete() is false
-							err = new Error """
-								The task [#{me.getNames()}] has timed out.
-								"""
-							me.exit(err)
-					, me.config.timeout)  if me.config.timeout
-					ambi(methodToFire, args...)
+
+					# Setup timeout if appropriate
+					if me.config.timeout
+						me.timeout = wait me.config.timeout, ->
+							if me.isComplete() is false
+								err = new Error """
+									The task [#{me.getNames()}] has timed out.
+									"""
+								me.exit(err)
+
+					# Execute with ambi if appropriate
+					if me.config.ambi isnt false
+						ambi(methodToFire, args...)
+
+					# Otherwise execute directly if appropriate
+					else
+						methodToFire(args...)
 				else
 					err = new Error """
 						The task [#{me.getNames()}] was fired but has no method to fire
@@ -455,8 +469,11 @@ class Task extends Interface
 			catch err
 				me.exit(err)
 
+		# Wrap execution in a domain if appropriate
 		if @taskDomain?
 			@taskDomain.run(fire)
+
+		# Otherwise execute directly if appropriate
 		else
 			fire()
 

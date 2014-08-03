@@ -115,6 +115,16 @@
       </nav>
       <div id='filecontents'>
         <h1 id="history">History</h1>
+<h2 id="v4-0-4-august-3-2014">v4.0.4 August 3, 2014</h2>
+<ul>
+<li>Added the ability to turn off using domains by setting the new task option <code>domain</code> to <code>false</code> (defaults to <code>true</code>)</li>
+<li>Added the ability to turn off using <a href="https://github.com/bevry/ambi">ambi</a> by setting the new task option <code>ambi</code> to <code>false</code> (defaults to <code>true</code>)</li>
+</ul>
+<h2 id="v4-0-3-july-11-2014">v4.0.3 July 11, 2014</h2>
+<ul>
+<li>Use <code>setImmediate</code> instead of <code>nextTick</code> to avoid <code>(node) warning: Recursive process.nextTick detected. This will break in the next version of node. Please use setImmediate for recursive deferral.</code> errors</li>
+<li>Updated dependencies</li>
+</ul>
 <h2 id="v4-0-2-june-18-2014">v4.0.2 June 18, 2014</h2>
 <ul>
 <li>Added support for <code>done</code>, <code>whenDone</code>, <code>onceDone</code>, <code>once</code>, and <code>on</code> configuration options</li>
@@ -1069,10 +1079,10 @@
     </div>
     <div id='footer'>
   Generated on
-  Fri Jul 11 2014 04:14:19 GMT+1000 (EST)
+  Sun Aug 03 2014 15:19:08 GMT+1000 (EST)
   by
   <a href='https://github.com/gjtorikian/biscotto' title='TomDoc-CoffeeScript API documentation generator'>Biscotto</a>
-  v2.1.3
+  v2.2.1
   (Node.js v0.10.29).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts

@@ -1,5 +1,9 @@
 # History
 
+## v4.0.4 August 3, 2014
+- Added the ability to turn off using domains by setting the new task option `domain` to `false` (defaults to `true`)
+- Added the ability to turn off using [ambi](https://github.com/bevry/ambi) by setting the new task option `ambi` to `false` (defaults to `true`)
+
 ## v4.0.3 July 11, 2014
 - Use `setImmediate` instead of `nextTick` to avoid `(node) warning: Recursive process.nextTick detected. This will break in the next version of node. Please use setImmediate for recursive deferral.` errors
 - Updated dependencies
