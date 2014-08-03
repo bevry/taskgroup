@@ -1,5 +1,8 @@
 # History
 
+## v4.0.5 August 3, 2014
+- Changed an error output to be of error type
+
 ## v4.0.4 August 3, 2014
 - Added the ability to turn off using domains by setting the new task option `domain` to `false` (defaults to `true`)
 - Added the ability to turn off using [ambi](https://github.com/bevry/ambi) by setting the new task option `ambi` to `false` (defaults to `true`)

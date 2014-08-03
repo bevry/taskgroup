@@ -1183,8 +1183,9 @@ class TaskGroup extends Interface
 		# Mark that one less item is running
 		index = @itemsRunning.indexOf(item)
 		if index is -1
+			# this should never happen, but maybe it could, in which case we definitely want to know about it
 			@err ?= indexError = new Error("Could not find [#{item.getNames()}] in the running queue")
-			console.log(indexError.message)
+			console.error(indexError.stack or indexError)
 		else
 			@itemsRunning = @itemsRunning.slice(0, index).concat(@itemsRunning.slice(index+1))
 

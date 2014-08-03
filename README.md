@@ -38,7 +38,7 @@ Group together synchronous and asynchronous tasks and execute them with support 
 ### [Browserify](http://browserify.org/)
 - Use: `require('taskgroup')`
 - Install: `npm install --save taskgroup`
-- CDN URL: `//wzrd.in/bundle/taskgroup@4.0.4`
+- CDN URL: `//wzrd.in/bundle/taskgroup@4.0.5`
 
 ### [Ender](http://ender.jit.su/)
 - Use: `require('taskgroup')`
