@@ -1,5 +1,22 @@
 # History
 
+## v4.1.0 February 2, 2015
+- This release fixes the errors in completion callbacks being swallowed/lost
+	- Thanks to [kksharma1618](https://github.com/kksharma1618) for [issue #17](https://github.com/bevry/taskgroup/issues/17)
+- The following changes have been made
+	- We no longer use `try...catch` at all, if you want error catching in your task, you must not disable domains (they are enabled by default) - [why?](https://github.com/bevry/taskgroup/issues/17#issuecomment-72383610)
+	- We now force exit the domain when the task's method calls its completion callback
+	- Domains now wrap only the firing of the task's method, rather than the preparation too as before
+	- Removed superflous check to ensure a task has a method before execution
+	- Ensured the actual check to ensure a task has a method before execution also checks if the method is actually a function (via checking for `.bind`) as the superflous check did
+- This **could** introduce the following issues in the following cases:
+	- You may get errors that were suppressed before now showing themselves, this is good, but it may cause unexpected things to break loudly that were breaking silently before
+	- If you have domains disabled and an error is thrown, you will get a different flow of logic than before as the error will be caught in your code, not TaskGroup's
+	- The domain's flow has improved, but this may cause a different flow than you were expecting previously
+- This **will** introduce the following issues in the following cases:
+ 	- If you are still on Node v0.8, synchronous errors and perhaps asynchronous errors thrown within your task method will no longer be caught by TaskGroup (due to Node 0.8's crippled domain functionality) and instead will need to be caught by your code either via preferably sent to the task method's completion callback rather than thrown, or via your own try...catch. But please upgrade to Node 0.10 or higher.
+- In other words, this release is the most stable yet, but do run your tests (you should always do this)
+
 ## v4.0.5 August 3, 2014
 - Changed an error output to be of error type
 

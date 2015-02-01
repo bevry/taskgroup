@@ -24,8 +24,6 @@
       </ul>
     </nav>
     <div id='search'>
-      <a id='class_list_link' href='class_list.html'>Classes</a>
-      <a id='method_list_link' href='method_list.html'>Methods</a>
       <a id='extra_list_link' href='extra_list.html'>Extras</a>
     </div>
   </div>
@@ -115,6 +113,32 @@
       </nav>
       <div id='filecontents'>
         <h1 id="history">History</h1>
+<h2 id="v4-1-0-february-2-2015">v4.1.0 February 2, 2015</h2>
+<ul>
+<li>This release fixes the errors in completion callbacks being swallowed/lost<ul>
+<li>Thanks to <a href="https://github.com/kksharma1618">kksharma1618</a> for <a href="https://github.com/bevry/taskgroup/issues/17">issue #17</a></li>
+</ul>
+</li>
+<li>The following changes have been made<ul>
+<li>We no longer use <code>try...catch</code> at all, if you want error catching in your task, you must not disable domains (they are enabled by default) - <a href="https://github.com/bevry/taskgroup/issues/17#issuecomment-72383610">why?</a></li>
+<li>We now force exit the domain when the task&#39;s method calls its completion callback</li>
+<li>Domains now wrap only the firing of the task&#39;s method, rather than the preparation too as before</li>
+<li>Removed superflous check to ensure a task has a method before execution</li>
+<li>Ensured the actual check to ensure a task has a method before execution also checks if the method is actually a function (via checking for <code>.bind</code>) as the superflous check did</li>
+</ul>
+</li>
+<li>This <strong>could</strong> introduce the following issues in the following cases:<ul>
+<li>You may get errors that were suppressed before now showing themselves, this is good, but it may cause unexpected things to break loudly that were breaking silently before</li>
+<li>If you have domains disabled and an error is thrown, you will get a different flow of logic than before as the error will be caught in your code, not TaskGroup&#39;s</li>
+<li>The domain&#39;s flow has improved, but this may cause a different flow than you were expecting previously</li>
+</ul>
+</li>
+<li>This <strong>will</strong> introduce the following issues in the following cases:<ul>
+<li>If you are still on Node v0.8, synchronous errors and perhaps asynchronous errors thrown within your task method will no longer be caught by TaskGroup (due to Node 0.8&#39;s crippled domain functionality) and instead will need to be caught by your code either via preferably sent to the task method&#39;s completion callback rather than thrown, or via your own try...catch. But please upgrade to Node 0.10 or higher.</li>
+</ul>
+</li>
+<li>In other words, this release is the most stable yet, but do run your tests (you should always do this)</li>
+</ul>
 <h2 id="v4-0-5-august-3-2014">v4.0.5 August 3, 2014</h2>
 <ul>
 <li>Changed an error output to be of error type</li>
@@ -1083,11 +1107,11 @@
     </div>
     <div id='footer'>
   Generated on
-  Sun Aug 03 2014 17:01:16 GMT+1000 (EST)
+  Mon Feb 02 2015 04:55:06 GMT+0800 (AWST)
   by
   <a href='https://github.com/gjtorikian/biscotto' title='TomDoc-CoffeeScript API documentation generator'>Biscotto</a>
-  v2.2.1
-  (Node.js v0.10.29).
+  v2.3.1
+  (Node.js v0.10.35).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
 </div>
