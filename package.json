@@ -59,7 +59,8 @@
     "joe-reporter-console": "~1.2.1",
     "chai": "~1.10.0",
     "projectz": "~0.3.17",
-    "biscotto": "^2.3.1"
+    "biscotto": "^2.3.1",
+    "safeps": "^2.2.12"
   },
   "directories": {
     "lib": "./out/lib"

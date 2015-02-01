@@ -423,51 +423,54 @@ class Task extends Interface
 		me = @
 
 		# Check that we have a method to fire
-		if me.config.method? is false
+		if me.config.method?.bind? is false
 			err = new Error """
 				The task [#{me.getNames()}] failed to run as no method was defined for it.
 				"""
 			me.emit('error', err)
 			return @
 
-		# Add our completion callback to our specified arguments to send over to the method
-		args = (@config.args or []).concat([@exit.bind(@)])
-
 		# Prepare the task domain if it doesn't already exist
 		if @config.domain isnt false and @taskDomain? is false and domain?.create?
+			# Setup the domain
 			@taskDomain = domain.create()
 			@taskDomain.on('error', @exit.bind(@))
 
-		# Listen for uncaught errors
+			# Make sure if the method supports a callback, we prevent the domain from entering our task
+			# RE: https://github.com/bevry/taskgroup/issues/17
+			complete = (args...) ->
+				me.taskDomain?.exit()
+				me.exit(args...)
+		else
+			complete = @exit.bind(@)
+
+		# Add our completion callback to the arguments that the method will receive
+		args = (@config.args or []).concat([complete])
+
+		# Our fire function that will be wrapped in a domain or executed directly
 		fire = ->
-			try
-				if me.config.method?.bind
-					methodToFire = me.config.method.bind(me)
-					me.emit(me.status = 'running')
+			# Bind the method to ourself
+			methodToFire = me.config.method.bind(me)
 
-					# Setup timeout if appropriate
-					if me.config.timeout
-						me.timeout = wait me.config.timeout, ->
-							if me.isComplete() is false
-								err = new Error """
-									The task [#{me.getNames()}] has timed out.
-									"""
-								me.exit(err)
+			# Execute with ambi if appropriate
+			if me.config.ambi isnt false
+				ambi(methodToFire, args...)
 
-					# Execute with ambi if appropriate
-					if me.config.ambi isnt false
-						ambi(methodToFire, args...)
+			# Otherwise execute directly if appropriate
+			else
+				methodToFire(args...)
 
-					# Otherwise execute directly if appropriate
-					else
-						methodToFire(args...)
-				else
+		# Setup timeout if appropriate
+		if me.config.timeout
+			me.timeout = wait me.config.timeout, ->
+				if me.isComplete() is false
 					err = new Error """
-						The task [#{me.getNames()}] was fired but has no method to fire
+						The task [#{me.getNames()}] has timed out.
 						"""
-					throw err
-			catch err
-				me.exit(err)
+					me.exit(err)
+
+		# Notify that we are now running
+		me.emit(me.status = 'running')
 
 		# Wrap execution in a domain if appropriate
 		if @taskDomain?
