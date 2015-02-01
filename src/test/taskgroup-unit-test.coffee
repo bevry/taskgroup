@@ -259,6 +259,27 @@ joe.describe 'task', (describe,it) ->
 			# Run
 			task.run()
 
+		# https://github.com/bevry/taskgroup/issues/17
+		it 'it should not catch errors within the completion callback', (done) ->
+			backup = null
+			d = require('domain').create()
+			d.on 'error', (err) ->
+				clearTimeout(backup)
+				expectError(err, 'goodbye world')
+				done()
+			d.run ->
+				myTask = new Task (complete) ->
+					complete()
+
+				myTask.done (err) ->
+					throw new Error('goodbye world')
+
+				myTask.run()
+
+				backup = wait 1000, ->
+					throw new Error("world still exists! this shouldn't have happend")
+
+
 	# Basic
 	describe "arguments", (suite,it) ->
 		# Sync
