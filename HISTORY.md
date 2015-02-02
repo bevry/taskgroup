@@ -21,6 +21,7 @@
 	- The domain's flow has improved, but this may cause a different flow than you were expecting previously
 - This **will** introduce the following issues in the following cases:
  	- If you are still on Node v0.8, synchronous errors and perhaps asynchronous errors thrown within your task method will no longer be caught by TaskGroup (due to Node 0.8's crippled domain functionality) and instead will need to be caught by your code either via preferably sent to the task method's completion callback rather than thrown, or via your own try...catch. But please upgrade to Node 0.10 or higher.
+	- If you are running TaskGroup in a web browser, you will need to catch errors manually or utilise a domain shim (browserify has one by default) - [why?](https://github.com/bevry/taskgroup/issues/18)
 - In other words, this release is the most stable yet, but do run your tests (you should always do this)
 
 ## v4.0.5 August 3, 2014
