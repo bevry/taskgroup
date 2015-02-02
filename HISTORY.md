@@ -1,5 +1,11 @@
 # History
 
+## v4.2.0 February 2, 2015
+- Reintroduced `try...catch` for Node v0.8 and browser environments with a workaround to prevent error suppression
+	- Thanks to [kksharma1618](https://github.com/kksharma1618) for [issue #17](https://github.com/bevry/taskgroup/issues/17)
+	- Closes [issue #18](https://github.com/bevry/taskgroup/issues/17)
+- You can now ignore all the warnings from the v4.1.0 changelog as the behaviour is more or less the same as v4.0.5 but with added improvements
+
 ## v4.1.0 February 2, 2015
 - This release fixes the errors in completion callbacks being swallowed/lost
 	- Thanks to [kksharma1618](https://github.com/kksharma1618) for [issue #17](https://github.com/bevry/taskgroup/issues/17)

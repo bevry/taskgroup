@@ -142,11 +142,6 @@ joe.describe 'task', (describe,it) ->
 				done()
 
 		it 'should detect sync throw error on synchronous task', (done) ->
-			# Check node version
-			if process.versions.node.substr(0,3) is '0.8'
-				console.log 'skip this test on node 0.8 because domains behave differently'
-				return done()
-
 			# Specify how many special checks we are expecting
 			checks = 0
 			neverReached = false
@@ -266,15 +261,10 @@ joe.describe 'task', (describe,it) ->
 
 		# https://github.com/bevry/taskgroup/issues/17
 		it 'it should not catch errors within the completion callback: issue 17', (done) ->
-			# Check node version
-			if process.versions.node.substr(0,3) is '0.8'
-				console.log 'skip this test on node 0.8 because domains behave differently'
-				return done()
-
 			# Run our test file
 			require('safeps').exec 'node issue17.js', {cwd:__dirname}, (err, stdout, stderr) ->
 				# Check if we got the error we expected
-				if stderr.indexOf("throw new Error('goodbye world');") isnt -1
+				if stderr.indexOf("Error: goodbye world\n    at Task.") isnt -1
 					done()
 				else
 					err = new Error('Issue 17 check did not execute correctly')

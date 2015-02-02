@@ -126,61 +126,63 @@
 Available configuration is documented in <a href='../classes/Task.html#setConfig-instance'>::setConfig</a>.
 
 Available events:
-- `started()` - emitted when we start execution
-- `running()` - emitted when the method starts execution
-- `failed(err)` - emitted when execution exited with a failure
-- `passed()` - emitted when execution exited with a success
-- `completed(err, args...)` - emitted when execution exited, `args` are the result arguments from the method
-- `error(err)` - emtited if an unexpected error occurs without ourself
-- `done(err, args...)` - emitted when either execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)
+
+ - `started()` - emitted when we start execution
+ - `running()` - emitted when the method starts execution
+ - `failed(err)` - emitted when execution exited with a failure
+ - `passed()` - emitted when execution exited with a success
+ - `completed(err, args...)` - emitted when execution exited, `args` are the result arguments from the method
+ - `error(err)` - emtited if an unexpected error occurs without ourself
+ - `done(err, args...)` - emitted when either execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)
 
 Available internal statuses:
-- `null` - execution has not yet started
-- `'started'` - execution has begun
-- `'running'` - execution of our method has begun
-- `'failed'` - execution of our method has failed
-- `'passed'` - execution of our method has succeeded
-- `'destroyed'` - we've been destroyed and can no longer execute
+
+ - `null` - execution has not yet started
+ - `'started'` - execution has begun
+ - `'running'` - execution of our method has begun
+ - `'failed'` - execution of our method has failed
+  - `'passed'` - execution of our method has succeeded
+ - `'destroyed'` - we've been destroyed and can no longer execute
 
 Examples
 
- task = require('taskgroup').Task.create('my synchronous task', function(){
+ task = require('taskgroup').Task.create('my synchronous task', ->
    return 5
- }).done(console.log)  // [null, 5]
+ ).done(console.log)  # null, 5]
 
- task = require('taskgroup').Task.create('my asynchronous task', function(complete){
+ task = require('taskgroup').Task.create('my asynchronous task', (complete) ->
    complete(null, 5)
- }).done(console.log)  // [null, 5]
+ ).done(console.log)  # [null, 5]
 
- task = require('taskgroup').Task.create('my task that errors', function(){
-   var err = new Error('deliberate error')
-   return err;  // if asynchronous, can also do: complete(err)
+ task = require('taskgroup').Task.create('my task that errors', ->
+   err = new Error('deliberate error')
+   return err  // if asynchronous, can also do: complete(err)
    // thrown and uncaught errors are also caught thanks to domains, but that should be avoided
    // as it would put your app in an unknown state
- }).done(console.log)  // [Error('deliberator error')] 
+ ).done(console.log)  # [Error('deliberator error')] 
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
       
     </h4>
-    <pre><code class='coffee'>task = require(&#39;taskgroup&#39;).Task.create(&#39;my synchronous task&#39;, function(){
+    <pre><code class='coffee'>task = require(&#39;taskgroup&#39;).Task.create(&#39;my synchronous task&#39;, -&gt;
   return 5
-}).done(console.log)  &#47;&#47; [null, 5]</code></pre>
+).done(console.log)  # null, 5]</code></pre>
     <h4>
       
     </h4>
-    <pre><code class='coffee'>task = require(&#39;taskgroup&#39;).Task.create(&#39;my asynchronous task&#39;, function(complete){
+    <pre><code class='coffee'>task = require(&#39;taskgroup&#39;).Task.create(&#39;my asynchronous task&#39;, (complete) -&gt;
   complete(null, 5)
-}).done(console.log)  &#47;&#47; [null, 5]</code></pre>
+).done(console.log)  # [null, 5]</code></pre>
     <h4>
       
     </h4>
-    <pre><code class='coffee'>task = require(&#39;taskgroup&#39;).Task.create(&#39;my task that errors&#39;, function(){
-  var err = new Error(&#39;deliberate error&#39;)
-  return err;  &#47;&#47; if asynchronous, can also do: complete(err)
+    <pre><code class='coffee'>task = require(&#39;taskgroup&#39;).Task.create(&#39;my task that errors&#39;, -&gt;
+  err = new Error(&#39;deliberate error&#39;)
+  return err  &#47;&#47; if asynchronous, can also do: complete(err)
   &#47;&#47; thrown and uncaught errors are also caught thanks to domains, but that should be avoided
   &#47;&#47; as it would put your app in an unknown state
-}).done(console.log)  &#47;&#47; [Error(&#39;deliberator error&#39;)] </code></pre>
+).done(console.log)  # [Error(&#39;deliberator error&#39;)] </code></pre>
   </div>
 </div>
 <div class='tags'>
@@ -332,13 +334,13 @@ Examples
     <p class='signature' id='create-class'>
       Task .<strong>create</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v4.0.4
-/src&#47;lib&#47;taskgroup.coffee#L166'>Source</a>
+&#47;blob&#47;v4.1.0
+/src&#47;lib&#47;taskgroup.coffee#L168'>Source</a>
     </p>
     <div class='docstring'>
    Public: Creates a new <a href='../classes/Task.html'>Task</a> instance.
 
-args - The {Arguments} to forwarded along to the <a href='../classes/Task.html#constructor-instance'>::constructor</a>.
+args - The Arguments to forwarded along to the <a href='../classes/Task.html#constructor-instance'>::constructor</a>.
 
 Returns the new <a href='../classes/Task.html'>Task</a> instance. 
 </div>
@@ -346,10 +348,9 @@ Returns the new <a href='../classes/Task.html'>Task</a> instance.
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='type'>(Arguments)</span>
       <span class='name'>args</span>
       &mdash;
-      <span class='desc'>The {Arguments} to forwarded along to the <a href='../classes/Task.html#constructor-instance'>::constructor</a>.</span>
+      <span class='desc'>The Arguments to forwarded along to the <a href='../classes/Task.html#constructor-instance'>::constructor</a>.</span>
     </li>
   </ul>
   <h3>Returns:</h3>
@@ -367,8 +368,8 @@ Returns the new <a href='../classes/Task.html'>Task</a> instance.
     <p class='signature' id='isTask-class'>
       Boolean .<strong>isTask</strong>(item)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v4.0.4
-/src&#47;lib&#47;taskgroup.coffee#L157'>Source</a>
+&#47;blob&#47;v4.1.0
+/src&#47;lib&#47;taskgroup.coffee#L159'>Source</a>
     </p>
     <div class='docstring'>
    Public: A helper method to check if the passed argument is an instanceof a <a href='../classes/Task.html'>Task</a>.
@@ -405,8 +406,8 @@ Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference
     <p class='signature' id='constructor-instance'>
       ::<strong>constructor</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v4.0.4
-/src&#47;lib&#47;taskgroup.coffee#L188'>Source</a>
+&#47;blob&#47;v4.1.0
+/src&#47;lib&#47;taskgroup.coffee#L190'>Source</a>
     </p>
     <div class='docstring'>
   Public: Initialize our new <a href='../classes/Task.html'>Task</a> instance. Forwards arguments onto <a href='../classes/Task.html#setConfig-instance'>::setConfig</a>. 
@@ -421,8 +422,8 @@ Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference
     <p class='signature' id='destroy-instance'>
       ::<strong>destroy</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v4.0.4
-/src&#47;lib&#47;taskgroup.coffee#L354'>Source</a>
+&#47;blob&#47;v4.1.0
+/src&#47;lib&#47;taskgroup.coffee#L356'>Source</a>
     </p>
     <div class='docstring'>
   Public: Destroy the task and prevent it from executing ever again. 
@@ -434,8 +435,8 @@ Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference
     <p class='signature' id='hasExited-instance'>
       Boolean ::<strong>hasExited</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v4.0.4
-/src&#47;lib&#47;taskgroup.coffee#L268'>Source</a>
+&#47;blob&#47;v4.1.0
+/src&#47;lib&#47;taskgroup.coffee#L270'>Source</a>
     </p>
     <div class='docstring'>
    Public: Have we finished its execution yet?
@@ -458,8 +459,8 @@ Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference
     <p class='signature' id='hasStarted-instance'>
       Boolean ::<strong>hasStarted</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v4.0.4
-/src&#47;lib&#47;taskgroup.coffee#L262'>Source</a>
+&#47;blob&#47;v4.1.0
+/src&#47;lib&#47;taskgroup.coffee#L264'>Source</a>
     </p>
     <div class='docstring'>
    Public: Have we started execution yet?
@@ -482,8 +483,8 @@ Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference
     <p class='signature' id='isComplete-instance'>
       Boolean ::<strong>isComplete</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v4.0.4
-/src&#47;lib&#47;taskgroup.coffee#L280'>Source</a>
+&#47;blob&#47;v4.1.0
+/src&#47;lib&#47;taskgroup.coffee#L282'>Source</a>
     </p>
     <div class='docstring'>
    Public: Have we completed its execution yet?
@@ -506,8 +507,8 @@ Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference
     <p class='signature' id='isDestroyed-instance'>
       Boolean ::<strong>isDestroyed</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v4.0.4
-/src&#47;lib&#47;taskgroup.coffee#L274'>Source</a>
+&#47;blob&#47;v4.1.0
+/src&#47;lib&#47;taskgroup.coffee#L276'>Source</a>
     </p>
     <div class='docstring'>
    Public: Have we been destroyed?
@@ -530,8 +531,8 @@ Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference
     <p class='signature' id='onceDone-instance'>
       ::<strong>onceDone</strong>(listener)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v4.0.4
-/src&#47;lib&#47;taskgroup.coffee#L338'>Source</a>
+&#47;blob&#47;v4.1.0
+/src&#47;lib&#47;taskgroup.coffee#L340'>Source</a>
     </p>
     <div class='docstring'>
    Public: Once Done Promise.
@@ -555,8 +556,8 @@ listener - The <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Refe
     <p class='signature' id='run-instance'>
       ::<strong>run</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v4.0.4
-/src&#47;lib&#47;taskgroup.coffee#L424'>Source</a>
+&#47;blob&#47;v4.1.0
+/src&#47;lib&#47;taskgroup.coffee#L438'>Source</a>
     </p>
     <div class='docstring'>
    Public: Start the execution of the task.
@@ -570,8 +571,8 @@ Will emit an `error` event if the task has already started before.
     <p class='signature' id='setConfig-instance'>
       ::<strong>setConfig</strong>(opts = {})
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v4.0.4
-/src&#47;lib&#47;taskgroup.coffee#L221'>Source</a>
+&#47;blob&#47;v4.1.0
+/src&#47;lib&#47;taskgroup.coffee#L223'>Source</a>
     </p>
     <div class='docstring'>
    Public: Set the configuration for our instance.
@@ -580,18 +581,18 @@ Despite accepting an <a href='https://developer.mozilla.org/en-US/docs/JavaScrip
 When using an array, a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/String'>String</a> becomes the :name, a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> becomes the :method, and an <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> becomes the :config
 
 config - Our configuration <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> can contain the following fields:
- :name - (default: null) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/String'>String</a> for what we would like our name to be, useful for debugging.
- :done - (default: null) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> that we would like passed to <a href='../classes/Task.html#onceDone-instance'>::onceDone</a> (aliases are :onceDone, and :next)
- :whenDone - (default: null) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> that we would like passed to <a href='../classes/Task.html#whenDone-instance'>::whenDone</a>
- :on - (default: null) An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> of (eventName => listener) that we would like bound via {EventEmitter:on}.
- :once - (default: null) An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> of (eventName => listener) that we would like bound via {EventEmitter:once}.
- :method - (default: null) The <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> that we would like to execute within our task.
- :parent - (default: null) A parent <a href='../classes/TaskGroup.html'>TaskGroup</a> that we may be attached to.
- :onError - (default: 'exit') A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/String'>String</a> that is either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.
- :args - (default: null) An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of arguments that we would like to forward onto our method when we execute it.
- :timeout - (default: null) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number'>Number</a> of millesconds that we would like to wait before timing out the method.
- :ambi - (default: true) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> for whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately
- :domain - (default: true) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> for whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution) 
+  :name - (default: null) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/String'>String</a> for what we would like our name to be, useful for debugging.
+  :done - (default: null) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> that we would like passed to <a href='../classes/Task.html#onceDone-instance'>::onceDone</a> (aliases are :onceDone, and :next)
+  :whenDone - (default: null) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> that we would like passed to <a href='../classes/Task.html#whenDone-instance'>::whenDone</a>
+  :on - (default: null) An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> of (eventName => listener) that we would like bound via EventEmitter.on.
+  :once - (default: null) An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> of (eventName => listener) that we would like bound via EventEmitter.once.
+  :method - (default: null) The <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Function'>Function</a> that we would like to execute within our task.
+  :parent - (default: null) A parent <a href='../classes/TaskGroup.html'>TaskGroup</a> that we may be attached to.
+  :onError - (default: 'exit') A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/String'>String</a> that is either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.
+  :args - (default: null) An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of arguments that we would like to forward onto our method when we execute it.
+  :timeout - (default: null) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number'>Number</a> of millesconds that we would like to wait before timing out the method.
+  :ambi - (default: true) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> for whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately
+  :domain - (default: true) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> for whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution) 
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -625,13 +626,13 @@ config - Our configuration <a href='https://developer.mozilla.org/en-US/docs/Jav
         <span class='type'>(Object)</span>
         <span class='name'>on</span>
         &mdash;
-        <span class='desc'>(default: null) An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> of (eventName =&gt; listener) that we would like bound via {EventEmitter:on}.</span>
+        <span class='desc'>(default: null) An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> of (eventName =&gt; listener) that we would like bound via EventEmitter.on.</span>
       </li>
       <li>
         <span class='type'>(Object)</span>
         <span class='name'>once</span>
         &mdash;
-        <span class='desc'>(default: null) An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> of (eventName =&gt; listener) that we would like bound via {EventEmitter:once}.</span>
+        <span class='desc'>(default: null) An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object'>Object</a> of (eventName =&gt; listener) that we would like bound via EventEmitter.once.</span>
       </li>
       <li>
         <span class='type'>(Function)</span>
@@ -683,8 +684,8 @@ config - Our configuration <a href='https://developer.mozilla.org/en-US/docs/Jav
     <p class='signature' id='whenDone-instance'>
       ::<strong>whenDone</strong>(listener)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
-&#47;blob&#47;v4.0.4
-/src&#47;lib&#47;taskgroup.coffee#L326'>Source</a>
+&#47;blob&#47;v4.1.0
+/src&#47;lib&#47;taskgroup.coffee#L328'>Source</a>
     </p>
     <div class='docstring'>
    Public: When Done Promise.
@@ -708,11 +709,11 @@ listener - The <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Refe
     </div>
     <div id='footer'>
   Generated on
-  Sun Aug 03 2014 17:01:16 GMT+1000 (EST)
+  Mon Feb 02 2015 10:40:24 GMT+0800 (AWST)
   by
   <a href='https://github.com/gjtorikian/biscotto' title='TomDoc-CoffeeScript API documentation generator'>Biscotto</a>
-  v2.2.1
-  (Node.js v0.10.29).
+  v2.3.1
+  (Node.js v0.10.35).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
 </div>

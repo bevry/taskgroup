@@ -126,38 +126,40 @@ class Interface extends EventEmitter
 # Available configuration is documented in {::setConfig}.
 #
 # Available events:
-# - `started()` - emitted when we start execution
-# - `running()` - emitted when the method starts execution
-# - `failed(err)` - emitted when execution exited with a failure
-# - `passed()` - emitted when execution exited with a success
-# - `completed(err, args...)` - emitted when execution exited, `args` are the result arguments from the method
-# - `error(err)` - emtited if an unexpected error occurs without ourself
-# - `done(err, args...)` - emitted when either execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)
+#
+#  - `started()` - emitted when we start execution
+#  - `running()` - emitted when the method starts execution
+#  - `failed(err)` - emitted when execution exited with a failure
+#  - `passed()` - emitted when execution exited with a success
+#  - `completed(err, args...)` - emitted when execution exited, `args` are the result arguments from the method
+#  - `error(err)` - emtited if an unexpected error occurs without ourself
+#  - `done(err, args...)` - emitted when either execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)
 #
 # Available internal statuses:
-# - `null` - execution has not yet started
-# - `'started'` - execution has begun
-# - `'running'` - execution of our method has begun
-# - `'failed'` - execution of our method has failed
-# - `'passed'` - execution of our method has succeeded
-# - `'destroyed'` - we've been destroyed and can no longer execute
+#
+#  - `null` - execution has not yet started
+#  - `'started'` - execution has begun
+#  - `'running'` - execution of our method has begun
+#  - `'failed'` - execution of our method has failed
+#   - `'passed'` - execution of our method has succeeded
+#  - `'destroyed'` - we've been destroyed and can no longer execute
 #
 # Examples
 #
-#  task = require('taskgroup').Task.create('my synchronous task', function(){
+#  task = require('taskgroup').Task.create('my synchronous task', ->
 #    return 5
-#  }).done(console.log)  // [null, 5]
+#  ).done(console.log)  # null, 5]
 #
-#  task = require('taskgroup').Task.create('my asynchronous task', function(complete){
+#  task = require('taskgroup').Task.create('my asynchronous task', (complete) ->
 #    complete(null, 5)
-#  }).done(console.log)  // [null, 5]
+#  ).done(console.log)  # [null, 5]
 #
-#  task = require('taskgroup').Task.create('my task that errors', function(){
-#    var err = new Error('deliberate error')
-#    return err;  // if asynchronous, can also do: complete(err)
+#  task = require('taskgroup').Task.create('my task that errors', ->
+#    err = new Error('deliberate error')
+#    return err  // if asynchronous, can also do: complete(err)
 #    // thrown and uncaught errors are also caught thanks to domains, but that should be avoided
 #    // as it would put your app in an unknown state
-#  }).done(console.log)  // [Error('deliberator error')]
+#  ).done(console.log)  # [Error('deliberator error')]
 class Task extends Interface
 	# Internal: The type of our class for the purpose of duck typing
 	# which is needed when working with node virtual machines
@@ -180,7 +182,7 @@ class Task extends Interface
 
 	# Public: Creates a new {Task} instance.
 	#
-	# args - The {Arguments} to forwarded along to the {::constructor}.
+	# args - The Arguments to forwarded along to the {::constructor}.
 	#
 	# Returns the new {Task} instance.
 	@create: (args...) -> return new @(args...)
@@ -232,8 +234,8 @@ class Task extends Interface
 	#   :name - (default: null) A {String} for what we would like our name to be, useful for debugging.
 	#   :done - (default: null) A {Function} that we would like passed to {::onceDone} (aliases are :onceDone, and :next)
 	#   :whenDone - (default: null) A {Function} that we would like passed to {::whenDone}
-	#   :on - (default: null) An {Object} of (eventName => listener) that we would like bound via {EventEmitter:on}.
-	#   :once - (default: null) An {Object} of (eventName => listener) that we would like bound via {EventEmitter:once}.
+	#   :on - (default: null) An {Object} of (eventName => listener) that we would like bound via EventEmitter.on.
+	#   :once - (default: null) An {Object} of (eventName => listener) that we would like bound via EventEmitter.once.
 	#   :method - (default: null) The {Function} that we would like to execute within our task.
 	#   :parent - (default: null) A parent {TaskGroup} that we may be attached to.
 	#   :onError - (default: 'exit') A {String} that is either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.
@@ -421,6 +423,7 @@ class Task extends Interface
 	fire: ->
 		# Prepare
 		me = @
+		args = (@config.args or []).slice()
 
 		# Check that we have a method to fire
 		if me.config.method?.bind? is false
@@ -440,15 +443,12 @@ class Task extends Interface
 			# RE: https://github.com/bevry/taskgroup/issues/17
 			complete = (args...) ->
 				me.taskDomain?.exit()
-				me.exit(args...)
+				return me.exit(args...)
 		else
 			complete = @exit.bind(@)
 
-		# Add our completion callback to the arguments that the method will receive
-		args = (@config.args or []).concat([complete])
-
 		# Our fire function that will be wrapped in a domain or executed directly
-		fire = ->
+		fireMethod = ->
 			# Bind the method to ourself
 			methodToFire = me.config.method.bind(me)
 
@@ -472,13 +472,30 @@ class Task extends Interface
 		# Notify that we are now running
 		me.emit(me.status = 'running')
 
-		# Wrap execution in a domain if appropriate
-		if @taskDomain?
-			@taskDomain.run(fire)
+		# Check for crippled domain and use try...catch instead
+		if process.browser or process.versions.node.substr(0,3) is '0.8'
+			# Use the next tick workaround to escape the try...catch scope
+			# Which would otherwise catch errors inside our code when it shouldn't therefore suppressing errors
+			completeOriginal = complete
+			complete = (args...) ->
+				process.nextTick -> completeOriginal(args...)
+				return me
 
-		# Otherwise execute directly if appropriate
+			# Add the competion callback to the arguments our method will receive
+			args.push(complete)
+
+			# Wrap in a try...catch to at least provide some protection
+			try
+				# Fire the method within the domain if desired, otherwise execute directly
+				if @taskDomain? then @taskDomain.run(fireMethod) else fireMethod()
+			catch err
+				me.exit(err)
 		else
-			fire()
+			# Add the competion callback to the arguments our method will receive
+			args.push(complete)
+
+			# Fire the method within the domain if desired, otherwise execute directly
+			if @taskDomain? then @taskDomain.run(fireMethod) else fireMethod()
 
 		# Chain
 		@
@@ -557,7 +574,7 @@ class TaskGroup extends Interface
 
 	# Public: Creates a new {TaskGroup} instance.
 	#
-	# args - The {Arguments} to be forwarded along to the {::constructor}.
+	# args - The Arguments to be forwarded along to the {::constructor}.
 	#
 	# Returns the new {TaskGroup} instance.
 	@create: (args...) -> return new @(args...)
@@ -571,7 +588,7 @@ class TaskGroup extends Interface
 	# Internal: An {Array} of the items that have completed
 	itemsCompleted: null
 
-	# Internal: An {Array} of the result {Arguments} for each completed item when their :includeInResults configuration option is not `false`
+	# Internal: An {Array} of the result Arguments for each completed item when their :includeInResults configuration option is not `false`
 	results: null
 
 	# Internal: An {Error} object if execution has failed at some point
@@ -586,7 +603,7 @@ class TaskGroup extends Interface
 	# Internal: The configuration for our {Task} instance. See {::setConfig} for available configuration.
 	config: null
 
-	# Public: Initialize our new {TaskGroup} instance. Forwards arguments onto {::setConfig}.
+	# Public: Initialize our new {TaskGroup} instance. Forwards Arguments onto {::setConfig}.
 	constructor: (args...) ->
 		# Init
 		me = @
@@ -641,8 +658,8 @@ class TaskGroup extends Interface
 	#   :name - (default: null) A {String} for what we would like our name to be, useful for debugging.
 	#   :done - (default: null) A {Function} that we would like passed to {::onceDone} (aliases are :onceDone, and :next)
 	#   :whenDone - (default: null) A {Function} that we would like passed to {::whenDone}
-	#   :on - (default: null) An {Object} of (eventName => listener) that we would like bound via {EventEmitter:on}.
-	#   :once - (default: null) An {Object} of (eventName => listener) that we would like bound via {EventEmitter:once}.	#   :method - (default: null) A {Function} that we would like to use to created nested groups and tasks using an inline style.
+	#   :on - (default: null) An {Object} of (eventName => listener) that we would like bound via EventEmitter.on.
+	#   :once - (default: null) An {Object} of (eventName => listener) that we would like bound via EventEmitter.once.	#   :method - (default: null) A {Function} that we would like to use to created nested groups and tasks using an inline style.
 	#   :parent - (default: null) A parent {TaskGroup} that we may be attached to.
 	#   :onError - (default: 'exit') A {String} that is either `'exit'` or `'ignore'`, when `'ignore'` errors that occur within items will not halt execution and will not be reported in the completion callbacks `err` argument (but will still be in the `results` argument).
 	#   :concurrency - (default: 1) The {Number} of items that we would like to execute at the same time. Use `0` for unlimited. `1` accomplishes serial execution, everything else accomplishes parallel execution.
@@ -751,7 +768,7 @@ class TaskGroup extends Interface
 	# Internal: Add an item to ourself and configure it accordingly
 	#
 	# item - A {Task} or {TaskGroup} instance that we would like added to ourself
-	# args - Additional configuration {Arguments} to apply to each item
+	# args - Additional configuration Arguments to apply to each item
 	addItem: (item, args...) ->
 		# Prepare
 		me = @
@@ -822,7 +839,7 @@ class TaskGroup extends Interface
 	# Internal: Add items to ourself and configure them accordingly
 	#
 	# items - An {Array} of {Task} and/or {TaskGroup} instances to add to ourself
-	# args - Optional {Arguments} to configure each added item
+	# args - Optional Arguments to configure each added item
 	addItems: (items, args...) ->
 		items = [items]  unless Array.isArray(items)
 		return (@addItem(item, args...)  for item in items)
@@ -835,7 +852,7 @@ class TaskGroup extends Interface
 	#
 	# If the first argument is already a {Task} instance, then just update it's configuration with the remaning arguments.
 	#
-	# args - {Arguments} to use to configure the {Task} instance
+	# args - Arguments to use to configure the {Task} instance
 	#
 	# Returns the new {Task} instance
 	createTask: (args...) ->
@@ -853,7 +870,7 @@ class TaskGroup extends Interface
 
 	# Public: Add a {Task} with some configuration to ourself, create it if needed.
 	#
-	# args - {Arguments} to configure (and if needed, create) the task
+	# args - Arguments to configure (and if needed, create) the task
 	addTask: (args...) ->
 		task = @addItem @createTask args...
 
@@ -863,7 +880,7 @@ class TaskGroup extends Interface
 	# Public: Add {Task}s with some configuration to ourself, create it if needed.
 	#
 	# items - An {Array} of {Task} items to add to ourself
-	# args - Optional {Arguments} to configure each added {Task}
+	# args - Optional Arguments to configure each added {Task}
 	addTasks: (items, args...) ->
 		items = [items]  unless Array.isArray(items)
 		tasks = (@addTask(item, args...)  for item in items)
@@ -879,7 +896,7 @@ class TaskGroup extends Interface
 	#
 	# If the first argument is already a {TaskGroup} instance, then just update it's configuration with the remaning arguments.
 	#
-	# args - {Arguments} to use to configure the {TaskGroup} instance
+	# args - Arguments to use to configure the {TaskGroup} instance
 	#
 	# Returns the new {TaskGroup} instance
 	createGroup: (args...) ->
@@ -897,7 +914,7 @@ class TaskGroup extends Interface
 
 	# Public: Add a {TaskGroup} with some configuration to ourself, create it if needed.
 	#
-	# args - {Arguments} to configure (and if needed, create) the {TaskGroup}
+	# args - Arguments to configure (and if needed, create) the {TaskGroup}
 	addGroup: (args...) ->
 		group = @addItem @createGroup args...
 
@@ -907,7 +924,7 @@ class TaskGroup extends Interface
 	# Public: Add {TaskGroup}s with some configuration to ourself, create it if needed.
 	#
 	# items - An {Array} of {TaskGroup} items to add to ourself
-	# args - Optional {Arguments} to configure each added {TaskGroup}
+	# args - Optional Arguments to configure each added {TaskGroup}
 	addGroups: (items, args...) ->
 		items = [items]  unless Array.isArray(items)
 		groups = (@addGroup(item, args...)  for item in items)
