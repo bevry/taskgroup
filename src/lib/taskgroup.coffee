@@ -335,9 +335,15 @@ class Task extends Interface
 
 		# Error as we have already completed before
 		else if @config.onError isnt 'ignore'
+			stateNames = @getNames()
+			stateInformation = util.inspect(
+				error: @err?.stack?.toString?() or @err?.message or @err,
+				previousResult: @result,
+				currentArguments: args
+			)
 			err = new Error """
-				The task [#{@getNames()}] just completed, but it had already completed earlier, this is unexpected. State information is:
-				#{util.inspect({error:@err, previousResult:@result, currentArguments:args})}
+				The task [#{stateNames}] just completed, but it had already completed earlier, this is unexpected. State information is:
+				#{stateInformation}
 				"""
 			@emit('error', err)
 

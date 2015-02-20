@@ -115,6 +115,10 @@
       </nav>
       <div id='filecontents'>
         <h1 id="history">History</h1>
+<h2 id="v4-2-1-february-20-2015">v4.2.1 February 20, 2015</h2>
+<ul>
+<li>Output more information about errors when a task completes twice</li>
+</ul>
 <h2 id="v4-2-0-february-2-2015">v4.2.0 February 2, 2015</h2>
 <ul>
 <li>Reintroduced <code>try...catch</code> for Node v0.8 and browser environments with a workaround to prevent error suppression<ul>
@@ -145,7 +149,10 @@
 </ul>
 </li>
 <li>This <strong>will</strong> introduce the following issues in the following cases:<ul>
-<li>If you are still on Node v0.8, synchronous errors and perhaps asynchronous errors thrown within your task method will no longer be caught by TaskGroup (due to Node 0.8&#39;s crippled domain functionality) and instead will need to be caught by your code either via preferably sent to the task method&#39;s completion callback rather than thrown, or via your own try...catch. But please upgrade to Node 0.10 or higher.</li>
+<li>If you are still on Node v0.8, synchronous errors and perhaps asynchronous errors thrown within your task method will no longer be caught by TaskGroup (due to Node 0.8&#39;s crippled domain functionality) and instead will need to be caught by your code either via preferably sent to the task method&#39;s completion callback rather than thrown, or via your own try...catch. But please upgrade to Node 0.10 or higher.<ul>
+<li>If you are running TaskGroup in a web browser, you will need to catch errors manually or utilise a domain shim (browserify has one by default) - <a href="https://github.com/bevry/taskgroup/issues/18">why?</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li>In other words, this release is the most stable yet, but do run your tests (you should always do this)</li>
@@ -1118,11 +1125,11 @@
     </div>
     <div id='footer'>
   Generated on
-  Mon Feb 02 2015 10:40:24 GMT+0800 (AWST)
+  Fri Feb 20 2015 19:23:22 GMT+0800 (AWST)
   by
   <a href='https://github.com/gjtorikian/biscotto' title='TomDoc-CoffeeScript API documentation generator'>Biscotto</a>
   v2.3.1
-  (Node.js v0.10.35).
+  (Node.js v0.12.0).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
 </div>

@@ -1,5 +1,8 @@
 # History
 
+## v4.2.1 February 20, 2015
+- Output more information about errors when a task completes twice
+
 ## v4.2.0 February 2, 2015
 - Reintroduced `try...catch` for Node v0.8 and browser environments with a workaround to prevent error suppression
 	- Thanks to [kksharma1618](https://github.com/kksharma1618) for [issue #17](https://github.com/bevry/taskgroup/issues/17)
