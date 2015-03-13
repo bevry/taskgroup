@@ -41,7 +41,7 @@ Group together synchronous and asynchronous tasks and execute them with support 
 - Install: `npm install --save taskgroup`
 - CDN URL: `//wzrd.in/bundle/taskgroup@4.2.1`
 
-### [Ender](http://ender.jit.su/)
+### [Ender](http://enderjs.com)
 - Use: `require('taskgroup')`
 - Install: `ender add taskgroup`
 
@@ -111,10 +111,14 @@ These amazing people have contributed code to this project:
 
 ## License
 
-Licensed under the incredibly [permissive](http://en.wikipedia.org/wiki/Permissive_free_software_licence) [MIT license](http://creativecommons.org/licenses/MIT/)
+Unless stated otherwise all works are:
 
-Copyright &copy; 2013+ Bevry Pty Ltd <us@bevry.me> (http://bevry.me)
-<br/>Copyright &copy; 2011-2012 Benjamin Lupton <b@lupton.cc> (http://balupton.com)
+- Copyright &copy; 2013+ Bevry Pty Ltd <us@bevry.me> (http://bevry.me)
+- Copyright &copy; 2011+ Benjamin Lupton <b@lupton.cc> (http://balupton.com)
+
+and licensed under:
+
+- The incredibly [permissive](http://en.wikipedia.org/wiki/Permissive_free_software_licence) [MIT License](http://opensource.org/licenses/mit-license.php)
 
 <!-- /LICENSE -->
 

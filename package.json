@@ -28,7 +28,7 @@
     "batch",
     "concurrency"
   ],
-  "author": "2013+ Bevry Pty Ltd <us@bevry.me> (http://bevry.me), 2011-2012 Benjamin Lupton <b@lupton.cc> (http://balupton.com)",
+  "author": "2013+ Bevry Pty Ltd <us@bevry.me> (http://bevry.me), 2011+ Benjamin Lupton <b@lupton.cc> (http://balupton.com)",
   "maintainers": [
     "Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)"
   ],
@@ -50,15 +50,15 @@
     "node": ">=0.8"
   },
   "dependencies": {
-    "ambi": "~2.2.0",
-    "csextends": "~1.0.3"
+    "ambi": "^2.2.0",
+    "csextends": "^1.0.3"
   },
   "devDependencies": {
-    "coffee-script": "~1.9.0",
-    "joe": "~1.5.0",
-    "joe-reporter-console": "~1.2.1",
-    "chai": "~1.10.0",
-    "projectz": "~0.3.17",
+    "coffee-script": "^1.9.1",
+    "joe": "^1.6.0",
+    "joe-reporter-console": "^1.2.1",
+    "chai": "^2.1.1",
+    "projectz": "^0.5.0",
     "biscotto": "^2.3.1",
     "safeps": "^2.2.12"
   },
