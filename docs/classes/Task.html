@@ -335,7 +335,7 @@ Examples
       Task .<strong>create</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v4.2.1
-/src&#47;lib&#47;taskgroup.coffee#L168'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L175'>Source</a>
     </p>
     <div class='docstring'>
    Public: Creates a new <a href='../classes/Task.html'>Task</a> instance.
@@ -369,7 +369,7 @@ Returns the new <a href='../classes/Task.html'>Task</a> instance.
       Boolean .<strong>isTask</strong>(item)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v4.2.1
-/src&#47;lib&#47;taskgroup.coffee#L159'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L166'>Source</a>
     </p>
     <div class='docstring'>
    Public: A helper method to check if the passed argument is an instanceof a <a href='../classes/Task.html'>Task</a>.
@@ -407,7 +407,7 @@ Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference
       ::<strong>constructor</strong>(args...)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v4.2.1
-/src&#47;lib&#47;taskgroup.coffee#L190'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L197'>Source</a>
     </p>
     <div class='docstring'>
   Public: Initialize our new <a href='../classes/Task.html'>Task</a> instance. Forwards arguments onto <a href='../classes/Task.html#setConfig-instance'>::setConfig</a>. 
@@ -423,7 +423,7 @@ Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference
       ::<strong>destroy</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v4.2.1
-/src&#47;lib&#47;taskgroup.coffee#L362'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L371'>Source</a>
     </p>
     <div class='docstring'>
   Public: Destroy the task and prevent it from executing ever again. 
@@ -436,7 +436,7 @@ Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference
       Boolean ::<strong>hasExited</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v4.2.1
-/src&#47;lib&#47;taskgroup.coffee#L270'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L279'>Source</a>
     </p>
     <div class='docstring'>
    Public: Have we finished its execution yet?
@@ -460,7 +460,7 @@ Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference
       Boolean ::<strong>hasStarted</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v4.2.1
-/src&#47;lib&#47;taskgroup.coffee#L264'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L273'>Source</a>
     </p>
     <div class='docstring'>
    Public: Have we started execution yet?
@@ -484,7 +484,7 @@ Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference
       Boolean ::<strong>isComplete</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v4.2.1
-/src&#47;lib&#47;taskgroup.coffee#L282'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L291'>Source</a>
     </p>
     <div class='docstring'>
    Public: Have we completed its execution yet?
@@ -508,7 +508,7 @@ Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference
       Boolean ::<strong>isDestroyed</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v4.2.1
-/src&#47;lib&#47;taskgroup.coffee#L276'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L285'>Source</a>
     </p>
     <div class='docstring'>
    Public: Have we been destroyed?
@@ -532,7 +532,7 @@ Returns a <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference
       ::<strong>onceDone</strong>(listener)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v4.2.1
-/src&#47;lib&#47;taskgroup.coffee#L346'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L355'>Source</a>
     </p>
     <div class='docstring'>
    Public: Once Done Promise.
@@ -557,7 +557,7 @@ listener - The <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Refe
       ::<strong>run</strong>()
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v4.2.1
-/src&#47;lib&#47;taskgroup.coffee#L444'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L453'>Source</a>
     </p>
     <div class='docstring'>
    Public: Start the execution of the task.
@@ -572,7 +572,7 @@ Will emit an `error` event if the task has already started before.
       ::<strong>setConfig</strong>(opts = {})
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v4.2.1
-/src&#47;lib&#47;taskgroup.coffee#L223'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L232'>Source</a>
     </p>
     <div class='docstring'>
    Public: Set the configuration for our instance.
@@ -592,7 +592,8 @@ config - Our configuration <a href='https://developer.mozilla.org/en-US/docs/Jav
   :args - (default: null) An <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Array'>Array</a> of arguments that we would like to forward onto our method when we execute it.
   :timeout - (default: null) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number'>Number</a> of millesconds that we would like to wait before timing out the method.
   :ambi - (default: true) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> for whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately
-  :domain - (default: true) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> for whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution) 
+  :domain - (default: true) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> for whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution)
+  :sync - (default: false) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> for whether or not we should execute certain calls asynchronously (`false`) or synchronously (`true`) 
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -676,6 +677,12 @@ config - Our configuration <a href='https://developer.mozilla.org/en-US/docs/Jav
         &mdash;
         <span class='desc'>(default: true) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> for whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution)</span>
       </li>
+      <li>
+        <span class='type'>(Boolean)</span>
+        <span class='name'>sync</span>
+        &mdash;
+        <span class='desc'>(default: false) A <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Boolean'>Boolean</a> for whether or not we should execute certain calls asynchronously (<code>false</code>) or synchronously (<code>true</code>)</span>
+      </li>
     </ul>
   </ul>
 </div>
@@ -685,7 +692,7 @@ config - Our configuration <a href='https://developer.mozilla.org/en-US/docs/Jav
       ::<strong>whenDone</strong>(listener)
       <a class='gh-link' href='https:&#47;&#47;github.com&#47;bevry&#47;taskgroup
 &#47;blob&#47;v4.2.1
-/src&#47;lib&#47;taskgroup.coffee#L334'>Source</a>
+/src&#47;lib&#47;taskgroup.coffee#L343'>Source</a>
     </p>
     <div class='docstring'>
    Public: When Done Promise.
@@ -709,7 +716,7 @@ listener - The <a href='https://developer.mozilla.org/en-US/docs/JavaScript/Refe
     </div>
     <div id='footer'>
   Generated on
-  Fri Mar 13 2015 21:02:24 GMT+0800 (AWST)
+  Sun Mar 15 2015 18:37:36 GMT+0800 (AWST)
   by
   <a href='https://github.com/gjtorikian/biscotto' title='TomDoc-CoffeeScript API documentation generator'>Biscotto</a>
   v2.3.1

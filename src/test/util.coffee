@@ -28,11 +28,14 @@ expectDeep = (argsActual, argsExpected) ->
 expectResult = (argsExpected...) -> (argsActual...) ->
 	expectDeep(argsActual, argsExpected)
 
-expectError = (inputError, message) ->
+expectError = (inputError, message, description) ->
 	try
-		expect(inputError?.message).to.contain(message)
+		if message
+			expect(inputError?.message or inputError, description).to.contain(message)
+		else
+			expect(inputError, description).to.equal(message)
 	catch checkError
-		inspect 'actual:', inputError, 'expected:', message
+		inspect 'actual:', inputError?.stack, 'expected:', message
 		throw checkError
 	return null
 

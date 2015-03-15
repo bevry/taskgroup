@@ -39,7 +39,7 @@ joe.describe 'task', (describe,it) ->
 				checks.push 'completion callback'
 				expect(task.status, 'status to be passed as we are within the completion callback').to.equal('passed')
 				expect(task.result, "the set result to be as expected as the task has completed").to.deep.equal([err,result])
-				expect(err, "the callback error to be null as we did not error").to.equal(null)
+				expectError(err, null, "the callback error to be null as we did not error")
 				expect(result, "the callback result to be as expected").to.equal(10)
 
 			# Check task hasn't run yet
@@ -81,7 +81,7 @@ joe.describe 'task', (describe,it) ->
 				++checks
 				expect(task.status, 'status to be passed as we are within the completion callback').to.equal('passed')
 				expect(task.result, "the set result to be as expected as the task has completed").to.deep.equal([err,result])
-				expect(err, "the callback error to be null as we did not error").to.equal(null)
+				expectError(err, null, "the callback error to be null as we did not error")
 				expect(result, "the callback result to be as expected").to.equal(10)
 
 			# Check task hasn't run yet
@@ -94,6 +94,92 @@ joe.describe 'task', (describe,it) ->
 			# Check task hasn't run yet
 			expect(task.status, "status to be null as we haven't started running yet").to.equal(null)
 			expect(task.result, 'result to be null as tasks execute asynchronously').to.equal(null)
+
+			# Check that all our special checks have run
+			wait delay, ->
+				++checks
+				expect(checks, "all our special checks have run").to.equal(3)
+				done()
+
+	# Sync Flag
+	describe "sync flag", (suite,it) ->
+		# Async
+		# Test that the task executes correctly asynchronously
+		it 'should work with async', (done) ->
+			# Specify how many special checks we are expecting
+			checks = []
+
+			# Create our asynchronous task
+			task = Task.create {sync:true}, (complete) ->
+				checks.push 'task 1 - before wait'
+				# Wait a while as this is an async test
+				wait delay, ->
+					checks.push 'task 1 - after wait'
+					expect(task.status, 'status to be running as we are within the task').to.equal('running')
+					expect(task.result, "result to be null as we haven't set it yet").to.equal(null)
+					# Return no error, and the result to the completion callback completing the task
+					complete(null, 10)
+
+			# Check the task completed as expected
+			task.done (err,result) ->
+				checks.push 'completion callback'
+				expect(task.status, 'status to be passed as we are within the completion callback').to.equal('passed')
+				expect(task.result, "the set result to be as expected as the task has completed").to.deep.equal([err, result])
+				expect(err, "the callback error to be null as we did not error").to.equal(null)
+				expect(result, "the callback result to be as expected").to.equal(10)
+
+			# Check task hasn't run yet
+			expect(task.status, "status to be null as we haven't started running yet").to.equal(null)
+			expect(task.result, "result to be null as we haven't started running yet").to.equal(null)
+
+			# Run thet ask
+			task.run()
+
+			# Check task hasn't run yet
+			expect(task.status, "status to be running as we have started running due to sync flag").to.equal('running')
+			expect(task.result, 'result to be set as tasks execute asynchronously').to.equal(null)
+
+			# Check that all our special checks have run
+			wait delay*2, ->
+				expectDeep(checks, [
+					'task 1 - before wait'
+					'task 1 - after wait'
+					'completion callback'
+				])
+				done()
+
+		# Sync
+		# Test that the task
+		it 'should work with sync', (done) ->
+			# Specify how many special checks we are expecting
+			checks = 0
+
+			# Create our synchronous task
+			task = new Task {sync:true}, ->
+				++checks
+				expect(task.status, 'status to be running as we are within the task').to.equal('running')
+				expect(task.result, "result to be null as we haven't set it yet").to.equal(null)
+				# Return our result completing the task
+				return 10
+
+			# Check the task completed as expected
+			task.done (err,result) ->
+				++checks
+				expect(task.status, 'status to be passed as we are within the completion callback').to.equal('passed')
+				expect(task.result, "the set result to be as expected as the task has completed").to.deep.equal([err,result])
+				expect(err, "the callback error to be null as we did not error").to.equal(null)
+				expect(result, "the callback result to be as expected").to.equal(10)
+
+			# Check task hasn't run yet
+			expect(task.status, "status to be null as we haven't started running yet").to.equal(null)
+			expect(task.result, "result to be null as we haven't started running yet").to.equal(null)
+
+			# Run
+			task.run()
+
+			# Check task hasn't run yet
+			expect(task.status, "status to be passed as we have already finished due to the sync flag").to.equal('passed')
+			expect(task.result, 'result to be set as we have already finished due to the sync flag').to.deep.equal([null, 10])
 
 			# Check that all our special checks have run
 			wait delay, ->
@@ -387,6 +473,14 @@ joe.describe 'taskgroup', (describe,it) ->
 
 			tasks.run()
 
+			expect(tasks.getItemNames(), 'tasks totals').to.deep.equal(
+				remaining: ['task 1', 'task 2']
+				running: []
+				completed: []
+				total: 2
+				results: []
+			)
+
 		# Parallel with new API
 		it 'should work when running in parallel', (done) ->
 			tasks = new TaskGroup().setConfig({concurrency:0}).done (err,results) ->
@@ -444,6 +538,14 @@ joe.describe 'taskgroup', (describe,it) ->
 				return 20
 
 			tasks.run()
+
+			expect(tasks.getItemNames(), 'tasks totals').to.deep.equal(
+				remaining: ['task 1', 'task 2']
+				running: []
+				completed: []
+				total: 2
+				results: []
+			)
 
 		# Parallel
 		it 'should work when running in parallel with new API', (done) ->
@@ -504,6 +606,126 @@ joe.describe 'taskgroup', (describe,it) ->
 				]
 			).run()
 
+			expect(tasks.getItemNames(), 'tasks totals').to.deep.equal(
+				remaining: ['task 1 for my tasks', 'task 2 for my tasks']
+				running: []
+				completed: []
+				total: 2
+				results: []
+			)
+
+	# Sync flag
+	describe "sync flag", (suite,it) ->
+		# Serial
+		it 'should work when running in serial', (done) ->
+			tasks = new TaskGroup().setConfig({sync:true,name:'my tests',concurrency:1}).done (err,results) ->
+				expect(err?.message or null).to.equal(null)
+				expect(tasks.status, 'status to be passed as we are within the completion callback').to.equal('passed')
+				expect(tasks.config.concurrency).to.equal(1)
+
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: []
+					running: []
+					completed: ['task 1', 'task 2']
+					total: 2
+					results: [[null,10], [null,20]]
+
+				expect(results).to.deep.equal(expectedItems.results)
+				expect(actualItems, 'completion items').to.deep.equal(expectedItems)
+
+				done()
+
+			tasks.addTask 'task 1', (complete) ->
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: ['task 2']
+					running: ['task 1']
+					completed: []
+					total: 2
+					results: []
+				expect(actualItems, 'task 1 items before wait items').to.deep.equal(expectedItems)
+
+				wait delay, ->
+					actualItems = tasks.getItemNames()
+					expect(actualItems, 'task 1 items after wait items').to.deep.equal(expectedItems)
+
+					complete(null, 10)
+
+			tasks.addTask 'task 2', ->
+				actualItems = tasks.getItemNames()
+				expectedItems =
+					remaining: []
+					running: ['task 2']
+					completed: ['task 1']
+					total: 2
+					results:  [[null,10]]
+				expect(actualItems, 'task 2 items').to.deep.equal(expectedItems)
+
+				return 20
+
+			tasks.run()
+
+			expect(tasks.getItemNames(), 'tasks totals').to.deep.equal(
+				remaining: ['task 2']
+				running: ['task 1']
+				completed: []
+				total: 2
+				results: []
+			)
+
+	# Serial
+	it 'should work when running in serial with sync tasks', (done) ->
+		tasks = new TaskGroup().setConfig({sync:true,name:'my tests',concurrency:1}).done (err,results) ->
+			expect(err?.message or null).to.equal(null)
+			expect(tasks.status, 'status to be passed as we are within the completion callback').to.equal('passed')
+			expect(tasks.config.concurrency).to.equal(1)
+
+			actualItems = tasks.getItemNames()
+			expectedItems =
+				remaining: []
+				running: []
+				completed: ['task 1', 'task 2']
+				total: 2
+				results: [[null,10], [null,20]]
+
+			expect(results).to.deep.equal(expectedItems.results)
+			expect(actualItems, 'completion items').to.deep.equal(expectedItems)
+
+		tasks.addTask 'task 1', (complete) ->
+			actualItems = tasks.getItemNames()
+			expectedItems =
+				remaining: ['task 2']
+				running: ['task 1']
+				completed: []
+				total: 2
+				results: []
+			expect(actualItems, 'task 1 items').to.deep.equal(expectedItems)
+			complete(null, 10)
+
+		tasks.addTask 'task 2', ->
+			actualItems = tasks.getItemNames()
+			expectedItems =
+				remaining: []
+				running: ['task 2']
+				completed: ['task 1']
+				total: 2
+				results:  [[null,10]]
+			expect(actualItems, 'task 2 items').to.deep.equal(expectedItems)
+			return 20
+
+		tasks.run()
+
+		expect(tasks.getItemNames(), 'tasks totals').to.deep.equal(
+			remaining: []
+			running: []
+			completed: []
+			total: 0
+			results: [[null,10], [null,20]]
+		)
+
+		setTimeout(done, 1000)
+
 	# Basic
 	describe "errors", (suite,it) ->
 		# Error Serial
@@ -511,7 +733,7 @@ joe.describe 'taskgroup', (describe,it) ->
 			err1 = new Error('deliberate error')
 			err2 = new Error('unexpected error')
 			tasks = new TaskGroup().setConfig({name:'my tasks', concurrency:1}).done (err,results) ->
-				expect(err.message).to.equal('deliberate error')
+				expectError(err, 'deliberate error')
 				expect(tasks.config.concurrency).to.equal(1)
 				expect(tasks.status).to.equal('failed')
 				expect(tasks.err).to.equal(err)
@@ -550,7 +772,7 @@ joe.describe 'taskgroup', (describe,it) ->
 			err1 = new Error('task 1 deliberate error')
 			err2 = new Error('task 2 deliberate error')
 			tasks = new TaskGroup().setConfig({name:'my tasks', concurrency:0}).done (err,results) ->
-				expect(err.message).to.equal('task 2 deliberate error')
+				expect(err, 'task 2 deliberate error')
 				expect(tasks.status).to.equal('failed')
 				expect(tasks.err).to.equal(err)
 				expect(tasks.config.concurrency).to.equal(0)
@@ -693,8 +915,7 @@ joe.describe 'nested', (describe,it) ->
 					return 20
 
 		tasks.done (err, results) ->
-			console.log(err)  if err
-			expect(err?.message or null).to.equal(null)
+			expect(err, null, 'inline taskgroup executed without error')
 
 			console.log(checks)  if checks.length isnt 4
 			expect(checks.length, 'checks').to.equal(4)
@@ -799,8 +1020,7 @@ joe.describe 'nested', (describe,it) ->
 
 
 		tasks.done (err, results) ->
-			console.log(err)  if err
-			expect(err?.message or null).to.equal(null)
+			expect(err, null, 'traditional format taskgroup executed without error')
 
 			console.log(checks)  if checks.length isnt 4
 			expect(checks.length, 'checks').to.equal(4)
@@ -918,8 +1138,7 @@ joe.describe 'nested', (describe,it) ->
 			return 30
 
 		tasks.done (err, results) ->
-			console.log(err)  if err
-			expect(err?.message or null).to.equal(null)
+			expect(err, null, 'mixed format taskgroup executed without error')
 
 			console.log(checks)  if checks.length isnt 4
 			expect(checks.length, 'checks').to.equal(4)

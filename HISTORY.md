@@ -1,5 +1,12 @@
 # History
 
+## v4.3.0 March 13, 2015
+- Module.exports now exports the TaskGroup class, of which `Task` and `TaskGroup` are now children
+- Added `Task` attribute on the TaskGroup class to allow over-riding of what should be the sub-task class
+- Added `TaskGroup` attribute on the TaskGroup class to allow over-riding of what should be the sub-taskgroup class
+- Added the `sync` configuration option, which when set to `true` will allow the execution of a Task or TaskGroup to execute synchronously
+- Updated dependencies
+
 ## v4.2.1 February 20, 2015
 - Output more information about errors when a task completes twice
 

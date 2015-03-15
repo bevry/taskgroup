@@ -118,6 +118,13 @@ class Interface extends EventEmitter
 	# Returns our configuration {Object} directly.
 	getConfig: -> @config
 
+	# Queue
+	queue: (fn) ->
+		if @config.sync
+			fn()
+		else
+			queue(fn)
+		@
 
 # =====================================
 
@@ -216,6 +223,7 @@ class Task extends Interface
 		@config.onError ?= 'exit'
 		@config.ambi ?= true
 		@config.domain ?= true
+		@config.sync ?= false
 		@events ?= []
 		@events.push('error', 'started', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed')
 
@@ -243,6 +251,7 @@ class Task extends Interface
 	#   :timeout - (default: null) A {Number} of millesconds that we would like to wait before timing out the method.
 	#   :ambi - (default: true) A {Boolean} for whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately
 	#   :domain - (default: true) A {Boolean} for whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution)
+	#   :sync - (default: false) A {Boolean} for whether or not we should execute certain calls asynchronously (`false`) or synchronously (`true`)
 	setConfig: (opts={}) ->
 		# Handle arguments
 		if Array.isArray(opts)
@@ -380,7 +389,7 @@ class Task extends Interface
 	# listener - The {Function} to attach or execute.
 	whenDone: (listener) ->
 		if @isComplete()
-			queue =>  # avoid zalgo
+			@queue =>  # avoid zalgo
 				listener.apply(@, @result or [])
 		else
 			super(listener)
@@ -392,7 +401,7 @@ class Task extends Interface
 	# listener - The {Function} to attach or execute.
 	onceDone: (listener) ->
 		if @isComplete()
-			queue =>  # avoid zalgo
+			@queue =>  # avoid zalgo
 				listener.apply(@, @result or [])
 		else
 			super(listener)
@@ -510,7 +519,7 @@ class Task extends Interface
 	#
 	# Will emit an `error` event if the task has already started before.
 	run: ->
-		queue =>
+		@queue =>
 			# Already completed or even destroyed?
 			if @hasStarted()
 				err = new Error """
@@ -558,6 +567,12 @@ class Task extends Interface
 # - `'passed'` - execution has exited with success status
 # - `'destroyed'` - we've been destroyed and can no longer execute
 class TaskGroup extends Interface
+	# Internal: A reference to the Task class for use in createTask if we want to override it
+	Task: Task
+
+	# Internal: A reference to the Task class for use in createGroup if we want to override it
+	TaskGroup: TaskGroup
+
 	# Internal: The type of our class for the purpose of duck typing
 	# which is needed when working with node virtual machines
 	# as instanceof will not work in those environments.
@@ -617,6 +632,7 @@ class TaskGroup extends Interface
 		@config ?= {}
 		@config.concurrency ?= 1
 		@config.onError ?= 'exit'
+		@config.sync ?= false
 		@itemsRemaining ?= []
 		@itemsRunning ?= []
 		@itemsCompleted ?= []
@@ -630,7 +646,7 @@ class TaskGroup extends Interface
 		# Give setConfig enough chance to fire
 		# Changing this to setImmediate breaks a lot of things
 		# As tasks inside nested taskgroups will fire in any order
-		queue(@autoRun.bind(@))
+		@queue(@autoRun.bind(@))
 
 		# Chain
 		@
@@ -675,6 +691,7 @@ class TaskGroup extends Interface
 	#   :tasks - (default: null) An {Array} of tasks to be added as children.
 	#   :groups - (default: null) An {Array} of groups to be added as children.
 	#   :items - (default: null) An {Array} of {Task} and/or {TaskGroup} instances to be added to this group.
+	#   :sync - (default: false) A {Boolean} for whether or not we should execute certain calls asynchronously (`false`) or synchronously (`true`)
 	setConfig: (opts={}) ->
 		# Handle arguments
 		if Array.isArray(opts)
@@ -783,7 +800,7 @@ class TaskGroup extends Interface
 		return null  unless item
 
 		# Link our item to ourself
-		item.setConfig({parent: @})
+		item.setConfig({parent: @, sync:@config.sync})
 		item.setConfig(args...)  if args.length isnt 0
 		item.config.name ?= "#{item.type} #{@getItemsTotal()+1} for #{@getName()}"
 
@@ -869,7 +886,7 @@ class TaskGroup extends Interface
 
 		# Support receiving arguments to create a task instance
 		else
-			task = new Task(args...)
+			task = new @Task(args...)
 
 		# Return the new task
 		return task
@@ -878,7 +895,7 @@ class TaskGroup extends Interface
 	#
 	# args - Arguments to configure (and if needed, create) the task
 	addTask: (args...) ->
-		task = @addItem @createTask args...
+		task = @addItem @createTask.apply(@, args)
 
 		# Chain
 		@
@@ -913,7 +930,7 @@ class TaskGroup extends Interface
 
 		# Support receiving arugments to create a taskgroup intance
 		else
-			taskgroup = new TaskGroup(args...)
+			taskgroup = new @TaskGroup(args...)
 
 		# Return the taskgroup instance
 		return taskgroup
@@ -922,7 +939,7 @@ class TaskGroup extends Interface
 	#
 	# args - Arguments to configure (and if needed, create) the {TaskGroup}
 	addGroup: (args...) ->
-		group = @addItem @createGroup args...
+		group = @addItem @createGroup.apply(@, args)
 
 		# Chain
 		@
@@ -1126,7 +1143,7 @@ class TaskGroup extends Interface
 	# listener - The {Function} to attach or execute.
 	whenDone: (handler) ->
 		if @isComplete()
-			queue =>  # avoid zalgo
+			@queue =>  # avoid zalgo
 				handler.call(@, @err, @results)
 		else
 			super(handler)
@@ -1138,7 +1155,7 @@ class TaskGroup extends Interface
 	# listener - The {Function} to attach or execute.
 	onceDone: (handler) ->
 		if @isComplete()
-			queue =>  # avoid zalgo
+			@queue =>  # avoid zalgo
 				handler.call(@, @err, @results)
 		else
 			super(handler)
@@ -1295,7 +1312,7 @@ class TaskGroup extends Interface
 
 	# Public: Start the execution.
 	run: (args...) ->
-		queue =>
+		@queue =>
 			# Apply our new status and notify our intention to run
 			@emit(@status = 'started')
 
@@ -1306,4 +1323,6 @@ class TaskGroup extends Interface
 		@
 
 # Export
-module.exports = {Task,TaskGroup}
+TaskGroup.Task = Task
+TaskGroup.TaskGroup = TaskGroup
+module.exports = TaskGroup

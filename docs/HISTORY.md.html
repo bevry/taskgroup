@@ -115,6 +115,14 @@
       </nav>
       <div id='filecontents'>
         <h1 id="history">History</h1>
+<h2 id="v4-3-0-march-13-2015">v4.3.0 March 13, 2015</h2>
+<ul>
+<li>Module.exports now exports the TaskGroup class, of which <code>Task</code> and <code>TaskGroup</code> are now children</li>
+<li>Added <code>Task</code> attribute on the TaskGroup class to allow over-riding of what should be the sub-task class</li>
+<li>Added <code>TaskGroup</code> attribute on the TaskGroup class to allow over-riding of what should be the sub-taskgroup class</li>
+<li>Added the <code>sync</code> configuration option, which when set to <code>true</code> will allow the execution of a Task or TaskGroup to execute synchronously</li>
+<li>Updated dependencies</li>
+</ul>
 <h2 id="v4-2-1-february-20-2015">v4.2.1 February 20, 2015</h2>
 <ul>
 <li>Output more information about errors when a task completes twice</li>
@@ -1125,7 +1133,7 @@
     </div>
     <div id='footer'>
   Generated on
-  Fri Mar 13 2015 21:02:24 GMT+0800 (AWST)
+  Sun Mar 15 2015 18:37:36 GMT+0800 (AWST)
   by
   <a href='https://github.com/gjtorikian/biscotto' title='TomDoc-CoffeeScript API documentation generator'>Biscotto</a>
   v2.3.1
