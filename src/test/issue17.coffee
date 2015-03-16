@@ -1,5 +1,5 @@
-{Task,TaskGroup} = require('../../')
 {wait} = require('assert-helpers')
+{Task,TaskGroup} = require('../../')
 
 myTask = new Task (complete) ->
 	complete()

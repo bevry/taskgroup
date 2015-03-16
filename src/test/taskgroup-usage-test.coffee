@@ -1,11 +1,11 @@
 # Import
 util = require('util')
 joe = require('joe')
+{wait, throwUnexpected, returnViaCallback, completeViaCallback, expectViaCallback, expectErrorViaCallback} = require('assert-helpers')
 {Task,TaskGroup} = require('../../')
 
 # Prepare
 delay = 100
-{wait, throwUnexpected, returnViaCallback, completeViaCallback, expectViaCallback, expectErrorViaCallback} = require('assert-helpers')
 
 
 # ====================================

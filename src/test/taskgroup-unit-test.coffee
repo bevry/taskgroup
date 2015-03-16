@@ -6,13 +6,12 @@
 
 # Import
 util = require('util')
-{expect} = require('chai')
 joe = require('joe')
+{wait, equal, deepEqual, errorEqual} = require('assert-helpers')
 {Task,TaskGroup} = require('../../')
 
 # Prepare
 delay = 100
-{wait, equal, deepEqual, errorEqual} = require('assert-helpers')
 
 # Task
 joe.describe 'task', (describe,it) ->
