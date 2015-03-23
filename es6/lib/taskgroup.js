@@ -1294,8 +1294,13 @@ class TaskGroup extends Interface {
 	}
 
 	// Public
+	get hasError () {
+		return this.state.get('error') != null
+	}
+
+	// Public
 	get hasResult () {
-		return this.state.get('error') != null || this.state.get('results').length !== 0
+		return this.hasError || this.state.get('results').length !== 0
 	}
 
 	// Internal: Whether or not we have any available slots to execute more items.
@@ -1313,8 +1318,7 @@ class TaskGroup extends Interface {
 	// Returns a {Boolean} which is `true` if we are paused.
 	get shouldPause () {
 		return (
-			this.config.get('onError') === 'exit' &&
-			this.state.get('error') != null
+			this.config.get('onError') === 'exit' && this.hasError
 		)
 	}
 
