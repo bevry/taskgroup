@@ -1295,7 +1295,7 @@ class TaskGroup extends Interface {
 
 	// Public
 	get hasResult () {
-		return this.state.get('error') || this.state.get('results').length !== 0
+		return this.state.get('error') != null || this.state.get('results').length !== 0
 	}
 
 	// Internal: Whether or not we have any available slots to execute more items.
