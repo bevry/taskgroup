@@ -1,7 +1,7 @@
 {
   "title": "TaskGroup",
   "name": "taskgroup",
-  "version": "4.3.0",
+  "version": "5.0.0",
   "description": "Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.",
   "homepage": "https://github.com/bevry/taskgroup",
   "license": {
@@ -54,12 +54,15 @@
     "csextends": "^1.0.3"
   },
   "devDependencies": {
+    "assert-helpers": "^1.0.0",
+    "babel": "^4.7.16",
+    "babel-eslint": "^2.0.2",
+    "biscotto": "^2.3.1",
     "coffee-script": "^1.9.1",
+    "eslint": "^0.17.1",
     "joe": "^1.6.0",
     "joe-reporter-console": "^1.2.1",
-    "assert-helpers": "^1.0.0",
     "projectz": "^0.5.0",
-    "biscotto": "^2.3.1",
     "safeps": "^2.2.12"
   },
   "directories": {
@@ -67,11 +70,12 @@
   },
   "scripts": {
     "preinstall": "node ./cyclic.js",
-    "test": "node ./out/test/taskgroup-test.js"
+    "test": "node ./coffeejs/test/taskgroup-test.js"
   },
-  "main": "./out/lib/taskgroup.js",
+  "main": "./es6guardian.js",
   "cakeConfiguration": {
-    "COFFEE_SRC_PATH": "src",
-    "BISCOTTO_SRC_PATH": "src"
+    "COFFEE_SRC_PATH": "coffee",
+    "COFFEE_OUT_PATH": "coffeejs",
+    "BABEL_SRC_PATH": "es6"
   }
 }

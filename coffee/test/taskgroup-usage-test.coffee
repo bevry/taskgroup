@@ -43,9 +43,9 @@ joe.describe 'task', (describe, it) ->
 
 joe.describe 'taskgroup', (describe, it) ->
 	# failure: done with no run
-	it 'TaskGroup.create().addTask(...).done(...) should time out when run was not called', (complete) ->
+	it 'TaskGroup.create().addTaskChain(...).done(...) should time out when run was not called', (complete) ->
 		tasks = TaskGroup.create()
-			.addTask(returnViaCallback(5))
+			.addTaskChain(returnViaCallback(5))
 			.done(throwUnexpected)
 		wait(delay, complete)
 
@@ -57,40 +57,40 @@ joe.describe 'taskgroup', (describe, it) ->
 			.done(complete)
 
 	# success: run then done then add
-	it 'TaskGroup.create().run().done(...).addTask(...) should complete with the tasks results', (complete) ->
+	it 'TaskGroup.create().run().done(...).addTaskChain(...) should complete with the tasks results', (complete) ->
 		tasks = TaskGroup.create()
 			.run()
 			.done(expectViaCallback(null, [[null,5]]))
 			.done(complete)
-			.addTask(returnViaCallback(5))
+			.addTaskChain(returnViaCallback(5))
 
 	# success: done then task then run then done
-	it 'TaskGroup.create().run().done(...) should complete correctly', (complete) ->
+	it 'TaskGroup.create().done().addTaskChain(...).run().addTaskChain(...).done(...) should complete correctly', (complete) ->
 		tasks = TaskGroup.create()
 			.done(expectViaCallback(null, [[null,5], [null,10]]))
-			.addTask(returnViaCallback(5))
+			.addTaskChain('task 1 that will return 5', returnViaCallback(5))
 			.run()
-			.addTask(returnViaCallback(10))
+			.addTaskChain('task 2 that will return 10', returnViaCallback(10))
 			.done(complete)
 
 	# success: done then task then run then done
 	it 'TaskGroup.create().run().run().done(...) should complete only once', (complete) ->
 		tasks = TaskGroup.create()
 			.done(expectViaCallback(null, [[null,5],[null,10]]))
-			.addTask(returnViaCallback(5))
+			.addTaskChain(returnViaCallback(5))
 			.run().run()
-			.addTask(returnViaCallback(10))
+			.addTaskChain(returnViaCallback(10))
 			.done(complete)
 
 	# success: multiple runs
 	it 'Taskgroup should be able to complete multiple times', (complete) ->
 		tasks = TaskGroup.create()
-			.addTask(returnViaCallback(5))
+			.addTaskChain(returnViaCallback(5))
 			.run()
 			.done(expectViaCallback(null, [[null,5]]))
 		wait delay, ->
 			tasks
-				.addTask(returnViaCallback(10))
+				.addTaskChain(returnViaCallback(10))
 				.done(expectViaCallback(null, [[null,5],[null,10]]))
 				.done(complete)
 
@@ -98,9 +98,9 @@ joe.describe 'taskgroup', (describe, it) ->
 	it 'Taskgroup should pause when encountering an error', (complete) ->
 		err = new Error('fail after 5')
 		tasks = TaskGroup.create()
-			.addTask(returnViaCallback(5))
-			.addTask(returnViaCallback(err))
-			.addTask(returnViaCallback(10))
+			.addTaskChain(returnViaCallback(5))
+			.addTaskChain(returnViaCallback(err))
+			.addTaskChain(returnViaCallback(10))
 			.run()
 			.done(expectViaCallback(err, [[null,5], [err]]))
 			.done(-> complete())
@@ -109,14 +109,14 @@ joe.describe 'taskgroup', (describe, it) ->
 	it 'Taskgroup should be able to resume after an error', (complete) ->
 		err = new Error('fail after 5')
 		tasks = TaskGroup.create()
-			.addTask(returnViaCallback(5))
-			.addTask(returnViaCallback(err))
-			.addTask(returnViaCallback(10))
+			.addTaskChain(returnViaCallback(5))
+			.addTaskChain(returnViaCallback(err))
+			.addTaskChain(returnViaCallback(10))
 			.run()
 			.done(expectViaCallback(err, [[null,5], [err]]))
 		wait delay, ->
 			tasks
-				.addTask(returnViaCallback(15))
+				.addTaskChain(returnViaCallback(15))
 				.done(expectViaCallback(null, [[null,5], [err], [null,10], [null,15]]))
 				.done(complete)
 
@@ -124,9 +124,9 @@ joe.describe 'taskgroup', (describe, it) ->
 	it 'Taskgroup should ignore when encountering an error with different config', (complete) ->
 		err = new Error('fail after 5')
 		tasks = TaskGroup.create({onError: 'ignore'})
-			.addTask(returnViaCallback(5))
-			.addTask(returnViaCallback(err))
-			.addTask(returnViaCallback(10))
+			.addTaskChain(returnViaCallback(5))
+			.addTaskChain(returnViaCallback(err))
+			.addTaskChain(returnViaCallback(10))
 			.run()
 			.done(expectViaCallback(null, [
 				[null,5], [err], [null,10]
@@ -136,12 +136,14 @@ joe.describe 'taskgroup', (describe, it) ->
 	# failure: nested timeouts
 	it 'Taskgroup should apply nested configuration to tasks', (complete) ->
 		tasks = TaskGroup.create()
-			.setNestedTaskConfig(
-				timeout: delay
-				onError: 'ignore'
-			)
-			.addTask(returnViaCallback(5))
-			.addTask(completeViaCallback(10, delay*2))
-			.addTask(returnViaCallback(15))
+			.setConfig({
+				nestedTaskConfig: {
+					timeout: delay
+					onError: 'ignore'
+				}
+			})
+			.addTaskChain(returnViaCallback(5))
+			.addTaskChain(completeViaCallback(10, delay*2))
+			.addTaskChain(returnViaCallback(15))
 			.run()
 			.done(expectErrorViaCallback('timed out', complete))

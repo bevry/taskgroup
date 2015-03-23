@@ -59,7 +59,7 @@ joe.describe 'task', (describe,it) ->
 					'task 1 - before wait'
 					'task 1 - after wait'
 					'completion callback'
-				])
+				], 'all testing checks fired correctly')
 				done()
 
 		# Sync
@@ -428,12 +428,12 @@ joe.describe 'taskgroup', (describe,it) ->
 	describe "basic", (suite,it) ->
 		# Serial
 		it 'should work when running in serial', (done) ->
-			tasks = new TaskGroup().setConfig({name:'my tests',concurrency:1}).done (err,results) ->
+			tasks = new TaskGroup({name:'my tests',concurrency:1}).done (err,results) ->
 				equal(err, null)
 				equal(tasks.status, 'passed', 'status to be passed as we are within the completion callback')
-				equal(tasks.config.concurrency, 1)
+				equal(tasks.concurrency, 1)
 
-				actualItems = tasks.getItemNames()
+				actualItems = tasks.itemNames
 				expectedItems =
 					remaining: []
 					running: []
@@ -447,7 +447,7 @@ joe.describe 'taskgroup', (describe,it) ->
 				done()
 
 			tasks.addTask 'task 1', (complete) ->
-				actualItems = tasks.getItemNames()
+				actualItems = tasks.itemNames
 				expectedItems =
 					remaining: ['task 2']
 					running: ['task 1']
@@ -457,14 +457,14 @@ joe.describe 'taskgroup', (describe,it) ->
 				deepEqual(actualItems, expectedItems, 'task 1 items before wait items')
 
 				wait delay, ->
-					actualItems = tasks.getItemNames()
+					actualItems = tasks.itemNames
 					deepEqual(actualItems, expectedItems, 'task 1 items after wait items')
 
 					complete(null, 10)
 
 
 			tasks.addTask 'task 2', ->
-				actualItems = tasks.getItemNames()
+				actualItems = tasks.itemNames
 				expectedItems =
 					remaining: []
 					running: ['task 2']
@@ -477,7 +477,7 @@ joe.describe 'taskgroup', (describe,it) ->
 
 			tasks.run()
 
-			actualItems = tasks.getItemNames()
+			actualItems = tasks.itemNames
 			expectedItems =
 				remaining: ['task 1', 'task 2']
 				running: []
@@ -488,12 +488,12 @@ joe.describe 'taskgroup', (describe,it) ->
 
 		# Parallel with new API
 		it 'should work when running in parallel', (done) ->
-			tasks = new TaskGroup().setConfig({concurrency:0}).done (err,results) ->
+			tasks = new TaskGroup({concurrency:0}).done (err,results) ->
 				equal(err, null)
 				equal(tasks.status, 'passed', 'status to be passed as we are within the completion callback')
-				equal(tasks.config.concurrency, 0)
+				equal(tasks.concurrency, 0)
 
-				actualItems = tasks.getItemNames()
+				actualItems = tasks.itemNames
 				expectedItems =
 					remaining: []
 					running: []
@@ -508,7 +508,7 @@ joe.describe 'taskgroup', (describe,it) ->
 
 			tasks.addTask 'task 1', (complete) ->
 
-				actualItems = tasks.getItemNames()
+				actualItems = tasks.itemNames
 				expectedItems =
 					remaining: []
 					running: ['task 1', 'task 2']
@@ -519,7 +519,7 @@ joe.describe 'taskgroup', (describe,it) ->
 
 				wait delay, ->
 
-					actualItems = tasks.getItemNames()
+					actualItems = tasks.itemNames
 					expectedItems =
 						remaining: []
 						running: ['task 1']
@@ -531,7 +531,7 @@ joe.describe 'taskgroup', (describe,it) ->
 					complete(null,10)
 
 			tasks.addTask 'task 2', ->
-				actualItems = tasks.getItemNames()
+				actualItems = tasks.itemNames
 				expectedItems =
 					remaining: []
 					running: ['task 1', 'task 2']
@@ -544,7 +544,7 @@ joe.describe 'taskgroup', (describe,it) ->
 
 			tasks.run()
 
-			actualItems = tasks.getItemNames()
+			actualItems = tasks.itemNames
 			expectedItems =
 				remaining: ['task 1', 'task 2']
 				running: []
@@ -561,13 +561,13 @@ joe.describe 'taskgroup', (describe,it) ->
 				next: (err,results) ->
 					equal(err, null)
 					equal(tasks.status, 'passed', 'status to be passed as we are within the completion callback')
-					equal(tasks.config.concurrency, 0)
+					equal(tasks.concurrency, 0)
 
-					actualItems = tasks.getItemNames()
+					actualItems = tasks.itemNames
 					expectedItems =
 						remaining: []
 						running: []
-						completed: ['task 2 for my tasks', 'task 1 for my tasks']
+						completed: ['task 2 for [my tasks]', 'task 1 for [my tasks]']
 						total: 2
 						results: [[null,20], [null,10]]
 					deepEqual(results, expectedItems.results)
@@ -577,21 +577,21 @@ joe.describe 'taskgroup', (describe,it) ->
 
 				tasks: [
 					(complete) ->
-						actualItems = tasks.getItemNames()
+						actualItems = tasks.itemNames
 						expectedItems =
 							remaining: []
-							running: ['task 1 for my tasks', 'task 2 for my tasks']
+							running: ['task 1 for [my tasks]', 'task 2 for [my tasks]']
 							completed: []
 							total: 2
 							results: []
 						deepEqual(actualItems, expectedItems, 'task 1 before wait items')
 
 						wait delay, ->
-							actualItems = tasks.getItemNames()
+							actualItems = tasks.itemNames
 							expectedItems =
 								remaining: []
-								running: ['task 1 for my tasks']
-								completed: ['task 2 for my tasks']
+								running: ['task 1 for [my tasks]']
+								completed: ['task 2 for [my tasks]']
 								total: 2
 								results: [[null,20]]
 							deepEqual(actualItems, expectedItems, 'task 1 after wait items')
@@ -599,10 +599,10 @@ joe.describe 'taskgroup', (describe,it) ->
 							complete(null, 10)
 
 					->
-						actualItems = tasks.getItemNames()
+						actualItems = tasks.itemNames
 						expectedItems =
 							remaining: []
-							running: ['task 1 for my tasks', 'task 2 for my tasks']
+							running: ['task 1 for [my tasks]', 'task 2 for [my tasks]']
 							completed: []
 							total: 2
 							results: []
@@ -612,9 +612,9 @@ joe.describe 'taskgroup', (describe,it) ->
 				]
 			).run()
 
-			actualItems = tasks.getItemNames()
+			actualItems = tasks.itemNames
 			expectedItems =
-				remaining: ['task 1 for my tasks', 'task 2 for my tasks']
+				remaining: ['task 1 for [my tasks]', 'task 2 for [my tasks]']
 				running: []
 				completed: []
 				total: 2
@@ -625,12 +625,12 @@ joe.describe 'taskgroup', (describe,it) ->
 	describe "sync flag", (suite,it) ->
 		# Serial
 		it 'should work when running in serial', (done) ->
-			tasks = new TaskGroup().setConfig({sync:true,name:'my tests',concurrency:1}).done (err,results) ->
+			tasks = new TaskGroup({sync:true, name:'my tests', concurrency:1}).done (err,results) ->
 				equal(err, null)
 				equal(tasks.status, 'passed', 'status to be passed as we are within the completion callback')
-				equal(tasks.config.concurrency, 1)
+				equal(tasks.concurrency, 1)
 
-				actualItems = tasks.getItemNames()
+				actualItems = tasks.itemNames
 				expectedItems =
 					remaining: []
 					running: []
@@ -644,7 +644,7 @@ joe.describe 'taskgroup', (describe,it) ->
 				done()
 
 			tasks.addTask 'task 1', (complete) ->
-				actualItems = tasks.getItemNames()
+				actualItems = tasks.itemNames
 				expectedItems =
 					remaining: ['task 2']
 					running: ['task 1']
@@ -654,13 +654,13 @@ joe.describe 'taskgroup', (describe,it) ->
 				deepEqual(actualItems, expectedItems, 'task 1 items before wait items')
 
 				wait delay, ->
-					actualItems = tasks.getItemNames()
+					actualItems = tasks.itemNames
 					deepEqual(actualItems, expectedItems, 'task 1 items after wait items')
 
 					complete(null, 10)
 
 			tasks.addTask 'task 2', ->
-				actualItems = tasks.getItemNames()
+				actualItems = tasks.itemNames
 				expectedItems =
 					remaining: []
 					running: ['task 2']
@@ -673,7 +673,7 @@ joe.describe 'taskgroup', (describe,it) ->
 
 			tasks.run()
 
-			actualItems = tasks.getItemNames()
+			actualItems = tasks.itemNames
 			expectedItems =
 				remaining: ['task 2']
 				running: ['task 1']
@@ -684,12 +684,12 @@ joe.describe 'taskgroup', (describe,it) ->
 
 	# Serial
 	it 'should work when running in serial with sync tasks', (done) ->
-		tasks = new TaskGroup().setConfig({sync:true,name:'my tests',concurrency:1}).done (err,results) ->
+		tasks = new TaskGroup({sync:true,name:'my tests',concurrency:1}).done (err,results) ->
 			equal(err, null)
 			equal(tasks.status, 'passed', 'status to be passed as we are within the completion callback')
-			equal(tasks.config.concurrency, 1)
+			equal(tasks.concurrency, 1)
 
-			actualItems = tasks.getItemNames()
+			actualItems = tasks.itemNames
 			expectedItems =
 				remaining: []
 				running: []
@@ -701,7 +701,7 @@ joe.describe 'taskgroup', (describe,it) ->
 			deepEqual(actualItems, expectedItems, 'completion items')
 
 		tasks.addTask 'task 1', (complete) ->
-			actualItems = tasks.getItemNames()
+			actualItems = tasks.itemNames
 			expectedItems =
 				remaining: ['task 2']
 				running: ['task 1']
@@ -712,7 +712,7 @@ joe.describe 'taskgroup', (describe,it) ->
 			complete(null, 10)
 
 		tasks.addTask 'task 2', ->
-			actualItems = tasks.getItemNames()
+			actualItems = tasks.itemNames
 			expectedItems =
 				remaining: []
 				running: ['task 2']
@@ -724,7 +724,7 @@ joe.describe 'taskgroup', (describe,it) ->
 
 		tasks.run()
 
-		actualItems = tasks.getItemNames()
+		actualItems = tasks.itemNames
 		expectedItems =
 			remaining: []
 			running: []
@@ -737,21 +737,22 @@ joe.describe 'taskgroup', (describe,it) ->
 
 	# Basic
 	describe "errors", (suite,it) ->
+		err1 = new Error('deliberate error')
+		err2 = new Error('unexpected error')
+
 		# Error Serial
 		it 'should handle error correctly in serial', (done) ->
-			err1 = new Error('deliberate error')
-			err2 = new Error('unexpected error')
-			tasks = new TaskGroup().setConfig({name:'my tasks', concurrency:1}).done (err,results) ->
+			tasks = new TaskGroup({name:'my tasks', concurrency:1}).done (err,results) ->
 				errorEqual(err, 'deliberate error')
-				equal(tasks.config.concurrency, 1)
+				equal(tasks.concurrency, 1)
 				equal(tasks.status, 'failed')
-				equal(tasks.err, err)
+				equal(tasks.error, err)
 
-				actualItems = tasks.getItemNames()
+				actualItems = tasks.itemNames
 				expectedItems =
-					remaining: ['task 2 for my tasks']
+					remaining: ['task 2 for [my tasks]']
 					running: []
-					completed: ['task 1 for my tasks']
+					completed: ['task 1 for [my tasks]']
 					total: 2
 					results: [[err1]]
 				deepEqual(results, expectedItems.results)
@@ -760,10 +761,10 @@ joe.describe 'taskgroup', (describe,it) ->
 				done()
 
 			tasks.addTask (complete) ->
-				actualItems = tasks.getItemNames()
+				actualItems = tasks.itemNames
 				expectedItems =
-					remaining: ['task 2 for my tasks']
-					running: ['task 1 for my tasks']
+					remaining: ['task 2 for [my tasks]']
+					running: ['task 1 for [my tasks]']
 					completed: []
 					total: 2
 					results: []
@@ -778,19 +779,17 @@ joe.describe 'taskgroup', (describe,it) ->
 
 		# Parallel
 		it 'should handle error correctly in parallel', (done) ->
-			err1 = new Error('task 1 deliberate error')
-			err2 = new Error('task 2 deliberate error')
-			tasks = new TaskGroup().setConfig({name:'my tasks', concurrency:0}).done (err,results) ->
-				errorEqual(err, 'task 2 deliberate error')
+			tasks = new TaskGroup({name:'my tasks', concurrency:0}).done (err,results) ->
+				errorEqual(err, err2)
 				equal(tasks.status, 'failed')
-				equal(tasks.err, err)
-				equal(tasks.config.concurrency, 0)
+				equal(tasks.error, err)
+				equal(tasks.concurrency, 0)
 
-				actualItems = tasks.getItemNames()
+				actualItems = tasks.itemNames
 				expectedItems =
 					remaining: []
 					running: []
-					completed: ['task 2 for my tasks', 'task 1 for my tasks']
+					completed: ['task 2 for [my tasks]', 'task 1 for [my tasks]']
 					total: 2
 					results: [[err2], [err1]]
 				deepEqual(results, expectedItems.results)
@@ -800,21 +799,21 @@ joe.describe 'taskgroup', (describe,it) ->
 
 			# Error via completion callback
 			tasks.addTask (complete) ->
-				actualItems = tasks.getItemNames()
+				actualItems = tasks.itemNames
 				expectedItems =
 					remaining: []
-					running: ['task 1 for my tasks', 'task 2 for my tasks']
+					running: ['task 1 for [my tasks]', 'task 2 for [my tasks]']
 					completed: []
 					total: 2
 					results: []
 				deepEqual(actualItems, expectedItems, 'task 1 before wait items')
 
 				wait delay, ->
-					actualItems = tasks.getItemNames()
+					actualItems = tasks.itemNames
 					expectedItems =
 						remaining: []
-						running: ['task 1 for my tasks']
-						completed: ['task 2 for my tasks']
+						running: ['task 1 for [my tasks]']
+						completed: ['task 2 for [my tasks]']
 						total: 2
 						results: [[err2]]
 					deepEqual(actualItems, expectedItems, 'task 1 after wait items')
@@ -824,10 +823,10 @@ joe.describe 'taskgroup', (describe,it) ->
 
 			# Error via return
 			tasks.addTask ->
-				actualItems = tasks.getItemNames()
+				actualItems = tasks.itemNames
 				expectedItems =
 					remaining: []
-					running: ['task 1 for my tasks', 'task 2 for my tasks']
+					running: ['task 1 for [my tasks]', 'task 2 for [my tasks]']
 					completed: []
 					total: 2
 					results: []
@@ -847,14 +846,14 @@ joe.describe 'nested', (describe,it) ->
 		checks = []
 
 		tasks = new TaskGroup 'my tests', (addGroup,addTask) ->
-			equal(@config.name, 'my tests')
+			equal(@name, 'my tests')
 
 			addTask 'my task', (complete) ->
 				checks.push('my task 1')
-				equal(@config.name, 'my task')
+				equal(@name, 'my task')
 
 				# totals for parent group
-				actualItems = tasks.getItemNames()
+				actualItems = tasks.itemNames
 				expectedItems =
 					remaining: ['my group']
 					running: ['my task']
@@ -867,7 +866,7 @@ joe.describe 'nested', (describe,it) ->
 					checks.push('my task 2')
 
 					# totals for parent group
-					actualItems = tasks.getItemNames()
+					actualItems = tasks.itemNames
 					deepEqual(actualItems, expectedItems, 'my task items after wait')
 
 					complete(null, 10)
@@ -875,10 +874,10 @@ joe.describe 'nested', (describe,it) ->
 			addGroup 'my group', (addGroup,addTask) ->
 				myGroup = @
 				checks.push('my group')
-				equal(@config.name, 'my group')
+				equal(@name, 'my group')
 
 				# totals for parent group
-				actualItems = tasks.getItemNames()
+				actualItems = tasks.itemNames
 				expectedItems =
 					remaining: []
 					running: ['my group']
@@ -888,7 +887,7 @@ joe.describe 'nested', (describe,it) ->
 				deepEqual(actualItems, expectedItems, 'my group parent items')
 
 				# totals for sub group
-				actualItems = myGroup.getItemNames()
+				actualItems = myGroup.itemNames
 				expectedItems =
 					remaining: []
 					running: ['taskgroup method for my group']
@@ -899,10 +898,10 @@ joe.describe 'nested', (describe,it) ->
 
 				addTask 'my second task', ->
 					checks.push('my second task')
-					equal(@config.name, 'my second task')
+					equal(@name, 'my second task')
 
 					# totals for parent group
-					actualItems = tasks.getItemNames()
+					actualItems = tasks.itemNames
 					expectedItems =
 						remaining: []
 						running: ['my group']
@@ -912,7 +911,7 @@ joe.describe 'nested', (describe,it) ->
 					deepEqual(actualItems, expectedItems, 'my group parent items')
 
 					# totals for sub group
-					actualItems = myGroup.getItemNames()
+					actualItems = myGroup.itemNames
 					expectedItems =
 						remaining: []
 						running: ['my second task']
@@ -930,7 +929,7 @@ joe.describe 'nested', (describe,it) ->
 			equal(checks.length, 4, 'all the expected checks ran')
 
 			# totals for parent group
-			actualItems = tasks.getItemNames()
+			actualItems = tasks.itemNames
 			expectedItems =
 				remaining: []
 				running: []
@@ -955,10 +954,10 @@ joe.describe 'nested', (describe,it) ->
 
 		tasks.addTask 'my task', (complete) ->
 			checks.push('my task 1')
-			equal(@config.name, 'my task')
+			equal(@name, 'my task')
 
 			# totals for parent group
-			actualItems = tasks.getItemNames()
+			actualItems = tasks.itemNames
 			expectedItems =
 				remaining: ['my group']
 				running: ['my task']
@@ -971,7 +970,7 @@ joe.describe 'nested', (describe,it) ->
 				checks.push('my task 2')
 
 				# totals for parent group
-				actualItems = tasks.getItemNames()
+				actualItems = tasks.itemNames
 				deepEqual(actualItems, expectedItems, 'my task items after wait')
 
 				complete(null, 10)
@@ -979,10 +978,10 @@ joe.describe 'nested', (describe,it) ->
 		tasks.addGroup 'my group', ->
 			myGroup = @
 			checks.push('my group')
-			equal(@config.name, 'my group')
+			equal(@name, 'my group')
 
 			# totals for parent group
-			actualItems = tasks.getItemNames()
+			actualItems = tasks.itemNames
 			expectedItems =
 				remaining: []
 				running: ['my group']
@@ -992,7 +991,7 @@ joe.describe 'nested', (describe,it) ->
 			deepEqual(actualItems, expectedItems, 'my group parent items')
 
 			# totals for sub group
-			actualItems = myGroup.getItemNames()
+			actualItems = myGroup.itemNames
 			expectedItems =
 				remaining: []
 				running: ['taskgroup method for my group']
@@ -1003,10 +1002,10 @@ joe.describe 'nested', (describe,it) ->
 
 			@addTask 'my second task', ->
 				checks.push('my second task')
-				equal(@config.name, 'my second task')
+				equal(@name, 'my second task')
 
 				# totals for parent group
-				actualItems = tasks.getItemNames()
+				actualItems = tasks.itemNames
 				expectedItems =
 					remaining: []
 					running: ['my group']
@@ -1016,7 +1015,7 @@ joe.describe 'nested', (describe,it) ->
 				deepEqual(actualItems, expectedItems, 'my group parent items')
 
 				# totals for sub group
-				actualItems = myGroup.getItemNames()
+				actualItems = myGroup.itemNames
 				expectedItems =
 					remaining: []
 					running: ['my second task']
@@ -1035,7 +1034,7 @@ joe.describe 'nested', (describe,it) ->
 			equal(checks.length, 4, 'all the expected checks ran')
 
 			# totals for parent group
-			actualItems = tasks.getItemNames()
+			actualItems = tasks.itemNames
 			expectedItems =
 				remaining: []
 				running: []
@@ -1062,7 +1061,7 @@ joe.describe 'nested', (describe,it) ->
 			checks.push('my task 1')
 
 			# totals for parent group
-			actualItems = tasks.getItemNames()
+			actualItems = tasks.itemNames
 			expectedItems =
 				remaining: ['my group 1', 'my task 3']
 				running: ['my task 1']
@@ -1076,10 +1075,10 @@ joe.describe 'nested', (describe,it) ->
 		tasks.addGroup 'my group 1', ->
 			myGroup = @
 			checks.push('my group 1')
-			equal(@config.name, 'my group 1')
+			equal(@name, 'my group 1')
 
 			# totals for parent group
-			actualItems = tasks.getItemNames()
+			actualItems = tasks.itemNames
 			expectedItems =
 				remaining: ['my task 3']
 				running: ['my group 1']
@@ -1089,7 +1088,7 @@ joe.describe 'nested', (describe,it) ->
 			deepEqual(actualItems, expectedItems, 'my group 1 parent items')
 
 			# totals for sub group
-			actualItems = myGroup.getItemNames()
+			actualItems = myGroup.itemNames
 			expectedItems =
 				remaining: []
 				running: ['taskgroup method for my group 1']
@@ -1101,10 +1100,10 @@ joe.describe 'nested', (describe,it) ->
 
 			@addTask 'my task 2', ->
 				checks.push('my task 2')
-				equal(@config.name, 'my task 2')
+				equal(@name, 'my task 2')
 
 				# totals for parent group
-				actualItems = tasks.getItemNames()
+				actualItems = tasks.itemNames
 				expectedItems =
 					remaining: ['my task 3']
 					running: ['my group 1']
@@ -1114,7 +1113,7 @@ joe.describe 'nested', (describe,it) ->
 				deepEqual(actualItems, expectedItems, 'my group 1 after wait parent items')
 
 				# totals for sub group
-				actualItems = myGroup.getItemNames()
+				actualItems = myGroup.itemNames
 				expectedItems =
 					remaining: []
 					running: ['my task 2']
@@ -1127,10 +1126,10 @@ joe.describe 'nested', (describe,it) ->
 
 		tasks.addTask 'my task 3', ->
 			checks.push('my task 3')
-			equal(@config.name, 'my task 3')
+			equal(@name, 'my task 3')
 
 			# totals for parent group
-			actualItems = tasks.getItemNames()
+			actualItems = tasks.itemNames
 			expectedItems =
 				remaining: []
 				running: ['my task 3']
@@ -1153,7 +1152,7 @@ joe.describe 'nested', (describe,it) ->
 			equal(checks.length, 4, 'all the expected checks ran')
 
 			# totals for parent group
-			actualItems = tasks.getItemNames()
+			actualItems = tasks.itemNames
 			expectedItems =
 				remaining: []
 				running: []
@@ -1183,7 +1182,7 @@ joe.describe 'nested', (describe,it) ->
 
 		task = tasks.addTask 'my task 1', (complete) ->
 			checks.push('my task 1')
-			equal(@config.name, 'my task 1')
+			equal(@name, 'my task 1')
 			equal(tasks.remaining.length, 0)
 			equal(tasks.running, 1)
 

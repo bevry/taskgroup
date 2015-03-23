@@ -1,3 +1,5 @@
+// March 23, 2015
+// https://github.com/bevry/base
 {
   // enforcing options
   "bitwise": true,
@@ -32,7 +34,7 @@
   "boss": true,  // we understand assignments
   "debug": false,
   "eqnull": true,  // we know how to do null/undefined checks
-  "esnext": false,
+  "esnext": true,  // we are in the future with iojs and babeljs
   "evil": false,
   "expr": false,
   "funcscope": false,
