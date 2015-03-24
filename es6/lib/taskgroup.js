@@ -1,5 +1,6 @@
+'use strict'
+
 // Import
-let queue = setImmediate || process.nextTick  // node 0.8 b/c
 let {EventEmitter} = require('events')
 let ambi = require('ambi')
 let csextends = require('csextends')
@@ -16,7 +17,14 @@ if ( process.browser || process.versions.node.substr(0, 3) === '0.8' ) {
 
 // Helpers
 let util = {}
+
+// Make setTimeout a lot nicer
 util.wait = (delay, fn) => setTimeout(fn, delay)
+
+// Cross-platform (node 0.10+, node 0.8+, browser) compatible setImmediate
+util.queue = (global || window).setImmediate || (process && process.nextTick) || function(fn){setTimeout(fn, 0)}
+
+// Convert an error to a string
 util.errorToString = function(error){
 	if ( !error ) {
 		return null
@@ -28,6 +36,7 @@ util.errorToString = function(error){
 		return error.toString()
 	}
 }
+
 util.mapCopyIterator = function(value, key){
 	this.set(key, value)
 }
@@ -198,7 +207,7 @@ class Interface extends EventEmitter {
 		// If synchronouse, execute immediately
 		if ( this.config.get('sync') ) fn()
 		// Otherwise, execute at the next tick
-		else queue(fn)
+		else util.queue(fn)
 
 		// Chain
 		return this
