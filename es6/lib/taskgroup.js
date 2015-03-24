@@ -545,6 +545,17 @@ class Task extends Interface {
 		return this
 	}
 
+	// Internal: Clear the domain
+	clearDomain () {
+		let taskDomain = this.state.taskDomain
+		if ( taskDomain ) {
+			taskDomain.exit()
+			taskDomain.removeAllListeners()
+			this.state.taskDomain = null
+		}
+		return this
+	}
+
 	// Public: Destroy the task and prevent it from executing ever again.
 	destroy () {
 		this.done(() => {
@@ -565,6 +576,9 @@ class Task extends Interface {
 			// Remove all isteners
 			// thisTODO should we exit or dispose of the domain?
 			this.removeAllListeners()
+
+			// Clear the domain
+			this.clearDomain()
 		})
 
 		// Chain
@@ -602,7 +616,8 @@ class Task extends Interface {
 		// Instead we cover it up like so, to ensure the domain exits, as well to ensure the arguments are passed
 		completeMethod = (...args) => {
 			if ( this.config.sync || taskDomain ) {
-				if ( taskDomain ) taskDomain.exit()
+				this.clearDomain()
+				taskDomain = null
 				exitMethod(...args)
 			} else {
 				// Use the next tick workaround to escape the try...catch scope
