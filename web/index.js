@@ -1,5 +1,5 @@
 'use strict'
-let TaskGroup = require('TaskGroup')
+let TaskGroup = require('../es6/lib/taskgroup.js')
 let $status = document.getElementById('status')
 let $performance = document.getElementById('performance')
 $performance.onclick = window.performanceTest = function(){

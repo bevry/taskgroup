@@ -136,8 +136,8 @@ class Interface extends EventEmitter {
 
 	// Internal: Fire our completion event.
 	complete () {
-		let err = new Error('interface should provide this')
-		this.emit('error', err)
+		let error = new Error('interface should provide this')
+		this.emit('error', error)
 		return this
 	}
 
@@ -224,11 +224,11 @@ class Interface extends EventEmitter {
 //
 //  - `started()` - emitted when we start execution
 //  - `running()` - emitted when the method starts execution
-//  - `failed(err)` - emitted when execution exited with a failure
+//  - `failed(error)` - emitted when execution exited with a failure
 //  - `passed()` - emitted when execution exited with a success
-//  - `completed(err, ...args)` - emitted when execution exited, `args` are the result arguments from the method
-//  - `error(err)` - emtited if an unexpected error occurs without ourself
-//  - `done(err, ...args)` - emitted when either execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)
+//  - `completed(error, ...args)` - emitted when execution exited, `args` are the result arguments from the method
+//  - `error(error)` - emtited if an unexpected error occurs without ourself
+//  - `done(error, ...args)` - emitted when either execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)
 //
 // Available internal statuses:
 //
@@ -250,8 +250,8 @@ class Interface extends EventEmitter {
 //  ).done(console.info) // [null, 5]
 //
 //  task = require('taskgroup').Task.create('my task that errors', ->
-//    err = new Error('deliberate error')
-//    return err  // if asynchronous, can also do: complete(err)
+//    error = new Error('deliberate error')
+//    return error  // if asynchronous, can also do: complete(error)
 //    // thrown and uncaught errors are also caught thanks to domains, but that should be avoided
 //    // as it would put your app in an unknown state
 //  ).done(console.info) // [Error('deliberator error')]
@@ -717,11 +717,11 @@ class Task extends Interface {
 // Available events:
 // - `started()` - emitted when we start execution
 // - `running()` - emitted when the first item starts execution
-// - `failed(err)` - emitted when execution exited with a failure
+// - `failed(error)` - emitted when execution exited with a failure
 // - `passed()` - emitted when execution exited with a success
-// - `completed(err, results)` - emitted when execution exited, `results` is an {Array} of the result arguments for each item that executed
-// - `error(err)` - emtited if an unexpected error occured within ourself
-// - `done(err, results)` - emitted when either the execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)
+// - `completed(error, results)` - emitted when execution exited, `results` is an {Array} of the result arguments for each item that executed
+// - `error(error)` - emtited if an unexpected error occured within ourself
+// - `done(error, results)` - emitted when either the execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)
 // - `item.*(...)` - bubbled events from an added item
 // - `task.*(...)` - bubbled events from an added {Task}
 // - `group.*(...)` - bubbled events from an added {TaskGroup}
@@ -865,7 +865,7 @@ class TaskGroup extends Interface {
 	//   :on - (default: null) An {Object} of (eventName => listener) that we would like bound via EventEmitter.on.
 	//   :once - (default: null) An {Object} of (eventName => listener) that we would like bound via EventEmitter.once.	//   :method - (default: null) A {Function} that we would like to use to created nested groups and tasks using an inline style.
 	//   :parent - (default: null) A parent {TaskGroup} that we may be attached to.
-	//   :onError - (default: 'exit') A {String} that is either `'exit'` or `'ignore'`, when `'ignore'` errors that occur within items will not halt execution and will not be reported in the completion callbacks `err` argument (but will still be in the `results` argument).
+	//   :onError - (default: 'exit') A {String} that is either `'exit'` or `'ignore'`, when `'ignore'` errors that occur within items will not halt execution and will not be reported in the completion callbacks `error` argument (but will still be in the `results` argument).
 	//   :concurrency - (default: 1) The {Number} of items that we would like to execute at the same time. Use `0` for unlimited. `1` accomplishes serial execution, everything else accomplishes parallel execution.
 	//   :run - (default: true) A {Boolean} for whether or not to the :method (if specified) automatically.
 	//   :nestedConfig - (default: null) An {Object} of nested configuration to be applied to all items of this group.
