@@ -607,7 +607,8 @@ class Task extends Interface {
 			} else {
 				// Use the next tick workaround to escape the try...catch scope
 				// Which would otherwise catch errors inside our code when it shouldn't therefore suppressing errors
-				process.nextTick(function(){
+				// @TODO add test for this, originally used process.nextTick, changed to util.queue, hopefully it still does the same
+				util.queue(function(){
 					exitMethod(...args)
 				})
 			}
