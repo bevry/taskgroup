@@ -45,7 +45,7 @@ util.copyObject = function(obj1, obj2){
 }
 util.iterateObject = function(obj, iterator){
 	if ( obj ) {
-		if ( obj instanceof Map ) {
+		if ( obj instanceof Map ) {  // performance of this is neglible
 			obj.forEach(iterator)
 		} else {
 			for ( var key in obj ) {
@@ -785,6 +785,7 @@ class TaskGroup extends Interface {
 
 		// Internal: The configuration for our {TaskGroup} instance. See {::setConfig} for available configuration.
 		this.config = {
+			nestedEvents: false,
 			nestedTaskConfig: {},
 			nestedConfig: {},
 			concurrency: 1,
@@ -990,17 +991,21 @@ class TaskGroup extends Interface {
 		// Extract
 		let nestedConfig = this.config.nestedConfig
 		let nestedTaskConfig = this.config.nestedTaskConfig
+		let nestedEvents = this.config.nestedEvents
 
 		// Bubble task events
 		if ( Task.isTask(item) ) {
 			// Nested configuration
 			item.setConfig(itemConfig, nestedConfig, nestedTaskConfig, ...args)
 
-			item.state.events.forEach(function(event){
-				item.on(event, function(...args){
-					me.emit(`task.${event}`, item, ...args)
+			// Bubble the nested events if desired
+			if ( nestedEvents ) {
+				item.state.events.forEach(function(event){
+					item.on(event, function(...args){
+						me.emit(`task.${event}`, item, ...args)
+					})
 				})
-			})
+			}
 
 			// Notify our intention
 			this.emit('task.add', item)
@@ -1011,12 +1016,14 @@ class TaskGroup extends Interface {
 			// Nested configuration
 			item.setConfig(itemConfig, nestedConfig, {nestedConfig, nestedTaskConfig}, ...args)
 
-			// Bubble item events
-			item.state.events.forEach(function(event){
-				item.on(event, function(...args){
-					me.emit(`group.${event}`, item, ...args)
+			// Bubble the nested events if desired
+			if ( nestedEvents ) {
+				item.state.events.forEach(function(event){
+					item.on(event, function(...args){
+						me.emit(`group.${event}`, item, ...args)
+					})
 				})
-			})
+			}
 
 			// Notify our intention
 			this.emit('group.add', item)
@@ -1032,20 +1039,15 @@ class TaskGroup extends Interface {
 			item.config.name = `${item.type} ${this.totalItems+1} for [${this.name}]`
 		}
 
-		// Bubble item events
-		item.state.events.forEach(function(event){
-			item.on(event, function(...args){
-				me.emit(`item.${event}`, item, ...args)
+		// Bubble the nested events if desired
+		if ( nestedEvents ) {
+			item.state.events.forEach(function(event){
+				item.on(event, function(...args){
+					me.emit(`item.${event}`, item, ...args)
+				})
 			})
-		})
-
-		// @TODO why is this commented out?
-		// // Bubble item error event directly
-		// item.on 'error', (...args) ->
-		// 	me.emit('error', ...args)
-
-		// Notify our intention
-		this.emit('item.add', item)
+			this.emit('item.add', item)
+		}
 
 		// Handle item completion and errors once
 		// we can't just do item.done, or item.once('done'), because we need the item to be the argument, rather than `this`
