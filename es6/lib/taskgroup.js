@@ -36,28 +36,24 @@ util.errorToString = function(error){
 		return error.toString()
 	}
 }
-
-util.mapCopyIterator = function(value, key){
-	this.set(key, value)
+util.copyObject = function(obj1, obj2){
+	if ( obj2 ) {
+		util.iterateObject(obj2, function(value, key){
+			obj1[key] = value
+		})
+	}
 }
-util.copyToMap = function(map, object){
-	let objectMap = util.ensureMap(object)
-	let copyToMap = util.mapCopyIterator.bind(map)
-	objectMap.forEach(copyToMap)
-	return map
-}
-util.ensureMap = function(obj, Klass=Map){
-	if ( obj instanceof Klass ) {
-		return obj
-	} else {
-		let result = new Klass()
-		if ( obj ) {
-			Object.keys(obj).forEach(function(key){
-				let value = obj[key]
-				result.set(key, value)
-			})
+util.iterateObject = function(obj, iterator){
+	if ( obj ) {
+		if ( obj instanceof Map ) {
+			obj.forEach(iterator)
+		} else {
+			for ( var key in obj ) {
+				if ( obj.hasOwnProperty(key) ) {
+					iterator(obj[key], key)
+				}
+			}
 		}
-		return result
 	}
 }
 util.ensureArray = function(arr) {
@@ -181,7 +177,7 @@ class Interface extends EventEmitter {
 	// Returns either a joined {String} or an {Array} based on the value of the `format` option.
 	get namesArray () {
 		// Fetch
-		let names = [], name = this.name, parent = this.config.get('parent')
+		let names = [], name = this.name, parent = this.config.parent
 		if ( parent ) names.push(...parent.namesArray)
 		if ( name ) names.push(name)
 
@@ -199,13 +195,13 @@ class Interface extends EventEmitter {
 	//
 	// Returns the configured name {String}.
 	get name () {
-		return this.config.get('name') || `${this.type} ${Math.random()}`
+		return this.config.name || `${this.type} ${Math.random()}`
 	}
 
 	// Queue
 	queue (fn) {
 		// If synchronouse, execute immediately
-		if ( this.config.get('sync') ) fn()
+		if ( this.config.sync ) fn()
 		// Otherwise, execute at the next tick
 		else util.queue(fn)
 
@@ -274,14 +270,14 @@ class Task extends Interface {
 	//
 	// Returns a {Boolean} which is `true` if we have commenced execution
 	get started () {
-		return this.state.get('status') != null
+		return this.state.status != null
 	}
 
 	// Public: Have we finished its execution yet?
 	//
 	// Returns a {Boolean} which is `true` if we have finished execution
 	get exited () {
-		switch ( this.state.get('status') ) {
+		switch ( this.state.status ) {
 			case 'completed':
 			case 'destroyed':
 				return true
@@ -295,14 +291,14 @@ class Task extends Interface {
 	//
 	// Returns a {Boolean} which is `true` if we have bene destroyed
 	get destroyed () {
-		return this.state.get('status') === 'destroyed'
+		return this.state.status === 'destroyed'
 	}
 
 	// Public: Have we completed its execution yet?
 	//
 	// Returns a {Boolean} which is `true` if we have completed
 	get completed () {
-		switch ( this.state.get('status') ) {
+		switch ( this.state.status ) {
 			case 'failed':
 			case 'passed':
 			case 'destroyed':
@@ -317,47 +313,41 @@ class Task extends Interface {
 	// @TODO Decide if the following is still needed
 
 	// Internal: The first {Error} that has occured.
-	get error () { return this.state.get('error') }
+	get error () { return this.state.error }
 
 	// Internal: A {String} containing our current status. See our {Task} description for available values.
-	get status () { return this.state.get('status') }
+	get status () { return this.state.status }
 
 	// Internal: An {Array} of the events that we may emit. Events that will be executed can be found in the {Task} description.
-	get events () { return this.state.get('events') }
+	get events () { return this.state.events }
 
 	// Internal: An {Array} of the result arguments of our method.
 	// The first item in the array should be the {Error} if it exists.
-	get result () { return this.state.get('result') }
+	get result () { return this.state.result }
 
 	// Internal: The {Domain} that we create to capture errors for our method.
-	get taskDomain () { return this.state.get('taskDomain') }
+	get taskDomain () { return this.state.taskDomain }
 
 	// Public: Initialize our new {Task} instance. Forwards arguments onto {::setConfig}.
 	constructor (...args) {
 		super(...args)
 
 		// Data
-		this.state = new Map()
-			.set('events', new Set())
+		this.state = {
+			error: null,
+			status: null,
+			events: ['events', 'error', 'started', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed']
+		}
 
 		// Configuration
-		this.config = new Map()
-			.set('run', false)
-			.set('onError', 'exit')
-			.set('ambi', true)
-			.set('domain', true)
-			.set('sync', false)
-
-		// Events
-		this.state.get('events')
-			.add('error')
-			.add('started')
-			.add('running')
-			.add('failed')
-			.add('passed')
-			.add('completed')
-			.add('done')
-			.add('destroyed')
+		this.config = {
+			run: false,
+			onError: 'exit',
+			ambi: true,
+			domain: true,
+			sync: false,
+			args: null
+		}
 
 		// Apply configuration
 		this.setConfig(...args)
@@ -386,38 +376,36 @@ class Task extends Interface {
 	//   :domain - (default: true) A {Boolean} for whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution)
 	//   :sync - (default: false) A {Boolean} for whether or not we should execute certain calls asynchronously (`false`) or synchronously (`true`)
 	setConfig (...args) {
-		let opts = new Map()
+		let opts = {}
 
 		// Extract the configuration from the arguments
 		args.forEach(function(arg){
 			let type = typeof arg
 			switch ( type ) {
 				case 'string':
-					opts.set('name', arg)
+					opts.name = arg
 					break
 				case 'function':
-					opts.set('method', arg)
+					opts.method = arg
 					break
 				case 'object':
-					util.copyToMap(opts, arg)
+					util.copyObject(opts, arg)
 					break
 			}
 		})
 
 		// Apply the configuration directly to our instance
-		opts.forEach((value, key) => {
+		util.iterateObject(opts, (value, key) => {
 			if ( value == null ) return
 			switch ( key ) {
 				case 'on':
-					value = util.ensureMap(value)
-					value.forEach((value, key) => {
+					util.iterateObject(value, (value, key) => {
 						if ( value ) this.on(key, value)
 					})
 					break
 
 				case 'once':
-					value = util.ensureMap(value)
-					value.forEach((value, key) => {
+					util.iterateObject(value, (value, key) => {
 						if ( value ) this.once(key, value)
 					})
 					break
@@ -433,7 +421,7 @@ class Task extends Interface {
 					break
 
 				default:
-					this.config.set(key, value)
+					this.config[key] = value
 					break
 			}
 		})
@@ -449,22 +437,19 @@ class Task extends Interface {
 	// args - The arguments {Array} that will be applied to the {::result} variable. First argument is the {Error} if it exists.
 	exit (...args) {
 		// Store the first error
-		let error = this.state.get('error')
+		let error = this.state.error
 		if ( args[0] && !error ) {
-			error = args[0]
-			this.state.set('error', error)
+			this.state.error = error = args[0]
 		}
 
 		// Complete for the first (and hopefully only) time
 		if ( this.completed === false ) {
 			// Apply the result if it exists
-			if ( args.length !== 0 ) this.state.set('result', args)
+			if ( args.length !== 0 ) this.state.result = args
 
-			// Did we error?
+			// Set the status and emit depending on success or failure status
 			let status = (error ? 'failed' : 'passed')
-			this.state.set('status', status)
-
-			// Notify our listeners of our status
+			this.state.status = status
 			this.emit(status, error)
 
 			// Fire the completion callback
@@ -472,8 +457,8 @@ class Task extends Interface {
 		}
 
 		// Error as we have already completed before
-		else if ( this.config.get('onError') !== 'ignore' ) {
-			let result = this.state.get('result')
+		else if ( this.config.onError !== 'ignore' ) {
+			let result = this.state.result
 			let stateInformation = require('util').inspect({
 				error: util.errorToString(error),
 				previousResult: result,
@@ -494,11 +479,11 @@ class Task extends Interface {
 		let completed = this.completed
 		if ( completed ) {
 			// Notify our listeners we have completed
-			let args = this.state.get('result') || []
+			let args = this.state.result || []
 			this.emit('completed', ...args)
 
 			// Prevent the error from persisting
-			this.state.delete('error')
+			this.state.error = null
 
 			// Should we reset results?
 			// this.results = []
@@ -522,7 +507,7 @@ class Task extends Interface {
 		if ( this.completed ) {
 			// avoid zalgo
 			this.queue(() => {
-				let result = this.state.get('result') || []
+				let result = this.state.result || []
 				listener.apply(this, result)
 			})
 		} else {
@@ -541,7 +526,7 @@ class Task extends Interface {
 		if ( this.completed ) {
 			// avoid zalgo
 			this.queue(() => {
-				let result = this.state.get('result') || []
+				let result = this.state.result || []
 				listener.apply(this, result)
 			})
 		} else {
@@ -556,7 +541,7 @@ class Task extends Interface {
 	//
 	// At this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.
 	resetResults () {
-		this.state.set('result', [])
+		this.state.result = []
 		return this
 	}
 
@@ -564,14 +549,13 @@ class Task extends Interface {
 	destroy () {
 		this.done(() => {
 			// Prepare
-			let status = this.state.get('status')
+			let status = this.state.status
 
 			// Are we already destroyed?
 			if ( status === 'destroyed' ) return
 
 			// Update our status and notify our listeners
-			status = 'destroyed'
-			this.state.set('status', status)
+			this.state.status = status = 'destroyed'
 			this.emit(status)
 
 			// Clear results
@@ -590,12 +574,12 @@ class Task extends Interface {
 	// Internal: Fire the task method with our config arguments and wrapped in a domain.
 	fire () {
 		// Prepare
-		let args = (this.config.get('args') || []).slice()
-		let taskDomain = this.state.get('taskDomain')
-		let useDomains = this.config.get('domain') !== false
+		let args = (this.config.args || []).slice()
+		let taskDomain = this.state.taskDomain
+		let useDomains = this.config.domain !== false
 		let exitMethod = this.exit.bind(this)
 		let completeMethod, fireMethod
-		let method = this.config.get('method')
+		let method = this.config.method
 
 		// Check that we have a method to fire
 		if ( !method ) {
@@ -610,15 +594,14 @@ class Task extends Interface {
 		// Prepare the task domain if it doesn't already exist
 		if ( useDomains && domain && !taskDomain ) {
 			// Setup the domain
-			taskDomain = domain.create()
-			this.state.set('taskDomain', taskDomain)
+			this.state.taskDomain = taskDomain = domain.create()
 			taskDomain.on('error', exitMethod)
 		}
 
 		// Domains, as well as process.nextTick, make it so we can't just use exitMethod directly
 		// Instead we cover it up like so, to ensure the domain exits, as well to ensure the arguments are passed
 		completeMethod = (...args) => {
-			if ( this.config.get('sync') || taskDomain ) {
+			if ( this.config.sync || taskDomain ) {
 				if ( taskDomain ) taskDomain.exit()
 				exitMethod(...args)
 			} else {
@@ -633,7 +616,7 @@ class Task extends Interface {
 		// Our fire function that will be wrapped in a domain or executed directly
 		fireMethod = () => {
 			// Execute with ambi if appropriate
-			if ( this.config.get('ambi') !== false ) {
+			if ( this.config.ambi !== false ) {
 				ambi(method, ...args)
 			}
 
@@ -647,20 +630,19 @@ class Task extends Interface {
 		args.push(completeMethod)
 
 		// Setup timeout if appropriate
-		let timeout = this.config.get('timeout')
-		if ( timeout ) {
-			timeout = util.wait(timeout, () => {
+		let timeoutDuration = this.config.timeout
+		if ( timeoutDuration ) {
+			this.state.timeout = util.wait(timeoutDuration, () => {
 				if ( !this.completed ) {
 					let error = new Error(`The task [${this.names}] has timed out.`)
 					exitMethod(error)
 				}
 			})
-			this.state.set('timeout', timeout)
 		}
 
 		// Notify that we are now running
 		let status = 'running'
-		this.state.set('status', status)
+		this.state.status = status
 		this.emit(status)
 
 		// Fire the method within the domain if desired, otherwise execute directly
@@ -693,7 +675,7 @@ class Task extends Interface {
 			else {
 				// Apply our new status and notify our listeners
 				let status = 'started'
-				this.state.set('status', status)
+				this.state.status = status
 				this.emit(status)
 
 				// Fire the task
@@ -763,59 +745,52 @@ class TaskGroup extends Interface {
 	// @TODO Decide if the following is still needed
 
 	// Internal: The config.concurrency property
-	get concurrency () { return this.config.get('concurrency') }
+	get concurrency () { return this.config.concurrency }
 
 	// Internal: The first {Error} that has occured.
-	get error () { return this.state.get('error') }
+	get error () { return this.state.error }
 
 	// Internal: A {String} containing our current status. See our {TaskGroup} description for available values.
-	get status () { return this.state.get('status') }
+	get status () { return this.state.status }
 
 	// Internal: An {Array} of the events that we may emit. Events that will be executed can be found in the {Task} description.
-	get events () { return this.state.get('events') }
+	get events () { return this.state.events }
 
 	// Internal: An {Array} of the result Arguments for each completed item when their :includeInResults configuration option is not `false`
-	get results () { return this.state.get('results') }
+	get results () { return this.state.results }
 
 	// Internal: An {Array} of the items that are still yet to execute
-	get itemsRemaining () { return this.state.get('itemsRemaining') }
+	get itemsRemaining () { return this.state.itemsRemaining }
 
 	// Internal: An {Array} of the items that are currently running
-	get itemsRunning () { return this.state.get('itemsRunning') }
+	get itemsRunning () { return this.state.itemsRunning }
 
 	// Internal: An {Array} of the items that have completed
-	get itemsCompleted () { return this.state.get('itemsCompleted') }
+	get itemsCompleted () { return this.state.itemsCompleted }
 
 	// Public: Initialize our new {Task} instance. Forwards arguments onto {::setConfig}.
 	constructor (...args) {
 		super(...args)
 
 		// State
-		this.state = new Map()
-			.set('events', new Set())
-			.set('results', [])
-			.set('itemsRemaining', [])
-			.set('itemsRunning', [])
-			.set('itemsCompleted', [])
+		this.state = {
+			error: null,
+			status: null,
+			events: ['error', 'started', 'running', 'passed', 'failed', 'completed', 'done', 'destroyed'],
+			results: [],
+			itemsRemaining: [],
+			itemsRunning: [],
+			itemsCompleted: []
+		}
 
 		// Internal: The configuration for our {TaskGroup} instance. See {::setConfig} for available configuration.
-		this.config = new Map()
-			.set('nestedTaskConfig', new Map())
-			.set('nestedConfig', new Map())
-			.set('concurrency', 1)
-			.set('onError', 'exit')
-			.set('sync', false)
-
-		// Add events
-		this.state.get('events')
-			.add('error')
-			.add('started')
-			.add('running')
-			.add('passed')
-			.add('failed')
-			.add('completed')
-			.add('done')
-			.add('destroyed')
+		this.config = {
+			nestedTaskConfig: {},
+			nestedConfig: {},
+			concurrency: 1,
+			onError: 'exit',
+			sync: false
+		}
 
 		// Apply configuration
 		this.setConfig(...args)
@@ -836,8 +811,7 @@ class TaskGroup extends Interface {
 	// Public: Set Nested Task Config
 	set nestedTaskConfig (opts) {
 		// Fetch and copy options to the state's nested task configuration
-		let nestedTaskConfig = this.state.get('nestedTaskConfig')
-		util.copyToMap(nestedTaskConfig, opts)
+		util.copyObject(this.state.nestedTaskConfig, opts)
 
 		// Chain
 		return this
@@ -846,8 +820,7 @@ class TaskGroup extends Interface {
 	// Public: Set Nested Config
 	set nestedConfig (opts) {
 		// Fetch and copy options to the state's nested configuration
-		let nestedConfig = this.state.get('nestedConfig')
-		util.copyToMap(nestedConfig, opts)
+		util.copyObject(this.state.nestedConfig, opts)
 
 		// Chain
 		return this
@@ -875,38 +848,36 @@ class TaskGroup extends Interface {
 	//   :items - (default: null) An {Array} of {Task} and/or {TaskGroup} instances to be added to this group.
 	//   :sync - (default: false) A {Boolean} for whether or not we should execute certain calls asynchronously (`false`) or synchronously (`true`)
 	setConfig (...args) {
-			let opts = new Map()
+			let opts = {}
 
 			// Extract the configuration from the arguments
 			args.forEach(function(arg){
 				let type = typeof arg
 				switch ( type ) {
 					case 'string':
-						opts.set('name', arg)
+						opts.name = arg
 						break
 					case 'function':
-						opts.set('method', arg)
+						opts.method = arg
 						break
 					case 'object':
-						util.copyToMap(opts, arg)
+						util.copyObject(opts, arg)
 						break
 				}
 			})
 
 			// Apply the configuration directly to our instance
-			opts.forEach((value, key) => {
+			util.iterateObject(opts, (value, key) => {
 				if ( value == null ) return
 				switch ( key ) {
 					case 'on':
-						value = util.ensureMap(value)
-						value.forEach((value, key) => {
+						util.iterateObject(value, (value, key) => {
 							if ( value ) this.on(key, value)
 						})
 						break
 
 					case 'once':
-						value = util.ensureMap(value)
-						value.forEach((value, key) => {
+						util.iterateObject(value, (value, key) => {
 							if ( value ) this.once(key, value)
 						})
 						break
@@ -937,7 +908,7 @@ class TaskGroup extends Interface {
 						break
 
 					default:
-						this.config.set(key, value)
+						this.config[key] = value
 						break
 				}
 		})
@@ -954,13 +925,12 @@ class TaskGroup extends Interface {
 	//
 	// method - The {Function} of our method
 	// config - An optional {Object} of configuration for the task to be created for our method
-	addMethod (method, opts) {
-		opts = util.ensureMap(opts)
+	addMethod (method, opts={}) {
 		method = method.bind(this) // run the taskgroup method on the group, rather than itself
 		method.isTaskGroupMethod = true
-		if ( !opts.get('name') ) opts.set('name', 'taskgroup method for '+this.name)
-		if ( !opts.get('args') ) opts.set('args', [this.addGroup.bind(this), this.addTask.bind(this)])
-		if ( !opts.has('includeInResults') ) opts.set('includeInResults', false)
+		if ( !opts.name ) opts.name = 'taskgroup method for '+this.name
+		if ( !opts.args ) opts.args = [this.addGroup.bind(this), this.addTask.bind(this)]
+		if ( opts.includeInResults == null ) opts.includeInResults = false
 		return this.addTask(method, opts)
 	}
 
@@ -973,8 +943,8 @@ class TaskGroup extends Interface {
 	// Used primarily to cause the :method to fire at the appropriate time when using inline style.
 	autoRun () {
 		// Prepare
-		let method = this.config.get('method')
-		let run = this.config.get('run')
+		let method = this.config.method
+		let run = this.config.run
 
 		// Auto run if we are going the inline style and have no parent
 		if ( method ) {
@@ -982,9 +952,8 @@ class TaskGroup extends Interface {
 			this.addMethod(method)
 
 			// If we are the topmost group default run to true
-			if ( !this.config.get('parent') && run == null ) {
-				run = true
-				this.config.set('run', run)
+			if ( !this.config.parent && run == null ) {
+				this.state.run = run = true
 			}
 		}
 
@@ -1013,26 +982,21 @@ class TaskGroup extends Interface {
 		if ( !item ) return null
 
 		// Link our item to ourself
-		item.setConfig({
+		let itemConfig = {
 			'parent': this,
-			'sync': this.config.get('sync')
-		})
-		if ( args.length !== 0 ) item.setConfig(...args)
-		if ( !item.config.get('name') ) {
-			item.config.set('name', `${item.type} ${this.totalItems+1} for [${this.name}]`)
+			'sync': this.config.sync
 		}
 
 		// Extract
-		let nestedConfig = this.config.get('nestedConfig')
-		let nestedTaskConfig = this.config.get('nestedTaskConfig')
+		let nestedConfig = this.config.nestedConfig
+		let nestedTaskConfig = this.config.nestedTaskConfig
 
 		// Bubble task events
 		if ( Task.isTask(item) ) {
 			// Nested configuration
-			item.setConfig(nestedConfig)
-			item.setConfig(nestedTaskConfig)
+			item.setConfig(itemConfig, nestedConfig, nestedTaskConfig, ...args)
 
-			item.state.get('events').forEach(function(event){
+			item.state.events.forEach(function(event){
 				item.on(event, function(...args){
 					me.emit(`task.${event}`, item, ...args)
 				})
@@ -1045,11 +1009,10 @@ class TaskGroup extends Interface {
 		// Bubble group events
 		else if ( TaskGroup.isTaskGroup(item) ) {
 			// Nested configuration
-			item.setConfig(nestedConfig)
-			item.setConfig({nestedConfig, nestedTaskConfig})
+			item.setConfig(itemConfig, nestedConfig, {nestedConfig, nestedTaskConfig}, ...args)
 
 			// Bubble item events
-			item.state.get('events').forEach(function(event){
+			item.state.events.forEach(function(event){
 				item.on(event, function(...args){
 					me.emit(`group.${event}`, item, ...args)
 				})
@@ -1059,8 +1022,18 @@ class TaskGroup extends Interface {
 			this.emit('group.add', item)
 		}
 
+		// Unknown type
+		else {
+			// error
+		}
+
+		// Name default
+		if ( !item.config.name ) {
+			item.config.name = `${item.type} ${this.totalItems+1} for [${this.name}]`
+		}
+
 		// Bubble item events
-		item.state.get('events').forEach(function(event){
+		item.state.events.forEach(function(event){
 			item.on(event, function(...args){
 				me.emit(`item.${event}`, item, ...args)
 			})
@@ -1081,7 +1054,7 @@ class TaskGroup extends Interface {
 		})
 
 		// Add the item
-		this.state.get('itemsRemaining').push(item)
+		this.state.itemsRemaining.push(item)
 
 		// We may be running and expecting items, if so, fire
 		this.fire()
@@ -1228,9 +1201,9 @@ class TaskGroup extends Interface {
 	//
 	// Returns a {Number} of the total items we have
 	get totalItems () {
-		let running = this.state.get('itemsRunning').length
-		let remaining = this.state.get('itemsRemaining').length
-		let completed = this.state.get('itemsCompleted').length
+		let running = this.state.itemsRunning.length
+		let remaining = this.state.itemsRemaining.length
+		let completed = this.state.itemsCompleted.length
 		let total = running + remaining + completed
 		return total
 	}
@@ -1244,10 +1217,10 @@ class TaskGroup extends Interface {
 	//   :total - A {Number} of the total items we have
 	//   :results - An {Array} of the results of the compelted items
 	get itemNames () {
-		let running = this.state.get('itemsRunning').map((item) => item.name)
-		let remaining = this.state.get('itemsRemaining').map((item) => item.name)
-		let completed = this.state.get('itemsCompleted').map((item) => item.name)
-		let results = this.state.get('results')
+		let running = this.state.itemsRunning.map((item) => item.name)
+		let remaining = this.state.itemsRemaining.map((item) => item.name)
+		let completed = this.state.itemsCompleted.map((item) => item.name)
+		let results = this.state.results
 		let total = running.length + remaining.length + completed.length
 		return {
 			remaining,
@@ -1267,10 +1240,10 @@ class TaskGroup extends Interface {
 	//   :total - A {Number} of the total items we have
 	//   :results - A {Number} of the total results we have
 	get itemTotals () {
-		let running = this.state.get('itemsRunning').length
-		let remaining = this.state.get('itemsRemaining').length
-		let completed = this.state.get('itemsCompleted').length
-		let results = this.state.get('results').length
+		let running = this.state.itemsRunning.length
+		let remaining = this.state.itemsRemaining.length
+		let completed = this.state.itemsCompleted.length
+		let results = this.state.results.length
 		let total = running + remaining + completed
 		return {
 			remaining,
@@ -1285,14 +1258,14 @@ class TaskGroup extends Interface {
 	//
 	// Returns a {Boolean} which is `true` if we have any items that are currently running
 	get hasRunning () {
-		return this.state.get('itemsRunning').length !== 0
+		return this.state.itemsRunning.length !== 0
 	}
 
 	// Public: Whether or not we have any items that are yet to execute
 	//
 	// Returns a {Boolean} which is `true` if we have any items that are still yet to be executed
 	get hasRemaining () {
-		return this.state.get('itemsRemaining').length !== 0
+		return this.state.itemsRemaining.length !== 0
 	}
 
 	// Public: Whether or not we have any items
@@ -1304,21 +1277,21 @@ class TaskGroup extends Interface {
 
 	// Public
 	get hasError () {
-		return this.state.get('error') != null
+		return this.state.error != null
 	}
 
 	// Public
 	get hasResult () {
-		return this.hasError || this.state.get('results').length !== 0
+		return this.hasError || this.state.results.length !== 0
 	}
 
 	// Internal: Whether or not we have any available slots to execute more items.
 	//
 	// Returns a {Boolean} which is `true` if we have available slots.
 	get hasSlots () {
-		let concurrency = this.config.get('concurrency')
+		let concurrency = this.config.concurrency
 		return (
-			concurrency === 0 || this.state.get('itemsRunning').length < concurrency
+			concurrency === 0 || this.state.itemsRunning.length < concurrency
 		)
 	}
 
@@ -1327,7 +1300,7 @@ class TaskGroup extends Interface {
 	// Returns a {Boolean} which is `true` if we are paused.
 	get shouldPause () {
 		return (
-			this.config.get('onError') === 'exit' && this.hasError
+			this.config.onError === 'exit' && this.hasError
 		)
 	}
 
@@ -1355,7 +1328,7 @@ class TaskGroup extends Interface {
 	//
 	// Returns a {Boolean} which is `true` if we have finished execution
 	get exited () {
-		switch ( this.state.get('status') ) {
+		switch ( this.state.status ) {
 			case 'completed':
 			case 'destroyed':
 				return true
@@ -1369,7 +1342,7 @@ class TaskGroup extends Interface {
 	//
 	// Returns a {Boolean} which is `true` if we have commenced execution
 	get started () {
-		return this.state.get('status') != null
+		return this.state.status != null
 	}
 
 	// Public
@@ -1405,27 +1378,25 @@ class TaskGroup extends Interface {
 
 		if ( completed ) {
 			// Notity our listners we have completed
-			this.emit('completed', this.state.get('error'), this.state.get('results'))
+			this.emit('completed', this.state.error, this.state.results)
 
 			// Prevent the error from persisting
-			this.state.delete('error')
+			this.state.error = null
 
 			// Cleanup the items that will now go unused
-			let itemsCompleted = this.state.get('itemsCompleted')
-			itemsCompleted.forEach(function(item){
+			this.state.itemsCompleted.forEach(function(item){
 				item.destroy()
 			})
-			itemsCompleted = []
-			this.state.set('itemsCompleted', itemsCompleted)
+			this.state.itemsCompleted = []
 
 			// Should we reset results?
-			// this.results = []
+			// this.state.results = []
 			// no, it would break the promise nature of done
 			// as it would mean that if multiple done handlers are added, they would each get different results
 			// if they wish to reset the results, they should do so manually via resetResults
 
 			// Should we reset the status?
-			// this.status = null
+			// this.state.status = null
 			// no, it would break the promise nature of done
 			// as it would mean that once a done is fired, no more can be fired, until run is called again
 		}
@@ -1440,7 +1411,7 @@ class TaskGroup extends Interface {
 	whenDone (handler) {
 		if ( this.completed ) {
 			// avoid zalgo
-			this.queue( () => handler.call(this, this.state.get('error'), this.state.get('results')) )
+			this.queue( () => handler.call(this, this.state.error, this.state.results) )
 		} else {
 			super.whenDone(handler)
 		}
@@ -1456,7 +1427,7 @@ class TaskGroup extends Interface {
 	onceDone (handler) {
 		if ( this.completed ) {
 			// avoid zalgo
-			this.queue( () => handler.call(this, this.state.get('error'), this.state.get('results')) )
+			this.queue( () => handler.call(this, this.state.error, this.state.results) )
 		} else {
 			super.onceDone(handler)
 		}
@@ -1469,7 +1440,7 @@ class TaskGroup extends Interface {
 	//
 	// At this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.
 	resetResults () {
-		this.state.set('results', [])
+		this.state.results = []
 
 		// Chain
 		return this
@@ -1510,20 +1481,17 @@ class TaskGroup extends Interface {
 			// Fire the next item
 
 			// Update our status and notify our listeners
-			let status = this.state.get('status')
+			let status = this.state.status
 			if ( status !== 'running' ) {
-				status = 'running'
-				this.state.set('status', status)
+				this.state.status = status = 'running'
 				this.emit(status)
 			}
 
 			// Get the next item
-			let itemsRemaining = this.state.get('itemsRemaining')
-			let item = itemsRemaining.shift()
+			let item = this.state.itemsRemaining.shift()
 
 			// Add it to the remaining items
-			let itemsRunning = this.state.get('itemsRunning')
-			itemsRunning.push(item)
+			this.state.itemsRunning.push(item)
 
 			// Run it
 			item.run()
@@ -1539,16 +1507,15 @@ class TaskGroup extends Interface {
 	// Internal: What to do when an item completes
 	itemCompletionCallback (item, ...args) {
 		// Prepare
-		let error = this.state.get('error')
-		let itemsRunning = this.state.get('itemsRunning')
-		let itemsCompleted = this.state.get('itemsCompleted')
-		let results = this.state.get('results')
+		let error = this.state.error
+		let itemsRunning = this.state.itemsRunning
+		let itemsCompleted = this.state.itemsCompleted
+		let results = this.state.results
 
 		// Update error if it exists
-		if ( this.config.get('onError') === 'exit' && args[0] ) {
+		if ( this.config.onError === 'exit' && args[0] ) {
 			if ( !error ) {
-				error = args[0]
-				this.state.set('error', error)
+				this.state.error = error = args[0]
 			}
 		}
 
@@ -1559,20 +1526,18 @@ class TaskGroup extends Interface {
 			let indexError = new Error(`Could not find [${item.names}] in the running queue`)
 			console.error(util.errorToString(indexError))
 			if ( !error ) {
-				error = indexError
-				this.state.set('error', error)
+				this.state.error = error = indexError
 			}
 		}
 		else {
-			itemsRunning = itemsRunning.slice(0, index).concat(itemsRunning.slice(index+1))
-			this.state.set('itemsRunning', itemsRunning)
+			this.state.itemsRunning = itemsRunning = itemsRunning.slice(0, index).concat(itemsRunning.slice(index+1))
 		}
 
 		// Add to the completed queue
 		itemsCompleted.push(item)
 
 		// Add the result
-		if ( item.config.get('includeInResults') !== false ) {
+		if ( item.config.includeInResults !== false ) {
 			results.push(args)
 		}
 
@@ -1605,7 +1570,7 @@ class TaskGroup extends Interface {
 	// Public: Clear remaning items.
 	clear () {
 		// Destroy all the items
-		let itemsRemaining = this.state.get('itemsRemaining')
+		let itemsRemaining = this.state.itemsRemaining
 		while ( itemsRemaining.length !== 0 ) {
 			itemsRemaining.pop()
 		}
@@ -1622,14 +1587,13 @@ class TaskGroup extends Interface {
 		// Once finished, destroy it
 		this.done(() => {
 			// Prepare
-			let status = this.state.get('status')
+			let status = this.state.status
 
 			// Are we already destroyed?
 			if ( status === 'destroyed' ) return
 
 			// Update our status and notify our listeners
-			status = 'destroyed'
-			this.state.set('status', status)
+			this.state.status = status = 'destroyed'
 			this.emit(status)
 
 			// Clear results
@@ -1648,17 +1612,14 @@ class TaskGroup extends Interface {
 	// Internal: We now want to exit.
 	exit (...args) {
 		// Store the first error
-		let error = this.state.get('error')
+		let error = this.state.error
 		if ( args[0] && !error ) {
-			error = args[0]
-			this.state.set('error', error)
+			this.state.error = error = args[0]
 		}
 
-		// Did we error?
+		// Set and emmit the appropriate status for our error or non-error
 		let status = (error ? 'failed' : 'passed')
-		this.state.set('status', status)
-
-		// Notify our listeners of our status
+		this.state.status = status
 		this.emit(status, error)
 
 		// Fire the completion callback
@@ -1673,7 +1634,7 @@ class TaskGroup extends Interface {
 		this.queue(() => {
 			// Apply our new status and notify our intention to run
 			let status = 'started'
-			this.state.set('status', status)
+			this.state.status = status
 			this.emit(status)
 
 			// Give time for the listeners to complete before continuing

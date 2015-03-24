@@ -437,7 +437,7 @@ joe.describe 'taskgroup', (describe,it) ->
 				expectedItems =
 					remaining: []
 					running: []
-					completed: ['task 1', 'task 2']
+					completed: ['my task 1', 'my task 2']
 					total: 2
 					results: [[null,10], [null,20]]
 
@@ -446,11 +446,11 @@ joe.describe 'taskgroup', (describe,it) ->
 
 				done()
 
-			tasks.addTask 'task 1', (complete) ->
+			tasks.addTask 'my task 1', (complete) ->
 				actualItems = tasks.itemNames
 				expectedItems =
-					remaining: ['task 2']
-					running: ['task 1']
+					remaining: ['my task 2']
+					running: ['my task 1']
 					completed: []
 					total: 2
 					results: []
@@ -463,12 +463,12 @@ joe.describe 'taskgroup', (describe,it) ->
 					complete(null, 10)
 
 
-			tasks.addTask 'task 2', ->
+			tasks.addTask 'my task 2', ->
 				actualItems = tasks.itemNames
 				expectedItems =
 					remaining: []
-					running: ['task 2']
-					completed: ['task 1']
+					running: ['my task 2']
+					completed: ['my task 1']
 					total: 2
 					results:  [[null,10]]
 				deepEqual(actualItems, expectedItems, 'task 2 items')
@@ -479,7 +479,7 @@ joe.describe 'taskgroup', (describe,it) ->
 
 			actualItems = tasks.itemNames
 			expectedItems =
-				remaining: ['task 1', 'task 2']
+				remaining: ['my task 1', 'my task 2']
 				running: []
 				completed: []
 				total: 2
