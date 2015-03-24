@@ -57,6 +57,7 @@
     "assert-helpers": "^1.0.0",
     "babel": "^4.7.16",
     "babel-eslint": "^2.0.2",
+    "babelify": "^5.0.4",
     "coffee-script": "^1.9.1",
     "eslint": "^0.17.1",
     "joe": "^1.6.0",
@@ -68,11 +69,13 @@
   "directories": {
     "lib": "./out/lib"
   },
+  "main": "./es6guardian.js",
   "scripts": {
     "preinstall": "node ./cyclic.js",
-    "test": "node --harmony ./coffeejs/test/taskgroup-test.js"
+    "test": "node --harmony ./coffeejs/test/taskgroup-test.js",
+    "profile": "node --harmony ./es5/test/profile.js",
+    "browserify": "./node_modules/.bin/browserify ./web/index.js -t babelify --outfile ./web/out.js"
   },
-  "main": "./es6guardian.js",
   "cakeConfiguration": {
     "COFFEE_SRC_PATH": "coffee",
     "COFFEE_OUT_PATH": "coffeejs",

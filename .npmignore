@@ -38,3 +38,4 @@ bower.json
 
 coffeejs/
 **/*.cpuprofile
+web/

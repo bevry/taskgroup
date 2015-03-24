@@ -5,20 +5,29 @@ let util = require('./util')
 let mode = 'profile'
 let testname = 'taskgroup-profile-test'
 
-// PRepare tests
-let testArray = Array(1000).join().split(',')
+// Start profiling
 if ( mode === 'profile' ) util.startProfile(testname)
 
-// Let's do it
+// Prepare
+let createTask = function(name, value){
+	return function() {
+		// $status.innerHTML += value
+		return value
+	}
+}
+
+// Create the taskgroup
 let tasks = TaskGroup.create()
 
-testArray.forEach(function(value, index) {
-	let name = 'Task '+index
-	tasks.addTask(name, function() {
-		return 'Value '+index
-	})
-})
+// Add the tasks
+for ( let i = 0, n = 50000; i < n; ++i ) {
+	let name = 'Task '+i
+	let value = 'Value '+i
+	let task = createTask(name, value)
+	tasks.addTask(name, task)
+}
 
+// Listen for complete
 tasks.done(function(){
 	if ( mode === 'heap ') {
 		util.saveSnapshot(testname)
@@ -29,4 +38,5 @@ tasks.done(function(){
 	}
 })
 
+// Run the tasks
 tasks.run()
