@@ -57,13 +57,13 @@
     "assert-helpers": "^1.0.0",
     "babel": "^4.7.16",
     "babel-eslint": "^2.0.2",
-    "biscotto": "^2.3.1",
     "coffee-script": "^1.9.1",
     "eslint": "^0.17.1",
     "joe": "^1.6.0",
     "joe-reporter-console": "^1.2.1",
     "projectz": "^0.5.0",
-    "safeps": "^2.2.12"
+    "safeps": "^2.2.12",
+    "v8-profiler": "^5.2.4"
   },
   "directories": {
     "lib": "./out/lib"

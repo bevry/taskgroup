@@ -26,3 +26,4 @@ out/
 
 coffeejs/
 es5/
+**/*.cpuprofile

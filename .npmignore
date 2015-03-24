@@ -37,3 +37,4 @@ bower.json
 # CUSTOM MODIFICATIONS
 
 coffeejs/
+**/*.cpuprofile
