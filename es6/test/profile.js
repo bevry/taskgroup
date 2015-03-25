@@ -2,8 +2,8 @@
 
 let TaskGroup = require('../../')
 let util = require('./util')
-let mode = 'profile'
 let testname = 'taskgroup-profile-test'
+let mode = 'heap'
 
 // Start profiling
 if ( mode === 'profile' ) util.startProfile(testname)

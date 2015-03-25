@@ -18,9 +18,9 @@ util.saveSnapshot = function (testname, next) {
 		result += data // not a buffer
 	}
 	let complete = function () {
+		snapshot.delete()
 		fs.writeFileSync(filename, result)
-		snapshot.delete();
-		next();
+		next()
 	}
 	snapshot.serialize(concatIterator, complete)
 }
@@ -33,8 +33,8 @@ util.stopProfile = function (testname, next) {
 	let filename = testname+'.cpuprofile'
 	let cpuProfile = profiler.stopProfiling(testname)
 	let profileJSON = JSON.stringify(cpuProfile)
-	cpuProfile.delete();
-	
+	cpuProfile.delete()
+
 	next = next || function(error){
 		if ( error ) return console.error(error)
 		console.log('Profile taken successfully:', filename)
@@ -45,7 +45,6 @@ util.stopProfile = function (testname, next) {
 
 	// Write the file
 	fs.writeFileSync(filename, profileJSON)
-	
-	next();
+	next()
 }
 module.exports = util
