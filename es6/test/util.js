@@ -18,7 +18,9 @@ util.saveSnapshot = function (testname, next) {
 		result += data // not a buffer
 	}
 	let complete = function () {
-		fs.writeFile(filename, result, next)
+		fs.writeFileSync(filename, result)
+		snapshot.delete();
+		next();
 	}
 	snapshot.serialize(concatIterator, complete)
 }
@@ -31,7 +33,8 @@ util.stopProfile = function (testname, next) {
 	let filename = testname+'.cpuprofile'
 	let cpuProfile = profiler.stopProfiling(testname)
 	let profileJSON = JSON.stringify(cpuProfile)
-
+	cpuProfile.delete();
+	
 	next = next || function(error){
 		if ( error ) return console.error(error)
 		console.log('Profile taken successfully:', filename)
@@ -41,6 +44,8 @@ util.stopProfile = function (testname, next) {
 	profileJSON = profileJSON.replace(/"bailoutReason":/g, '"deoptReason":')
 
 	// Write the file
-	fs.writeFile(filename, profileJSON, next)
+	fs.writeFileSync(filename, profileJSON)
+	
+	next();
 }
 module.exports = util
