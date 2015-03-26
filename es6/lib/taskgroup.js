@@ -1,9 +1,9 @@
 'use strict'
 
 // Import
-let {EventEmitter} = require('events')
-let ambi = require('ambi')
-let csextends = require('csextends')
+const ambi = require('ambi'),
+	csextends = require('csextends'),
+	EventEmitter = require('events');
 
 // Domains
 let domain = null
@@ -16,7 +16,7 @@ if ( process.browser || process.versions.node.substr(0, 3) === '0.8' ) {
 }
 
 // Helpers
-let util = {}
+const util = {}
 
 // Make setTimeout a lot nicer
 util.wait = (delay, fn) => setTimeout(fn, delay)
@@ -63,10 +63,10 @@ util.ensureArray = function(arr) {
 
 
 // =====================================
-// Interface
+// BaseEventEmitter
 
 // Internal: Base class containing common functionality for {Task} and {TaskGroup}.
-class Interface extends EventEmitter {
+class BaseEventEmitter extends EventEmitter {
 	// Public: A helper method to create a new subclass with our extensions.
 	//
 	// extensions - An {Object} of extensions to apply to the new subclass
@@ -76,11 +76,11 @@ class Interface extends EventEmitter {
 		csextends.apply(this, args)
 	}
 
-	// Public: Creates a new {TaskGroup} instance.
+	// Public: Creates a new {SubClass} instance.
 	//
 	// args - The Arguments to be forwarded along to the {::constructor}.
 	//
-	// Returns the new {TaskGroup} instance.
+	// Returns the new {SubClass} instance.
 	static create (...args) {
 		return new this(...args)
 	}
@@ -92,8 +92,8 @@ class Interface extends EventEmitter {
 	// and when the emit, we check if there is a `done` listener:
 	// - if there is, then emit the done event with the original event arguments
 	// - if there isn't, then output the error to stderr and throw it.
-	constructor (...args) {
-		super(...args)
+	constructor() {
+		super()
 
 		// Add support for the done event
 		// If we do have an error, then throw it if there is no existing or done listeners
@@ -184,6 +184,7 @@ class Interface extends EventEmitter {
 		// Return
 		return names
 	}
+
 	get names () {
 		return this.namesArray.join(' ➞  ')
 	}
@@ -200,7 +201,7 @@ class Interface extends EventEmitter {
 
 	// Queue
 	queue (fn) {
-		// If synchronouse, execute immediately
+		// If synchronous, execute immediately
 		if ( this.config.sync ) fn()
 		// Otherwise, execute at the next tick
 		else util.queue(fn)
@@ -208,6 +209,7 @@ class Interface extends EventEmitter {
 		// Chain
 		return this
 	}
+
 }
 
 // =====================================
@@ -251,7 +253,7 @@ class Interface extends EventEmitter {
 //    // thrown and uncaught errors are also caught thanks to domains, but that should be avoided
 //    // as it would put your app in an unknown state
 //  ).done(console.info) // [Error('deliberator error')]
-class Task extends Interface {
+class Task extends BaseEventEmitter {
 	// Internal: The type of our class for the purpose of duck typing
 	// which is needed when working with node virtual machines
 	// as instanceof will not work in those environments.
@@ -351,9 +353,6 @@ class Task extends Interface {
 
 		// Apply configuration
 		this.setConfig(...args)
-
-		// Chain
-		return this
 	}
 
 	// Public: Set the configuration for our instance.
@@ -731,7 +730,7 @@ class Task extends Interface {
 // - `'failed'` - execution has exited with failure status
 // - `'passed'` - execution has exited with success status
 // - `'destroyed'` - we've been destroyed and can no longer execute
-class TaskGroup extends Interface {
+class TaskGroup extends BaseEventEmitter {
 	// Internal: The type of our class for the purpose of duck typing
 	// which is needed when working with node virtual machines
 	// as instanceof will not work in those environments.
@@ -816,9 +815,6 @@ class TaskGroup extends Interface {
 		// Changing this to setImmediate breaks a lot of things
 		// As tasks inside nested taskgroups will fire in any order
 		this.queue(this.autoRun.bind(this))
-
-		// Chain
-		return this
 	}
 
 
