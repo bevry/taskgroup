@@ -90,7 +90,9 @@ class BaseEventEmitter extends EventEmitter {
 	//
 	// Returns the new {SubClass} instance.
 	static create (a, b, c, d, e, f, g) {
-		return new this(a, b, c, d, e, f, g)  // ...args currently has
+		return new this(a, b, c, d, e, f, g)
+		// Using ...args causes memory+tracing issues
+		// https://github.com/jashkenas/coffeescript/issues/3236#issuecomment-85057536
 	}
 
 	// Adds support for the done event while
