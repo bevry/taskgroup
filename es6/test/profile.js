@@ -1,5 +1,3 @@
-'use strict'
-
 let TaskGroup = require('../../')
 let util = require('./util')
 let testname = 'taskgroup-profile-test'
@@ -9,8 +7,8 @@ let mode = 'heap'
 if ( mode === 'profile' ) util.startProfile(testname)
 
 // Prepare
-let createTask = function(name, value){
-	return function() {
+let createTask = function (name, value) {
+	return function () {
 		// $status.innerHTML += value
 		return value
 	}
@@ -28,11 +26,12 @@ for ( let i = 0, n = 50000; i < n; ++i ) {
 }
 
 // Listen for complete
-tasks.done(function(){
+tasks.done(function () {
 	if ( mode === 'heap ') {
 		util.saveSnapshot(testname)
-	} else {
-		setTimeout(function(){
+	}
+	else {
+		setTimeout(function () {
 			util.stopProfile(testname)
 		}, 2000)
 	}

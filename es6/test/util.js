@@ -1,5 +1,3 @@
-'use strict'
-
 let fs = require('fs'), profiler = require('v8-profiler')
 
 let util = {}
@@ -9,8 +7,8 @@ util.saveSnapshot = function (testname, next) {
 	let result = '' // not a buffer
 	let snapshot = profiler.takeSnapshot(testname)
 
-	next = next || function(error){
-		if ( error ) return console.error(error)
+	next = next || function (error) {
+		if ( error )  return console.error(error)
 		console.log('Snapshot taken successfully:', filename)
 	}
 
@@ -35,8 +33,8 @@ util.stopProfile = function (testname, next) {
 	let profileJSON = JSON.stringify(cpuProfile)
 	cpuProfile.delete()
 
-	next = next || function(error){
-		if ( error ) return console.error(error)
+	next = next || function (error) {
+		if ( error )  return console.error(error)
 		console.log('Profile taken successfully:', filename)
 	}
 

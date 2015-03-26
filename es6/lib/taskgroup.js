@@ -1,5 +1,3 @@
-'use strict'
-
 // Import
 const ambi = require('ambi')
 const csextends = require('csextends')
@@ -10,10 +8,12 @@ let domain
 if ( process.browser || process.versions.node.substr(0, 3) === '0.8' ) {
 	// domains are crippled in this environment, don't use them
 	domain = null
-} else {
+}
+else {
 	try {
 		domain = require('domain')
-	} catch (e){}
+	}
+	catch (e) {}
 }
 
 
@@ -24,36 +24,42 @@ if ( process.browser || process.versions.node.substr(0, 3) === '0.8' ) {
 const wait = (delay, fn) => setTimeout(fn, delay)
 
 // Cross-platform (node 0.10+, node 0.8+, browser) compatible setImmediate
-const queue = (global || window).setImmediate || (process && process.nextTick) || function(fn){setTimeout(fn, 0)}
+const queue = (global || window).setImmediate || (process && process.nextTick) || function (fn) {
+	setTimeout(fn, 0)
+}
 
 // Convert an error to a string
-const errorToString = function(error){
+const errorToString = function (error) {
 	if ( !error ) {
 		return null
-	} else if ( error.stack ) {
+	}
+	else if ( error.stack ) {
 		return error.stack.toString()
-	} else if ( error.message ) {
+	}
+	else if ( error.message ) {
 		return error.message.toString()
-	} else {
+	}
+	else {
 		return error.toString()
 	}
 }
 
 // Copy all items from an object into another object
-const copyObject = function(obj1, obj2){
+const copyObject = function (obj1, obj2) {
 	if ( obj2 ) {
-		iterateObject(obj2, function(value, key){
+		iterateObject(obj2, function (value, key) {
 			obj1[key] = value
 		})
 	}
 }
 
 // Iterate an object or a map fast
-const iterateObject = function(obj, iterator){
+const iterateObject = function (obj, iterator) {
 	if ( obj ) {
 		if ( obj instanceof Map ) {  // performance of this is neglible
 			obj.forEach(iterator)
-		} else {
+		}
+		else {
 			for ( var key in obj ) {
 				if ( obj.hasOwnProperty(key) ) {
 					iterator(obj[key], key)
@@ -64,7 +70,7 @@ const iterateObject = function(obj, iterator){
 }
 
 // Ensure that the passed array is actually an array
-const ensureArray = function(arr) {
+const ensureArray = function (arr) {
 	if ( !Array.isArray(arr) ) arr = [arr]
 	return arr
 }
@@ -102,7 +108,7 @@ class BaseEventEmitter extends EventEmitter {
 	// and when the emit, we check if there is a `done` listener:
 	// - if there is, then emit the done event with the original event arguments
 	// - if there isn't, then output the error to stderr and throw it.
-	constructor() {
+	constructor () {
 		super()
 
 		// Add support for the done event
@@ -187,8 +193,8 @@ class BaseEventEmitter extends EventEmitter {
 	get namesArray () {
 		// Fetch
 		const names = [], name = this.name, parent = this.config.parent
-		if ( parent ) names.push(...parent.namesArray)
-		if ( name ) names.push(name)
+		if ( parent )  names.push(...parent.namesArray)
+		if ( name )  names.push(name)
 
 		// Return
 		return names
@@ -388,7 +394,8 @@ class Task extends BaseEventEmitter {
 		const opts = {}
 
 		// Extract the configuration from the arguments
-		args.forEach(function(arg){
+		args.forEach(function (arg) {
+			if ( arg == null )  return
 			const type = typeof arg
 			switch ( type ) {
 				case 'string':
@@ -400,12 +407,15 @@ class Task extends BaseEventEmitter {
 				case 'object':
 					copyObject(opts, arg)
 					break
+				default:
+					const error = new Error(`Unknown argument type of [${type}] given to Task::setConfig()`)
+					throw error
 			}
 		})
 
 		// Apply the configuration directly to our instance
 		iterateObject(opts, (value, key) => {
-			if ( value == null ) return
+			if ( value == null )  return
 			switch ( key ) {
 				case 'on':
 					iterateObject(value, (value, key) => {
@@ -519,7 +529,8 @@ class Task extends BaseEventEmitter {
 				const result = this.state.result || []
 				listener.apply(this, result)
 			})
-		} else {
+		}
+		else {
 			super.whenDone(listener)
 		}
 
@@ -538,7 +549,8 @@ class Task extends BaseEventEmitter {
 				const result = this.state.result || []
 				listener.apply(this, result)
 			})
-		} else {
+		}
+		else {
 			super.onceDone(listener)
 		}
 
@@ -572,7 +584,7 @@ class Task extends BaseEventEmitter {
 			let status = this.state.status
 
 			// Are we already destroyed?
-			if ( status === 'destroyed' ) return
+			if ( status === 'destroyed' )  return
 
 			// Update our status and notify our listeners
 			this.state.status = status = 'destroyed'
@@ -627,11 +639,12 @@ class Task extends BaseEventEmitter {
 				this.clearDomain()
 				taskDomain = null
 				exitMethod(...args)
-			} else {
+			}
+			else {
 				// Use the next tick workaround to escape the try...catch scope
 				// Which would otherwise catch errors inside our code when it shouldn't therefore suppressing errors
 				// @TODO add test for this, originally used process.nextTick, changed to queue, hopefully it still does the same
-				queue(function(){
+				queue(function () {
 					exitMethod(...args)
 				})
 			}
@@ -672,10 +685,12 @@ class Task extends BaseEventEmitter {
 		// Fire the method within the domain if desired, otherwise execute directly
 		if ( taskDomain ) {
 			taskDomain.run(fireMethod)
-		} else {
+		}
+		else {
 			try {
 				fireMethod()
-			} catch (error) {
+			}
+			catch (error) {
 				exitMethod(error)
 			}
 		}
@@ -870,69 +885,73 @@ class TaskGroup extends BaseEventEmitter {
 	//   :items - (default: null) An {Array} of {Task} and/or {TaskGroup} instances to be added to this group.
 	//   :sync - (default: false) A {Boolean} for whether or not we should execute certain calls asynchronously (`false`) or synchronously (`true`)
 	setConfig (...args) {
-			const opts = {}
+		const opts = {}
 
-			// Extract the configuration from the arguments
-			args.forEach(function(arg){
-				const type = typeof arg
-				switch ( type ) {
-					case 'string':
-						opts.name = arg
-						break
-					case 'function':
-						opts.method = arg
-						break
-					case 'object':
-						copyObject(opts, arg)
-						break
-				}
-			})
+		// Extract the configuration from the arguments
+		args.forEach(function (arg) {
+			if ( arg == null )  return
+			const type = typeof arg
+			switch ( type ) {
+				case 'string':
+					opts.name = arg
+					break
+				case 'function':
+					opts.method = arg
+					break
+				case 'object':
+					copyObject(opts, arg)
+					break
+				default:
+					const error = new Error(`Unknown argument type of [${type}] given to TaskGroup::setConfig()`)
+					throw error
+			}
+		})
 
-			// Apply the configuration directly to our instance
-			iterateObject(opts, (value, key) => {
-				if ( value == null ) return
-				switch ( key ) {
-					case 'on':
-						iterateObject(value, (value, key) => {
-							if ( value ) this.on(key, value)
-						})
-						break
+		// Apply the configuration directly to our instance
+		iterateObject(opts, (value, key) => {
+			if ( value == null )  return
+			switch ( key ) {
+				case 'on':
+					iterateObject(value, (value, key) => {
+						if ( value )  this.on(key, value)
+					})
+					break
 
-					case 'once':
-						iterateObject(value, (value, key) => {
-							if ( value ) this.once(key, value)
-						})
-						break
+				case 'once':
+					iterateObject(value, (value, key) => {
+						if ( value )  this.once(key, value)
+					})
+					break
 
-					case 'whenDone':
-						this.whenDone(value)
-						break
+				case 'whenDone':
+					this.whenDone(value)
+					break
 
-					case 'onceDone':
-					case 'done':
-					case 'next':
-						this.done(value)
-						break
+				case 'onceDone':
+				case 'done':
+				case 'next':
+					this.done(value)
+					break
 
-					case 'task':
-					case 'tasks':
-						this.addTasks(value)
-						break
+				case 'task':
+				case 'tasks':
+					this.addTasks(value)
+					break
 
-					case 'group':
-					case 'groups':
-						this.addGroups(value)
-						break
+				case 'group':
+				case 'groups':
+					this.addGroups(value)
+					break
 
-					case 'item':
-					case 'items':
-						this.addItems(value)
-						break
+				case 'item':
+				case 'items':
+					this.addItems(value)
+					break
 
-					default:
-						this.config[key] = value
-						break
-				}
+				default:
+					this.config[key] = value
+					break
+			}
 		})
 
 		// Chain
@@ -950,9 +969,9 @@ class TaskGroup extends BaseEventEmitter {
 	addMethod (method, opts={}) {
 		method = method.bind(this) // run the taskgroup method on the group, rather than itself
 		method.isTaskGroupMethod = true
-		if ( !opts.name ) opts.name = 'taskgroup method for '+this.name
-		if ( !opts.args ) opts.args = [this.addGroup.bind(this), this.addTask.bind(this)]
-		if ( opts.includeInResults == null ) opts.includeInResults = false
+		if ( !opts.name )  opts.name = 'taskgroup method for '+this.name
+		if ( !opts.args )  opts.args = [this.addGroup.bind(this), this.addTask.bind(this)]
+		if ( opts.includeInResults == null )  opts.includeInResults = false
 		return this.addTask(method, opts)
 	}
 
@@ -1005,8 +1024,8 @@ class TaskGroup extends BaseEventEmitter {
 
 		// Link our item to ourself
 		const itemConfig = {
-			'parent': this,
-			'sync': this.config.sync
+			parent: this,
+			sync: this.config.sync
 		}
 
 		// Extract
@@ -1021,8 +1040,8 @@ class TaskGroup extends BaseEventEmitter {
 
 			// Bubble the nested events if desired
 			if ( nestedEvents ) {
-				item.state.events.forEach(function(event){
-					item.on(event, function(...args){
+				item.state.events.forEach(function (event) {
+					item.on(event, function (...args) {
 						me.emit(`task.${event}`, item, ...args)
 					})
 				})
@@ -1039,8 +1058,8 @@ class TaskGroup extends BaseEventEmitter {
 
 			// Bubble the nested events if desired
 			if ( nestedEvents ) {
-				item.state.events.forEach(function(event){
-					item.on(event, function(...args){
+				item.state.events.forEach(function (event) {
+					item.on(event, function (...args) {
 						me.emit(`group.${event}`, item, ...args)
 					})
 				})
@@ -1062,8 +1081,8 @@ class TaskGroup extends BaseEventEmitter {
 
 		// Bubble the nested events if desired
 		if ( nestedEvents ) {
-			item.state.events.forEach(function(event){
-				item.on(event, function(...args){
+			item.state.events.forEach(function (event) {
+				item.on(event, function (...args) {
 					me.emit(`item.${event}`, item, ...args)
 				})
 			})
@@ -1072,7 +1091,7 @@ class TaskGroup extends BaseEventEmitter {
 
 		// Handle item completion and errors once
 		// we can't just do item.done, or item.once('done'), because we need the item to be the argument, rather than `this`
-		item.done(function(...args){
+		item.done(function (...args) {
 			me.itemCompletionCallback(item, ...args)
 		})
 
@@ -1407,7 +1426,7 @@ class TaskGroup extends BaseEventEmitter {
 			this.state.error = null
 
 			// Cleanup the items that will now go unused
-			this.state.itemsCompleted.forEach(function(item){
+			this.state.itemsCompleted.forEach(function (item) {
 				item.destroy()
 			})
 			this.state.itemsCompleted = []
@@ -1435,7 +1454,8 @@ class TaskGroup extends BaseEventEmitter {
 		if ( this.completed ) {
 			// avoid zalgo
 			this.queue( () => handler.call(this, this.state.error, this.state.results) )
-		} else {
+		}
+		else {
 			super.whenDone(handler)
 		}
 
@@ -1451,7 +1471,8 @@ class TaskGroup extends BaseEventEmitter {
 		if ( this.completed ) {
 			// avoid zalgo
 			this.queue( () => handler.call(this, this.state.error, this.state.results) )
-		} else {
+		}
+		else {
 			super.onceDone(handler)
 		}
 

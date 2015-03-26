@@ -31,6 +31,7 @@ DOCCO            = pathUtil.join(MODULES_PATH, ".bin", "docco")
 DOCPAD           = pathUtil.join(MODULES_PATH, ".bin", "docpad")
 BISCOTTO         = pathUtil.join(MODULES_PATH, ".bin", "biscotto")
 BABEL            = pathUtil.join(MODULES_PATH, ".bin", "babel")
+ESLINT           = pathUtil.join(MODULES_PATH, ".bin", "eslint")
 
 config = {}
 config.TEST_PATH           = "test"
@@ -44,6 +45,7 @@ config.DOCPAD_SRC_PATH     = null
 config.DOCPAD_OUT_PATH     = "out"
 config.BABEL_SRC_PATH      = null
 config.BABEL_OUT_PATH      = "es5"
+config.ESLINT_SRC_PATH      = null
 
 for own key,value of (PACKAGE_DATA.cakeConfiguration or {})
 	config[key] = value
@@ -200,9 +202,12 @@ actions =
 			console.log('\ncake compile')
 			actions.compile(opts, safe next, step2)
 		step2 = ->
+			console.log('\neslint:')
+			spawn(ESLINT, [config.ESLINT_SRC_PATH], {output:true, cwd:APP_PATH}).on('close', safe next, step3)
+		step3 = ->
 			console.log('\nnpm test:')
-			spawn(NPM, ['test'], {output:true, cwd:APP_PATH}).on('close', safe next, step3)
-		step3 = next
+			spawn(NPM, ['test'], {output:true, cwd:APP_PATH}).on('close', safe next, step4)
+		step4 = next
 
 		# Start
 		step1()

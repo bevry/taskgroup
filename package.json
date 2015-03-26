@@ -79,6 +79,7 @@
   "cakeConfiguration": {
     "COFFEE_SRC_PATH": "coffee",
     "COFFEE_OUT_PATH": "coffeejs",
-    "BABEL_SRC_PATH": "es6"
+    "BABEL_SRC_PATH": "es6",
+    "ESLINT_SRC_PATH": "es6"
   }
 }
