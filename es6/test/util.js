@@ -1,48 +1,62 @@
-let fs = require('fs'), profiler = require('v8-profiler')
+const fsUtil = require('fs'), pathUtil = require('path'), profiler = require('v8-profiler')
 
-let util = {}
-util.saveSnapshot = function (testname, next) {
+const writeFile = function (filepath, data, next) {
+	try {
+		fsUtil.writeFileSync(filepath, data)
+	}
+	catch (error) {
+		next(error)
+		return
+	}
+	next()
+}
+
+export const saveSnapshot = function (testname, next) {
 	// https://github.com/node-inspector/v8-profiler/blob/851baf05bb8c98936751e0b3984a4e4195c3e3af/test/cpu_cprofiler.js#L200-L212
-	let filename = testname+'.heapsnapshot'
+	const filename = testname+'.heapsnapshot'
+	const filepath = pathUtil.join(process.cwd(), filename)
 	let result = '' // not a buffer
 	let snapshot = profiler.takeSnapshot(testname)
 
 	next = next || function (error) {
 		if ( error )  return console.error(error)
-		console.log('Snapshot taken successfully:', filename)
+		console.log('Snapshot taken successfully:', filepath)
 	}
 
-	let concatIterator = function (data) {
+	const concatIterator = function (data) {
 		result += data // not a buffer
 	}
-	let complete = function () {
+	const complete = function () {
 		snapshot.delete()
-		fs.writeFileSync(filename, result)
-		next()
+		snapshot = null
+
+		writeFile(filepath, result, next)
 	}
+
 	snapshot.serialize(concatIterator, complete)
 }
 
-util.startProfile = function (testname) {
-	let recordSamples = true // generate flame data
-	profiler.startProfiling(testname, recordSamples)
+export const startProfile = function (testname) {
+	profiler.startProfiling(testname, true)
 }
-util.stopProfile = function (testname, next) {
-	let filename = testname+'.cpuprofile'
+
+export const stopProfile = function (testname, next) {
+	const filename = testname+'.cpuprofile'
+	const filepath = pathUtil.join(process.cwd(), filename)
 	let cpuProfile = profiler.stopProfiling(testname)
 	let profileJSON = JSON.stringify(cpuProfile)
+
 	cpuProfile.delete()
+	cpuProfile = null
 
 	next = next || function (error) {
 		if ( error )  return console.error(error)
-		console.log('Profile taken successfully:', filename)
+		console.log('Profile taken successfully:', filepath)
 	}
 
 	// lets us see the deopt reason in latest chrome
 	profileJSON = profileJSON.replace(/"bailoutReason":/g, '"deoptReason":')
 
 	// Write the file
-	fs.writeFileSync(filename, profileJSON)
-	next()
+	writeFile(filepath, profileJSON, next)
 }
-module.exports = util

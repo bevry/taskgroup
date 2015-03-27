@@ -1,5 +1,5 @@
+import * as util from './util'
 let TaskGroup = require('../../')
-let util = require('./util')
 let testname = 'taskgroup-profile-test'
 let mode = 'heap'
 
@@ -7,7 +7,7 @@ let mode = 'heap'
 if ( mode === 'profile' ) util.startProfile(testname)
 
 // Prepare
-let createTask = function (name, value) {
+const createTask = function (name, value) {
 	return function () {
 		// $status.innerHTML += value
 		return value
@@ -15,13 +15,13 @@ let createTask = function (name, value) {
 }
 
 // Create the taskgroup
-let tasks = TaskGroup.create()
+const tasks = TaskGroup.create()
 
 // Add the tasks
 for ( let i = 0, n = 50000; i < n; ++i ) {
-	let name = 'Task '+i
-	let value = 'Value '+i
-	let task = createTask(name, value)
+	const name = 'Task '+i
+	const value = 'Value '+i
+	const task = createTask(name, value)
 	tasks.addTask(name, task)
 }
 

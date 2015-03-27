@@ -377,7 +377,10 @@
         "func-names": 0,
 
         // Define functions with var statements
-        // @TODO does this make debugging/profiling/tracing difficult?
+        // @TODO babel will name the functions for us, however quite redundantly:
+        // var myfunc = function myfunc (){}
+        // We can't yet change this to declaration mode, as declaration mode doesn't support ES6 => syntax which
+        // is only for anonymous functions that must be assigned via expressions instead of declarations
         "func-style": [2, "expression"],
 
         // Space after the colon
