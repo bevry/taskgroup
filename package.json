@@ -58,20 +58,16 @@
     "babel": "^4.7.16",
     "babel-eslint": "^2.0.2",
     "babelify": "^5.0.4",
+    "browserify": "^9.0.3",
     "coffee-script": "^1.9.1",
     "eslint": "^0.17.1",
     "joe": "^1.6.0",
     "joe-reporter-console": "^1.2.1",
     "projectz": "^0.5.0",
-    "safeps": "^2.2.12",
-    "v8-profiler": "^5.2.4"
-  },
-  "directories": {
-    "lib": "./out/lib"
+    "safeps": "^2.2.12"
   },
   "main": "./es6guardian.js",
   "scripts": {
-    "preinstall": "node ./cyclic.js",
     "test": "node --harmony ./coffeejs/test/taskgroup-test.js",
     "profile": "node --harmony ./es5/test/profile.js",
     "browserify": "./node_modules/.bin/browserify ./web/index.js -t babelify --outfile ./web/out.js"

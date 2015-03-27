@@ -1,7 +1,14 @@
+// 27 March 2015
+// https://github.com/bevry/base
 {
     "parser": "babel-eslint",
     "ecmaFeatures": {
         "modules": true
+    },
+    "env": {
+        "browser": true,
+        "node": true,
+        "es6": true
     },
     "rules": {
         // ----------------------------
@@ -496,10 +503,5 @@
         // We use this
         // @TODO revise this
         "wrap-regex": 2
-    },
-    "env": {
-        "browser": true,
-        "node": true,
-        "es6": true
     }
 }
