@@ -27,7 +27,7 @@ for ( let i = 0, n = 50000; i < n; ++i ) {
 
 // Listen for complete
 tasks.done(function () {
-	if ( mode === 'heap ') {
+	if ( mode === 'heap') {
 		util.saveSnapshot(testname)
 	}
 	else {
