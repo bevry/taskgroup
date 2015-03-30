@@ -87,7 +87,7 @@ class BaseEventEmitter extends EventEmitter {
 	//
 	// Returns the new sub {Class}
 	static subclass (...args) {
-		csextends.apply(this, args)
+		return csextends.apply(this, args)
 	}
 
 	// Public: Creates a new {SubClass} instance.
@@ -95,10 +95,8 @@ class BaseEventEmitter extends EventEmitter {
 	// args - The Arguments to be forwarded along to the {::constructor}.
 	//
 	// Returns the new {SubClass} instance.
-	static create (a, b, c, d, e, f, g) {
-		return new this(a, b, c, d, e, f, g)
-		// Using ...args causes memory+tracing issues
-		// https://github.com/jashkenas/coffeescript/issues/3236#issuecomment-85057536
+	static create (...args) {
+		return new this(...args)
 	}
 
 	// Adds support for the done event while
