@@ -6,6 +6,7 @@ const EventEmitter = require('events').EventEmitter /* .EventEmitter for Node 0.
 const domain = (process.browser || process.versions.node.substr(0, 3) === '0.8') ? null : require('domain')
 const hasMap = typeof Map !== 'undefined'
 
+
 // ====================================
 // Helpers
 
