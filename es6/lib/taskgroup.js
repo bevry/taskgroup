@@ -1,21 +1,10 @@
 // Import
 const ambi = require('ambi')
 const csextends = require('csextends')
-const EventEmitter = require('events')
-
-// Domains
-let domain
-if ( process.browser || process.versions.node.substr(0, 3) === '0.8' ) {
-	// domains are crippled in this environment, don't use them
-	domain = null
-}
-else {
-	try {
-		domain = require('domain')
-	}
-	catch (e) {}
-}
-
+const EventEmitter = require('events').EventEmitter /* .EventEmitter for Node 0.8 compatability */
+// Domains are crippled in the browser and on node 0.8, so don't use domains in those environments
+const domain = (process.browser || process.versions.node.substr(0, 3) === '0.8') ? null : require('domain')
+const hasMap = typeof Map !== 'undefined'
 
 // ====================================
 // Helpers
@@ -56,11 +45,12 @@ const copyObject = function (obj1, obj2) {
 // Iterate an object or a map fast
 const iterateObject = function (obj, iterator) {
 	if ( obj ) {
-		if ( obj instanceof Map ) {  // performance of this is neglible
+		if ( hasMap && obj instanceof Map ) {  // performance of this is neglible
 			obj.forEach(iterator)
 		}
 		else {
-			for ( var key in obj ) {
+			let key
+			for ( key in obj ) {
 				if ( obj.hasOwnProperty(key) ) {
 					iterator(obj[key], key)
 				}
