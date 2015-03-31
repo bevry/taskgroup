@@ -28,7 +28,10 @@ for ( let i = 0, n = 50000; i < n; ++i ) {
 // Listen for complete
 tasks.done(function () {
 	if ( mode === 'heap' ) {
-		util.saveSnapshot(testname)
+		// util.saveSnapshot(testname)  // 121mb heap (due to itemsCompleted in GC)
+		setTimeout(function () {
+			util.saveSnapshot(testname)  // 3mb heap
+		}, 1000)
 	}
 	else {
 		setTimeout(function () {
