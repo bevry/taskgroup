@@ -1414,11 +1414,8 @@ class TaskGroup extends BaseEventEmitter {
 			// Prevent the error from persisting
 			this.state.error = null
 
-			// Cleanup the items that will now go unused
-			this.state.itemsCompleted.forEach(function (item) {
-				item.destroy()
-			})
-			this.state.itemsCompleted = []
+			// Clear and destroy completed
+			this.clearCompleted()
 
 			// Should we reset results?
 			// this.state.results = []
@@ -1601,29 +1598,52 @@ class TaskGroup extends BaseEventEmitter {
 	}
 
 	// Public: Clear remaning items.
-	clear () {
-		// Destroy all the items
+	clearRemaining () {
 		const itemsRemaining = this.state.itemsRemaining
 		while ( itemsRemaining.length !== 0 ) {
-			itemsRemaining.pop()
+			itemsRemaining.pop().destroy()
 		}
 
 		// Chain
 		return this
 	}
 
+	// Public: Clear and destroy running items.
+	clearRunning () {
+		const error = new Error('Clearing running items is not possible. Instead remaining items and wait for running items to complete.')
+		this.emit('error', error)
+	}
+
+	// Public: Clear and destroy completed items.
+	clearCompleted () {
+		const itemsCompleted = this.state.itemsCompleted
+		while ( itemsCompleted.length !== 0 ) {
+			itemsCompleted.pop().destroy()
+		}
+
+		// Chain
+		return this
+	}
+
+	// Public: Alias for clear remaining items.
+	clear () {
+		return this.clearRemaining()
+	}
+
 	// Public: Destroy all remaining items and remove listeners.
 	destroy () {
-		// Destroy all the items
-		this.clear()
+		// Clear remaining items to prevent them from running
+		this.clearRemaining()
 
-		// Once finished, destroy it
+		// Once running items have finished, then proceed to destruction
 		this.done(() => {
 			// Prepare
 			let status = this.state.status
 
 			// Are we already destroyed?
 			if ( status === 'destroyed' ) return
+
+			// We don't need to call clear completed items as done() will have done that for us
 
 			// Update our status and notify our listeners
 			this.state.status = status = 'destroyed'
