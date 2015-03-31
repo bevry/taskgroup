@@ -1576,6 +1576,9 @@ class TaskGroup extends BaseEventEmitter {
 			itemsCompleted.push(item)
 		}
 		else {
+			// As it will no longer be destroyed in the complete() handler, destroy it here
+			item.destroy()
+			// Push the item name instead to keep getItemNames() working while keeping our footprint low
 			itemsCompleted.push(item.name)
 		}
 
