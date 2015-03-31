@@ -813,6 +813,10 @@ class TaskGroup extends BaseEventEmitter {
 
 		// Internal: The configuration for our {TaskGroup} instance. See {::setConfig} for available configuration.
 		this.config = {
+			// @TODO update storeCompleted to actually not store anything
+			// this will require tests to be updated (as task names no longer will be stored)
+			// as well as a counter inserted for the total completed (we may even get rid of that)
+			storeCompleted: false,
 			nestedEvents: false,
 			nestedTaskConfig: {},
 			nestedConfig: {},
@@ -1250,7 +1254,7 @@ class TaskGroup extends BaseEventEmitter {
 	get itemNames () {
 		const running = this.state.itemsRunning.map((item) => item.name)
 		const remaining = this.state.itemsRemaining.map((item) => item.name)
-		const completed = this.state.itemsCompleted.map((item) => item.name)
+		const completed = this.state.itemsCompleted.map((item) => item.name || item)
 		const results = this.state.results
 		const total = running.length + remaining.length + completed.length
 		return {
@@ -1564,7 +1568,12 @@ class TaskGroup extends BaseEventEmitter {
 		}
 
 		// Add to the completed queue
-		itemsCompleted.push(item)
+		if ( this.config.storeCompleted ) {
+			itemsCompleted.push(item)
+		}
+		else {
+			itemsCompleted.push(item.name)
+		}
 
 		// Add the result
 		if ( item.config.includeInResults !== false ) {
@@ -1617,8 +1626,13 @@ class TaskGroup extends BaseEventEmitter {
 	// Public: Clear and destroy completed items.
 	clearCompleted () {
 		const itemsCompleted = this.state.itemsCompleted
-		while ( itemsCompleted.length !== 0 ) {
-			itemsCompleted.pop().destroy()
+		if ( this.config.storeCompleted ) {
+			while ( itemsCompleted.length !== 0 ) {
+				itemsCompleted.pop().destroy()
+			}
+		}
+		else {
+			while ( itemsCompleted.pop() ) { }
 		}
 
 		// Chain
