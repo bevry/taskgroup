@@ -814,9 +814,13 @@ class TaskGroup extends BaseEventEmitter {
 		// Internal: The configuration for our {TaskGroup} instance. See {::setConfig} for available configuration.
 		this.config = {
 			// @TODO update storeCompleted to actually not store anything
-			// this will require tests to be updated (as task names no longer will be stored)
-			// as well as a counter inserted for the total completed (we may even get rid of that)
+			//   this will require tests to be updated (as task names no longer will be stored)
+			//   as well as a counter inserted for the total completed (we may even get rid of that)
 			storeCompleted: false,
+			// @TODO implement one or both of the following to ensure taskgroups successfully die once completed
+			//   should also implement this for the task class too
+			// storeResults: false,
+			// onExit: 'destroy',
 			nestedEvents: false,
 			nestedTaskConfig: {},
 			nestedConfig: {},
