@@ -40,6 +40,7 @@
                             <ul id="api-classes" class="apis classes">
                                 <li><a href="../classes/BaseEventEmitter.html">BaseEventEmitter</a></li>
                                 <li><a href="../classes/Task.html">Task</a></li>
+                                <li><a href="../classes/TaskGroup.html">TaskGroup</a></li>
                             </ul>
                 
                             <ul id="api-modules" class="apis modules">
@@ -93,7 +94,7 @@
 
 <div class="box intro">
     <p>Our Task Class</p>
-<p>Available configuration is documented in {::setConfig}.</p>
+<p>Available configuration is documented in <a href="../classes/Task.html#method_setConfig" class="crosslink">setConfig</a>.</p>
 <p>Available events:</p>
 <ul>
 <li><code>started()</code> - emitted when we start execution</li>
@@ -112,22 +113,6 @@
 <li><code>'failed'</code> - execution of our method has failed</li>
 <li><code>'passed'</code> - execution of our method has succeeded</li>
 <li><code>'destroyed'</code> - we've been destroyed and can no longer execute</li>
-</ul>
-<p>Available configuration:</p>
-<ul>
-<li>{String} [name] - What we would like our name to be, useful for debugging.</li>
-<li>{Function} [done] - Passed to {::onceDone} (aliases are <code>onceDone</code>, and <code>next</code>)</li>
-<li>{Function} [whenDone] - Ppassed to {::whenDone}</li>
-<li>{Object} [on] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}.</li>
-<li>{Object} [once] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}.</li>
-<li>{Function} [method] - The {Function} to execute for our task.</li>
-<li>{TaskGroup} [parent] - A parent {TaskGroup} that we may be attached to.</li>
-<li>{String} [onError] - Either <code>'exit'</code> or <code>'ignore'</code>, when <code>'ignore'</code> duplicate run errors are not reported, useful when combined with the timeout option.</li>
-<li>{Array} [args] - Arguments that we would like to forward onto our method when we execute it.</li>
-<li>{Number} [timeout] - Millesconds that we would like to wait before timing out the method.</li>
-<li>{Boolean} [ambi=true] - Whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately.</li>
-<li>{Boolean} [domain=true] - Whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution).</li>
-<li>{Boolean} [sync=false] - Whether or not we should execute certain calls asynchronously (set to <code>false</code>) or synchronously (set to <code>true</code>).</li>
 </ul>
 <p>Example:</p>
 <pre class="code prettyprint"><code class="language-javascript">var Task = require('taskgroup').Task
@@ -154,6 +139,40 @@ task = new Task('my task that passes an error', function(complete){
 
 </div>
 
+    <div class="constructor">
+        <h2>Constructor</h2>
+        <div id="method_Task" class="method item public">
+            <h3 class="name"><code>Task</code></h3>
+        
+                <span class="paren">()</span>
+        
+        
+        
+                <span class="flag public">public</span>
+        
+        
+        
+        
+        
+            <div class="meta">
+                        <p>
+                        Defined in
+                <a href="../files/es6_lib_taskgroup.js.html#l273"><code>es6&#x2F;lib&#x2F;taskgroup.js:273</code></a>
+                </p>
+        
+        
+        
+            </div>
+        
+            <div class="description">
+                
+            </div>
+        
+        
+        
+        
+        </div>
+    </div>
 
 <div id="classdocs" class="tabview">
     <ul class="api-class-tabs">
@@ -171,17 +190,38 @@ task = new Task('my task that passes an error', function(complete){
                     <h3>Methods</h3>
 
                     <ul class="index-list methods extends">
+                            <li class="index-item method private">
+                                <a href="#method_clearDomain">clearDomain</a>
+
+                            </li>
                             <li class="index-item method private inherited">
                                 <a href="#method_complete">complete</a>
+
+                            </li>
+                            <li class="index-item method public inherited">
+                                <a href="#method_constructor">constructor</a>
+
+                            </li>
+                            <li class="index-item method public">
+                                <a href="#method_destroy">destroy</a>
 
                             </li>
                             <li class="index-item method public inherited">
                                 <a href="#method_done">done</a>
 
                             </li>
+                            <li class="index-item method private">
+                                <a href="#method_exit">exit</a>
+
+                            </li>
+                            <li class="index-item method private">
+                                <a href="#method_fire">fire</a>
+
+                            </li>
                             <li class="index-item method public">
                                 <a href="#method_isTask">isTask</a>
 
+                                    <span class="flag static">static</span>
                             </li>
                             <li class="index-item method public inherited">
                                 <a href="#method_onceDone">onceDone</a>
@@ -189,6 +229,18 @@ task = new Task('my task that passes an error', function(complete){
                             </li>
                             <li class="index-item method private inherited">
                                 <a href="#method_queue">queue</a>
+
+                            </li>
+                            <li class="index-item method private">
+                                <a href="#method_resetResults">resetResults</a>
+
+                            </li>
+                            <li class="index-item method public">
+                                <a href="#method_run">run</a>
+
+                            </li>
+                            <li class="index-item method public">
+                                <a href="#method_setConfig">setConfig</a>
 
                             </li>
                             <li class="index-item method public inherited">
@@ -202,6 +254,26 @@ task = new Task('my task that passes an error', function(complete){
                     <h3>Properties</h3>
 
                     <ul class="index-list properties extends">
+                            <li class="index-item property public">
+                                <a href="#property_completed">completed</a>
+
+                            </li>
+                            <li class="index-item property public">
+                                <a href="#property_destroyed">destroyed</a>
+
+                            </li>
+                            <li class="index-item property protected">
+                                <a href="#property_error">error</a>
+
+                            </li>
+                            <li class="index-item property protected">
+                                <a href="#property_events">events</a>
+
+                            </li>
+                            <li class="index-item property public">
+                                <a href="#property_exited">exited</a>
+
+                            </li>
                             <li class="index-item property public inherited">
                                 <a href="#property_name">name</a>
 
@@ -212,6 +284,22 @@ task = new Task('my task that passes an error', function(complete){
                             </li>
                             <li class="index-item property public inherited">
                                 <a href="#property_namesArray">namesArray</a>
+
+                            </li>
+                            <li class="index-item property protected">
+                                <a href="#property_result">result</a>
+
+                            </li>
+                            <li class="index-item property public">
+                                <a href="#property_started">started</a>
+
+                            </li>
+                            <li class="index-item property protected">
+                                <a href="#property_status">status</a>
+
+                            </li>
+                            <li class="index-item property protected">
+                                <a href="#property_taskDomain">taskDomain</a>
 
                             </li>
                             <li class="index-item property private">
@@ -227,7 +315,40 @@ task = new Task('my task that passes an error', function(complete){
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
 
-<div id="method_complete" class="method item private inherited">
+<div id="method_clearDomain" class="method item private">
+    <h3 class="name"><code>clearDomain</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+        <span class="flag private">private</span>
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/es6_lib_taskgroup.js.html#l701"><code>es6&#x2F;lib&#x2F;taskgroup.js:701</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Clear the domain</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_complete" class="method item private">
     <h3 class="name"><code>complete</code></h3>
 
         <span class="paren">()</span>
@@ -242,9 +363,12 @@ task = new Task('my task that passes an error', function(complete){
 
 
     <div class="meta">
-                <p>Inherited from
-                <a href="../classes/BaseEventEmitter.html#method_complete">BaseEventEmitter</a>:
-        <a href="../files/es6_lib_taskgroup.js.html#l157"><code>es6&#x2F;lib&#x2F;taskgroup.js:157</code></a>
+            <p>Inherited from
+            <a href="../classes/BaseEventEmitter.html#method_complete">
+                BaseEventEmitter
+            </a>
+            but overwritten in
+        <a href="../files/es6_lib_taskgroup.js.html#l611"><code>es6&#x2F;lib&#x2F;taskgroup.js:611</code></a>
         </p>
 
 
@@ -252,7 +376,75 @@ task = new Task('my task that passes an error', function(complete){
     </div>
 
     <div class="description">
-        <p>&lt;p&gt;Fire our completion event.&lt;/p&gt;</p>
+        <p>Completetion Emitter. Used to emit the <code>completed</code> event and to cleanup our state.</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_constructor" class="method item public">
+    <h3 class="name"><code>constructor</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+        <span class="flag public">public</span>
+
+
+
+
+
+    <div class="meta">
+            <p>Inherited from
+            <a href="../classes/BaseEventEmitter.html#method_constructor">
+                BaseEventEmitter
+            </a>
+            but overwritten in
+        <a href="../files/es6_lib_taskgroup.js.html#l453"><code>es6&#x2F;lib&#x2F;taskgroup.js:453</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Initialize our new {Task} instance. Forwards arguments onto {::setConfig}.</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_destroy" class="method item public">
+    <h3 class="name"><code>destroy</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+        <span class="flag public">public</span>
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/es6_lib_taskgroup.js.html#l717"><code>es6&#x2F;lib&#x2F;taskgroup.js:717</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Destroy the task and prevent it from executing ever again.</p>
 
     </div>
 
@@ -318,6 +510,98 @@ task = new Task('my task that passes an error', function(complete){
 
 
 </div>
+<div id="method_exit" class="method item private">
+    <h3 class="name"><code>exit</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>args</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag private">private</span>
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/es6_lib_taskgroup.js.html#l564"><code>es6&#x2F;lib&#x2F;taskgroup.js:564</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Handles the completion and error conditions for ourself.
+Should only ever execute once, if it executes more than once, then we error.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">args</code>
+                        <span class="type">Arguments</span>
+
+
+                    <div class="param-description">
+                        <ul>
+<li>The arguments that will be applied to the {::result} variable. First argument is the {Error} if it exists.</li>
+</ul>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_fire" class="method item private">
+    <h3 class="name"><code>fire</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+        <span class="flag private">private</span>
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/es6_lib_taskgroup.js.html#l751"><code>es6&#x2F;lib&#x2F;taskgroup.js:751</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Fire the task method with our config arguments and wrapped in a domain.</p>
+
+    </div>
+
+
+
+
+</div>
 <div id="method_isTask" class="method item public">
     <h3 class="name"><code>isTask</code></h3>
 
@@ -337,13 +621,14 @@ task = new Task('my task that passes an error', function(complete){
         <span class="flag public">public</span>
 
 
+        <span class="flag static">static</span>
 
 
 
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l357"><code>es6&#x2F;lib&#x2F;taskgroup.js:357</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l342"><code>es6&#x2F;lib&#x2F;taskgroup.js:342</code></a>
         </p>
 
 
@@ -387,7 +672,7 @@ task = new Task('my task that passes an error', function(complete){
 
 
 </div>
-<div id="method_onceDone" class="method item public inherited">
+<div id="method_onceDone" class="method item public">
     <h3 class="name"><code>onceDone</code></h3>
 
         <div class="args">
@@ -408,9 +693,12 @@ task = new Task('my task that passes an error', function(complete){
 
 
     <div class="meta">
-                <p>Inherited from
-                <a href="../classes/BaseEventEmitter.html#method_onceDone">BaseEventEmitter</a>:
-        <a href="../files/es6_lib_taskgroup.js.html#l186"><code>es6&#x2F;lib&#x2F;taskgroup.js:186</code></a>
+            <p>Inherited from
+            <a href="../classes/BaseEventEmitter.html#method_onceDone">
+                BaseEventEmitter
+            </a>
+            but overwritten in
+        <a href="../files/es6_lib_taskgroup.js.html#l665"><code>es6&#x2F;lib&#x2F;taskgroup.js:665</code></a>
         </p>
 
 
@@ -418,7 +706,8 @@ task = new Task('my task that passes an error', function(complete){
     </div>
 
     <div class="description">
-        <p>&lt;p&gt;Attaches the listener to the &lt;code&gt;done&lt;/code&gt; event to be emitted only once, then removed to not fire again.&lt;/p&gt;</p>
+        <p>Once Done Promise.
+Fires the listener once, either on the next tick if we are already done, or if not, each time the <code>done</code> event fires.</p>
 
     </div>
 
@@ -432,9 +721,9 @@ task = new Task('my task that passes an error', function(complete){
 
 
                     <div class="param-description">
-                        <p>&lt;ul&gt;
-&lt;li&gt;Attaches to the &lt;code&gt;done&lt;/code&gt; event.&lt;/li&gt;
-&lt;/ul&gt;</p>
+                        <ul>
+<li>The {Function} to attach or execute.</li>
+</ul>
 
                     </div>
 
@@ -503,7 +792,302 @@ task = new Task('my task that passes an error', function(complete){
 
 
 </div>
-<div id="method_whenDone" class="method item public inherited">
+<div id="method_resetResults" class="method item private">
+    <h3 class="name"><code>resetResults</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+        <span class="flag private">private</span>
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/es6_lib_taskgroup.js.html#l689"><code>es6&#x2F;lib&#x2F;taskgroup.js:689</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Reset the results.
+At this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_run" class="method item public">
+    <h3 class="name"><code>run</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+        <span class="flag public">public</span>
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/es6_lib_taskgroup.js.html#l849"><code>es6&#x2F;lib&#x2F;taskgroup.js:849</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Start the execution of the task.
+Will emit an <code>error</code> event if the task has already started before.</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_setConfig" class="method item public">
+    <h3 class="name"><code>setConfig</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code class="optional">[config]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag public">public</span>
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/es6_lib_taskgroup.js.html#l483"><code>es6&#x2F;lib&#x2F;taskgroup.js:483</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Set the configuration for our instance.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name optional">[config]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name optional">[name]</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <ul>
+<li>What we would like our name to be, useful for debugging.</li>
+</ul>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[done]</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <ul>
+<li>Passed to <a href="../classes/Task.html#method_onceDone" class="crosslink">onceDone</a> (aliases are <code>onceDone</code>, and <code>next</code>)</li>
+</ul>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[whenDone]</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <ul>
+<li>Passed to <a href="../classes/Task.html#method_whenDone" class="crosslink">whenDone</a></li>
+</ul>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[on]</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <ul>
+<li>A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}.</li>
+</ul>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[once]</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <ul>
+<li>A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}.</li>
+</ul>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[method]</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <ul>
+<li>The {Function} to execute for our task.</li>
+</ul>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[parent]</code>
+                                    <span class="type"><a href="../classes/TaskGroup.html" class="crosslink">TaskGroup</a></span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <ul>
+<li>A parent <a href="../classes/TaskGroup.html" class="crosslink">TaskGroup</a> that we may be attached to.</li>
+</ul>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[onError]</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <ul>
+<li>Either <code>'exit'</code> or <code>'ignore'</code>, when <code>'ignore'</code> duplicate run errors are not reported, useful when combined with the timeout option.</li>
+</ul>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[args]</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <ul>
+<li>Arguments that we would like to forward onto our method when we execute it.</li>
+</ul>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[timeout]</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <ul>
+<li>Millesconds that we would like to wait before timing out the method.</li>
+</ul>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[ambi=true]</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <ul>
+<li>Whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately.</li>
+</ul>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[domain=true]</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <ul>
+<li>Whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution).</li>
+</ul>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[sync=false]</code>
+                                    <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <ul>
+<li>Whether or not we should execute certain calls asynchronously (set to <code>false</code>) or synchronously (set to <code>true</code>).</li>
+</ul>
+
+                                </div>
+
+                            </li>
+                        </ul>
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_whenDone" class="method item public">
     <h3 class="name"><code>whenDone</code></h3>
 
         <div class="args">
@@ -524,9 +1108,12 @@ task = new Task('my task that passes an error', function(complete){
 
 
     <div class="meta">
-                <p>Inherited from
-                <a href="../classes/BaseEventEmitter.html#method_whenDone">BaseEventEmitter</a>:
-        <a href="../files/es6_lib_taskgroup.js.html#l169"><code>es6&#x2F;lib&#x2F;taskgroup.js:169</code></a>
+            <p>Inherited from
+            <a href="../classes/BaseEventEmitter.html#method_whenDone">
+                BaseEventEmitter
+            </a>
+            but overwritten in
+        <a href="../files/es6_lib_taskgroup.js.html#l641"><code>es6&#x2F;lib&#x2F;taskgroup.js:641</code></a>
         </p>
 
 
@@ -534,7 +1121,8 @@ task = new Task('my task that passes an error', function(complete){
     </div>
 
     <div class="description">
-        <p>&lt;p&gt;Attaches the listener to the &lt;code&gt;done&lt;/code&gt; event to be emitted each time.&lt;/p&gt;</p>
+        <p>When Done Promise.
+Fires the listener, either on the next tick if we are already done, or if not, each time the <code>done</code> event fires.</p>
 
     </div>
 
@@ -548,9 +1136,9 @@ task = new Task('my task that passes an error', function(complete){
 
 
                     <div class="param-description">
-                        <p>&lt;ul&gt;
-&lt;li&gt;Attaches to the &lt;code&gt;done&lt;/code&gt; event.&lt;/li&gt;
-&lt;/ul&gt;</p>
+                        <ul>
+<li>The {Function} to attach or execute.</li>
+</ul>
 
                     </div>
 
@@ -566,6 +1154,136 @@ task = new Task('my task that passes an error', function(complete){
             <div id="properties" class="api-class-tabpanel">
                 <h2 class="off-left">Properties</h2>
 
+                    <div id="property_completed" class="property item public">
+                        <h3 class="name"><code>completed</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                    
+                    
+                            <span class="flag public">public</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/es6_lib_taskgroup.js.html#l391"><code>es6&#x2F;lib&#x2F;taskgroup.js:391</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>Have we completed its execution yet?</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_destroyed" class="property item public">
+                        <h3 class="name"><code>destroyed</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                    
+                    
+                            <span class="flag public">public</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/es6_lib_taskgroup.js.html#l381"><code>es6&#x2F;lib&#x2F;taskgroup.js:381</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>Have we been destroyed?</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_error" class="property item protected">
+                        <h3 class="name"><code>error</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Error" class="crosslink external" target="_blank">Error</a></span>
+                    
+                    
+                            <span class="flag protected">protected</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/es6_lib_taskgroup.js.html#l412"><code>es6&#x2F;lib&#x2F;taskgroup.js:412</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The first {Error} that has occured.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_events" class="property item protected">
+                        <h3 class="name"><code>events</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+                    
+                    
+                            <span class="flag protected">protected</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/es6_lib_taskgroup.js.html#l428"><code>es6&#x2F;lib&#x2F;taskgroup.js:428</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>An {Array} of the events that we may emit. Events that will be executed can be found in the {Task} description.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_exited" class="property item public">
+                        <h3 class="name"><code>exited</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                    
+                    
+                            <span class="flag public">public</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/es6_lib_taskgroup.js.html#l364"><code>es6&#x2F;lib&#x2F;taskgroup.js:364</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>Have we finished its execution yet?</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
                     <div id="property_name" class="property item public inherited">
                         <h3 class="name"><code>name</code></h3>
                         <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
@@ -645,6 +1363,111 @@ task = new Task('my task that passes an error', function(complete){
                     
                     
                     </div>
+                    <div id="property_result" class="property item protected">
+                        <h3 class="name"><code>result</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+                    
+                    
+                            <span class="flag protected">protected</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/es6_lib_taskgroup.js.html#l436"><code>es6&#x2F;lib&#x2F;taskgroup.js:436</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>An {Array} of the result arguments of our method.
+                    The first item in the array should be the {Error} if it exists.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_started" class="property item public">
+                        <h3 class="name"><code>started</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                    
+                    
+                            <span class="flag public">public</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/es6_lib_taskgroup.js.html#l354"><code>es6&#x2F;lib&#x2F;taskgroup.js:354</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>Have we started execution yet?</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_status" class="property item protected">
+                        <h3 class="name"><code>status</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                    
+                    
+                            <span class="flag protected">protected</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/es6_lib_taskgroup.js.html#l420"><code>es6&#x2F;lib&#x2F;taskgroup.js:420</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>A {String} containing our current status. See our {Task} description for available values.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_taskDomain" class="property item protected">
+                        <h3 class="name"><code>taskDomain</code></h3>
+                        <span class="type">Domain</span>
+                    
+                    
+                            <span class="flag protected">protected</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/es6_lib_taskgroup.js.html#l445"><code>es6&#x2F;lib&#x2F;taskgroup.js:445</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The {Domain} that we create to capture errors for our method.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
                     <div id="property_type" class="property item private">
                         <h3 class="name"><code>type</code></h3>
                         <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
@@ -657,7 +1480,7 @@ task = new Task('my task that passes an error', function(complete){
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l343"><code>es6&#x2F;lib&#x2F;taskgroup.js:343</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l328"><code>es6&#x2F;lib&#x2F;taskgroup.js:328</code></a>
                             </p>
                     
                     

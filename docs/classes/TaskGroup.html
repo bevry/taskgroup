@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>BaseEventEmitter - TaskGroup API</title>
+    <title>TaskGroup - TaskGroup API</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -77,15 +77,15 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1>BaseEventEmitter Class</h1>
+<h1>TaskGroup Class</h1>
 <div class="box meta">
 
         <div class="extends">
-            Extends EventEmitter
+            Extends <a href="../classes/BaseEventEmitter.html" class="crosslink">BaseEventEmitter</a>
         </div>
 
         <div class="foundat">
-            Defined in: <a href="../files/es6_lib_taskgroup.js.html#l73"><code>es6&#x2F;lib&#x2F;taskgroup.js:73</code></a>
+            Defined in: <a href="../files/es6_lib_taskgroup.js.html#l885"><code>es6&#x2F;lib&#x2F;taskgroup.js:885</code></a>
         </div>
 
 
@@ -93,20 +93,43 @@
 
 
 <div class="box intro">
-    <p>Base class containing common functionality for <a href="../classes/Task.html" class="crosslink">Task</a> and <a href="../classes/TaskGroup.html" class="crosslink">TaskGroup</a>.</p>
+    <p>Our TaskGroup class.</p>
+<p>Available configuration is documented in TaskGroup/setConfig.</p>
+<p>Available events:</p>
+<ul>
+<li><code>started()</code> - emitted when we start execution</li>
+<li><code>running()</code> - emitted when the first item starts execution</li>
+<li><code>failed(error)</code> - emitted when execution exited with a failure</li>
+<li><code>passed()</code> - emitted when execution exited with a success</li>
+<li><code>completed(error, results)</code> - emitted when execution exited, <code>results</code> is an {Array} of the result arguments for each item that executed</li>
+<li><code>error(error)</code> - emtited if an unexpected error occured within ourself</li>
+<li><code>done(error, results)</code> - emitted when either the execution completes (the <code>completed</code> event) or when an unexpected error occurs (the <code>error</code> event)</li>
+<li><code>item.*(...)</code> - bubbled events from an added item</li>
+<li><code>task.*(...)</code> - bubbled events from an added {Task}</li>
+<li><code>group.*(...)</code> - bubbled events from an added {TaskGroup}</li>
+</ul>
+<p>Available internal statuses:</p>
+<ul>
+<li><code>null</code> - execution has not yet started</li>
+<li><code>'started'</code> - execution has begun</li>
+<li><code>'running'</code> - execution of items has begun</li>
+<li><code>'failed'</code> - execution has exited with failure status</li>
+<li><code>'passed'</code> - execution has exited with success status</li>
+<li><code>'destroyed'</code> - we've been destroyed and can no longer execute</li>
+</ul>
 
 </div>
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_BaseEventEmitter" class="method item private">
-            <h3 class="name"><code>BaseEventEmitter</code></h3>
+        <div id="method_TaskGroup" class="method item public">
+            <h3 class="name"><code>TaskGroup</code></h3>
         
                 <span class="paren">()</span>
         
         
         
-                <span class="flag private">private</span>
+                <span class="flag public">public</span>
         
         
         
@@ -115,7 +138,7 @@
             <div class="meta">
                         <p>
                         Defined in
-                <a href="../files/es6_lib_taskgroup.js.html#l73"><code>es6&#x2F;lib&#x2F;taskgroup.js:73</code></a>
+                <a href="../files/es6_lib_taskgroup.js.html#l885"><code>es6&#x2F;lib&#x2F;taskgroup.js:885</code></a>
                 </p>
         
         
@@ -148,37 +171,27 @@
                     <h3>Methods</h3>
 
                     <ul class="index-list methods extends">
-                            <li class="index-item method private">
+                            <li class="index-item method private inherited">
                                 <a href="#method_complete">complete</a>
 
                             </li>
-                            <li class="index-item method">
+                            <li class="index-item method inherited">
                                 <a href="#method_constructor">constructor</a>
 
                             </li>
-                            <li class="index-item method public">
-                                <a href="#method_create">create</a>
-
-                                    <span class="flag static">static</span>
-                            </li>
-                            <li class="index-item method public">
+                            <li class="index-item method public inherited">
                                 <a href="#method_done">done</a>
 
                             </li>
-                            <li class="index-item method public">
+                            <li class="index-item method public inherited">
                                 <a href="#method_onceDone">onceDone</a>
 
                             </li>
-                            <li class="index-item method private">
+                            <li class="index-item method private inherited">
                                 <a href="#method_queue">queue</a>
 
                             </li>
-                            <li class="index-item method public">
-                                <a href="#method_subclass">subclass</a>
-
-                                    <span class="flag static">static</span>
-                            </li>
-                            <li class="index-item method public">
+                            <li class="index-item method public inherited">
                                 <a href="#method_whenDone">whenDone</a>
 
                             </li>
@@ -189,15 +202,15 @@
                     <h3>Properties</h3>
 
                     <ul class="index-list properties extends">
-                            <li class="index-item property public">
+                            <li class="index-item property public inherited">
                                 <a href="#property_name">name</a>
 
                             </li>
-                            <li class="index-item property public">
+                            <li class="index-item property public inherited">
                                 <a href="#property_names">names</a>
 
                             </li>
-                            <li class="index-item property public">
+                            <li class="index-item property public inherited">
                                 <a href="#property_namesArray">namesArray</a>
 
                             </li>
@@ -210,7 +223,7 @@
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
 
-<div id="method_complete" class="method item private">
+<div id="method_complete" class="method item private inherited">
     <h3 class="name"><code>complete</code></h3>
 
         <span class="paren">()</span>
@@ -225,8 +238,8 @@
 
 
     <div class="meta">
-                <p>
-                Defined in
+                <p>Inherited from
+                <a href="../classes/BaseEventEmitter.html#method_complete">BaseEventEmitter</a>:
         <a href="../files/es6_lib_taskgroup.js.html#l157"><code>es6&#x2F;lib&#x2F;taskgroup.js:157</code></a>
         </p>
 
@@ -235,7 +248,7 @@
     </div>
 
     <div class="description">
-        <p>Fire our completion event.</p>
+        <p>&lt;p&gt;Fire our completion event.&lt;/p&gt;</p>
 
     </div>
 
@@ -243,7 +256,7 @@
 
 
 </div>
-<div id="method_constructor" class="method item">
+<div id="method_constructor" class="method item inherited">
     <h3 class="name"><code>constructor</code></h3>
 
         <span class="paren">()</span>
@@ -256,8 +269,8 @@
 
 
     <div class="meta">
-                <p>
-                Defined in
+                <p>Inherited from
+                <a href="../classes/BaseEventEmitter.html#method_constructor">BaseEventEmitter</a>:
         <a href="../files/es6_lib_taskgroup.js.html#l108"><code>es6&#x2F;lib&#x2F;taskgroup.js:108</code></a>
         </p>
 
@@ -266,15 +279,15 @@
     </div>
 
     <div class="description">
-        <p>BaseEventEmitter Constructor</p>
-<p>Adds support for the done event while
+        <p>&lt;p&gt;BaseEventEmitter Constructor&lt;/p&gt;
+&lt;p&gt;Adds support for the done event while
 ensuring that errors are always handled correctly.
-It does this by listening to the <code>error</code> and <code>completed</code> events,
-and when the emit, we check if there is a <code>done</code> listener:</p>
-<ul>
-<li>if there is, then emit the done event with the original event arguments</li>
-<li>if there isn't, then output the error to stderr and throw it.</li>
-</ul>
+It does this by listening to the &lt;code&gt;error&lt;/code&gt; and &lt;code&gt;completed&lt;/code&gt; events,
+and when the emit, we check if there is a &lt;code&gt;done&lt;/code&gt; listener:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;if there is, then emit the done event with the original event arguments&lt;/li&gt;
+&lt;li&gt;if there isn't, then output the error to stderr and throw it.&lt;/li&gt;
+&lt;/ul&gt;</p>
 
     </div>
 
@@ -282,77 +295,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
 
 
 </div>
-<div id="method_create" class="method item public">
-    <h3 class="name"><code>create</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>args</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-        <span class="returns-inline">
-            <span class="type">SubClass</span>
-        </span>
-
-
-        <span class="flag public">public</span>
-
-
-        <span class="flag static">static</span>
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l95"><code>es6&#x2F;lib&#x2F;taskgroup.js:95</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Creates a new {SubClass} instance.</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">args</code>
-                        <span class="type">Arguments</span>
-
-
-                    <div class="param-description">
-                        <ul>
-<li>The arguments to be forwarded along to the constructor.</li>
-</ul>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type">SubClass</span>:
-                    <p>The new instance.</p>
-
-            </div>
-        </div>
-
-
-</div>
-<div id="method_done" class="method item public">
+<div id="method_done" class="method item public inherited">
     <h3 class="name"><code>done</code></h3>
 
         <div class="args">
@@ -373,8 +316,8 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
 
 
     <div class="meta">
-                <p>
-                Defined in
+                <p>Inherited from
+                <a href="../classes/BaseEventEmitter.html#method_done">BaseEventEmitter</a>:
         <a href="../files/es6_lib_taskgroup.js.html#l203"><code>es6&#x2F;lib&#x2F;taskgroup.js:203</code></a>
         </p>
 
@@ -383,7 +326,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
     </div>
 
     <div class="description">
-        <p>Alias for <a href="../classes/BaseEventEmitter.html#method_onceDone" class="crosslink">onceDone</a></p>
+        <p>&lt;p&gt;Alias for &lt;a href=&quot;../classes/BaseEventEmitter.html#method_onceDone&quot; class=&quot;crosslink&quot;&gt;onceDone&lt;/a&gt;&lt;/p&gt;</p>
 
     </div>
 
@@ -397,9 +340,9 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
 
 
                     <div class="param-description">
-                        <ul>
-<li>Attaches to the <code>done</code> event.</li>
-</ul>
+                        <p>&lt;p&gt;&lt;ul&gt;
+&lt;li&gt;Attaches to the &lt;code&gt;done&lt;/code&gt; event.&lt;/li&gt;
+&lt;/ul&gt;&lt;/p&gt;</p>
 
                     </div>
 
@@ -410,7 +353,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
 
 
 </div>
-<div id="method_onceDone" class="method item public">
+<div id="method_onceDone" class="method item public inherited">
     <h3 class="name"><code>onceDone</code></h3>
 
         <div class="args">
@@ -431,8 +374,8 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
 
 
     <div class="meta">
-                <p>
-                Defined in
+                <p>Inherited from
+                <a href="../classes/BaseEventEmitter.html#method_onceDone">BaseEventEmitter</a>:
         <a href="../files/es6_lib_taskgroup.js.html#l186"><code>es6&#x2F;lib&#x2F;taskgroup.js:186</code></a>
         </p>
 
@@ -441,7 +384,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
     </div>
 
     <div class="description">
-        <p>Attaches the listener to the <code>done</code> event to be emitted only once, then removed to not fire again.</p>
+        <p>&lt;p&gt;Attaches the listener to the &lt;code&gt;done&lt;/code&gt; event to be emitted only once, then removed to not fire again.&lt;/p&gt;</p>
 
     </div>
 
@@ -455,9 +398,9 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
 
 
                     <div class="param-description">
-                        <ul>
-<li>Attaches to the <code>done</code> event.</li>
-</ul>
+                        <p>&lt;p&gt;&lt;ul&gt;
+&lt;li&gt;Attaches to the &lt;code&gt;done&lt;/code&gt; event.&lt;/li&gt;
+&lt;/ul&gt;&lt;/p&gt;</p>
 
                     </div>
 
@@ -468,7 +411,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
 
 
 </div>
-<div id="method_queue" class="method item private">
+<div id="method_queue" class="method item private inherited">
     <h3 class="name"><code>queue</code></h3>
 
         <div class="args">
@@ -489,8 +432,8 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
 
 
     <div class="meta">
-                <p>
-                Defined in
+                <p>Inherited from
+                <a href="../classes/BaseEventEmitter.html#method_queue">BaseEventEmitter</a>:
         <a href="../files/es6_lib_taskgroup.js.html#l252"><code>es6&#x2F;lib&#x2F;taskgroup.js:252</code></a>
         </p>
 
@@ -499,7 +442,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
     </div>
 
     <div class="description">
-        <p>Executes the passed function either synchronously if <code>config.sync</code> is <code>true</code> or delays it for the next tick.</p>
+        <p>&lt;p&gt;Executes the passed function either synchronously if &lt;code&gt;config.sync&lt;/code&gt; is &lt;code&gt;true&lt;/code&gt; or delays it for the next tick.&lt;/p&gt;</p>
 
     </div>
 
@@ -513,9 +456,9 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
 
 
                     <div class="param-description">
-                        <ul>
-<li>The function to execute</li>
-</ul>
+                        <p>&lt;p&gt;&lt;ul&gt;
+&lt;li&gt;The function to execute&lt;/li&gt;
+&lt;/ul&gt;&lt;/p&gt;</p>
 
                     </div>
 
@@ -526,77 +469,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
 
 
 </div>
-<div id="method_subclass" class="method item public">
-    <h3 class="name"><code>subclass</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>extensions</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-        <span class="returns-inline">
-            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
-        </span>
-
-
-        <span class="flag public">public</span>
-
-
-        <span class="flag static">static</span>
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l82"><code>es6&#x2F;lib&#x2F;taskgroup.js:82</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>A helper method to create a new subclass with our extensions.</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">extensions</code>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
-
-
-                    <div class="param-description">
-                        <ul>
-<li>The methods and properties to use.</li>
-</ul>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>:
-                    <p>A new instance of the sub class.</p>
-
-            </div>
-        </div>
-
-
-</div>
-<div id="method_whenDone" class="method item public">
+<div id="method_whenDone" class="method item public inherited">
     <h3 class="name"><code>whenDone</code></h3>
 
         <div class="args">
@@ -617,8 +490,8 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
 
 
     <div class="meta">
-                <p>
-                Defined in
+                <p>Inherited from
+                <a href="../classes/BaseEventEmitter.html#method_whenDone">BaseEventEmitter</a>:
         <a href="../files/es6_lib_taskgroup.js.html#l169"><code>es6&#x2F;lib&#x2F;taskgroup.js:169</code></a>
         </p>
 
@@ -627,7 +500,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
     </div>
 
     <div class="description">
-        <p>Attaches the listener to the <code>done</code> event to be emitted each time.</p>
+        <p>&lt;p&gt;Attaches the listener to the &lt;code&gt;done&lt;/code&gt; event to be emitted each time.&lt;/p&gt;</p>
 
     </div>
 
@@ -641,9 +514,9 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
 
 
                     <div class="param-description">
-                        <ul>
-<li>Attaches to the <code>done</code> event.</li>
-</ul>
+                        <p>&lt;p&gt;&lt;ul&gt;
+&lt;li&gt;Attaches to the &lt;code&gt;done&lt;/code&gt; event.&lt;/li&gt;
+&lt;/ul&gt;&lt;/p&gt;</p>
 
                     </div>
 
@@ -659,7 +532,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
             <div id="properties" class="api-class-tabpanel">
                 <h2 class="off-left">Properties</h2>
 
-                    <div id="property_name" class="property item public">
+                    <div id="property_name" class="property item public inherited">
                         <h3 class="name"><code>name</code></h3>
                         <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
                     
@@ -669,8 +542,8 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
                     
                     
                         <div class="meta">
-                                    <p>
-                                    Defined in
+                                    <p>Inherited from
+                                    <a href="../classes/BaseEventEmitter.html#property_name">BaseEventEmitter</a>:
                             <a href="../files/es6_lib_taskgroup.js.html#l241"><code>es6&#x2F;lib&#x2F;taskgroup.js:241</code></a>
                             </p>
                     
@@ -678,15 +551,15 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
                         </div>
                     
                         <div class="description">
-                            <p>Get the name of our instance.
-                    If the name was never configured, then return the name in the format of <code>'#{this.type} #{Math.random()}'</code> to output something like <code>task 0.2123</code></p>
+                            <p>&lt;p&gt;Get the name of our instance.
+                    If the name was never configured, then return the name in the format of &lt;code&gt;'#{this.type} #{Math.random()}'&lt;/code&gt; to output something like &lt;code&gt;task 0.2123&lt;/code&gt;&lt;/p&gt;</p>
                     
                         </div>
                     
                     
                     
                     </div>
-                    <div id="property_names" class="property item public">
+                    <div id="property_names" class="property item public inherited">
                         <h3 class="name"><code>names</code></h3>
                         <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
                     
@@ -696,8 +569,8 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
                     
                     
                         <div class="meta">
-                                    <p>
-                                    Defined in
+                                    <p>Inherited from
+                                    <a href="../classes/BaseEventEmitter.html#property_names">BaseEventEmitter</a>:
                             <a href="../files/es6_lib_taskgroup.js.html#l230"><code>es6&#x2F;lib&#x2F;taskgroup.js:230</code></a>
                             </p>
                     
@@ -705,14 +578,14 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
                         </div>
                     
                         <div class="description">
-                            <p>Gets our name prefixed by all of our parents names</p>
+                            <p>&lt;p&gt;Gets our name prefixed by all of our parents names&lt;/p&gt;</p>
                     
                         </div>
                     
                     
                     
                     </div>
-                    <div id="property_namesArray" class="property item public">
+                    <div id="property_namesArray" class="property item public inherited">
                         <h3 class="name"><code>namesArray</code></h3>
                         <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
                     
@@ -722,8 +595,8 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
                     
                     
                         <div class="meta">
-                                    <p>
-                                    Defined in
+                                    <p>Inherited from
+                                    <a href="../classes/BaseEventEmitter.html#property_namesArray">BaseEventEmitter</a>:
                             <a href="../files/es6_lib_taskgroup.js.html#l214"><code>es6&#x2F;lib&#x2F;taskgroup.js:214</code></a>
                             </p>
                     
@@ -731,7 +604,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
                         </div>
                     
                         <div class="description">
-                            <p>Gets our name prepended by all of our parents names</p>
+                            <p>&lt;p&gt;Gets our name prepended by all of our parents names&lt;/p&gt;</p>
                     
                         </div>
                     

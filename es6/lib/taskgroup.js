@@ -75,6 +75,7 @@ Base class containing common functionality for {{#crossLink "Task"}}{{/crossLink
 
 @class BaseEventEmitter
 @extends EventEmitter
+@constructor
 @private
 */
 class BaseEventEmitter extends EventEmitter {
@@ -115,8 +116,7 @@ class BaseEventEmitter extends EventEmitter {
 	- if there is, then emit the done event with the original event arguments
 	- if there isn't, then output the error to stderr and throw it.
 
-	@class BaseEventEmitter
-	@constructor
+	@method constructor
 	*/
 	constructor () {
 		super()
@@ -273,7 +273,7 @@ class BaseEventEmitter extends EventEmitter {
 /**
 Our Task Class
 
-Available configuration is documented in {::setConfig}.
+Available configuration is documented in {{#crossLink "Task/setConfig"}}{{/crossLink}}.
 
 Available events:
 
@@ -293,22 +293,6 @@ Available internal statuses:
 - `'failed'` - execution of our method has failed
 - `'passed'` - execution of our method has succeeded
 - `'destroyed'` - we've been destroyed and can no longer execute
-
-Available configuration:
-
-- {String} [name] - What we would like our name to be, useful for debugging.
-- {Function} [done] - Passed to {::onceDone} (aliases are `onceDone`, and `next`)
-- {Function} [whenDone] - Ppassed to {::whenDone}
-- {Object} [on] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}.
-- {Object} [once] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}.
-- {Function} [method] - The {Function} to execute for our task.
-- {TaskGroup} [parent] - A parent {TaskGroup} that we may be attached to.
-- {String} [onError] - Either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.
-- {Array} [args] - Arguments that we would like to forward onto our method when we execute it.
-- {Number} [timeout] - Millesconds that we would like to wait before timing out the method.
-- {Boolean} [ambi=true] - Whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately.
-- {Boolean} [domain=true] - Whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution).
-- {Boolean} [sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`).
 
 Example:
 
@@ -337,6 +321,7 @@ task = new Task('my task that passes an error', function(complete){
 
 @class Task
 @extends BaseEventEmitter
+@constructor
 @public
 */
 class Task extends BaseEventEmitter {
@@ -359,22 +344,29 @@ class Task extends BaseEventEmitter {
 	@param {Task} item - The possible instance of the {Task} that we want to check
 	@return {Boolean} Whether or not the item is a {Task} instance.
 	@method isTask
+	@static
 	@public
 	*/
 	static isTask (item) {
 		return (item && item.type === 'task') || (item instanceof Task)
 	}
 
-	// Public: Have we started execution yet?
-	//
-	// Returns a {Boolean} which is `true` if we have commenced execution
+	/**
+	Have we started execution yet?
+	@type Boolean
+	@property started
+	@public
+	*/
 	get started () {
 		return this.state.status != null
 	}
 
-	// Public: Have we finished its execution yet?
-	//
-	// Returns a {Boolean} which is `true` if we have finished execution
+	/**
+	Have we finished its execution yet?
+	@type Boolean
+	@property exited
+	@public
+	*/
 	get exited () {
 		switch ( this.state.status ) {
 			case 'completed':
@@ -386,16 +378,22 @@ class Task extends BaseEventEmitter {
 		}
 	}
 
-	// Public: Have we been destroyed?
-	//
-	// Returns a {Boolean} which is `true` if we have bene destroyed
+	/**
+	Have we been destroyed?
+	@type Boolean
+	@property destroyed
+	@public
+	*/
 	get destroyed () {
 		return this.state.status === 'destroyed'
 	}
 
-	// Public: Have we completed its execution yet?
-	//
-	// Returns a {Boolean} which is `true` if we have completed
+	/**
+	Have we completed its execution yet?
+	@type Boolean
+	@property completed
+	@public
+	*/
 	get completed () {
 		switch ( this.state.status ) {
 			case 'failed':
@@ -411,23 +409,52 @@ class Task extends BaseEventEmitter {
 	// -----------------------------------
 	// @TODO Decide if the following is still needed
 
-	// Internal: The first {Error} that has occured.
+	/**
+	The first {Error} that has occured.
+	@type Error
+	@property error
+	@protected
+	*/
 	get error () { return this.state.error }
 
-	// Internal: A {String} containing our current status. See our {Task} description for available values.
+	/**
+	A {String} containing our current status. See our {Task} description for available values.
+	@type String
+	@property status
+	@protected
+	*/
 	get status () { return this.state.status }
 
-	// Internal: An {Array} of the events that we may emit. Events that will be executed can be found in the {Task} description.
+	/**
+	An {Array} of the events that we may emit. Events that will be executed can be found in the {Task} description.
+	@type Array
+	@property events
+	@protected
+	*/
 	get events () { return this.state.events }
 
-	// Internal: An {Array} of the result arguments of our method.
-	// The first item in the array should be the {Error} if it exists.
+	/**
+	An {Array} of the result arguments of our method.
+	The first item in the array should be the {Error} if it exists.
+	@type Array
+	@property result
+	@protected
+	*/
 	get result () { return this.state.result }
 
-	// Internal: The {Domain} that we create to capture errors for our method.
+	/**
+	The {Domain} that we create to capture errors for our method.
+	@type Domain
+	@property taskDomain
+	@protected
+	*/
 	get taskDomain () { return this.state.taskDomain }
 
-	// Public: Initialize our new {Task} instance. Forwards arguments onto {::setConfig}.
+	/**
+	Initialize our new {Task} instance. Forwards arguments onto {::setConfig}.
+	@method constructor
+	@public
+	*/
 	constructor (...args) {
 		// Initialise BaseEventEmitter
 		super()
@@ -453,12 +480,24 @@ class Task extends BaseEventEmitter {
 		this.setConfig(...args)
 	}
 
-	/*
+	/**
 	Set the configuration for our instance.
 
-	Despite accepting an {Object} of configuration, we can also accept an {Array} of configuration. When using an array, a {String} becomes the :name, a {Function} becomes the :method, and an {Object} becomes the :config.
+	@param {Object} [config]
+	@param {String} [config.name] - What we would like our name to be, useful for debugging.
+	@param {Function} [config.done] - Passed to {{#crossLink "Task/onceDone"}}{{/crossLink}} (aliases are `onceDone`, and `next`)
+	@param {Function} [config.whenDone] - Passed to {{#crossLink "Task/whenDone"}}{{/crossLink}}
+	@param {Object} [config.on] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}.
+	@param {Object} [config.once] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}.
+	@param {Function} [config.method] - The {Function} to execute for our task.
+	@param {TaskGroup} [config.parent] - A parent {{#crossLink "TaskGroup"}}{{/crossLink}} that we may be attached to.
+	@param {String} [config.onError] - Either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.
+	@param {Array} [config.args] - Arguments that we would like to forward onto our method when we execute it.
+	@param {Number} [config.timeout] - Millesconds that we would like to wait before timing out the method.
+	@param {Boolean} [config.ambi=true] - Whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately.
+	@param {Boolean} [config.domain=true] - Whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution).
+	@param {Boolean} [config.sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`).
 
-	@param {Arguments} args
 	@chainable
 	@method setConfig
 	@public
@@ -522,11 +561,14 @@ class Task extends BaseEventEmitter {
 		return this
 	}
 
-	// Internal: Handles the completion and error conditions for ourself.
-	//
-	// Should only ever execute once, if it executes more than once, then we error.
-	//
-	// args - The arguments {Array} that will be applied to the {::result} variable. First argument is the {Error} if it exists.
+	/**
+	Handles the completion and error conditions for ourself.
+	Should only ever execute once, if it executes more than once, then we error.
+	@param {Arguments} args - The arguments that will be applied to the {::result} variable. First argument is the {Error} if it exists.
+	@chainable
+	@method exit
+	@private
+	*/
 	exit (...args) {
 		// Store the first error
 		let error = this.state.error
@@ -566,7 +608,12 @@ class Task extends BaseEventEmitter {
 		return this
 	}
 
-	// Internal: Completetion Emitter. Used to emit the `completed` event and to cleanup our state.
+	/**
+	Completetion Emitter. Used to emit the `completed` event and to cleanup our state.
+	@chainable
+	@method complete
+	@private
+	*/
 	complete () {
 		const completed = this.completed
 		if ( completed ) {
@@ -591,10 +638,14 @@ class Task extends BaseEventEmitter {
 		return completed
 	}
 
-	// Public: When Done Promise.
-	// Fires the listener, either on the next tick if we are already done, or if not, each time the `done` event fires.
-	//
-	// listener - The {Function} to attach or execute.
+	/**
+	When Done Promise.
+	Fires the listener, either on the next tick if we are already done, or if not, each time the `done` event fires.
+	@param {Function} listener - The {Function} to attach or execute.
+	@chainable
+	@method whenDone
+	@public
+	*/
 	whenDone (listener) {
 		if ( this.completed ) {
 			// avoid zalgo
@@ -611,10 +662,14 @@ class Task extends BaseEventEmitter {
 		return this
 	}
 
-	// Public: Once Done Promise.
-	// Fires the listener once, either on the next tick if we are already done, or if not, once the `done` event fires.
-	//
-	// listener - The {Function} to attach or execute.
+	/**
+	Once Done Promise.
+	Fires the listener once, either on the next tick if we are already done, or if not, each time the `done` event fires.
+	@param {Function} listener - The {Function} to attach or execute.
+	@chainable
+	@method onceDone
+	@public
+	*/
 	onceDone (listener) {
 		if ( this.completed ) {
 			// avoid zalgo
@@ -631,15 +686,24 @@ class Task extends BaseEventEmitter {
 		return this
 	}
 
-	// Internal: Reset the results.
-	//
-	// At this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.
+	/**
+	Reset the results.
+	At this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.
+	@chainable
+	@method resetResults
+	@private
+	*/
 	resetResults () {
 		this.state.result = []
 		return this
 	}
 
-	// Internal: Clear the domain
+	/**
+	Clear the domain
+	@chainable
+	@method clearDomain
+	@private
+	*/
 	clearDomain () {
 		const taskDomain = this.state.taskDomain
 		if ( taskDomain ) {
@@ -650,7 +714,12 @@ class Task extends BaseEventEmitter {
 		return this
 	}
 
-	// Public: Destroy the task and prevent it from executing ever again.
+	/**
+	Destroy the task and prevent it from executing ever again.
+	@chainable
+	@method destroy
+	@public
+	*/
 	destroy () {
 		this.done(() => {
 			// Prepare
@@ -679,7 +748,12 @@ class Task extends BaseEventEmitter {
 		return this
 	}
 
-	// Internal: Fire the task method with our config arguments and wrapped in a domain.
+	/**
+	Fire the task method with our config arguments and wrapped in a domain.
+	@chainable
+	@method fire
+	@private
+	*/
 	fire () {
 		// Prepare
 		const args = (this.config.args || []).slice()
@@ -772,9 +846,13 @@ class Task extends BaseEventEmitter {
 		return this
 	}
 
-	// Public: Start the execution of the task.
-	//
-	// Will emit an `error` event if the task has already started before.
+	/**
+	Start the execution of the task.
+	Will emit an `error` event if the task has already started before.
+	@chainable
+	@method run
+	@public
+	*/
 	run () {
 		this.queue(() => {
 			// Already completed or even destroyed?
@@ -804,29 +882,38 @@ class Task extends BaseEventEmitter {
 // =====================================
 // Task Group
 
-// Public: Our TaskGroup class.
-//
-// Available configuration is documented in {::setConfig}.
-//
-// Available events:
-// - `started()` - emitted when we start execution
-// - `running()` - emitted when the first item starts execution
-// - `failed(error)` - emitted when execution exited with a failure
-// - `passed()` - emitted when execution exited with a success
-// - `completed(error, results)` - emitted when execution exited, `results` is an {Array} of the result arguments for each item that executed
-// - `error(error)` - emtited if an unexpected error occured within ourself
-// - `done(error, results)` - emitted when either the execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)
-// - `item.*(...)` - bubbled events from an added item
-// - `task.*(...)` - bubbled events from an added {Task}
-// - `group.*(...)` - bubbled events from an added {TaskGroup}
-//
-// Available internal statuses:
-// - `null` - execution has not yet started
-// - `'started'` - execution has begun
-// - `'running'` - execution of items has begun
-// - `'failed'` - execution has exited with failure status
-// - `'passed'` - execution has exited with success status
-// - `'destroyed'` - we've been destroyed and can no longer execute
+/**
+Our TaskGroup class.
+
+Available configuration is documented in {{#crossLink "TaskGroup/setConfig"}}{{/crossLink}}.
+
+Available events:
+
+- `started()` - emitted when we start execution
+- `running()` - emitted when the first item starts execution
+- `failed(error)` - emitted when execution exited with a failure
+- `passed()` - emitted when execution exited with a success
+- `completed(error, results)` - emitted when execution exited, `results` is an {Array} of the result arguments for each item that executed
+- `error(error)` - emtited if an unexpected error occured within ourself
+- `done(error, results)` - emitted when either the execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)
+- `item.*(...)` - bubbled events from an added item
+- `task.*(...)` - bubbled events from an added {Task}
+- `group.*(...)` - bubbled events from an added {TaskGroup}
+
+Available internal statuses:
+
+- `null` - execution has not yet started
+- `'started'` - execution has begun
+- `'running'` - execution of items has begun
+- `'failed'` - execution has exited with failure status
+- `'passed'` - execution has exited with success status
+- `'destroyed'` - we've been destroyed and can no longer execute
+
+@constructor
+@class TaskGroup
+@extends BaseEventEmitter
+@public
+*/
 class TaskGroup extends BaseEventEmitter {
 	// Internal: The type of our class for the purpose of duck typing
 	// which is needed when working with node virtual machines

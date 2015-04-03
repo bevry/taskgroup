@@ -12,7 +12,8 @@
             "modules": {},
             "classes": {
                 "BaseEventEmitter": 1,
-                "Task": 1
+                "Task": 1,
+                "TaskGroup": 1
             },
             "fors": {},
             "namespaces": {}
@@ -29,12 +30,12 @@
             "plugin_for": [],
             "extension_for": [],
             "file": "es6/lib/taskgroup.js",
-            "line": 107,
-            "description": "BaseEventEmitter Constructor\n\nAdds support for the done event while\nensuring that errors are always handled correctly.\nIt does this by listening to the `error` and `completed` events,\nand when the emit, we check if there is a `done` listener:\n\n- if there is, then emit the done event with the original event arguments\n- if there isn't, then output the error to stderr and throw it.",
+            "line": 73,
+            "description": "Base class containing common functionality for {{#crossLink \"Task\"}}{{/crossLink}} and {{#crossLink \"TaskGroup\"}}{{/crossLink}}.",
             "extends": "EventEmitter",
+            "is_constructor": 1,
             "access": "private",
-            "tagname": "",
-            "is_constructor": 1
+            "tagname": ""
         },
         "Task": {
             "name": "Task",
@@ -46,7 +47,24 @@
             "extension_for": [],
             "file": "es6/lib/taskgroup.js",
             "line": 273,
-            "description": "Our Task Class\n\nAvailable configuration is documented in {::setConfig}.\n\nAvailable events:\n\n- `started()` - emitted when we start execution\n- `running()` - emitted when the method starts execution\n- `failed(error)` - emitted when execution exited with a failure\n- `passed()` - emitted when execution exited with a success\n- `completed(error, ...resultArguments)` - emitted when execution exited, `resultArguments` are the result arguments from the method\n- `error(error)` - emtited if an unexpected error occurs without ourself\n- `done(error, ...resultArguments)` - emitted when either execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)\n\nAvailable internal statuses:\n\n- `null` - execution has not yet started\n- `'started'` - execution has begun\n- `'running'` - execution of our method has begun\n- `'failed'` - execution of our method has failed\n- `'passed'` - execution of our method has succeeded\n- `'destroyed'` - we've been destroyed and can no longer execute\n\nAvailable configuration:\n\n- {String} [name] - What we would like our name to be, useful for debugging.\n- {Function} [done] - Passed to {::onceDone} (aliases are `onceDone`, and `next`)\n- {Function} [whenDone] - Ppassed to {::whenDone}\n- {Object} [on] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}.\n- {Object} [once] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}.\n- {Function} [method] - The {Function} to execute for our task.\n- {TaskGroup} [parent] - A parent {TaskGroup} that we may be attached to.\n- {String} [onError] - Either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.\n- {Array} [args] - Arguments that we would like to forward onto our method when we execute it.\n- {Number} [timeout] - Millesconds that we would like to wait before timing out the method.\n- {Boolean} [ambi=true] - Whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately.\n- {Boolean} [domain=true] - Whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution).\n- {Boolean} [sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`).\n\nExample:\n\n``` javascript\nvar Task = require('taskgroup').Task\nvar task\n\ntask = new Task('my synchronous task', function(){\n\treturn 5\n}).done(console.info).run()  // [null, 5]\n\ntask = new Task('my asynchronous task', function(complete){\n\tcomplete(null, 5)\n}).done(console.info).run()  // [null, 5]\n\ntask = new Task('my task that returns an error', function(){\n\tvar error = new Error('deliberate error')\n\treturn error\n}).done(console.info).run()  // [Error('deliberator error')]\n\ntask = new Task('my task that passes an error', function(complete){\n\tvar error = new Error('deliberate error')\n\tcomplete(error)\n}).done(console.info).run()  // [Error('deliberator error')]\n```",
+            "description": "Our Task Class\n\nAvailable configuration is documented in {{#crossLink \"Task/setConfig\"}}{{/crossLink}}.\n\nAvailable events:\n\n- `started()` - emitted when we start execution\n- `running()` - emitted when the method starts execution\n- `failed(error)` - emitted when execution exited with a failure\n- `passed()` - emitted when execution exited with a success\n- `completed(error, ...resultArguments)` - emitted when execution exited, `resultArguments` are the result arguments from the method\n- `error(error)` - emtited if an unexpected error occurs without ourself\n- `done(error, ...resultArguments)` - emitted when either execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)\n\nAvailable internal statuses:\n\n- `null` - execution has not yet started\n- `'started'` - execution has begun\n- `'running'` - execution of our method has begun\n- `'failed'` - execution of our method has failed\n- `'passed'` - execution of our method has succeeded\n- `'destroyed'` - we've been destroyed and can no longer execute\n\nExample:\n\n``` javascript\nvar Task = require('taskgroup').Task\nvar task\n\ntask = new Task('my synchronous task', function(){\n\treturn 5\n}).done(console.info).run()  // [null, 5]\n\ntask = new Task('my asynchronous task', function(complete){\n\tcomplete(null, 5)\n}).done(console.info).run()  // [null, 5]\n\ntask = new Task('my task that returns an error', function(){\n\tvar error = new Error('deliberate error')\n\treturn error\n}).done(console.info).run()  // [Error('deliberator error')]\n\ntask = new Task('my task that passes an error', function(complete){\n\tvar error = new Error('deliberate error')\n\tcomplete(error)\n}).done(console.info).run()  // [Error('deliberator error')]\n```",
+            "extends": "BaseEventEmitter",
+            "is_constructor": 1,
+            "access": "public",
+            "tagname": ""
+        },
+        "TaskGroup": {
+            "name": "TaskGroup",
+            "shortname": "TaskGroup",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "es6/lib/taskgroup.js",
+            "line": 885,
+            "description": "Our TaskGroup class.\n\nAvailable configuration is documented in {{#crossLink \"TaskGroup/setConfig\"}}{{/crossLink}}.\n\nAvailable events:\n\n- `started()` - emitted when we start execution\n- `running()` - emitted when the first item starts execution\n- `failed(error)` - emitted when execution exited with a failure\n- `passed()` - emitted when execution exited with a success\n- `completed(error, results)` - emitted when execution exited, `results` is an {Array} of the result arguments for each item that executed\n- `error(error)` - emtited if an unexpected error occured within ourself\n- `done(error, results)` - emitted when either the execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)\n- `item.*(...)` - bubbled events from an added item\n- `task.*(...)` - bubbled events from an added {Task}\n- `group.*(...)` - bubbled events from an added {TaskGroup}\n\nAvailable internal statuses:\n\n- `null` - execution has not yet started\n- `'started'` - execution has begun\n- `'running'` - execution of items has begun\n- `'failed'` - execution has exited with failure status\n- `'passed'` - execution has exited with success status\n- `'destroyed'` - we've been destroyed and can no longer execute",
+            "is_constructor": 1,
             "extends": "BaseEventEmitter",
             "access": "public",
             "tagname": ""
@@ -55,7 +73,7 @@
     "classitems": [
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 81,
+            "line": 82,
             "description": "A helper method to create a new subclass with our extensions.",
             "params": [
                 {
@@ -77,7 +95,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 94,
+            "line": 95,
             "description": "Creates a new {SubClass} instance.",
             "params": [
                 {
@@ -95,6 +113,14 @@
             "name": "create",
             "access": "public",
             "tagname": "",
+            "class": "BaseEventEmitter"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 108,
+            "description": "BaseEventEmitter Constructor\n\nAdds support for the done event while\nensuring that errors are always handled correctly.\nIt does this by listening to the `error` and `completed` events,\nand when the emit, we check if there is a `done` listener:\n\n- if there is, then emit the done event with the original event arguments\n- if there isn't, then output the error to stderr and throw it.",
+            "itemtype": "method",
+            "name": "constructor",
             "class": "BaseEventEmitter"
         },
         {
@@ -215,7 +241,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 343,
+            "line": 328,
             "description": "The type of our class.\n\nUsed for the purpose of duck typing\nwhich is needed when working with node virtual machines\nas instanceof will not work in those environments.",
             "type": "String",
             "itemtype": "property",
@@ -227,7 +253,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 357,
+            "line": 342,
             "description": "A helper method to check if the passed argument is an instanceof a {Task}.",
             "params": [
                 {
@@ -242,6 +268,338 @@
             },
             "itemtype": "method",
             "name": "isTask",
+            "static": 1,
+            "access": "public",
+            "tagname": "",
+            "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 354,
+            "description": "Have we started execution yet?",
+            "type": "Boolean",
+            "itemtype": "property",
+            "name": "started",
+            "access": "public",
+            "tagname": "",
+            "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 364,
+            "description": "Have we finished its execution yet?",
+            "type": "Boolean",
+            "itemtype": "property",
+            "name": "exited",
+            "access": "public",
+            "tagname": "",
+            "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 381,
+            "description": "Have we been destroyed?",
+            "type": "Boolean",
+            "itemtype": "property",
+            "name": "destroyed",
+            "access": "public",
+            "tagname": "",
+            "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 391,
+            "description": "Have we completed its execution yet?",
+            "type": "Boolean",
+            "itemtype": "property",
+            "name": "completed",
+            "access": "public",
+            "tagname": "",
+            "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 412,
+            "description": "The first {Error} that has occured.",
+            "type": "Error",
+            "itemtype": "property",
+            "name": "error",
+            "access": "protected",
+            "tagname": "",
+            "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 420,
+            "description": "A {String} containing our current status. See our {Task} description for available values.",
+            "type": "String",
+            "itemtype": "property",
+            "name": "status",
+            "access": "protected",
+            "tagname": "",
+            "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 428,
+            "description": "An {Array} of the events that we may emit. Events that will be executed can be found in the {Task} description.",
+            "type": "Array",
+            "itemtype": "property",
+            "name": "events",
+            "access": "protected",
+            "tagname": "",
+            "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 436,
+            "description": "An {Array} of the result arguments of our method.\nThe first item in the array should be the {Error} if it exists.",
+            "type": "Array",
+            "itemtype": "property",
+            "name": "result",
+            "access": "protected",
+            "tagname": "",
+            "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 445,
+            "description": "The {Domain} that we create to capture errors for our method.",
+            "type": "Domain",
+            "itemtype": "property",
+            "name": "taskDomain",
+            "access": "protected",
+            "tagname": "",
+            "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 453,
+            "description": "Initialize our new {Task} instance. Forwards arguments onto {::setConfig}.",
+            "itemtype": "method",
+            "name": "constructor",
+            "access": "public",
+            "tagname": "",
+            "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 483,
+            "description": "Set the configuration for our instance.",
+            "params": [
+                {
+                    "name": "config",
+                    "description": "",
+                    "type": "Object",
+                    "optional": true,
+                    "props": [
+                        {
+                            "name": "name",
+                            "description": "- What we would like our name to be, useful for debugging.",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "done",
+                            "description": "- Passed to {{#crossLink \"Task/onceDone\"}}{{/crossLink}} (aliases are `onceDone`, and `next`)",
+                            "type": "Function",
+                            "optional": true
+                        },
+                        {
+                            "name": "whenDone",
+                            "description": "- Passed to {{#crossLink \"Task/whenDone\"}}{{/crossLink}}",
+                            "type": "Function",
+                            "optional": true
+                        },
+                        {
+                            "name": "on",
+                            "description": "- A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}.",
+                            "type": "Object",
+                            "optional": true
+                        },
+                        {
+                            "name": "once",
+                            "description": "- A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}.",
+                            "type": "Object",
+                            "optional": true
+                        },
+                        {
+                            "name": "method",
+                            "description": "- The {Function} to execute for our task.",
+                            "type": "Function",
+                            "optional": true
+                        },
+                        {
+                            "name": "parent",
+                            "description": "- A parent {{#crossLink \"TaskGroup\"}}{{/crossLink}} that we may be attached to.",
+                            "type": "TaskGroup",
+                            "optional": true
+                        },
+                        {
+                            "name": "onError",
+                            "description": "- Either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "args",
+                            "description": "- Arguments that we would like to forward onto our method when we execute it.",
+                            "type": "Array",
+                            "optional": true
+                        },
+                        {
+                            "name": "timeout",
+                            "description": "- Millesconds that we would like to wait before timing out the method.",
+                            "type": "Number",
+                            "optional": true
+                        },
+                        {
+                            "name": "ambi",
+                            "description": "- Whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately.",
+                            "type": "Boolean",
+                            "optional": true,
+                            "optdefault": "true"
+                        },
+                        {
+                            "name": "domain",
+                            "description": "- Whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution).",
+                            "type": "Boolean",
+                            "optional": true,
+                            "optdefault": "true"
+                        },
+                        {
+                            "name": "sync",
+                            "description": "- Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`).",
+                            "type": "Boolean",
+                            "optional": true,
+                            "optdefault": "false"
+                        }
+                    ]
+                }
+            ],
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "setConfig",
+            "access": "public",
+            "tagname": "",
+            "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 564,
+            "description": "Handles the completion and error conditions for ourself.\nShould only ever execute once, if it executes more than once, then we error.",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- The arguments that will be applied to the {::result} variable. First argument is the {Error} if it exists.",
+                    "type": "Arguments"
+                }
+            ],
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "exit",
+            "access": "private",
+            "tagname": "",
+            "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 611,
+            "description": "Completetion Emitter. Used to emit the `completed` event and to cleanup our state.",
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "complete",
+            "access": "private",
+            "tagname": "",
+            "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 641,
+            "description": "When Done Promise.\nFires the listener, either on the next tick if we are already done, or if not, each time the `done` event fires.",
+            "params": [
+                {
+                    "name": "listener",
+                    "description": "- The {Function} to attach or execute.",
+                    "type": "Function"
+                }
+            ],
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "whenDone",
+            "access": "public",
+            "tagname": "",
+            "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 665,
+            "description": "Once Done Promise.\nFires the listener once, either on the next tick if we are already done, or if not, each time the `done` event fires.",
+            "params": [
+                {
+                    "name": "listener",
+                    "description": "- The {Function} to attach or execute.",
+                    "type": "Function"
+                }
+            ],
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "onceDone",
+            "access": "public",
+            "tagname": "",
+            "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 689,
+            "description": "Reset the results.\nAt this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.",
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "resetResults",
+            "access": "private",
+            "tagname": "",
+            "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 701,
+            "description": "Clear the domain",
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "clearDomain",
+            "access": "private",
+            "tagname": "",
+            "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 717,
+            "description": "Destroy the task and prevent it from executing ever again.",
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "destroy",
+            "access": "public",
+            "tagname": "",
+            "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 751,
+            "description": "Fire the task method with our config arguments and wrapped in a domain.",
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "fire",
+            "access": "private",
+            "tagname": "",
+            "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 849,
+            "description": "Start the execution of the task.\nWill emit an `error` event if the task has already started before.",
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "run",
             "access": "public",
             "tagname": "",
             "class": "Task"
