@@ -985,6 +985,17 @@
             "access": "private",
             "tagname": "",
             "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 2005,
+            "description": "Start/restart/resume the execution of the TaskGroup.",
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "run",
+            "access": "public",
+            "tagname": "",
+            "class": "TaskGroup"
         }
     ],
     "warnings": []

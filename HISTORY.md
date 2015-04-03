@@ -1,5 +1,9 @@
 # History
 
+## v5.0.0 Unreleased
+- Removed `nestedConfig`, use either `nestedGroupConfig` or `nestedTaskConfig` or both
+
+
 ## v4.3.0 March 15, 2015
 - Module.exports now exports the TaskGroup class, of which `Task` and `TaskGroup` are now children
 - Added `Task` attribute on the TaskGroup class to allow over-riding of what should be the sub-task class

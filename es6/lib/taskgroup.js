@@ -917,7 +917,7 @@ Available internal statuses:
 @extends BaseEventEmitter
 @public
 */
-module.exports = class TaskGroup extends BaseEventEmitter {
+class TaskGroup extends BaseEventEmitter {
 	/**
 	The type of our class.
 
@@ -2002,7 +2002,12 @@ module.exports = class TaskGroup extends BaseEventEmitter {
 		return this
 	}
 
-	// Public: Start the execution.
+	/**
+	Start/restart/resume the execution of the TaskGroup.
+	@chainable
+	@method run
+	@public
+	*/
 	run () {
 		this.queue(() => {
 			// Apply our new status and notify our intention to run
