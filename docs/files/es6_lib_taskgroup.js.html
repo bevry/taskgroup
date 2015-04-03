@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>es6/lib/taskgroup.js - TaskGroup API</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="http://localhost:8000/web/logo.svg" title="TaskGroup API"></h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 5.0.0</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/BaseEventEmitter.html">BaseEventEmitter</a></li>
+                                <li><a href="../classes/Task.html">Task</a></li>
+                            </ul>
+                
+                            <ul id="api-modules" class="apis modules">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: es6/lib/taskgroup.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+// Import
+const ambi = require(&#x27;ambi&#x27;)
+const csextends = require(&#x27;csextends&#x27;)
+const EventEmitter = require(&#x27;events&#x27;).EventEmitter /* .EventEmitter for Node 0.8 compatability*/
+// Domains are crippled in the browser and on node 0.8, so don&#x27;t use domains in those environments
+const domain = (process.browser || process.versions.node.substr(0, 3) === &#x27;0.8&#x27;) ? null : require(&#x27;domain&#x27;)
+const hasMap = typeof Map !== &#x27;undefined&#x27;
+
+
+// ====================================
+// Helpers
+
+// Make setTimeout a lot nicer
+const wait = (delay, fn) =&gt; setTimeout(fn, delay)
+
+// Cross-platform (node 0.10+, node 0.8+, browser) compatible setImmediate
+const queue = (global || window).setImmediate || (process &amp;&amp; process.nextTick) || function (fn) {
+    setTimeout(fn, 0)
+}
+
+// Convert an error to a string
+const errorToString = function (error) {
+    if ( !error ) {
+        return null
+    }
+    else if ( error.stack ) {
+        return error.stack.toString()
+    }
+    else if ( error.message ) {
+        return error.message.toString()
+    }
+    else {
+        return error.toString()
+    }
+}
+
+// Copy all items from an object into another object
+const copyObject = function (obj1, obj2) {
+    if ( obj2 ) {
+        iterateObject(obj2, function (value, key) {
+            obj1[key] = value
+        })
+    }
+}
+
+// Iterate an object or a map fast
+const iterateObject = function (obj, iterator) {
+    if ( obj ) {
+        if ( hasMap &amp;&amp; obj instanceof Map ) {  // performance of this is neglible
+            obj.forEach(iterator)
+        }
+        else {
+            let key
+            for ( key in obj ) {
+                if ( obj.hasOwnProperty(key) ) {
+                    iterator(obj[key], key)
+                }
+            }
+        }
+    }
+}
+
+// Ensure that the passed array is actually an array
+const ensureArray = function (arr) {
+    if ( !Array.isArray(arr) ) arr = [arr]
+    return arr
+}
+
+
+// =====================================
+// BaseEventEmitter
+
+/**
+Base class containing common functionality for {{#crossLink &quot;Task&quot;}}{{/crossLink}} and {{#crossLink &quot;TaskGroup&quot;}}{{/crossLink}}.
+
+@class BaseEventEmitter
+@extends EventEmitter
+@private
+*/
+class BaseEventEmitter extends EventEmitter {
+    /**
+    A helper method to create a new subclass with our extensions.
+    @param {Object} extensions - The methods and properties to use.
+    @return {Object} A new instance of the sub class.
+
+    @static
+    @method subclass
+    @public
+    */
+    static subclass (...args) {
+        return csextends.apply(this, args)
+    }
+
+    /**
+    Creates a new {SubClass} instance.
+    @param {Arguments} args - The arguments to be forwarded along to the constructor.
+    @return {SubClass} The new instance.
+
+    @static
+    @method create
+    @public
+    */
+    static create (...args) {
+        return new this(...args)
+    }
+
+    /**
+    BaseEventEmitter Constructor
+
+    Adds support for the done event while
+    ensuring that errors are always handled correctly.
+    It does this by listening to the &#x60;error&#x60; and &#x60;completed&#x60; events,
+    and when the emit, we check if there is a &#x60;done&#x60; listener:
+
+    - if there is, then emit the done event with the original event arguments
+    - if there isn&#x27;t, then output the error to stderr and throw it.
+
+    @class BaseEventEmitter
+    @constructor
+    */
+    constructor () {
+        super()
+
+        // Add support for the done event
+        // If we do have an error, then throw it if there is no existing or done listeners
+        this.on(&#x27;error&#x27;, (error) =&gt; {
+            // has done listener, forward to that
+            if ( this.listeners(&#x27;done&#x27;).length !== 0 ) {
+                this.emit(&#x27;done&#x27;, error)
+            }
+
+            // has error, but no done listener and no event listener, throw error
+            else if ( error &amp;&amp; this.listeners(&#x27;error&#x27;).length === 1 ) {
+                // this isn&#x27;t good enough, throw the error
+                console.error(errorToString(error))
+                throw error
+            }
+        })
+
+        this.on(&#x27;completed&#x27;, (...args) =&gt; {
+            // Prepare
+            const error = args[0]
+
+            // has done listener, forward to that
+            if ( this.listeners(&#x27;done&#x27;).length !== 0 ) {
+                this.emit(&#x27;done&#x27;, ...args)
+            }
+
+            // has error, but no done listener and no event listener, throw error
+            else if ( error &amp;&amp; this.listeners(&#x27;completed&#x27;).length === 1 ) {
+                // this isn&#x27;t good enough, emit the error
+                this.emit(&#x27;error&#x27;, error)
+            }
+        })
+    }
+
+    /**
+    Fire our completion event.
+    @chainable
+    @method complete
+    @private
+    */
+    complete () {
+        const error = new Error(&#x27;interface should provide this&#x27;)
+        this.emit(&#x27;error&#x27;, error)
+        return this
+    }
+
+    /**
+    Attaches the listener to the &#x60;done&#x60; event to be emitted each time.
+    @param {Function} listener - Attaches to the &#x60;done&#x60; event.
+    @chainable
+    @method whenDone
+    @public
+    */
+    whenDone (listener) {
+        // check if we have a listener
+        if ( typeof listener === &#x27;function&#x27; ) {
+            this.on(&#x27;done&#x27;, listener.bind(this))
+        }
+
+        // Chain
+        return this
+    }
+
+    /**
+    Attaches the listener to the &#x60;done&#x60; event to be emitted only once, then removed to not fire again.
+    @param {Function} listener - Attaches to the &#x60;done&#x60; event.
+    @chainable
+    @method onceDone
+    @public
+    */
+    onceDone (listener) {
+        // Check if we have a listener
+        if ( typeof listener === &#x27;function&#x27; ) {
+            this.once(&#x27;done&#x27;, listener)
+        }
+
+        // Chain
+        return this
+    }
+
+    /**
+    Alias for {{#crossLink &quot;BaseEventEmitter/onceDone&quot;}}{{/crossLink}}
+    @param {Function} listener - Attaches to the &#x60;done&#x60; event.
+    @chainable
+    @method done
+    @public
+    */
+    done (listener) {
+        return this.onceDone(listener)
+    }
+
+    /**
+    Gets our name prepended by all of our parents names
+    @type Array
+    @property namesArray
+    @public
+    */
+    get namesArray () {
+        // Fetch
+        const names = [], name = this.name, parent = this.config.parent
+        if ( parent )  names.push(...parent.namesArray)
+        if ( name )  names.push(name)
+
+        // Return
+        return names
+    }
+
+    /**
+    Gets our name prefixed by all of our parents names
+    @type String
+    @property names
+    @public
+    */
+    get names () {
+        return this.namesArray.join(&#x27; ➞  &#x27;)
+    }
+
+
+    /**
+    Get the name of our instance.
+    If the name was never configured, then return the name in the format of &#x60;&#x27;#{this.type} #{Math.random()}&#x27;&#x60; to output something like &#x60;task 0.2123&#x60;
+    @type String
+    @property name
+    @public
+    */
+    get name () {
+        return this.config.name || &#x60;${this.type} ${Math.random()}&#x60;
+    }
+
+    /**
+    Executes the passed function either synchronously if &#x60;config.sync&#x60; is &#x60;true&#x60; or delays it for the next tick.
+    @param {Function} fn - The function to execute
+    @chainable
+    @method queue
+    @private
+    */
+    queue (fn) {
+        // If synchronous, execute immediately
+        if ( this.config.sync ) fn()
+        // Otherwise, execute at the next tick
+        else queue(fn)
+
+        // Chain
+        return this
+    }
+
+}
+
+// =====================================
+
+/**
+Our Task Class
+
+Available configuration is documented in {::setConfig}.
+
+Available events:
+
+- &#x60;started()&#x60; - emitted when we start execution
+- &#x60;running()&#x60; - emitted when the method starts execution
+- &#x60;failed(error)&#x60; - emitted when execution exited with a failure
+- &#x60;passed()&#x60; - emitted when execution exited with a success
+- &#x60;completed(error, ...resultArguments)&#x60; - emitted when execution exited, &#x60;resultArguments&#x60; are the result arguments from the method
+- &#x60;error(error)&#x60; - emtited if an unexpected error occurs without ourself
+- &#x60;done(error, ...resultArguments)&#x60; - emitted when either execution completes (the &#x60;completed&#x60; event) or when an unexpected error occurs (the &#x60;error&#x60; event)
+
+Available internal statuses:
+
+- &#x60;null&#x60; - execution has not yet started
+- &#x60;&#x27;started&#x27;&#x60; - execution has begun
+- &#x60;&#x27;running&#x27;&#x60; - execution of our method has begun
+- &#x60;&#x27;failed&#x27;&#x60; - execution of our method has failed
+- &#x60;&#x27;passed&#x27;&#x60; - execution of our method has succeeded
+- &#x60;&#x27;destroyed&#x27;&#x60; - we&#x27;ve been destroyed and can no longer execute
+
+Available configuration:
+
+- {String} [name] - What we would like our name to be, useful for debugging.
+- {Function} [done] - Passed to {::onceDone} (aliases are &#x60;onceDone&#x60;, and &#x60;next&#x60;)
+- {Function} [whenDone] - Ppassed to {::whenDone}
+- {Object} [on] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}.
+- {Object} [once] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}.
+- {Function} [method] - The {Function} to execute for our task.
+- {TaskGroup} [parent] - A parent {TaskGroup} that we may be attached to.
+- {String} [onError] - Either &#x60;&#x27;exit&#x27;&#x60; or &#x60;&#x27;ignore&#x27;&#x60;, when &#x60;&#x27;ignore&#x27;&#x60; duplicate run errors are not reported, useful when combined with the timeout option.
+- {Array} [args] - Arguments that we would like to forward onto our method when we execute it.
+- {Number} [timeout] - Millesconds that we would like to wait before timing out the method.
+- {Boolean} [ambi=true] - Whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately.
+- {Boolean} [domain=true] - Whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution).
+- {Boolean} [sync=false] - Whether or not we should execute certain calls asynchronously (set to &#x60;false&#x60;) or synchronously (set to &#x60;true&#x60;).
+
+Example:
+
+&#x60;&#x60;&#x60; javascript
+var Task = require(&#x27;taskgroup&#x27;).Task
+var task
+
+task = new Task(&#x27;my synchronous task&#x27;, function(){
+    return 5
+}).done(console.info).run()  // [null, 5]
+
+task = new Task(&#x27;my asynchronous task&#x27;, function(complete){
+    complete(null, 5)
+}).done(console.info).run()  // [null, 5]
+
+task = new Task(&#x27;my task that returns an error&#x27;, function(){
+    var error = new Error(&#x27;deliberate error&#x27;)
+    return error
+}).done(console.info).run()  // [Error(&#x27;deliberator error&#x27;)]
+
+task = new Task(&#x27;my task that passes an error&#x27;, function(complete){
+    var error = new Error(&#x27;deliberate error&#x27;)
+    complete(error)
+}).done(console.info).run()  // [Error(&#x27;deliberator error&#x27;)]
+&#x60;&#x60;&#x60;
+
+@class Task
+@extends BaseEventEmitter
+@public
+*/
+class Task extends BaseEventEmitter {
+    /**
+    The type of our class.
+
+    Used for the purpose of duck typing
+    which is needed when working with node virtual machines
+    as instanceof will not work in those environments.
+
+    @type String
+    @property type
+    @default &#x27;task&#x27;
+    @private
+    */
+    get type () { return &#x27;task&#x27; }
+
+    /**
+    A helper method to check if the passed argument is an instanceof a {Task}.
+    @param {Task} item - The possible instance of the {Task} that we want to check
+    @return {Boolean} Whether or not the item is a {Task} instance.
+    @method isTask
+    @public
+    */
+    static isTask (item) {
+        return (item &amp;&amp; item.type === &#x27;task&#x27;) || (item instanceof Task)
+    }
+
+    // Public: Have we started execution yet?
+    //
+    // Returns a {Boolean} which is &#x60;true&#x60; if we have commenced execution
+    get started () {
+        return this.state.status != null
+    }
+
+    // Public: Have we finished its execution yet?
+    //
+    // Returns a {Boolean} which is &#x60;true&#x60; if we have finished execution
+    get exited () {
+        switch ( this.state.status ) {
+            case &#x27;completed&#x27;:
+            case &#x27;destroyed&#x27;:
+                return true
+
+            default:
+                return false
+        }
+    }
+
+    // Public: Have we been destroyed?
+    //
+    // Returns a {Boolean} which is &#x60;true&#x60; if we have bene destroyed
+    get destroyed () {
+        return this.state.status === &#x27;destroyed&#x27;
+    }
+
+    // Public: Have we completed its execution yet?
+    //
+    // Returns a {Boolean} which is &#x60;true&#x60; if we have completed
+    get completed () {
+        switch ( this.state.status ) {
+            case &#x27;failed&#x27;:
+            case &#x27;passed&#x27;:
+            case &#x27;destroyed&#x27;:
+                return true
+
+            default:
+                return false
+        }
+    }
+
+    // -----------------------------------
+    // @TODO Decide if the following is still needed
+
+    // Internal: The first {Error} that has occured.
+    get error () { return this.state.error }
+
+    // Internal: A {String} containing our current status. See our {Task} description for available values.
+    get status () { return this.state.status }
+
+    // Internal: An {Array} of the events that we may emit. Events that will be executed can be found in the {Task} description.
+    get events () { return this.state.events }
+
+    // Internal: An {Array} of the result arguments of our method.
+    // The first item in the array should be the {Error} if it exists.
+    get result () { return this.state.result }
+
+    // Internal: The {Domain} that we create to capture errors for our method.
+    get taskDomain () { return this.state.taskDomain }
+
+    // Public: Initialize our new {Task} instance. Forwards arguments onto {::setConfig}.
+    constructor (...args) {
+        // Initialise BaseEventEmitter
+        super()
+
+        // Data
+        this.state = {
+            error: null,
+            status: null,
+            events: [&#x27;events&#x27;, &#x27;error&#x27;, &#x27;started&#x27;, &#x27;running&#x27;, &#x27;failed&#x27;, &#x27;passed&#x27;, &#x27;completed&#x27;, &#x27;done&#x27;, &#x27;destroyed&#x27;]
+        }
+
+        // Configuration
+        this.config = {
+            run: false,
+            onError: &#x27;exit&#x27;,
+            ambi: true,
+            domain: true,
+            sync: false,
+            args: null
+        }
+
+        // Apply configuration
+        this.setConfig(...args)
+    }
+
+    /*
+    Set the configuration for our instance.
+
+    Despite accepting an {Object} of configuration, we can also accept an {Array} of configuration. When using an array, a {String} becomes the :name, a {Function} becomes the :method, and an {Object} becomes the :config.
+
+    @param {Arguments} args
+    @chainable
+    @method setConfig
+    @public
+    */
+    setConfig (...args) {
+        const opts = {}
+
+        // Extract the configuration from the arguments
+        args.forEach(function (arg) {
+            if ( arg == null )  return
+            const type = typeof arg
+            switch ( type ) {
+                case &#x27;string&#x27;:
+                    opts.name = arg
+                    break
+                case &#x27;function&#x27;:
+                    opts.method = arg
+                    break
+                case &#x27;object&#x27;:
+                    copyObject(opts, arg)
+                    break
+                default:
+                    const error = new Error(&#x60;Unknown argument type of [${type}] given to Task::setConfig()&#x60;)
+                    throw error
+            }
+        })
+
+        // Apply the configuration directly to our instance
+        iterateObject(opts, (value, key) =&gt; {
+            if ( value == null )  return
+            switch ( key ) {
+                case &#x27;on&#x27;:
+                    iterateObject(value, (value, key) =&gt; {
+                        if ( value ) this.on(key, value)
+                    })
+                    break
+
+                case &#x27;once&#x27;:
+                    iterateObject(value, (value, key) =&gt; {
+                        if ( value ) this.once(key, value)
+                    })
+                    break
+
+                case &#x27;whenDone&#x27;:
+                    this.whenDone(value)
+                    break
+
+                case &#x27;onceDone&#x27;:
+                case &#x27;done&#x27;:
+                case &#x27;next&#x27;:
+                    this.onceDone(value)
+                    break
+
+                default:
+                    this.config[key] = value
+                    break
+            }
+        })
+
+        // Chain
+        return this
+    }
+
+    // Internal: Handles the completion and error conditions for ourself.
+    //
+    // Should only ever execute once, if it executes more than once, then we error.
+    //
+    // args - The arguments {Array} that will be applied to the {::result} variable. First argument is the {Error} if it exists.
+    exit (...args) {
+        // Store the first error
+        let error = this.state.error
+        if ( args[0] &amp;&amp; !error ) {
+            this.state.error = error = args[0]
+        }
+
+        // Complete for the first (and hopefully only) time
+        if ( this.completed === false ) {
+            // Apply the result if it exists
+            if ( args.length !== 0 ) this.state.result = args
+
+            // Set the status and emit depending on success or failure status
+            const status = (error ? &#x27;failed&#x27; : &#x27;passed&#x27;)
+            this.state.status = status
+            this.emit(status, error)
+
+            // Fire the completion callback
+            this.complete()
+        }
+
+        // Error as we have already completed before
+        else if ( this.config.onError !== &#x27;ignore&#x27; ) {
+            const result = this.state.result
+            const stateInformation = require(&#x27;util&#x27;).inspect({
+                error: errorToString(error),
+                previousResult: result,
+                currentArguments: args
+            })
+            const completedError = new Error(
+                &#x60;The task [${this.names}] just completed, but it had already completed earlier, this is unexpected. State information:
+                ${stateInformation}&#x60;)
+            this.emit(&#x27;error&#x27;, completedError)
+        }
+
+        // Chain
+        return this
+    }
+
+    // Internal: Completetion Emitter. Used to emit the &#x60;completed&#x60; event and to cleanup our state.
+    complete () {
+        const completed = this.completed
+        if ( completed ) {
+            // Notify our listeners we have completed
+            const args = this.state.result || []
+            this.emit(&#x27;completed&#x27;, ...args)
+
+            // Prevent the error from persisting
+            this.state.error = null
+
+            // Should we reset results?
+            // this.results = []
+            // no, it would break the promise nature of done
+            // as it would mean that if multiple done listener are added, they would each get different results
+            // if they wish to reset the results, they should do so manually via resetResults
+
+            // Should we reset the status?
+            // this.status = null
+            // no, it would break the promise nature of done
+            // as it would mean that once a done is fired, no more can be fired, until run is called again
+        }
+        return completed
+    }
+
+    // Public: When Done Promise.
+    // Fires the listener, either on the next tick if we are already done, or if not, each time the &#x60;done&#x60; event fires.
+    //
+    // listener - The {Function} to attach or execute.
+    whenDone (listener) {
+        if ( this.completed ) {
+            // avoid zalgo
+            this.queue(() =&gt; {
+                const result = this.state.result || []
+                listener.apply(this, result)
+            })
+        }
+        else {
+            super.whenDone(listener)
+        }
+
+        // Chain
+        return this
+    }
+
+    // Public: Once Done Promise.
+    // Fires the listener once, either on the next tick if we are already done, or if not, once the &#x60;done&#x60; event fires.
+    //
+    // listener - The {Function} to attach or execute.
+    onceDone (listener) {
+        if ( this.completed ) {
+            // avoid zalgo
+            this.queue(() =&gt; {
+                const result = this.state.result || []
+                listener.apply(this, result)
+            })
+        }
+        else {
+            super.onceDone(listener)
+        }
+
+        // Chain
+        return this
+    }
+
+    // Internal: Reset the results.
+    //
+    // At this point this method is internal, as it&#x27;s functionality may change in the future, and it&#x27;s outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.
+    resetResults () {
+        this.state.result = []
+        return this
+    }
+
+    // Internal: Clear the domain
+    clearDomain () {
+        const taskDomain = this.state.taskDomain
+        if ( taskDomain ) {
+            taskDomain.exit()
+            taskDomain.removeAllListeners()
+            this.state.taskDomain = null
+        }
+        return this
+    }
+
+    // Public: Destroy the task and prevent it from executing ever again.
+    destroy () {
+        this.done(() =&gt; {
+            // Prepare
+            let status = this.state.status
+
+            // Are we already destroyed?
+            if ( status === &#x27;destroyed&#x27; )  return
+
+            // Update our status and notify our listeners
+            this.state.status = status = &#x27;destroyed&#x27;
+            this.emit(status)
+
+            // Clear results
+            this.resetResults()
+            // item arrays should already be wiped due to done completion
+
+            // Remove all isteners
+            // thisTODO should we exit or dispose of the domain?
+            this.removeAllListeners()
+
+            // Clear the domain
+            this.clearDomain()
+        })
+
+        // Chain
+        return this
+    }
+
+    // Internal: Fire the task method with our config arguments and wrapped in a domain.
+    fire () {
+        // Prepare
+        const args = (this.config.args || []).slice()
+        let taskDomain = this.state.taskDomain
+        const useDomains = this.config.domain !== false
+        const exitMethod = this.exit.bind(this)
+        let method = this.config.method
+
+        // Check that we have a method to fire
+        if ( !method ) {
+            const error = new Error(&#x60;The task [${this.names}] failed to run as no method was defined for it.&#x60;)
+            this.emit(&#x27;error&#x27;, error)
+            return this
+        }
+
+        // Bind method
+        method = method.bind(this)
+
+        // Prepare the task domain if it doesn&#x27;t already exist
+        if ( useDomains &amp;&amp; domain &amp;&amp; !taskDomain ) {
+            // Setup the domain
+            this.state.taskDomain = taskDomain = domain.create()
+            taskDomain.on(&#x27;error&#x27;, exitMethod)
+        }
+
+        // Domains, as well as process.nextTick, make it so we can&#x27;t just use exitMethod directly
+        // Instead we cover it up like so, to ensure the domain exits, as well to ensure the arguments are passed
+        const completeMethod = (...args) =&gt; {
+            if ( this.config.sync || taskDomain ) {
+                this.clearDomain()
+                taskDomain = null
+                exitMethod(...args)
+            }
+            else {
+                // Use the next tick workaround to escape the try...catch scope
+                // Which would otherwise catch errors inside our code when it shouldn&#x27;t therefore suppressing errors
+                // @TODO add test for this, originally used process.nextTick, changed to queue, hopefully it still does the same
+                queue(function () {
+                    exitMethod(...args)
+                })
+            }
+        }
+
+        // Our fire function that will be wrapped in a domain or executed directly
+        const fireMethod = () =&gt; {
+            // Execute with ambi if appropriate
+            if ( this.config.ambi !== false ) {
+                ambi(method, ...args)
+            }
+
+            // Otherwise execute directly if appropriate
+            else {
+                method(...args)
+            }
+        }
+
+        // Add the competion callback to the arguments our method will receive
+        args.push(completeMethod)
+
+        // Setup timeout if appropriate
+        const timeoutDuration = this.config.timeout
+        if ( timeoutDuration ) {
+            this.state.timeout = wait(timeoutDuration, () =&gt; {
+                if ( !this.completed ) {
+                    const error = new Error(&#x60;The task [${this.names}] has timed out.&#x60;)
+                    exitMethod(error)
+                }
+            })
+        }
+
+        // Notify that we are now running
+        const status = &#x27;running&#x27;
+        this.state.status = status
+        this.emit(status)
+
+        // Fire the method within the domain if desired, otherwise execute directly
+        if ( taskDomain ) {
+            taskDomain.run(fireMethod)
+        }
+        else {
+            try {
+                fireMethod()
+            }
+            catch (error) {
+                exitMethod(error)
+            }
+        }
+
+        // Chain
+        return this
+    }
+
+    // Public: Start the execution of the task.
+    //
+    // Will emit an &#x60;error&#x60; event if the task has already started before.
+    run () {
+        this.queue(() =&gt; {
+            // Already completed or even destroyed?
+            if ( this.started ) {
+                const error = new Error(&#x60;The task [${this.names}] was just about to start, but it already started earlier, this is unexpected.&#x60;)
+                this.emit(&#x27;error&#x27;, error)
+            }
+
+            // Not yet completed, so lets run!
+            else {
+                // Apply our new status and notify our listeners
+                const status = &#x27;started&#x27;
+                this.state.status = status
+                this.emit(status)
+
+                // Fire the task
+                this.fire()
+            }
+        })
+
+        // Chain
+        return this
+    }
+}
+
+
+// =====================================
+// Task Group
+
+// Public: Our TaskGroup class.
+//
+// Available configuration is documented in {::setConfig}.
+//
+// Available events:
+// - &#x60;started()&#x60; - emitted when we start execution
+// - &#x60;running()&#x60; - emitted when the first item starts execution
+// - &#x60;failed(error)&#x60; - emitted when execution exited with a failure
+// - &#x60;passed()&#x60; - emitted when execution exited with a success
+// - &#x60;completed(error, results)&#x60; - emitted when execution exited, &#x60;results&#x60; is an {Array} of the result arguments for each item that executed
+// - &#x60;error(error)&#x60; - emtited if an unexpected error occured within ourself
+// - &#x60;done(error, results)&#x60; - emitted when either the execution completes (the &#x60;completed&#x60; event) or when an unexpected error occurs (the &#x60;error&#x60; event)
+// - &#x60;item.*(...)&#x60; - bubbled events from an added item
+// - &#x60;task.*(...)&#x60; - bubbled events from an added {Task}
+// - &#x60;group.*(...)&#x60; - bubbled events from an added {TaskGroup}
+//
+// Available internal statuses:
+// - &#x60;null&#x60; - execution has not yet started
+// - &#x60;&#x27;started&#x27;&#x60; - execution has begun
+// - &#x60;&#x27;running&#x27;&#x60; - execution of items has begun
+// - &#x60;&#x27;failed&#x27;&#x60; - execution has exited with failure status
+// - &#x60;&#x27;passed&#x27;&#x60; - execution has exited with success status
+// - &#x60;&#x27;destroyed&#x27;&#x60; - we&#x27;ve been destroyed and can no longer execute
+class TaskGroup extends BaseEventEmitter {
+    // Internal: The type of our class for the purpose of duck typing
+    // which is needed when working with node virtual machines
+    // as instanceof will not work in those environments.
+    get type () { return &#x27;taskgroup&#x27; }
+
+    // Public: A helper method to check if the passed argument is an instanceof a {TaskGroup}.
+    //
+    // item - The possible instance of the {TaskGroup} that we want to check
+    //
+    // Returns a {Boolean} of whether or not the item is a {TaskGroup} instance.
+    static isTaskGroup (group) {
+        return (group &amp;&amp; group.type === &#x27;taskgroup&#x27;) || group instanceof TaskGroup
+    }
+
+    // Internal: A reference to the {Task} class for use in {::createTask} if we want to override it
+    get Task () { return Task }
+
+    // Internal: A reference to the {TaskGroup} class for use in {::createGroup} if we want to override it
+    get TaskGroup () { return TaskGroup }
+
+    // Export API
+    static get Task () { return Task }
+    static get TaskGroup () { return TaskGroup }
+
+
+    // -----------------------------------
+    // @TODO Decide if the following is still needed
+
+    // Internal: The config.concurrency property
+    get concurrency () { return this.config.concurrency }
+
+    // Internal: The first {Error} that has occured.
+    get error () { return this.state.error }
+
+    // Internal: A {String} containing our current status. See our {TaskGroup} description for available values.
+    get status () { return this.state.status }
+
+    // Internal: An {Array} of the events that we may emit. Events that will be executed can be found in the {Task} description.
+    get events () { return this.state.events }
+
+    // Internal: An {Array} of the result Arguments for each completed item when their :includeInResults configuration option is not &#x60;false&#x60;
+    get results () { return this.state.results }
+
+    // Internal: An {Array} of the items that are still yet to execute
+    get itemsRemaining () { return this.state.itemsRemaining }
+
+    // Internal: An {Array} of the items that are currently running
+    get itemsRunning () { return this.state.itemsRunning }
+
+    // Internal: An {Array} of the items that have completed
+    get itemsCompleted () { return this.state.itemsCompleted }
+
+    // Public: Initialize our new {Task} instance. Forwards arguments onto {::setConfig}.
+    constructor (...args) {
+        super(...args)
+
+        // State
+        this.state = {
+            error: null,
+            status: null,
+            events: [&#x27;error&#x27;, &#x27;started&#x27;, &#x27;running&#x27;, &#x27;passed&#x27;, &#x27;failed&#x27;, &#x27;completed&#x27;, &#x27;done&#x27;, &#x27;destroyed&#x27;],
+            results: [],
+            itemsRemaining: [],
+            itemsRunning: [],
+            itemsCompleted: []
+        }
+
+        // Internal: The configuration for our {TaskGroup} instance. See {::setConfig} for available configuration.
+        this.config = {
+            // @TODO update storeCompleted to actually not store anything
+            //   this will require tests to be updated (as task names no longer will be stored)
+            //   as well as a counter inserted for the total completed (we may even get rid of that)
+            storeCompleted: false,
+            // @TODO implement one or both of the following to ensure taskgroups successfully die once completed
+            //   should also implement this for the task class too
+            // storeResults: false,
+            // onExit: &#x27;destroy&#x27;,
+            nestedEvents: false,
+            nestedTaskConfig: {},
+            nestedConfig: {},
+            concurrency: 1,
+            onError: &#x27;exit&#x27;,
+            sync: false
+        }
+
+        // Apply configuration
+        this.setConfig(...args)
+
+        // Give setConfig enough chance to fire
+        // Changing this to setImmediate breaks a lot of things
+        // As tasks inside nested taskgroups will fire in any order
+        this.queue(this.autoRun.bind(this))
+    }
+
+
+    // ---------------------------------
+    // Configuration
+
+    // Public: Set Nested Task Config
+    set nestedTaskConfig (opts) {
+        // Fetch and copy options to the state&#x27;s nested task configuration
+        copyObject(this.state.nestedTaskConfig, opts)
+
+        // Chain
+        return this
+    }
+
+    // Public: Set Nested Config
+    set nestedConfig (opts) {
+        // Fetch and copy options to the state&#x27;s nested configuration
+        copyObject(this.state.nestedConfig, opts)
+
+        // Chain
+        return this
+    }
+
+    // Public: Set the configuration for our instance.
+    //
+    // Despite accepting an {Object} of configuration, we can also accept an {Array} of configuration.
+    // When using an array, a {String} becomes the :name, a {Function} becomes the :method, and an {Object} becomes the :config
+    //
+    // config - Our configuration {Object} can contain the following fields:
+    //   :name - (default: null) A {String} for what we would like our name to be, useful for debugging.
+    //   :done - (default: null) A {Function} that we would like passed to {::onceDone} (aliases are :onceDone, and :next)
+    //   :whenDone - (default: null) A {Function} that we would like passed to {::whenDone}
+    //   :on - (default: null) An {Object} of (eventName =&gt; listener) that we would like bound via EventEmitter.on.
+    //   :once - (default: null) An {Object} of (eventName =&gt; listener) that we would like bound via EventEmitter.once.    //   :method - (default: null) A {Function} that we would like to use to created nested groups and tasks using an inline style.
+    //   :parent - (default: null) A parent {TaskGroup} that we may be attached to.
+    //   :onError - (default: &#x27;exit&#x27;) A {String} that is either &#x60;&#x27;exit&#x27;&#x60; or &#x60;&#x27;ignore&#x27;&#x60;, when &#x60;&#x27;ignore&#x27;&#x60; errors that occur within items will not halt execution and will not be reported in the completion callbacks &#x60;error&#x60; argument (but will still be in the &#x60;results&#x60; argument).
+    //   :concurrency - (default: 1) The {Number} of items that we would like to execute at the same time. Use &#x60;0&#x60; for unlimited. &#x60;1&#x60; accomplishes serial execution, everything else accomplishes parallel execution.
+    //   :run - (default: true) A {Boolean} for whether or not to the :method (if specified) automatically.
+    //   :nestedConfig - (default: null) An {Object} of nested configuration to be applied to all items of this group.
+    //   :nestedTaskConfig - (default: null) An {Object} of nested configuration to be applied to all {Task}s of this group.
+    //   :tasks - (default: null) An {Array} of tasks to be added as children.
+    //   :groups - (default: null) An {Array} of groups to be added as children.
+    //   :items - (default: null) An {Array} of {Task} and/or {TaskGroup} instances to be added to this group.
+    //   :sync - (default: false) A {Boolean} for whether or not we should execute certain calls asynchronously (&#x60;false&#x60;) or synchronously (&#x60;true&#x60;)
+    setConfig (...args) {
+        const opts = {}
+
+        // Extract the configuration from the arguments
+        args.forEach(function (arg) {
+            if ( arg == null )  return
+            const type = typeof arg
+            switch ( type ) {
+                case &#x27;string&#x27;:
+                    opts.name = arg
+                    break
+                case &#x27;function&#x27;:
+                    opts.method = arg
+                    break
+                case &#x27;object&#x27;:
+                    copyObject(opts, arg)
+                    break
+                default:
+                    const error = new Error(&#x60;Unknown argument type of [${type}] given to TaskGroup::setConfig()&#x60;)
+                    throw error
+            }
+        })
+
+        // Apply the configuration directly to our instance
+        iterateObject(opts, (value, key) =&gt; {
+            if ( value == null )  return
+            switch ( key ) {
+                case &#x27;on&#x27;:
+                    iterateObject(value, (value, key) =&gt; {
+                        if ( value )  this.on(key, value)
+                    })
+                    break
+
+                case &#x27;once&#x27;:
+                    iterateObject(value, (value, key) =&gt; {
+                        if ( value )  this.once(key, value)
+                    })
+                    break
+
+                case &#x27;whenDone&#x27;:
+                    this.whenDone(value)
+                    break
+
+                case &#x27;onceDone&#x27;:
+                case &#x27;done&#x27;:
+                case &#x27;next&#x27;:
+                    this.done(value)
+                    break
+
+                case &#x27;task&#x27;:
+                case &#x27;tasks&#x27;:
+                    this.addTasks(value)
+                    break
+
+                case &#x27;group&#x27;:
+                case &#x27;groups&#x27;:
+                    this.addGroups(value)
+                    break
+
+                case &#x27;item&#x27;:
+                case &#x27;items&#x27;:
+                    this.addItems(value)
+                    break
+
+                default:
+                    this.config[key] = value
+                    break
+            }
+        })
+
+        // Chain
+        return this
+    }
+
+
+    // ---------------------------------
+    // TaskGroup Method
+
+    // Internal: Prepare the method and it&#x27;s configuration, and add it as a task to be executed.
+    //
+    // method - The {Function} of our method
+    // config - An optional {Object} of configuration for the task to be created for our method
+    addMethod (method, opts={}) {
+        method = method.bind(this) // run the taskgroup method on the group, rather than itself
+        method.isTaskGroupMethod = true
+        if ( !opts.name )  opts.name = &#x27;taskgroup method for &#x27;+this.name
+        if ( !opts.args )  opts.args = [this.addGroup.bind(this), this.addTask.bind(this)]
+        if ( opts.includeInResults == null )  opts.includeInResults = false
+        return this.addTask(method, opts)
+    }
+
+    // Internal: Autorun ourself under certain conditions.
+    //
+    // Those conditions being:
+    // - if we the :method configuration is defined, and we have no :parent
+    // - if we the :run configuration is &#x60;true&#x60;
+    //
+    // Used primarily to cause the :method to fire at the appropriate time when using inline style.
+    autoRun () {
+        // Prepare
+        const method = this.config.method
+        let run = this.config.run
+
+        // Auto run if we are going the inline style and have no parent
+        if ( method ) {
+            // Add the function as our first unamed task with the extra arguments
+            this.addMethod(method)
+
+            // If we are the topmost group default run to true
+            if ( !this.config.parent &amp;&amp; run == null ) {
+                this.state.run = run = true
+            }
+        }
+
+        // Auto run if we are configured to
+        if ( run ) {
+            this.run()
+        }
+
+        // Chain
+        return this
+    }
+
+
+    // ---------------------------------
+    // Add Item
+
+    // Internal: Add an item to ourself and configure it accordingly
+    //
+    // item - A {Task} or {TaskGroup} instance that we would like added to ourself
+    // args - Additional configuration Arguments to apply to each item
+    addItem (item, ...args) {
+        // Prepare
+        const me = this
+
+        // Only add the item if it exists
+        if ( !item ) return null
+
+        // Link our item to ourself
+        const itemConfig = {
+            parent: this,
+            sync: this.config.sync
+        }
+
+        // Extract
+        const nestedConfig = this.config.nestedConfig
+        const nestedTaskConfig = this.config.nestedTaskConfig
+        const nestedEvents = this.config.nestedEvents
+
+        // Bubble task events
+        if ( Task.isTask(item) ) {
+            // Nested configuration
+            item.setConfig(itemConfig, nestedConfig, nestedTaskConfig, ...args)
+
+            // Bubble the nested events if desired
+            if ( nestedEvents ) {
+                item.state.events.forEach(function (event) {
+                    item.on(event, function (...args) {
+                        me.emit(&#x60;task.${event}&#x60;, item, ...args)
+                    })
+                })
+            }
+
+            // Notify our intention
+            this.emit(&#x27;task.add&#x27;, item)
+        }
+
+        // Bubble group events
+        else if ( TaskGroup.isTaskGroup(item) ) {
+            // Nested configuration
+            item.setConfig(itemConfig, nestedConfig, {nestedConfig, nestedTaskConfig}, ...args)
+
+            // Bubble the nested events if desired
+            if ( nestedEvents ) {
+                item.state.events.forEach(function (event) {
+                    item.on(event, function (...args) {
+                        me.emit(&#x60;group.${event}&#x60;, item, ...args)
+                    })
+                })
+            }
+
+            // Notify our intention
+            this.emit(&#x27;group.add&#x27;, item)
+        }
+
+        // Unknown type
+        else {
+            let error = new Error(&#x27;Unknown item type&#x27;)
+            this.emit(&#x27;error&#x27;, error)
+            return this
+        }
+
+        // Name default
+        if ( !item.config.name ) {
+            item.config.name = &#x60;${item.type} ${this.totalItems+1} for [${this.name}]&#x60;
+        }
+
+        // Bubble the nested events if desired
+        if ( nestedEvents ) {
+            item.state.events.forEach(function (event) {
+                item.on(event, function (...args) {
+                    me.emit(&#x60;item.${event}&#x60;, item, ...args)
+                })
+            })
+            this.emit(&#x27;item.add&#x27;, item)
+        }
+
+        // Handle item completion and errors once
+        // we can&#x27;t just do item.done, or item.once(&#x27;done&#x27;), because we need the item to be the argument, rather than &#x60;this&#x60;
+        item.done(function (...args) {
+            me.itemCompletionCallback(item, ...args)
+        })
+
+        // Add the item
+        this.state.itemsRemaining.push(item)
+
+        // We may be running and expecting items, if so, fire
+        this.fire()
+
+        // Return the item
+        return item
+    }
+    addItemChain (...args) {
+        this.addItem(...args)
+        return this
+    }
+
+    // Internal: Add items to ourself and configure them accordingly
+    //
+    // items - An {Array} of {Task} and/or {TaskGroup} instances to add to ourself
+    // args - Optional Arguments to configure each added item
+    addItems (items, ...args) {
+        items = ensureArray(items)
+        items.map((item) =&gt; this.addItem(item, ...args))
+        return items
+    }
+    addItemsChain (...args) {
+        this.addItems(...args)
+        return this
+    }
+
+
+    // ---------------------------------
+    // Add Task
+
+    // Public: Create a {Task} instance from some configuration.
+    //
+    // If the first argument is already a {Task} instance, then just update it&#x27;s configuration with the remaning arguments.
+    //
+    // args - Arguments to use to configure the {Task} instance
+    //
+    // Returns the new {Task} instance
+    createTask (...args) {
+        // Prepare
+        let task
+
+        // Support receiving an existing task instance
+        if ( Task.isTask(args[0]) ) {
+            task = args[0]
+            task.setConfig(...args.slice(1))
+        }
+
+        // Support receiving arguments to create a task instance
+        else {
+            task = new this.Task(...args)
+        }
+
+        // Return the new task
+        return task
+    }
+
+    // Public: Add a {Task} with some configuration to ourself, create it if needed.
+    //
+    // args - Arguments to configure (and if needed, create) the task
+    addTask (...args) {
+        const task = this.createTask(...args)
+        return this.addItem(task)
+    }
+    addTaskChain (...args) {
+        this.addTask(...args)
+        return this
+    }
+
+    // Public: Add {Task}s with some configuration to ourself, create it if needed.
+    //
+    // items - An {Array} of {Task} items to add to ourself
+    // args - Optional Arguments to configure each added {Task}
+    addTasks (items, ...args) {
+        items = ensureArray(items)
+        items.map((item) =&gt; this.addTask(item, ...args))
+        return items
+    }
+    addTasksChain (...args) {
+        this.addTasks(...args)
+        return this
+    }
+
+
+    // ---------------------------------
+    // Add Group
+
+    // Public: Create a {TaskGroup} instance from some configuration.
+    //
+    // If the first argument is already a {TaskGroup} instance, then just update it&#x27;s configuration with the remaning arguments.
+    //
+    // args - Arguments to use to configure the {TaskGroup} instance
+    //
+    // Returns the new {TaskGroup} instance
+    createGroup (...args) {
+        // Prepare
+        let group
+
+        // Support receiving an existing group instance
+        if ( TaskGroup.isTaskGroup(args[0]) ) {
+            group = args[0]
+            group.setConfig(...args.slice(1))
+        }
+
+        // Support receiving arguments to create a group instance
+        else {
+            group = new this.TaskGroup(...args)
+        }
+
+        // Return the new group
+        return group
+    }
+
+    // Public: Add a {TaskGroup} with some configuration to ourself, create it if needed.
+    //
+    // args - Arguments to configure (and if needed, create) the {TaskGroup}
+    addGroup (...args) {
+        const group = this.createGroup(...args)
+        return this.addItem(group)
+    }
+    addGroupChain (...args) {
+        this.addGroup(...args)
+        return this
+    }
+
+    // Public: Add {TaskGroup}s with some configuration to ourself, create it if needed.
+    //
+    // items - An {Array} of {TaskGroup} items to add to ourself
+    // args - Optional Arguments to configure each added {TaskGroup}
+    addGroups (items, ...args) {
+        items = ensureArray(items)
+        items.map((item) =&gt; this.addGroup(item, ...args))
+        return items
+    }
+    addGroupsChain (...args) {
+        this.addGroups(...args)
+        return this
+    }
+
+
+    // ---------------------------------
+    // Status Indicators
+
+    // Public: Gets the total number of items
+    //
+    // Returns a {Number} of the total items we have
+    get totalItems () {
+        const running = this.state.itemsRunning.length
+        const remaining = this.state.itemsRemaining.length
+        const completed = this.state.itemsCompleted.length
+        const total = running + remaining + completed
+        return total
+    }
+
+    // Public: Gets the names of the items, the total number of items, and their results for the purpose of debugging.
+    //
+    // Returns an {Object} containg the hashes:
+    //   :remaining - An {Array} of the names of the remaining items
+    //   :running - An {Array} of the names of the running items
+    //   :completed - An {Array} of the names of the completed items
+    //   :total - A {Number} of the total items we have
+    //   :results - An {Array} of the results of the compelted items
+    get itemNames () {
+        const running = this.state.itemsRunning.map((item) =&gt; item.name)
+        const remaining = this.state.itemsRemaining.map((item) =&gt; item.name)
+        const completed = this.state.itemsCompleted.map((item) =&gt; item.name || item)
+        const results = this.state.results
+        const total = running.length + remaining.length + completed.length
+        return {
+            remaining,
+            running,
+            completed,
+            total,
+            results
+        }
+    }
+
+    // Public: Gets the total number count of each of our item lists.
+    //
+    // Returns an {Object} containg the hashes:
+    //   :remaining - A {Number} of the total remaining items
+    //   :running - A {Number} of the total running items
+    //   :completed - A {Number} of the total completed items
+    //   :total - A {Number} of the total items we have
+    //   :results - A {Number} of the total results we have
+    get itemTotals () {
+        const running = this.state.itemsRunning.length
+        const remaining = this.state.itemsRemaining.length
+        const completed = this.state.itemsCompleted.length
+        const results = this.state.results.length
+        const total = running + remaining + completed
+        return {
+            remaining,
+            running,
+            completed,
+            total,
+            results
+        }
+    }
+
+    // Public: Whether or not we have any running items
+    //
+    // Returns a {Boolean} which is &#x60;true&#x60; if we have any items that are currently running
+    get hasRunning () {
+        return this.state.itemsRunning.length !== 0
+    }
+
+    // Public: Whether or not we have any items that are yet to execute
+    //
+    // Returns a {Boolean} which is &#x60;true&#x60; if we have any items that are still yet to be executed
+    get hasRemaining () {
+        return this.state.itemsRemaining.length !== 0
+    }
+
+    // Public: Whether or not we have any items
+    //
+    // Returns a {Boolean} which is &#x60;true&#x60; if we have any running or remaining items
+    get hasItems () {
+        return this.hasRunning || this.hasRemaining
+    }
+
+    // Public
+    get hasError () {
+        return this.state.error != null
+    }
+
+    // Public
+    get hasResult () {
+        return this.hasError || this.state.results.length !== 0
+    }
+
+    // Internal: Whether or not we have any available slots to execute more items.
+    //
+    // Returns a {Boolean} which is &#x60;true&#x60; if we have available slots.
+    get hasSlots () {
+        const concurrency = this.config.concurrency
+        return (
+            concurrency === 0 || this.state.itemsRunning.length &lt; concurrency
+        )
+    }
+
+    // Internal: Whether or not we have errord and want to pause when we have an error.
+    //
+    // Returns a {Boolean} which is &#x60;true&#x60; if we are paused.
+    get shouldPause () {
+        return (
+            this.config.onError === &#x27;exit&#x27; &amp;&amp; this.hasError
+        )
+    }
+
+    // Internal: Whether or not we are capable of firing more items.
+    //
+    // This is determined whether or not we are not paused, and we have remaning items, and we have slots able to execute those remaning items.
+    //
+    // Returns a {Boolean} which is &#x60;true&#x60; if we can fire more items.
+    get shouldFire () {
+        return (
+            !this.shouldPause &amp;&amp;
+            this.hasRemaining &amp;&amp;
+            this.hasSlots
+        )
+    }
+
+    // Public: Whether or not we have no items left
+    //
+    // Returns a {Boolean} which is &#x60;true&#x60; if we have no more running or remaining items
+    get empty () {
+        return !this.hasItems
+    }
+
+    // Public: Have we finished its execution yet?
+    //
+    // Returns a {Boolean} which is &#x60;true&#x60; if we have finished execution
+    get exited () {
+        switch ( this.state.status ) {
+            case &#x27;completed&#x27;:
+            case &#x27;destroyed&#x27;:
+                return true
+
+            default:
+                return false
+        }
+    }
+
+    // Public: Have we started execution yet?
+    //
+    // Returns a {Boolean} which is &#x60;true&#x60; if we have commenced execution
+    get started () {
+        return this.state.status != null
+    }
+
+    // Public
+    get paused () {
+        return (
+            this.shouldPause &amp;&amp;
+            !this.hasRunning
+        )
+    }
+
+    // Public: Have we completed its execution yet?
+    //
+    // Completion of executed is determined of whether or not we have started, and whether or not we are currently paused or have no remaining and running items left
+    //
+    // Returns a {Boolean} which is &#x60;true&#x60; if we have completed execution
+    get completed () {
+        return (
+            this.started &amp;&amp;
+            (
+                this.paused ||
+                this.empty
+            )
+        )
+    }
+
+
+    // ---------------------------------
+    // Firers
+
+    // Internal: Completetion Emitter. Used to emit the &#x60;completed&#x60; event and to cleanup our state.
+    complete () {
+        const completed = this.completed
+
+        if ( completed ) {
+            // Notity our listners we have completed
+            this.emit(&#x27;completed&#x27;, this.state.error, this.state.results)
+
+            // Prevent the error from persisting
+            this.state.error = null
+
+            // Clear and destroy completed
+            this.clearCompleted()
+
+            // Should we reset results?
+            // this.state.results = []
+            // no, it would break the promise nature of done
+            // as it would mean that if multiple done handlers are added, they would each get different results
+            // if they wish to reset the results, they should do so manually via resetResults
+
+            // Should we reset the status?
+            // this.state.status = null
+            // no, it would break the promise nature of done
+            // as it would mean that once a done is fired, no more can be fired, until run is called again
+        }
+
+        return completed
+    }
+
+    // Public: When Done Promise.
+    // Fires the listener, either on the next tick if we are already done, or if not, each time the &#x60;done&#x60; event fires.
+    //
+    // listener - The {Function} to attach or execute.
+    whenDone (handler) {
+        if ( this.completed ) {
+            // avoid zalgo
+            this.queue( () =&gt; handler.call(this, this.state.error, this.state.results) )
+        }
+        else {
+            super.whenDone(handler)
+        }
+
+        // Chain
+        return this
+    }
+
+    // Public: Once Done Promise.
+    // Fires the listener once, either on the next tick if we are already done, or if not, once the &#x60;done&#x60; event fires.
+    //
+    // listener - The {Function} to attach or execute.
+    onceDone (handler) {
+        if ( this.completed ) {
+            // avoid zalgo
+            this.queue( () =&gt; handler.call(this, this.state.error, this.state.results) )
+        }
+        else {
+            super.onceDone(handler)
+        }
+
+        // Chain
+        return this
+    }
+
+    // Internal: Reset the results.
+    //
+    // At this point this method is internal, as it&#x27;s functionality may change in the future, and it&#x27;s outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.
+    resetResults () {
+        this.state.results = []
+
+        // Chain
+        return this
+    }
+
+    // Internal: Fire the next items.
+    //
+    // Returns either an {Array} items that was fired, or &#x60;false&#x60; if no items were fired.
+    fireNextItems () {
+        // Prepare
+        const items = []
+
+        // Fire the next items
+        while ( true ) {
+            const item = this.fireNextItem()
+            if ( item ) {
+                items.push(item)
+            }
+            else {
+                break
+            }
+        }
+
+        // Return the items or false if no items
+        const result = items.length !== 0 ? items : false
+        return result
+    }
+
+    // Internal: Fire the next item.
+    //
+    // Returns either the item that was fired, or &#x60;false&#x60; if no item was fired.
+    fireNextItem () {
+        // Prepare
+        let result = false
+
+        // Can we run the next item?
+        if ( this.shouldFire ) {
+            // Fire the next item
+
+            // Update our status and notify our listeners
+            let status = this.state.status
+            if ( status !== &#x27;running&#x27; ) {
+                this.state.status = status = &#x27;running&#x27;
+                this.emit(status)
+            }
+
+            // Get the next item
+            const item = this.state.itemsRemaining.shift()
+
+            // Add it to the remaining items
+            this.state.itemsRunning.push(item)
+
+            // Run it
+            item.run()
+
+            // Return the item
+            result = item
+        }
+
+        // Return
+        return result
+    }
+
+    // Internal: What to do when an item completes
+    itemCompletionCallback (item, ...args) {
+        // Prepare
+        let error = this.state.error
+        const itemsRunning = this.state.itemsRunning
+        const itemsCompleted = this.state.itemsCompleted
+        const results = this.state.results
+
+        // Update error if it exists
+        if ( this.config.onError === &#x27;exit&#x27; &amp;&amp; args[0] ) {
+            if ( !error ) {
+                this.state.error = error = args[0]
+            }
+        }
+
+        // Mark that one less item is running
+        const index = itemsRunning.indexOf(item)
+        if ( index === -1 ) {
+            // this should never happen, but maybe it could, in which case we definitely want to know about it
+            const indexError = new Error(&#x60;Could not find [${item.names}] in the running queue&#x60;)
+            console.error(errorToString(indexError))
+            if ( !error ) {
+                this.state.error = error = indexError
+            }
+        }
+        else {
+            itemsRunning.splice(index, 1)
+        }
+
+        // Add to the completed queue
+        if ( this.config.storeCompleted ) {
+            itemsCompleted.push(item)
+        }
+        else {
+            // As it will no longer be destroyed in the complete() handler, destroy it here
+            item.destroy()
+            // Push the item name instead to keep getItemNames() working while keeping our footprint low
+            itemsCompleted.push(item.name)
+        }
+
+        // Add the result
+        if ( item.config.includeInResults !== false ) {
+            results.push(args)
+        }
+
+        // Fire
+        this.fire()
+
+        // Chain
+        return this
+    }
+
+    // Internal: Either execute the reamining items we are not paused, or complete execution by exiting.
+    fire () {
+        // Have we actually started?
+        if ( this.started ) {
+            // Check if we are complete, if so, exit
+            if ( this.completed ) {
+                this.exit()
+            }
+
+            // Otherwise continue firing items if we are wanting to pause
+            else if ( !this.shouldPause ) {
+                this.fireNextItems()
+            }
+        }
+
+        // Chain
+        return this
+    }
+
+    // Public: Clear remaning items.
+    clearRemaining () {
+        const itemsRemaining = this.state.itemsRemaining
+        while ( itemsRemaining.length !== 0 ) {
+            itemsRemaining.pop().destroy()
+        }
+
+        // Chain
+        return this
+    }
+
+    // Public: Clear and destroy running items.
+    clearRunning () {
+        const error = new Error(&#x27;Clearing running items is not possible. Instead remaining items and wait for running items to complete.&#x27;)
+        this.emit(&#x27;error&#x27;, error)
+    }
+
+    // Public: Clear and destroy completed items.
+    clearCompleted () {
+        const itemsCompleted = this.state.itemsCompleted
+        if ( this.config.storeCompleted ) {
+            while ( itemsCompleted.length !== 0 ) {
+                itemsCompleted.pop().destroy()
+            }
+        }
+        else {
+            // jscs:disable disallowEmptyBlocks
+            while ( itemsCompleted.pop() ) { }
+            // jscs:enable requireCurlyBraces
+        }
+
+        // Chain
+        return this
+    }
+
+    // Public: Alias for clear remaining items.
+    clear () {
+        return this.clearRemaining()
+    }
+
+    // Public: Destroy all remaining items and remove listeners.
+    destroy () {
+        // Clear remaining items to prevent them from running
+        this.clearRemaining()
+
+        // Once running items have finished, then proceed to destruction
+        this.done(() =&gt; {
+            // Prepare
+            let status = this.state.status
+
+            // Are we already destroyed?
+            if ( status === &#x27;destroyed&#x27; ) return
+
+            // We don&#x27;t need to call clear completed items as done() will have done that for us
+
+            // Update our status and notify our listeners
+            this.state.status = status = &#x27;destroyed&#x27;
+            this.emit(status)
+
+            // Clear results
+            this.resetResults()
+            // item arrays should already be wiped due to done completion
+
+            // Remove listeners
+            this.removeAllListeners()
+        })
+
+        // Chain
+        return this
+    }
+
+
+    // Internal: We now want to exit.
+    exit (...args) {
+        // Store the first error
+        let error = this.state.error
+        if ( args[0] &amp;&amp; !error ) {
+            this.state.error = error = args[0]
+        }
+
+        // Set and emmit the appropriate status for our error or non-error
+        const status = (error ? &#x27;failed&#x27; : &#x27;passed&#x27;)
+        this.state.status = status
+        this.emit(status, error)
+
+        // Fire the completion callback
+        this.complete()
+
+        // Chain
+        return this
+    }
+
+    // Public: Start the execution.
+    run () {
+        this.queue(() =&gt; {
+            // Apply our new status and notify our intention to run
+            const status = &#x27;started&#x27;
+            this.state.status = status
+            this.emit(status)
+
+            // Give time for the listeners to complete before continuing
+            this.fire()
+        })
+
+        // Chain
+        return this
+    }
+}
+
+// Export
+module.exports = TaskGroup
+
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

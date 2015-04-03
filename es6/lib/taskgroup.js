@@ -1,7 +1,7 @@
 // Import
 const ambi = require('ambi')
 const csextends = require('csextends')
-const EventEmitter = require('events').EventEmitter /* .EventEmitter for Node 0.8 compatability */
+const EventEmitter = require('events').EventEmitter /* .EventEmitter for Node 0.8 compatability*/
 // Domains are crippled in the browser and on node 0.8, so don't use domains in those environments
 const domain = (process.browser || process.versions.node.substr(0, 3) === '0.8') ? null : require('domain')
 const hasMap = typeof Map !== 'undefined'
@@ -71,38 +71,53 @@ const ensureArray = function (arr) {
 // BaseEventEmitter
 
 /**
- * Base class containing common functionality for {Task} and {TaskGroup}.
- * @class
- * @private
- */
+Base class containing common functionality for {{#crossLink "Task"}}{{/crossLink}} and {{#crossLink "TaskGroup"}}{{/crossLink}}.
+
+@class BaseEventEmitter
+@extends EventEmitter
+@private
+*/
 class BaseEventEmitter extends EventEmitter {
 	/**
-	 * A helper method to create a new subclass with our extensions.
-	 * @param {Object} extensions - An {Object} of extensions to apply to the new sub class
-	 * @return {Object} A new instance of the sub class
-	 * @function
-	 * @public
-	 */
+	A helper method to create a new subclass with our extensions.
+	@param {Object} extensions - The methods and properties to use.
+	@return {Object} A new instance of the sub class.
+
+	@static
+	@method subclass
+	@public
+	*/
 	static subclass (...args) {
 		return csextends.apply(this, args)
 	}
 
-	// Public: Creates a new {SubClass} instance.
-	//
-	// args - The Arguments to be forwarded along to the {::constructor}.
-	//
-	// Returns the new {SubClass} instance.
+	/**
+	Creates a new {SubClass} instance.
+	@param {Arguments} args - The arguments to be forwarded along to the constructor.
+	@return {SubClass} The new instance.
+
+	@static
+	@method create
+	@public
+	*/
 	static create (...args) {
 		return new this(...args)
 	}
 
-	// Adds support for the done event while
-	// ensuring that errors are always handled correctly.
-	//
-	// It does this by listening to the `error` and `completed` events,
-	// and when the emit, we check if there is a `done` listener:
-	// - if there is, then emit the done event with the original event arguments
-	// - if there isn't, then output the error to stderr and throw it.
+	/**
+	BaseEventEmitter Constructor
+
+	Adds support for the done event while
+	ensuring that errors are always handled correctly.
+	It does this by listening to the `error` and `completed` events,
+	and when the emit, we check if there is a `done` listener:
+
+	- if there is, then emit the done event with the original event arguments
+	- if there isn't, then output the error to stderr and throw it.
+
+	@class BaseEventEmitter
+	@constructor
+	*/
 	constructor () {
 		super()
 
@@ -137,19 +152,27 @@ class BaseEventEmitter extends EventEmitter {
 				this.emit('error', error)
 			}
 		})
-
 	}
 
-	// Internal: Fire our completion event.
+	/**
+	Fire our completion event.
+	@chainable
+	@method complete
+	@private
+	*/
 	complete () {
 		const error = new Error('interface should provide this')
 		this.emit('error', error)
 		return this
 	}
 
-	// Public: Attaches the listener to the `done` event to be emitted each time.
-	//
-	// listener - The {Function} to attach to the `done` event.
+	/**
+	Attaches the listener to the `done` event to be emitted each time.
+	@param {Function} listener - Attaches to the `done` event.
+	@chainable
+	@method whenDone
+	@public
+	*/
 	whenDone (listener) {
 		// check if we have a listener
 		if ( typeof listener === 'function' ) {
@@ -160,11 +183,15 @@ class BaseEventEmitter extends EventEmitter {
 		return this
 	}
 
-	// Public: Attaches the listener to the `done` event to be emitted only once, then removed to not fire again.
-	//
-	// listener - The {Function} to attach to the `done` event.
+	/**
+	Attaches the listener to the `done` event to be emitted only once, then removed to not fire again.
+	@param {Function} listener - Attaches to the `done` event.
+	@chainable
+	@method onceDone
+	@public
+	*/
 	onceDone (listener) {
-		// check if we have a listener
+		// Check if we have a listener
 		if ( typeof listener === 'function' ) {
 			this.once('done', listener)
 		}
@@ -173,18 +200,23 @@ class BaseEventEmitter extends EventEmitter {
 		return this
 	}
 
-	// Public: Alias for {::onceDone}
+	/**
+	Alias for {{#crossLink "BaseEventEmitter/onceDone"}}{{/crossLink}}
+	@param {Function} listener - Attaches to the `done` event.
+	@chainable
+	@method done
+	@public
+	*/
 	done (listener) {
 		return this.onceDone(listener)
 	}
 
-	// Public: Get our name with all of our parent names into a {String} or {Array}.
-	//
-	// opts - The options
-	//        :format - (default: 'string') A {String} that determines the format that we return, when `string` it will output a string of all our names, when `array` it will return the names as an array
-	//        :seperator - (default: ' ➞  ') A {String} that is used to join our array when returning a joined {String}
-	//
-	// Returns either a joined {String} or an {Array} based on the value of the `format` option.
+	/**
+	Gets our name prepended by all of our parents names
+	@type Array
+	@property namesArray
+	@public
+	*/
 	get namesArray () {
 		// Fetch
 		const names = [], name = this.name, parent = this.config.parent
@@ -195,21 +227,35 @@ class BaseEventEmitter extends EventEmitter {
 		return names
 	}
 
+	/**
+	Gets our name prefixed by all of our parents names
+	@type String
+	@property names
+	@public
+	*/
 	get names () {
 		return this.namesArray.join(' ➞  ')
 	}
 
-	// Public: Get the name of our instance.
-	//
-	// If the name was never configured, then return the name in the format of
-	// `'#{this.type} #{Math.random()}'` to output something like `task 0.2123`
-	//
-	// Returns the configured name {String}.
+
+	/**
+	Get the name of our instance.
+	If the name was never configured, then return the name in the format of `'#{this.type} #{Math.random()}'` to output something like `task 0.2123`
+	@type String
+	@property name
+	@public
+	*/
 	get name () {
 		return this.config.name || `${this.type} ${Math.random()}`
 	}
 
-	// Queue
+	/**
+	Executes the passed function either synchronously if `config.sync` is `true` or delays it for the next tick.
+	@param {Function} fn - The function to execute
+	@chainable
+	@method queue
+	@private
+	*/
 	queue (fn) {
 		// If synchronous, execute immediately
 		if ( this.config.sync ) fn()
@@ -224,68 +270,97 @@ class BaseEventEmitter extends EventEmitter {
 
 // =====================================
 
-// Public: Our Task Class.
-//
-// Available configuration is documented in {::setConfig}.
-//
-// Available events:
-//
-//  - `started()` - emitted when we start execution
-//  - `running()` - emitted when the method starts execution
-//  - `failed(error)` - emitted when execution exited with a failure
-//  - `passed()` - emitted when execution exited with a success
-//  - `completed(error, ...resultArguments)` - emitted when execution exited, `resultArguments` are the result arguments from the method
-//  - `error(error)` - emtited if an unexpected error occurs without ourself
-//  - `done(error, ...resultArguments)` - emitted when either execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)
-//
-// Available internal statuses:
-//
-//  - `null` - execution has not yet started
-//  - `'started'` - execution has begun
-//  - `'running'` - execution of our method has begun
-//  - `'failed'` - execution of our method has failed
-//   - `'passed'` - execution of our method has succeeded
-//  - `'destroyed'` - we've been destroyed and can no longer execute
-//
-// Examples
-//
-//  task = require('taskgroup').Task.create('my synchronous task', ->
-//    return 5
-//  ).done(console.info) // null, 5]
-//
-//  task = require('taskgroup').Task.create('my asynchronous task', (complete) ->
-//    complete(null, 5)
-//  ).done(console.info) // [null, 5]
-//
-//  task = require('taskgroup').Task.create('my task that errors', ->
-//    error = new Error('deliberate error')
-//    return error  // if asynchronous, can also do: complete(error)
-//    // thrown and uncaught errors are also caught thanks to domains, but that should be avoided
-//    // as it would put your app in an unknown state
-//  ).done(console.info) // [Error('deliberator error')]
 /**
- * Our Task Class
- * @extends BaseEventEmitter
- * @class
- * @public
- */
+Our Task Class
+
+Available configuration is documented in {::setConfig}.
+
+Available events:
+
+- `started()` - emitted when we start execution
+- `running()` - emitted when the method starts execution
+- `failed(error)` - emitted when execution exited with a failure
+- `passed()` - emitted when execution exited with a success
+- `completed(error, ...resultArguments)` - emitted when execution exited, `resultArguments` are the result arguments from the method
+- `error(error)` - emtited if an unexpected error occurs without ourself
+- `done(error, ...resultArguments)` - emitted when either execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)
+
+Available internal statuses:
+
+- `null` - execution has not yet started
+- `'started'` - execution has begun
+- `'running'` - execution of our method has begun
+- `'failed'` - execution of our method has failed
+- `'passed'` - execution of our method has succeeded
+- `'destroyed'` - we've been destroyed and can no longer execute
+
+Available configuration:
+
+- {String} [name] - What we would like our name to be, useful for debugging.
+- {Function} [done] - Passed to {::onceDone} (aliases are `onceDone`, and `next`)
+- {Function} [whenDone] - Ppassed to {::whenDone}
+- {Object} [on] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}.
+- {Object} [once] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}.
+- {Function} [method] - The {Function} to execute for our task.
+- {TaskGroup} [parent] - A parent {TaskGroup} that we may be attached to.
+- {String} [onError] - Either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.
+- {Array} [args] - Arguments that we would like to forward onto our method when we execute it.
+- {Number} [timeout] - Millesconds that we would like to wait before timing out the method.
+- {Boolean} [ambi=true] - Whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately.
+- {Boolean} [domain=true] - Whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution).
+- {Boolean} [sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`).
+
+Example:
+
+``` javascript
+var Task = require('taskgroup').Task
+var task
+
+task = new Task('my synchronous task', function(){
+	return 5
+}).done(console.info).run()  // [null, 5]
+
+task = new Task('my asynchronous task', function(complete){
+	complete(null, 5)
+}).done(console.info).run()  // [null, 5]
+
+task = new Task('my task that returns an error', function(){
+	var error = new Error('deliberate error')
+	return error
+}).done(console.info).run()  // [Error('deliberator error')]
+
+task = new Task('my task that passes an error', function(complete){
+	var error = new Error('deliberate error')
+	complete(error)
+}).done(console.info).run()  // [Error('deliberator error')]
+```
+
+@class Task
+@extends BaseEventEmitter
+@public
+*/
 class Task extends BaseEventEmitter {
 	/**
-	 * The type of our class for the purpose of duck typing
-	 * which is needed when working with node virtual machines
-	 * as instanceof will not work in those environments.
-	 * @function
-	 * @private
-	 */
+	The type of our class.
+
+	Used for the purpose of duck typing
+	which is needed when working with node virtual machines
+	as instanceof will not work in those environments.
+
+	@type String
+	@property type
+	@default 'task'
+	@private
+	*/
 	get type () { return 'task' }
 
 	/**
-	 * A helper method to check if the passed argument is an instanceof a {Task}
-	 * @param {Task} item - The possible instance of the {Task} that we want to check
-	 * @return {Boolean} Whether or not the item is a {Task} instance.
-	 * @function
-	 * @public
-	 */
+	A helper method to check if the passed argument is an instanceof a {Task}.
+	@param {Task} item - The possible instance of the {Task} that we want to check
+	@return {Boolean} Whether or not the item is a {Task} instance.
+	@method isTask
+	@public
+	*/
 	static isTask (item) {
 		return (item && item.type === 'task') || (item instanceof Task)
 	}
@@ -378,25 +453,16 @@ class Task extends BaseEventEmitter {
 		this.setConfig(...args)
 	}
 
-	// Public: Set the configuration for our instance.
-	//
-	// Despite accepting an {Object} of configuration, we can also accept an {Array} of configuration.
-	// When using an array, a {String} becomes the :name, a {Function} becomes the :method, and an {Object} becomes the :config
-	//
-	// config - Our configuration {Object} can contain the following fields:
-	//   :name - (default: null) A {String} for what we would like our name to be, useful for debugging.
-	//   :done - (default: null) A {Function} that we would like passed to {::onceDone} (aliases are :onceDone, and :next)
-	//   :whenDone - (default: null) A {Function} that we would like passed to {::whenDone}
-	//   :on - (default: null) An {Object} of (eventName => listener) that we would like bound via EventEmitter.on.
-	//   :once - (default: null) An {Object} of (eventName => listener) that we would like bound via EventEmitter.once.
-	//   :method - (default: null) The {Function} that we would like to execute within our task.
-	//   :parent - (default: null) A parent {TaskGroup} that we may be attached to.
-	//   :onError - (default: 'exit') A {String} that is either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.
-	//   :args - (default: null) An {Array} of arguments that we would like to forward onto our method when we execute it.
-	//   :timeout - (default: null) A {Number} of millesconds that we would like to wait before timing out the method.
-	//   :ambi - (default: true) A {Boolean} for whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately
-	//   :domain - (default: true) A {Boolean} for whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution)
-	//   :sync - (default: false) A {Boolean} for whether or not we should execute certain calls asynchronously (`false`) or synchronously (`true`)
+	/*
+	Set the configuration for our instance.
+
+	Despite accepting an {Object} of configuration, we can also accept an {Array} of configuration. When using an array, a {String} becomes the :name, a {Function} becomes the :method, and an {Object} becomes the :config.
+
+	@param {Arguments} args
+	@chainable
+	@method setConfig
+	@public
+	*/
 	setConfig (...args) {
 		const opts = {}
 
@@ -1086,7 +1152,9 @@ class TaskGroup extends BaseEventEmitter {
 
 		// Unknown type
 		else {
-			// error
+			let error = new Error('Unknown item type')
+			this.emit('error', error)
+			return this
 		}
 
 		// Name default
@@ -1657,7 +1725,9 @@ class TaskGroup extends BaseEventEmitter {
 			}
 		}
 		else {
+			// jscs:disable disallowEmptyBlocks
 			while ( itemsCompleted.pop() ) { }
+			// jscs:enable requireCurlyBraces
 		}
 
 		// Chain

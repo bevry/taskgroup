@@ -1,0 +1,251 @@
+{
+    "project": {
+        "name": "TaskGroup API",
+        "description": "Technical API documentation for Bevry's TaskGroup flow control library.",
+        "version": "5.0.0",
+        "url": "https://github.com/bevry/taskgroup",
+        "logo": "http://localhost:8000/web/logo.svg"
+    },
+    "files": {
+        "es6/lib/taskgroup.js": {
+            "name": "es6/lib/taskgroup.js",
+            "modules": {},
+            "classes": {
+                "BaseEventEmitter": 1,
+                "Task": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {},
+    "classes": {
+        "BaseEventEmitter": {
+            "name": "BaseEventEmitter",
+            "shortname": "BaseEventEmitter",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "es6/lib/taskgroup.js",
+            "line": 107,
+            "description": "BaseEventEmitter Constructor\n\nAdds support for the done event while\nensuring that errors are always handled correctly.\nIt does this by listening to the `error` and `completed` events,\nand when the emit, we check if there is a `done` listener:\n\n- if there is, then emit the done event with the original event arguments\n- if there isn't, then output the error to stderr and throw it.",
+            "extends": "EventEmitter",
+            "access": "private",
+            "tagname": "",
+            "is_constructor": 1
+        },
+        "Task": {
+            "name": "Task",
+            "shortname": "Task",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "es6/lib/taskgroup.js",
+            "line": 273,
+            "description": "Our Task Class\n\nAvailable configuration is documented in {::setConfig}.\n\nAvailable events:\n\n- `started()` - emitted when we start execution\n- `running()` - emitted when the method starts execution\n- `failed(error)` - emitted when execution exited with a failure\n- `passed()` - emitted when execution exited with a success\n- `completed(error, ...resultArguments)` - emitted when execution exited, `resultArguments` are the result arguments from the method\n- `error(error)` - emtited if an unexpected error occurs without ourself\n- `done(error, ...resultArguments)` - emitted when either execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)\n\nAvailable internal statuses:\n\n- `null` - execution has not yet started\n- `'started'` - execution has begun\n- `'running'` - execution of our method has begun\n- `'failed'` - execution of our method has failed\n- `'passed'` - execution of our method has succeeded\n- `'destroyed'` - we've been destroyed and can no longer execute\n\nAvailable configuration:\n\n- {String} [name] - What we would like our name to be, useful for debugging.\n- {Function} [done] - Passed to {::onceDone} (aliases are `onceDone`, and `next`)\n- {Function} [whenDone] - Ppassed to {::whenDone}\n- {Object} [on] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}.\n- {Object} [once] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}.\n- {Function} [method] - The {Function} to execute for our task.\n- {TaskGroup} [parent] - A parent {TaskGroup} that we may be attached to.\n- {String} [onError] - Either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.\n- {Array} [args] - Arguments that we would like to forward onto our method when we execute it.\n- {Number} [timeout] - Millesconds that we would like to wait before timing out the method.\n- {Boolean} [ambi=true] - Whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately.\n- {Boolean} [domain=true] - Whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution).\n- {Boolean} [sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`).\n\nExample:\n\n``` javascript\nvar Task = require('taskgroup').Task\nvar task\n\ntask = new Task('my synchronous task', function(){\n\treturn 5\n}).done(console.info).run()  // [null, 5]\n\ntask = new Task('my asynchronous task', function(complete){\n\tcomplete(null, 5)\n}).done(console.info).run()  // [null, 5]\n\ntask = new Task('my task that returns an error', function(){\n\tvar error = new Error('deliberate error')\n\treturn error\n}).done(console.info).run()  // [Error('deliberator error')]\n\ntask = new Task('my task that passes an error', function(complete){\n\tvar error = new Error('deliberate error')\n\tcomplete(error)\n}).done(console.info).run()  // [Error('deliberator error')]\n```",
+            "extends": "BaseEventEmitter",
+            "access": "public",
+            "tagname": ""
+        }
+    },
+    "classitems": [
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 81,
+            "description": "A helper method to create a new subclass with our extensions.",
+            "params": [
+                {
+                    "name": "extensions",
+                    "description": "- The methods and properties to use.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "A new instance of the sub class.",
+                "type": "Object"
+            },
+            "static": 1,
+            "itemtype": "method",
+            "name": "subclass",
+            "access": "public",
+            "tagname": "",
+            "class": "BaseEventEmitter"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 94,
+            "description": "Creates a new {SubClass} instance.",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- The arguments to be forwarded along to the constructor.",
+                    "type": "Arguments"
+                }
+            ],
+            "return": {
+                "description": "The new instance.",
+                "type": "SubClass"
+            },
+            "static": 1,
+            "itemtype": "method",
+            "name": "create",
+            "access": "public",
+            "tagname": "",
+            "class": "BaseEventEmitter"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 157,
+            "description": "Fire our completion event.",
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "complete",
+            "access": "private",
+            "tagname": "",
+            "class": "BaseEventEmitter"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 169,
+            "description": "Attaches the listener to the `done` event to be emitted each time.",
+            "params": [
+                {
+                    "name": "listener",
+                    "description": "- Attaches to the `done` event.",
+                    "type": "Function"
+                }
+            ],
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "whenDone",
+            "access": "public",
+            "tagname": "",
+            "class": "BaseEventEmitter"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 186,
+            "description": "Attaches the listener to the `done` event to be emitted only once, then removed to not fire again.",
+            "params": [
+                {
+                    "name": "listener",
+                    "description": "- Attaches to the `done` event.",
+                    "type": "Function"
+                }
+            ],
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "onceDone",
+            "access": "public",
+            "tagname": "",
+            "class": "BaseEventEmitter"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 203,
+            "description": "Alias for {{#crossLink \"BaseEventEmitter/onceDone\"}}{{/crossLink}}",
+            "params": [
+                {
+                    "name": "listener",
+                    "description": "- Attaches to the `done` event.",
+                    "type": "Function"
+                }
+            ],
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "done",
+            "access": "public",
+            "tagname": "",
+            "class": "BaseEventEmitter"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 214,
+            "description": "Gets our name prepended by all of our parents names",
+            "type": "Array",
+            "itemtype": "property",
+            "name": "namesArray",
+            "access": "public",
+            "tagname": "",
+            "class": "BaseEventEmitter"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 230,
+            "description": "Gets our name prefixed by all of our parents names",
+            "type": "String",
+            "itemtype": "property",
+            "name": "names",
+            "access": "public",
+            "tagname": "",
+            "class": "BaseEventEmitter"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 241,
+            "description": "Get the name of our instance.\nIf the name was never configured, then return the name in the format of `'#{this.type} #{Math.random()}'` to output something like `task 0.2123`",
+            "type": "String",
+            "itemtype": "property",
+            "name": "name",
+            "access": "public",
+            "tagname": "",
+            "class": "BaseEventEmitter"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 252,
+            "description": "Executes the passed function either synchronously if `config.sync` is `true` or delays it for the next tick.",
+            "params": [
+                {
+                    "name": "fn",
+                    "description": "- The function to execute",
+                    "type": "Function"
+                }
+            ],
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "queue",
+            "access": "private",
+            "tagname": "",
+            "class": "BaseEventEmitter"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 343,
+            "description": "The type of our class.\n\nUsed for the purpose of duck typing\nwhich is needed when working with node virtual machines\nas instanceof will not work in those environments.",
+            "type": "String",
+            "itemtype": "property",
+            "name": "type",
+            "default": "'task'",
+            "access": "private",
+            "tagname": "",
+            "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 357,
+            "description": "A helper method to check if the passed argument is an instanceof a {Task}.",
+            "params": [
+                {
+                    "name": "item",
+                    "description": "- The possible instance of the {Task} that we want to check",
+                    "type": "Task"
+                }
+            ],
+            "return": {
+                "description": "Whether or not the item is a {Task} instance.",
+                "type": "Boolean"
+            },
+            "itemtype": "method",
+            "name": "isTask",
+            "access": "public",
+            "tagname": "",
+            "class": "Task"
+        }
+    ],
+    "warnings": []
+}

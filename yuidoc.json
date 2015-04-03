@@ -1,0 +1,17 @@
+{
+    "name": "TaskGroup API",
+    "description": "Technical API documentation for Bevry's TaskGroup flow control library.",
+    "version": "5.0.0",
+    "url": "https://github.com/bevry/taskgroup",
+    "logo": "http://localhost:8000/web/logo.svg",
+    "options": {
+        "linkNatives": true,
+        "attributesEmit": true,
+        "selleck": false,
+        "ignorePaths": [ "test" ],
+        "paths": "./es6",
+        "outdir": "./docs",
+        "tabtospace": 4,
+        "markdown": "default"
+    }
+}
