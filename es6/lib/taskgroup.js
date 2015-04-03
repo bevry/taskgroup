@@ -1144,8 +1144,8 @@ class TaskGroup extends BaseEventEmitter {
 	@param {Object} [config]
 
 	@param {String} [config.name] - What we would like our name to be, useful for debugging.
-	@param {Function} [config.done] - Passed to {{#crossLink "Task/onceDone"}}{{/crossLink}} (aliases are `onceDone`, and `next`)
-	@param {Function} [config.whenDone] - Passed to {{#crossLink "Task/whenDone"}}{{/crossLink}}
+	@param {Function} [config.done] - Passed to {{#crossLink "TaskGroup/onceDone"}}{{/crossLink}} (aliases are `onceDone`, and `next`)
+	@param {Function} [config.whenDone] - Passed to {{#crossLink "TaskGroup/whenDone"}}{{/crossLink}}
 	@param {Object} [config.on] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}.
 	@param {Object} [config.once] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}.
 	@param {TaskGroup} [config.parent] - A parent {{#crossLink "TaskGroup"}}{{/crossLink}} that we may be attached to.

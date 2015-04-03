@@ -848,13 +848,13 @@
                         },
                         {
                             "name": "done",
-                            "description": "- Passed to {{#crossLink \"Task/onceDone\"}}{{/crossLink}} (aliases are `onceDone`, and `next`)",
+                            "description": "- Passed to {{#crossLink \"TaskGroup/onceDone\"}}{{/crossLink}} (aliases are `onceDone`, and `next`)",
                             "type": "Function",
                             "optional": true
                         },
                         {
                             "name": "whenDone",
-                            "description": "- Passed to {{#crossLink \"Task/whenDone\"}}{{/crossLink}}",
+                            "description": "- Passed to {{#crossLink \"TaskGroup/whenDone\"}}{{/crossLink}}",
                             "type": "Function",
                             "optional": true
                         },
