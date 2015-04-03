@@ -70,13 +70,19 @@ const ensureArray = function (arr) {
 // =====================================
 // BaseEventEmitter
 
-// Internal: Base class containing common functionality for {Task} and {TaskGroup}.
+/**
+ * Base class containing common functionality for {Task} and {TaskGroup}.
+ * @class
+ * @private
+ */
 class BaseEventEmitter extends EventEmitter {
-	// Public: A helper method to create a new subclass with our extensions.
-	//
-	// extensions - An {Object} of extensions to apply to the new subclass
-	//
-	// Returns the new sub {Class}
+	/**
+	 * A helper method to create a new subclass with our extensions.
+	 * @param {Object} extensions - An {Object} of extensions to apply to the new sub class
+	 * @return {Object} A new instance of the sub class
+	 * @function
+	 * @public
+	 */
 	static subclass (...args) {
 		return csextends.apply(this, args)
 	}
@@ -257,17 +263,29 @@ class BaseEventEmitter extends EventEmitter {
 //    // thrown and uncaught errors are also caught thanks to domains, but that should be avoided
 //    // as it would put your app in an unknown state
 //  ).done(console.info) // [Error('deliberator error')]
+/**
+ * Our Task Class
+ * @extends BaseEventEmitter
+ * @class
+ * @public
+ */
 class Task extends BaseEventEmitter {
-	// Internal: The type of our class for the purpose of duck typing
-	// which is needed when working with node virtual machines
-	// as instanceof will not work in those environments.
+	/**
+	 * The type of our class for the purpose of duck typing
+	 * which is needed when working with node virtual machines
+	 * as instanceof will not work in those environments.
+	 * @function
+	 * @private
+	 */
 	get type () { return 'task' }
 
-	// Public: A helper method to check if the passed argument is an instanceof a {Task}.
-	//
-	// item - The possible instance of the {Task} that we want to check
-	//
-	// Returns a {Boolean} of whether or not the item is a {Task} instance.
+	/**
+	 * A helper method to check if the passed argument is an instanceof a {Task}
+	 * @param {Task} item - The possible instance of the {Task} that we want to check
+	 * @return {Boolean} Whether or not the item is a {Task} instance.
+	 * @function
+	 * @public
+	 */
 	static isTask (item) {
 		return (item && item.type === 'task') || (item instanceof Task)
 	}
