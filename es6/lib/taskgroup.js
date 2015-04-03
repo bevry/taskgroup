@@ -429,12 +429,13 @@ class Task extends BaseEventEmitter {
 	An {Array} of the events that we may emit. Events that will be executed can be found in the {Task} description.
 	@type Array
 	@property events
+	@default ['events', 'error', 'started', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed']
 	@protected
 	*/
 	get events () { return this.state.events }
 
 	/**
-	An {Array} of the result arguments of our method.
+	An {Array} representing the returned result or the passed {Arguments} of our method.
 	The first item in the array should be the {Error} if it exists.
 	@type Array
 	@property result
@@ -451,7 +452,7 @@ class Task extends BaseEventEmitter {
 	get taskDomain () { return this.state.taskDomain }
 
 	/**
-	Initialize our new {Task} instance. Forwards arguments onto {::setConfig}.
+	Initialize our new {Task} instance. Forwards arguments onto {{#crossLink "Task/setConfig"}}{{/crossLink}}.
 	@method constructor
 	@public
 	*/
@@ -484,19 +485,21 @@ class Task extends BaseEventEmitter {
 	Set the configuration for our instance.
 
 	@param {Object} [config]
+
 	@param {String} [config.name] - What we would like our name to be, useful for debugging.
 	@param {Function} [config.done] - Passed to {{#crossLink "Task/onceDone"}}{{/crossLink}} (aliases are `onceDone`, and `next`)
 	@param {Function} [config.whenDone] - Passed to {{#crossLink "Task/whenDone"}}{{/crossLink}}
 	@param {Object} [config.on] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}.
 	@param {Object} [config.once] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}.
-	@param {Function} [config.method] - The {Function} to execute for our task.
 	@param {TaskGroup} [config.parent] - A parent {{#crossLink "TaskGroup"}}{{/crossLink}} that we may be attached to.
 	@param {String} [config.onError] - Either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.
+	@param {Boolean} [config.sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`).
+
+	@param {Function} [config.method] - The {Function} to execute for our {Task}.
 	@param {Array} [config.args] - Arguments that we would like to forward onto our method when we execute it.
 	@param {Number} [config.timeout] - Millesconds that we would like to wait before timing out the method.
 	@param {Boolean} [config.ambi=true] - Whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately.
 	@param {Boolean} [config.domain=true] - Whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution).
-	@param {Boolean} [config.sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`).
 
 	@chainable
 	@method setConfig
@@ -914,60 +917,150 @@ Available internal statuses:
 @extends BaseEventEmitter
 @public
 */
-class TaskGroup extends BaseEventEmitter {
-	// Internal: The type of our class for the purpose of duck typing
-	// which is needed when working with node virtual machines
-	// as instanceof will not work in those environments.
+module.exports = class TaskGroup extends BaseEventEmitter {
+	/**
+	The type of our class.
+
+	Used for the purpose of duck typing
+	which is needed when working with node virtual machines
+	as instanceof will not work in those environments.
+
+	@type String
+	@property type
+	@default 'taskgroup'
+	@private
+	*/
 	get type () { return 'taskgroup' }
 
-	// Public: A helper method to check if the passed argument is an instanceof a {TaskGroup}.
-	//
-	// item - The possible instance of the {TaskGroup} that we want to check
-	//
-	// Returns a {Boolean} of whether or not the item is a {TaskGroup} instance.
+	/**
+	A helper method to check if the passed argument is an instanceof a {TaskGroup}.
+	@param {TaskGroup} item - The possible instance of the {TaskGroup} that we want to check
+	@return {Boolean} Whether or not the item is a {TaskGroup} instance.
+	@method isTaskGroup
+	@static
+	@public
+	*/
 	static isTaskGroup (group) {
 		return (group && group.type === 'taskgroup') || group instanceof TaskGroup
 	}
 
-	// Internal: A reference to the {Task} class for use in {::createTask} if we want to override it
+	/**
+	A reference to the {Task} class for use in {::createTask} if we want to override it.
+	@type Task
+	@property Task
+	@default Task
+	@public
+	*/
 	get Task () { return Task }
 
-	// Internal: A reference to the {TaskGroup} class for use in {::createGroup} if we want to override it
+	/**
+	A reference to the {TaskGroup} class for use in {::createGroup} if we want to override it.
+	@type TaskGroup
+	@property TaskGroup
+	@default TaskGroup
+	@public
+	*/
 	get TaskGroup () { return TaskGroup }
 
+	// -----------------------------------
 	// Export API
+
+	/**
+	A reference to the {Task} class.
+	@type Task
+	@property Task
+	@default Task
+	@static
+	@public
+	*/
 	static get Task () { return Task }
+
+	/**
+	A reference to the {TaskGroup} class.
+	@type TaskGroup
+	@property TaskGroup
+	@default TaskGroup
+	@static
+	@public
+	*/
 	static get TaskGroup () { return TaskGroup }
 
 
 	// -----------------------------------
 	// @TODO Decide if the following is still needed
 
-	// Internal: The config.concurrency property
+	/**
+	The {config.concurrency} property.
+	@type Number
+	@property concurrency
+	@protected
+	*/
 	get concurrency () { return this.config.concurrency }
 
-	// Internal: The first {Error} that has occured.
+	/**
+	The first {Error} that has occured.
+	@type Error
+	@property error
+	@protected
+	*/
 	get error () { return this.state.error }
 
-	// Internal: A {String} containing our current status. See our {TaskGroup} description for available values.
+	/**
+	A {String} containing our current status. See our {TaskGroup} description for available values.
+	@type String
+	@property status
+	@protected
+	*/
 	get status () { return this.state.status }
 
-	// Internal: An {Array} of the events that we may emit. Events that will be executed can be found in the {Task} description.
+	/**
+	An {Array} of the events that we may emit. Events that will be executed can be found in the {Task} description.
+	@type Array
+	@property events
+	@protected
+	*/
 	get events () { return this.state.events }
 
-	// Internal: An {Array} of the result Arguments for each completed item when their :includeInResults configuration option is not `false`
+	/**
+	An {Array} that contains the result property for each completed {Task} and {TaskGroup}.
+	An item can disable having its result property added to this results array by setting its {includeInResults} configuration option to `false`.
+	@type Array
+	@property results
+	@protected
+	*/
 	get results () { return this.state.results }
 
-	// Internal: An {Array} of the items that are still yet to execute
+	/**
+	An {Array} of each {Task} and {TaskGroup} in this group that are still yet to execute.
+	@type Array
+	@property itemsRemaining
+	@protected
+	*/
 	get itemsRemaining () { return this.state.itemsRemaining }
 
-	// Internal: An {Array} of the items that are currently running
+	/**
+	An {Array} of each {Task} and {TaskGroup} in this group that are currently executing.
+	@TODO offer the ability to disable this completely via `storeRunningItems: false`
+	@type Array
+	@property itemsRunning
+	@protected
+	*/
 	get itemsRunning () { return this.state.itemsRunning }
 
-	// Internal: An {Array} of the items that have completed
+	/**
+	An {Array} of each {Task} and {TaskGroup} in this group that have completed.
+	@TODO offer the ability to disable this completely via `storeCompletedItems: false`
+	@type Array
+	@property itemsRunning
+	@protected
+	*/
 	get itemsCompleted () { return this.state.itemsCompleted }
 
-	// Public: Initialize our new {Task} instance. Forwards arguments onto {::setConfig}.
+	/**
+	Initialize our new {TaskGroup} instance. Forwards arguments onto {{#crossLink "TaskGroup/setConfig"}}{{/crossLink}}.
+	@method constructor
+	@public
+	*/
 	constructor (...args) {
 		super(...args)
 
@@ -985,8 +1078,8 @@ class TaskGroup extends BaseEventEmitter {
 		// Internal: The configuration for our {TaskGroup} instance. See {::setConfig} for available configuration.
 		this.config = {
 			// @TODO update storeCompleted to actually not store anything
-			//   this will require tests to be updated (as task names no longer will be stored)
-			//   as well as a counter inserted for the total completed (we may even get rid of that)
+			// this will require tests to be updated (as task names no longer will be stored)
+			// as well as a counter inserted for the total completed (we may even get rid of that)
 			storeCompleted: false,
 			// @TODO implement one or both of the following to ensure taskgroups successfully die once completed
 			//   should also implement this for the task class too
@@ -994,7 +1087,7 @@ class TaskGroup extends BaseEventEmitter {
 			// onExit: 'destroy',
 			nestedEvents: false,
 			nestedTaskConfig: {},
-			nestedConfig: {},
+			nestedGroupConfig: {},
 			concurrency: 1,
 			onError: 'exit',
 			sync: false
@@ -1013,7 +1106,13 @@ class TaskGroup extends BaseEventEmitter {
 	// ---------------------------------
 	// Configuration
 
-	// Public: Set Nested Task Config
+	/**
+	Merged passed configuration into {config.nestedTaskConfig}.
+	@param {Object} opts - The configuration to merge.
+	@type Object
+	@property nestedTaskConfig
+	@public
+	*/
 	set nestedTaskConfig (opts) {
 		// Fetch and copy options to the state's nested task configuration
 		copyObject(this.state.nestedTaskConfig, opts)
@@ -1022,36 +1121,50 @@ class TaskGroup extends BaseEventEmitter {
 		return this
 	}
 
-	// Public: Set Nested Config
-	set nestedConfig (opts) {
+	/**
+	Merged passed configuration into {config.nestedGroupConfig}.
+	@param {Object} opts - The configuration to merge.
+	@type Object
+	@property nestedGroupConfig
+	@public
+	*/
+	set nestedGroupConfig (opts) {
 		// Fetch and copy options to the state's nested configuration
-		copyObject(this.state.nestedConfig, opts)
+		copyObject(this.state.nestedGroupConfig, opts)
 
 		// Chain
 		return this
 	}
 
-	// Public: Set the configuration for our instance.
-	//
-	// Despite accepting an {Object} of configuration, we can also accept an {Array} of configuration.
-	// When using an array, a {String} becomes the :name, a {Function} becomes the :method, and an {Object} becomes the :config
-	//
-	// config - Our configuration {Object} can contain the following fields:
-	//   :name - (default: null) A {String} for what we would like our name to be, useful for debugging.
-	//   :done - (default: null) A {Function} that we would like passed to {::onceDone} (aliases are :onceDone, and :next)
-	//   :whenDone - (default: null) A {Function} that we would like passed to {::whenDone}
-	//   :on - (default: null) An {Object} of (eventName => listener) that we would like bound via EventEmitter.on.
-	//   :once - (default: null) An {Object} of (eventName => listener) that we would like bound via EventEmitter.once.	//   :method - (default: null) A {Function} that we would like to use to created nested groups and tasks using an inline style.
-	//   :parent - (default: null) A parent {TaskGroup} that we may be attached to.
-	//   :onError - (default: 'exit') A {String} that is either `'exit'` or `'ignore'`, when `'ignore'` errors that occur within items will not halt execution and will not be reported in the completion callbacks `error` argument (but will still be in the `results` argument).
-	//   :concurrency - (default: 1) The {Number} of items that we would like to execute at the same time. Use `0` for unlimited. `1` accomplishes serial execution, everything else accomplishes parallel execution.
-	//   :run - (default: true) A {Boolean} for whether or not to the :method (if specified) automatically.
-	//   :nestedConfig - (default: null) An {Object} of nested configuration to be applied to all items of this group.
-	//   :nestedTaskConfig - (default: null) An {Object} of nested configuration to be applied to all {Task}s of this group.
-	//   :tasks - (default: null) An {Array} of tasks to be added as children.
-	//   :groups - (default: null) An {Array} of groups to be added as children.
-	//   :items - (default: null) An {Array} of {Task} and/or {TaskGroup} instances to be added to this group.
-	//   :sync - (default: false) A {Boolean} for whether or not we should execute certain calls asynchronously (`false`) or synchronously (`true`)
+	/**
+	Set the configuration for our instance.
+
+	Despite accepting an {Object} of configuration, we can also accept an {Array} of configuration.	When using an array, a {String} becomes the :name, a {Function} becomes the :method, and an {Object} becomes the :config
+
+	@param {Object} [config]
+
+	@param {String} [config.name] - What we would like our name to be, useful for debugging.
+	@param {Function} [config.done] - Passed to {{#crossLink "Task/onceDone"}}{{/crossLink}} (aliases are `onceDone`, and `next`)
+	@param {Function} [config.whenDone] - Passed to {{#crossLink "Task/whenDone"}}{{/crossLink}}
+	@param {Object} [config.on] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}.
+	@param {Object} [config.once] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}.
+	@param {TaskGroup} [config.parent] - A parent {{#crossLink "TaskGroup"}}{{/crossLink}} that we may be attached to.
+	@param {String} [config.onError] - Either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.
+	@param {Boolean} [config.sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`).
+
+	@param {Function} [config.method] - The {Function} to execute for our {TaskGroup} when using inline execution style.
+	@param {Boolean} [config.run=true] - A {Boolean} for whether or not to the :method (if specified) automatically.
+	@param {Number} [config.concurrency=1] - The amount of items that we would like to execute at the same time. Use `0` for unlimited. `1` accomplishes serial execution, everything else accomplishes parallel execution.
+	@param {Object} [config.nestedGroupConfig] - The nested configuration to be applied to all {TaskGroup} descendants of this group.
+	@param {Object} [config.nestedTaskConfig] - The nested configuration to be applied to all {Task} descendants of this group.
+	@param {Array} [config.tasks] - An {Array} of {Task} instances to be added to this group.
+	@param {Array} [config.groups] - An {Array} of {TaskGroup} instances to be added to this group.
+	@param {Array} [config.items] - An {Array} of {Task} and/or {TaskGroup} instances to be added to this group.
+
+	@chainable
+	@method setConfig
+	@public
+	*/
 	setConfig (...args) {
 		const opts = {}
 
@@ -1130,10 +1243,14 @@ class TaskGroup extends BaseEventEmitter {
 	// ---------------------------------
 	// TaskGroup Method
 
-	// Internal: Prepare the method and it's configuration, and add it as a task to be executed.
-	//
-	// method - The {Function} of our method
-	// config - An optional {Object} of configuration for the task to be created for our method
+	/**
+	Prepare the method and it's configuration, and add it as a task to be executed.
+	@param {Function} method - The function we want to execute as the method of this TaskGroup.
+	@param {Object} config - Optional configuration for the task to be created for the method.
+	@return {Task} The task for the method.
+	@method addMethod
+	@private
+	*/
 	addMethod (method, opts={}) {
 		method = method.bind(this) // run the taskgroup method on the group, rather than itself
 		method.isTaskGroupMethod = true
@@ -1143,13 +1260,20 @@ class TaskGroup extends BaseEventEmitter {
 		return this.addTask(method, opts)
 	}
 
-	// Internal: Autorun ourself under certain conditions.
-	//
-	// Those conditions being:
-	// - if we the :method configuration is defined, and we have no :parent
-	// - if we the :run configuration is `true`
-	//
-	// Used primarily to cause the :method to fire at the appropriate time when using inline style.
+	/**
+	Autorun ourself under certain conditions.
+
+	Those conditions being:
+
+	- if we the :method configuration is defined, and we have no :parent
+	- if we the :run configuration is `true`
+
+	Used primarily to cause the :method to fire at the appropriate time when using inline style.
+
+	@chainable
+	@method autoRun
+	@private
+	*/
 	autoRun () {
 		// Prepare
 		const method = this.config.method
@@ -1197,14 +1321,14 @@ class TaskGroup extends BaseEventEmitter {
 		}
 
 		// Extract
-		const nestedConfig = this.config.nestedConfig
+		const nestedGroupConfig = this.config.nestedGroupConfig
 		const nestedTaskConfig = this.config.nestedTaskConfig
 		const nestedEvents = this.config.nestedEvents
 
 		// Bubble task events
 		if ( Task.isTask(item) ) {
 			// Nested configuration
-			item.setConfig(itemConfig, nestedConfig, nestedTaskConfig, ...args)
+			item.setConfig(itemConfig, nestedTaskConfig, ...args)
 
 			// Bubble the nested events if desired
 			if ( nestedEvents ) {
@@ -1222,7 +1346,7 @@ class TaskGroup extends BaseEventEmitter {
 		// Bubble group events
 		else if ( TaskGroup.isTaskGroup(item) ) {
 			// Nested configuration
-			item.setConfig(itemConfig, nestedConfig, {nestedConfig, nestedTaskConfig}, ...args)
+			item.setConfig(itemConfig, {nestedTaskConfig, nestedGroupConfig}, nestedGroupConfig, ...args)
 
 			// Bubble the nested events if desired
 			if ( nestedEvents ) {

@@ -62,7 +62,7 @@
             "plugin_for": [],
             "extension_for": [],
             "file": "es6/lib/taskgroup.js",
-            "line": 885,
+            "line": 888,
             "description": "Our TaskGroup class.\n\nAvailable configuration is documented in {{#crossLink \"TaskGroup/setConfig\"}}{{/crossLink}}.\n\nAvailable events:\n\n- `started()` - emitted when we start execution\n- `running()` - emitted when the first item starts execution\n- `failed(error)` - emitted when execution exited with a failure\n- `passed()` - emitted when execution exited with a success\n- `completed(error, results)` - emitted when execution exited, `results` is an {Array} of the result arguments for each item that executed\n- `error(error)` - emtited if an unexpected error occured within ourself\n- `done(error, results)` - emitted when either the execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)\n- `item.*(...)` - bubbled events from an added item\n- `task.*(...)` - bubbled events from an added {Task}\n- `group.*(...)` - bubbled events from an added {TaskGroup}\n\nAvailable internal statuses:\n\n- `null` - execution has not yet started\n- `'started'` - execution has begun\n- `'running'` - execution of items has begun\n- `'failed'` - execution has exited with failure status\n- `'passed'` - execution has exited with success status\n- `'destroyed'` - we've been destroyed and can no longer execute",
             "is_constructor": 1,
             "extends": "BaseEventEmitter",
@@ -346,14 +346,15 @@
             "type": "Array",
             "itemtype": "property",
             "name": "events",
+            "default": "['events', 'error', 'started', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed']",
             "access": "protected",
             "tagname": "",
             "class": "Task"
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 436,
-            "description": "An {Array} of the result arguments of our method.\nThe first item in the array should be the {Error} if it exists.",
+            "line": 437,
+            "description": "An {Array} representing the returned result or the passed {Arguments} of our method.\nThe first item in the array should be the {Error} if it exists.",
             "type": "Array",
             "itemtype": "property",
             "name": "result",
@@ -363,7 +364,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 445,
+            "line": 446,
             "description": "The {Domain} that we create to capture errors for our method.",
             "type": "Domain",
             "itemtype": "property",
@@ -374,8 +375,8 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 453,
-            "description": "Initialize our new {Task} instance. Forwards arguments onto {::setConfig}.",
+            "line": 454,
+            "description": "Initialize our new {Task} instance. Forwards arguments onto {{#crossLink \"Task/setConfig\"}}{{/crossLink}}.",
             "itemtype": "method",
             "name": "constructor",
             "access": "public",
@@ -384,7 +385,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 483,
+            "line": 484,
             "description": "Set the configuration for our instance.",
             "params": [
                 {
@@ -424,12 +425,6 @@
                             "optional": true
                         },
                         {
-                            "name": "method",
-                            "description": "- The {Function} to execute for our task.",
-                            "type": "Function",
-                            "optional": true
-                        },
-                        {
                             "name": "parent",
                             "description": "- A parent {{#crossLink \"TaskGroup\"}}{{/crossLink}} that we may be attached to.",
                             "type": "TaskGroup",
@@ -439,6 +434,19 @@
                             "name": "onError",
                             "description": "- Either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.",
                             "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "sync",
+                            "description": "- Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`).",
+                            "type": "Boolean",
+                            "optional": true,
+                            "optdefault": "false"
+                        },
+                        {
+                            "name": "method",
+                            "description": "- The {Function} to execute for our {Task}.",
+                            "type": "Function",
                             "optional": true
                         },
                         {
@@ -466,13 +474,6 @@
                             "type": "Boolean",
                             "optional": true,
                             "optdefault": "true"
-                        },
-                        {
-                            "name": "sync",
-                            "description": "- Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`).",
-                            "type": "Boolean",
-                            "optional": true,
-                            "optdefault": "false"
                         }
                     ]
                 }
@@ -486,7 +487,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 564,
+            "line": 567,
             "description": "Handles the completion and error conditions for ourself.\nShould only ever execute once, if it executes more than once, then we error.",
             "params": [
                 {
@@ -504,7 +505,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 611,
+            "line": 614,
             "description": "Completetion Emitter. Used to emit the `completed` event and to cleanup our state.",
             "chainable": 1,
             "itemtype": "method",
@@ -515,7 +516,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 641,
+            "line": 644,
             "description": "When Done Promise.\nFires the listener, either on the next tick if we are already done, or if not, each time the `done` event fires.",
             "params": [
                 {
@@ -533,7 +534,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 665,
+            "line": 668,
             "description": "Once Done Promise.\nFires the listener once, either on the next tick if we are already done, or if not, each time the `done` event fires.",
             "params": [
                 {
@@ -551,7 +552,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 689,
+            "line": 692,
             "description": "Reset the results.\nAt this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.",
             "chainable": 1,
             "itemtype": "method",
@@ -562,7 +563,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 701,
+            "line": 704,
             "description": "Clear the domain",
             "chainable": 1,
             "itemtype": "method",
@@ -573,7 +574,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 717,
+            "line": 720,
             "description": "Destroy the task and prevent it from executing ever again.",
             "chainable": 1,
             "itemtype": "method",
@@ -584,7 +585,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 751,
+            "line": 754,
             "description": "Fire the task method with our config arguments and wrapped in a domain.",
             "chainable": 1,
             "itemtype": "method",
@@ -595,7 +596,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 849,
+            "line": 852,
             "description": "Start the execution of the task.\nWill emit an `error` event if the task has already started before.",
             "chainable": 1,
             "itemtype": "method",
@@ -603,6 +604,387 @@
             "access": "public",
             "tagname": "",
             "class": "Task"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 921,
+            "description": "The type of our class.\n\nUsed for the purpose of duck typing\nwhich is needed when working with node virtual machines\nas instanceof will not work in those environments.",
+            "type": "String",
+            "itemtype": "property",
+            "name": "type",
+            "default": "'taskgroup'",
+            "access": "private",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 935,
+            "description": "A helper method to check if the passed argument is an instanceof a {TaskGroup}.",
+            "params": [
+                {
+                    "name": "item",
+                    "description": "- The possible instance of the {TaskGroup} that we want to check",
+                    "type": "TaskGroup"
+                }
+            ],
+            "return": {
+                "description": "Whether or not the item is a {TaskGroup} instance.",
+                "type": "Boolean"
+            },
+            "itemtype": "method",
+            "name": "isTaskGroup",
+            "static": 1,
+            "access": "public",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 947,
+            "description": "A reference to the {Task} class for use in {::createTask} if we want to override it.",
+            "type": "Task",
+            "itemtype": "property",
+            "name": "Task",
+            "default": "Task",
+            "access": "public",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 956,
+            "description": "A reference to the {TaskGroup} class for use in {::createGroup} if we want to override it.",
+            "type": "TaskGroup",
+            "itemtype": "property",
+            "name": "TaskGroup",
+            "default": "TaskGroup",
+            "access": "public",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 968,
+            "description": "A reference to the {Task} class.",
+            "type": "Task",
+            "itemtype": "property",
+            "name": "Task",
+            "default": "Task",
+            "static": 1,
+            "access": "public",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 978,
+            "description": "A reference to the {TaskGroup} class.",
+            "type": "TaskGroup",
+            "itemtype": "property",
+            "name": "TaskGroup",
+            "default": "TaskGroup",
+            "static": 1,
+            "access": "public",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 992,
+            "description": "The {config.concurrency} property.",
+            "type": "Number",
+            "itemtype": "property",
+            "name": "concurrency",
+            "access": "protected",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1000,
+            "description": "The first {Error} that has occured.",
+            "type": "Error",
+            "itemtype": "property",
+            "name": "error",
+            "access": "protected",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1008,
+            "description": "A {String} containing our current status. See our {TaskGroup} description for available values.",
+            "type": "String",
+            "itemtype": "property",
+            "name": "status",
+            "access": "protected",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1016,
+            "description": "An {Array} of the events that we may emit. Events that will be executed can be found in the {Task} description.",
+            "type": "Array",
+            "itemtype": "property",
+            "name": "events",
+            "access": "protected",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1024,
+            "description": "An {Array} that contains the result property for each completed {Task} and {TaskGroup}.\nAn item can disable having its result property added to this results array by setting its {includeInResults} configuration option to `false`.",
+            "type": "Array",
+            "itemtype": "property",
+            "name": "results",
+            "access": "protected",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1033,
+            "description": "An {Array} of each {Task} and {TaskGroup} in this group that are still yet to execute.",
+            "type": "Array",
+            "itemtype": "property",
+            "name": "itemsRemaining",
+            "access": "protected",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1041,
+            "description": "An {Array} of each {Task} and {TaskGroup} in this group that are currently executing.",
+            "todo": [
+                "offer the ability to disable this completely via `storeRunningItems: false`"
+            ],
+            "type": "Array",
+            "itemtype": "property",
+            "name": "itemsRunning",
+            "access": "protected",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1050,
+            "description": "An {Array} of each {Task} and {TaskGroup} in this group that have completed.",
+            "todo": [
+                "offer the ability to disable this completely via `storeCompletedItems: false`"
+            ],
+            "type": "Array",
+            "itemtype": "property",
+            "name": "itemsRunning",
+            "access": "protected",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1059,
+            "description": "Initialize our new {TaskGroup} instance. Forwards arguments onto {{#crossLink \"TaskGroup/setConfig\"}}{{/crossLink}}.",
+            "itemtype": "method",
+            "name": "constructor",
+            "access": "public",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1109,
+            "description": "Merged passed configuration into {config.nestedTaskConfig}.",
+            "type": "Object",
+            "itemtype": "property",
+            "name": "nestedTaskConfig",
+            "access": "public",
+            "tagname": "",
+            "class": "TaskGroup",
+            "subprops": [
+                {
+                    "name": "opts",
+                    "description": "- The configuration to merge.",
+                    "type": "Object"
+                }
+            ]
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1124,
+            "description": "Merged passed configuration into {config.nestedGroupConfig}.",
+            "type": "Object",
+            "itemtype": "property",
+            "name": "nestedGroupConfig",
+            "access": "public",
+            "tagname": "",
+            "class": "TaskGroup",
+            "subprops": [
+                {
+                    "name": "opts",
+                    "description": "- The configuration to merge.",
+                    "type": "Object"
+                }
+            ]
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1139,
+            "description": "Set the configuration for our instance.\n\nDespite accepting an {Object} of configuration, we can also accept an {Array} of configuration.\tWhen using an array, a {String} becomes the :name, a {Function} becomes the :method, and an {Object} becomes the :config",
+            "params": [
+                {
+                    "name": "config",
+                    "description": "",
+                    "type": "Object",
+                    "optional": true,
+                    "props": [
+                        {
+                            "name": "name",
+                            "description": "- What we would like our name to be, useful for debugging.",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "done",
+                            "description": "- Passed to {{#crossLink \"Task/onceDone\"}}{{/crossLink}} (aliases are `onceDone`, and `next`)",
+                            "type": "Function",
+                            "optional": true
+                        },
+                        {
+                            "name": "whenDone",
+                            "description": "- Passed to {{#crossLink \"Task/whenDone\"}}{{/crossLink}}",
+                            "type": "Function",
+                            "optional": true
+                        },
+                        {
+                            "name": "on",
+                            "description": "- A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}.",
+                            "type": "Object",
+                            "optional": true
+                        },
+                        {
+                            "name": "once",
+                            "description": "- A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}.",
+                            "type": "Object",
+                            "optional": true
+                        },
+                        {
+                            "name": "parent",
+                            "description": "- A parent {{#crossLink \"TaskGroup\"}}{{/crossLink}} that we may be attached to.",
+                            "type": "TaskGroup",
+                            "optional": true
+                        },
+                        {
+                            "name": "onError",
+                            "description": "- Either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "sync",
+                            "description": "- Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`).",
+                            "type": "Boolean",
+                            "optional": true,
+                            "optdefault": "false"
+                        },
+                        {
+                            "name": "method",
+                            "description": "- The {Function} to execute for our {TaskGroup} when using inline execution style.",
+                            "type": "Function",
+                            "optional": true
+                        },
+                        {
+                            "name": "run",
+                            "description": "- A {Boolean} for whether or not to the :method (if specified) automatically.",
+                            "type": "Boolean",
+                            "optional": true,
+                            "optdefault": "true"
+                        },
+                        {
+                            "name": "concurrency",
+                            "description": "- The amount of items that we would like to execute at the same time. Use `0` for unlimited. `1` accomplishes serial execution, everything else accomplishes parallel execution.",
+                            "type": "Number",
+                            "optional": true,
+                            "optdefault": "1"
+                        },
+                        {
+                            "name": "nestedGroupConfig",
+                            "description": "- The nested configuration to be applied to all {TaskGroup} descendants of this group.",
+                            "type": "Object",
+                            "optional": true
+                        },
+                        {
+                            "name": "nestedTaskConfig",
+                            "description": "- The nested configuration to be applied to all {Task} descendants of this group.",
+                            "type": "Object",
+                            "optional": true
+                        },
+                        {
+                            "name": "tasks",
+                            "description": "- An {Array} of {Task} instances to be added to this group.",
+                            "type": "Array",
+                            "optional": true
+                        },
+                        {
+                            "name": "groups",
+                            "description": "- An {Array} of {TaskGroup} instances to be added to this group.",
+                            "type": "Array",
+                            "optional": true
+                        },
+                        {
+                            "name": "items",
+                            "description": "- An {Array} of {Task} and/or {TaskGroup} instances to be added to this group.",
+                            "type": "Array",
+                            "optional": true
+                        }
+                    ]
+                }
+            ],
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "setConfig",
+            "access": "public",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1246,
+            "description": "Prepare the method and it's configuration, and add it as a task to be executed.",
+            "params": [
+                {
+                    "name": "method",
+                    "description": "- The function we want to execute as the method of this TaskGroup.",
+                    "type": "Function"
+                },
+                {
+                    "name": "config",
+                    "description": "- Optional configuration for the task to be created for the method.",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "The task for the method.",
+                "type": "Task"
+            },
+            "itemtype": "method",
+            "name": "addMethod",
+            "access": "private",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1263,
+            "description": "Autorun ourself under certain conditions.\n\nThose conditions being:\n\n- if we the :method configuration is defined, and we have no :parent\n- if we the :run configuration is `true`\n\nUsed primarily to cause the :method to fire at the appropriate time when using inline style.",
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "autoRun",
+            "access": "private",
+            "tagname": "",
+            "class": "TaskGroup"
         }
     ],
     "warnings": []

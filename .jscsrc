@@ -27,7 +27,6 @@
     "disallowYodaConditions": true,
     "requireAnonymousFunctions": true,
     "requireCamelCaseOrUpperCaseIdentifiers": true,
-    "requireCapitalizedComments": true,
     "requireCapitalizedConstructors": true,
     "requireDollarBeforejQueryAssignment": true,
     "requireDotNotation": true,
