@@ -1689,40 +1689,62 @@ class TaskGroup extends BaseEventEmitter {
 		}
 	}
 
-	// Public: Whether or not we have any running items
-	//
-	// Returns a {Boolean} which is `true` if we have any items that are currently running
+	/**
+	Whether or not we have any running items.
+	@type Boolean
+	@property hasRunning
+	@private
+	*/
 	get hasRunning () {
 		return this.state.itemsRunning.length !== 0
 	}
 
-	// Public: Whether or not we have any items that are yet to execute
-	//
-	// Returns a {Boolean} which is `true` if we have any items that are still yet to be executed
+	/**
+	Whether or not we have any items yet to execute.
+	@type Boolean
+	@property hasRunning
+	@private
+	*/
 	get hasRemaining () {
 		return this.state.itemsRemaining.length !== 0
 	}
 
-	// Public: Whether or not we have any items
-	//
-	// Returns a {Boolean} which is `true` if we have any running or remaining items
+	/**
+	Whether or not we have any items running or remaining.
+	@type Boolean
+	@property hasItems
+	@private
+	*/
 	get hasItems () {
 		return this.hasRunning || this.hasRemaining
 	}
 
-	// Public
+	/**
+	Whether or not we have an error.
+	@type Boolean
+	@property hasError
+	@private
+	*/
 	get hasError () {
 		return this.state.error != null
 	}
 
-	// Public
+	/**
+	Whether or not we have an error or a result.
+	@type Boolean
+	@property hasResult
+	@private
+	*/
 	get hasResult () {
 		return this.hasError || this.state.results.length !== 0
 	}
 
-	// Internal: Whether or not we have any available slots to execute more items.
-	//
-	// Returns a {Boolean} which is `true` if we have available slots.
+	/**
+	Whether or not we have any available slots to execute more items.
+	@type Boolean
+	@property hasResult
+	@private
+	*/
 	get hasSlots () {
 		const concurrency = this.config.concurrency
 		return (
@@ -1730,9 +1752,12 @@ class TaskGroup extends BaseEventEmitter {
 		)
 	}
 
-	// Internal: Whether or not we have errord and want to pause when we have an error.
-	//
-	// Returns a {Boolean} which is `true` if we are paused.
+	/**
+	Whether or not we have errord and want to pause when we have an error.
+	@type Boolean
+	@property shouldPause
+	@private
+	*/
 	get shouldPause () {
 		return (
 			this.config.onError === 'exit' && this.hasError
