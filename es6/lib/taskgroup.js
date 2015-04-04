@@ -460,14 +460,14 @@ class Task extends BaseEventEmitter {
 		// Initialise BaseEventEmitter
 		super()
 
-		// Data
+		// State defaults
 		this.state = {
 			error: null,
 			status: null,
 			events: ['events', 'error', 'started', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed']
 		}
 
-		// Configuration
+		// Configuration defaults
 		this.config = {
 			run: false,
 			onError: 'exit',
@@ -477,7 +477,7 @@ class Task extends BaseEventEmitter {
 			args: null
 		}
 
-		// Apply configuration
+		// Apply user configuration
 		this.setConfig(...args)
 	}
 
@@ -1064,7 +1064,7 @@ class TaskGroup extends BaseEventEmitter {
 	constructor (...args) {
 		super(...args)
 
-		// State
+		// State defaults
 		this.state = {
 			error: null,
 			status: null,
@@ -1075,7 +1075,7 @@ class TaskGroup extends BaseEventEmitter {
 			itemsCompleted: []
 		}
 
-		// Internal: The configuration for our {TaskGroup} instance. See {::setConfig} for available configuration.
+		// Configuration defaults
 		this.config = {
 			// @TODO update storeCompleted to actually not store anything
 			// this will require tests to be updated (as task names no longer will be stored)
@@ -1093,7 +1093,7 @@ class TaskGroup extends BaseEventEmitter {
 			sync: false
 		}
 
-		// Apply configuration
+		// Apply user configuration
 		this.setConfig(...args)
 
 		// Give setConfig enough chance to fire
@@ -1303,10 +1303,15 @@ class TaskGroup extends BaseEventEmitter {
 	// ---------------------------------
 	// Add Item
 
-	// Internal: Add an item to ourself and configure it accordingly
-	//
-	// item - A {Task} or {TaskGroup} instance that we would like added to ourself
-	// args - Additional configuration Arguments to apply to each item
+	/**
+	Adds a {Task|TaskGroup} instance and configures it from the arguments.
+
+	@param {Arguments} ...args - Arguments used to configure the {Task|TaskGroup} instance.
+
+	@return {Task|TaskGroup}
+	@method addItem
+	@public
+	*/
 	addItem (item, ...args) {
 		// Prepare
 		const me = this
@@ -1398,20 +1403,40 @@ class TaskGroup extends BaseEventEmitter {
 		// Return the item
 		return item
 	}
-	addItemChain (...args) {
-		this.addItem(...args)
-		return this
-	}
 
-	// Internal: Add items to ourself and configure them accordingly
-	//
-	// items - An {Array} of {Task} and/or {TaskGroup} instances to add to ourself
-	// args - Optional Arguments to configure each added item
+	/**
+	Adds {Task|TaskGroup} instances and configures them from the arguments.
+
+	@param {Array} items - Array of {Task|TaskGroup} instances to add to this task group.
+	@param {Arguments} ...args - Arguments used to configure the {Task|TaskGroup} instances.
+
+	@return {Array}
+	@method addItems
+	@public
+	*/
 	addItems (items, ...args) {
 		items = ensureArray(items)
 		items.map((item) => this.addItem(item, ...args))
 		return items
 	}
+
+	/**
+	Same as {{#crossLink "TaskGroup/addItem"}}{{/crossLink}} but chains instead of returning the item.
+	@chainable
+	@method addItemChain
+	@private
+	*/
+	addItemChain (...args) {
+		this.addItem(...args)
+		return this
+	}
+
+	/**
+	Same as {{#crossLink "TaskGroup/addItems"}}{{/crossLink}} but chains instead of returning the item.
+	@chainable
+	@method addItemsChain
+	@private
+	*/
 	addItemsChain (...args) {
 		this.addItems(...args)
 		return this
@@ -1421,13 +1446,17 @@ class TaskGroup extends BaseEventEmitter {
 	// ---------------------------------
 	// Add Task
 
-	// Public: Create a {Task} instance from some configuration.
-	//
-	// If the first argument is already a {Task} instance, then just update it's configuration with the remaning arguments.
-	//
-	// args - Arguments to use to configure the {Task} instance
-	//
-	// Returns the new {Task} instance
+	/**
+	Creates a {Task} instance and configures it from the arguments.
+
+	If the first argument is already a {Task} instance, then we configure it with the remaining arguments, instead of creating a new {Task} instance.
+
+	@param {Arguments} ...args - Arguments used to configure the {Task} instance.
+
+	@return {Task}
+	@method createTask
+	@public
+	*/
 	createTask (...args) {
 		// Prepare
 		let task
@@ -1447,27 +1476,55 @@ class TaskGroup extends BaseEventEmitter {
 		return task
 	}
 
-	// Public: Add a {Task} with some configuration to ourself, create it if needed.
-	//
-	// args - Arguments to configure (and if needed, create) the task
+	/**
+	Adds a {Task} instance and configures it from the arguments.
+
+	If a {Task} instance is not supplied, a {Task} instance is created from the arguments.
+
+	@param {Arguments} ...args - Arguments used to configure the {Task} instance.
+
+	@return {Task}
+	@method addTask
+	@public
+	*/
 	addTask (...args) {
 		const task = this.createTask(...args)
 		return this.addItem(task)
 	}
-	addTaskChain (...args) {
-		this.addTask(...args)
-		return this
-	}
 
-	// Public: Add {Task}s with some configuration to ourself, create it if needed.
-	//
-	// items - An {Array} of {Task} items to add to ourself
-	// args - Optional Arguments to configure each added {Task}
+	/**
+	Adds {Task} instances and configures them from the arguments.
+
+	@param {Array} items - Array of {Task} instances to add to this task group.
+	@param {Arguments} ...args - Arguments used to configure the {Task} instances.
+
+	@return {Array}
+	@method addTask
+	@public
+	*/
 	addTasks (items, ...args) {
 		items = ensureArray(items)
 		items.map((item) => this.addTask(item, ...args))
 		return items
 	}
+
+	/**
+	Same as {{#crossLink "TaskGroup/addTask"}}{{/crossLink}} but chains instead of returning the item.
+	@chainable
+	@method addTaskChain
+	@private
+	*/
+	addTaskChain (...args) {
+		this.addTask(...args)
+		return this
+	}
+
+	/**
+	Same as {{#crossLink "TaskGroup/addTasks"}}{{/crossLink}} but chains instead of returning the item.
+	@chainable
+	@method addTasksChain
+	@private
+	*/
 	addTasksChain (...args) {
 		this.addTasks(...args)
 		return this
@@ -1477,13 +1534,17 @@ class TaskGroup extends BaseEventEmitter {
 	// ---------------------------------
 	// Add Group
 
-	// Public: Create a {TaskGroup} instance from some configuration.
-	//
-	// If the first argument is already a {TaskGroup} instance, then just update it's configuration with the remaning arguments.
-	//
-	// args - Arguments to use to configure the {TaskGroup} instance
-	//
-	// Returns the new {TaskGroup} instance
+	/**
+	Creates a {TaskGroup} instance and configures it from the arguments.
+
+	If the first argument is already a {TaskGroup} instance, then we configure it with the remaining arguments, instead of creating a new {TaskGroup} instance.
+
+	@param {Arguments} ...args - Arguments used to configure the {TaskGroup} instance.
+
+	@return {TaskGroup}
+	@method createGroup
+	@public
+	*/
 	createGroup (...args) {
 		// Prepare
 		let group
@@ -1503,27 +1564,55 @@ class TaskGroup extends BaseEventEmitter {
 		return group
 	}
 
-	// Public: Add a {TaskGroup} with some configuration to ourself, create it if needed.
-	//
-	// args - Arguments to configure (and if needed, create) the {TaskGroup}
+	/**
+	Adds a {TaskGroup} instance and configures it from the arguments.
+
+	If a {TaskGroup} instance is not supplied, a {TaskGroup} instance is created from the arguments.
+
+	@param {Arguments} ...args - Arguments used to configure the {TaskGroup} instance.
+
+	@return {TaskGroup}
+	@method addGroup
+	@public
+	*/
 	addGroup (...args) {
 		const group = this.createGroup(...args)
 		return this.addItem(group)
 	}
-	addGroupChain (...args) {
-		this.addGroup(...args)
-		return this
-	}
 
-	// Public: Add {TaskGroup}s with some configuration to ourself, create it if needed.
-	//
-	// items - An {Array} of {TaskGroup} items to add to ourself
-	// args - Optional Arguments to configure each added {TaskGroup}
+	/**
+	Adds {TaskGroup} instances and configures them from the arguments.
+
+	@param {Array} items - Array of {TaskGroup} instances to add to this task group.
+	@param {Arguments} ...args - Arguments used to configure the {TaskGroup} instances.
+
+	@return {Array}
+	@method addGroups
+	@public
+	*/
 	addGroups (items, ...args) {
 		items = ensureArray(items)
 		items.map((item) => this.addGroup(item, ...args))
 		return items
 	}
+
+	/**
+	Same as {{#crossLink "TaskGroup/addGroup"}}{{/crossLink}} but chains instead of returning the item.
+	@chainable
+	@method addGroupChain
+	@private
+	*/
+	addGroupChain (...args) {
+		this.addGroup(...args)
+		return this
+	}
+
+	/**
+	Same as {{#crossLink "TaskGroup/addGroups"}}{{/crossLink}} but chains instead of returning the item.
+	@chainable
+	@method addGroupsChain
+	@private
+	*/
 	addGroupsChain (...args) {
 		this.addGroups(...args)
 		return this
@@ -1533,9 +1622,12 @@ class TaskGroup extends BaseEventEmitter {
 	// ---------------------------------
 	// Status Indicators
 
-	// Public: Gets the total number of items
-	//
-	// Returns a {Number} of the total items we have
+	/**
+	Gets the total number of items inside our task group.
+	@type Number
+	@property totalItems
+	@public
+	*/
 	get totalItems () {
 		const running = this.state.itemsRunning.length
 		const remaining = this.state.itemsRemaining.length
@@ -1544,14 +1636,21 @@ class TaskGroup extends BaseEventEmitter {
 		return total
 	}
 
-	// Public: Gets the names of the items, the total number of items, and their results for the purpose of debugging.
-	//
-	// Returns an {Object} containg the hashes:
-	//   :remaining - An {Array} of the names of the remaining items
-	//   :running - An {Array} of the names of the running items
-	//   :completed - An {Array} of the names of the completed items
-	//   :total - A {Number} of the total items we have
-	//   :results - An {Array} of the results of the compelted items
+	/**
+	Gets the names of the items, the total number of items, and their results for the purpose of debugging.
+
+	Returns an {Object} containg the hashes:
+
+	- remaining - An {Array} of the names of the remaining items
+	- running - An {Array} of the names of the running items
+	- completed - An {Array} of the names of the completed items
+	- total - A {Number} of the total items we have
+	- results - An {Array} of the results of the compelted items
+
+	@type Object
+	@property itemNames
+	@public
+	*/
 	get itemNames () {
 		const running = this.state.itemsRunning.map((item) => item.name)
 		const remaining = this.state.itemsRemaining.map((item) => item.name)

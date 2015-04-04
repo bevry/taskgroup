@@ -988,7 +988,286 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 2005,
+            "line": 1306,
+            "description": "Adds a {Task|TaskGroup} instance and configures it from the arguments.",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- Arguments used to configure the {Task|TaskGroup} instance.",
+                    "type": "Arguments",
+                    "multiple": true
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Task|TaskGroup"
+            },
+            "itemtype": "method",
+            "name": "addItem",
+            "access": "public",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1407,
+            "description": "Adds {Task|TaskGroup} instances and configures them from the arguments.",
+            "params": [
+                {
+                    "name": "items",
+                    "description": "- Array of {Task|TaskGroup} instances to add to this task group.",
+                    "type": "Array"
+                },
+                {
+                    "name": "args",
+                    "description": "- Arguments used to configure the {Task|TaskGroup} instances.",
+                    "type": "Arguments",
+                    "multiple": true
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Array"
+            },
+            "itemtype": "method",
+            "name": "addItems",
+            "access": "public",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1423,
+            "description": "Same as {{#crossLink \"TaskGroup/addItem\"}}{{/crossLink}} but chains instead of returning the item.",
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "addItemChain",
+            "access": "private",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1434,
+            "description": "Same as {{#crossLink \"TaskGroup/addItems\"}}{{/crossLink}} but chains instead of returning the item.",
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "addItemsChain",
+            "access": "private",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1449,
+            "description": "Creates a {Task} instance and configures it from the arguments.\n\nIf the first argument is already a {Task} instance, then we configure it with the remaining arguments, instead of creating a new {Task} instance.",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- Arguments used to configure the {Task} instance.",
+                    "type": "Arguments",
+                    "multiple": true
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Task"
+            },
+            "itemtype": "method",
+            "name": "createTask",
+            "access": "public",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1479,
+            "description": "Adds a {Task} instance and configures it from the arguments.\n\nIf a {Task} instance is not supplied, a {Task} instance is created from the arguments.",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- Arguments used to configure the {Task} instance.",
+                    "type": "Arguments",
+                    "multiple": true
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Task"
+            },
+            "itemtype": "method",
+            "name": "addTask",
+            "access": "public",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1495,
+            "description": "Adds {Task} instances and configures them from the arguments.",
+            "params": [
+                {
+                    "name": "items",
+                    "description": "- Array of {Task} instances to add to this task group.",
+                    "type": "Array"
+                },
+                {
+                    "name": "args",
+                    "description": "- Arguments used to configure the {Task} instances.",
+                    "type": "Arguments",
+                    "multiple": true
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Array"
+            },
+            "itemtype": "method",
+            "name": "addTask",
+            "access": "public",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1511,
+            "description": "Same as {{#crossLink \"TaskGroup/addTask\"}}{{/crossLink}} but chains instead of returning the item.",
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "addTaskChain",
+            "access": "private",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1522,
+            "description": "Same as {{#crossLink \"TaskGroup/addTasks\"}}{{/crossLink}} but chains instead of returning the item.",
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "addTasksChain",
+            "access": "private",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1537,
+            "description": "Creates a {TaskGroup} instance and configures it from the arguments.\n\nIf the first argument is already a {TaskGroup} instance, then we configure it with the remaining arguments, instead of creating a new {TaskGroup} instance.",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- Arguments used to configure the {TaskGroup} instance.",
+                    "type": "Arguments",
+                    "multiple": true
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "TaskGroup"
+            },
+            "itemtype": "method",
+            "name": "createGroup",
+            "access": "public",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1567,
+            "description": "Adds a {TaskGroup} instance and configures it from the arguments.\n\nIf a {TaskGroup} instance is not supplied, a {TaskGroup} instance is created from the arguments.",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "- Arguments used to configure the {TaskGroup} instance.",
+                    "type": "Arguments",
+                    "multiple": true
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "TaskGroup"
+            },
+            "itemtype": "method",
+            "name": "addGroup",
+            "access": "public",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1583,
+            "description": "Adds {TaskGroup} instances and configures them from the arguments.",
+            "params": [
+                {
+                    "name": "items",
+                    "description": "- Array of {TaskGroup} instances to add to this task group.",
+                    "type": "Array"
+                },
+                {
+                    "name": "args",
+                    "description": "- Arguments used to configure the {TaskGroup} instances.",
+                    "type": "Arguments",
+                    "multiple": true
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Array"
+            },
+            "itemtype": "method",
+            "name": "addGroups",
+            "access": "public",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1599,
+            "description": "Same as {{#crossLink \"TaskGroup/addGroup\"}}{{/crossLink}} but chains instead of returning the item.",
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "addGroupChain",
+            "access": "private",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1610,
+            "description": "Same as {{#crossLink \"TaskGroup/addGroups\"}}{{/crossLink}} but chains instead of returning the item.",
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "addGroupsChain",
+            "access": "private",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1625,
+            "description": "Gets the total number of items inside our task group.",
+            "type": "Number",
+            "itemtype": "property",
+            "name": "totalItems",
+            "access": "public",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 1639,
+            "description": "Gets the names of the items, the total number of items, and their results for the purpose of debugging.\n\nReturns an {Object} containg the hashes:\n\n- remaining - An {Array} of the names of the remaining items\n- running - An {Array} of the names of the running items\n- completed - An {Array} of the names of the completed items\n- total - A {Number} of the total items we have\n- results - An {Array} of the results of the compelted items",
+            "type": "Object",
+            "itemtype": "property",
+            "name": "itemNames",
+            "access": "public",
+            "tagname": "",
+            "class": "TaskGroup"
+        },
+        {
+            "file": "es6/lib/taskgroup.js",
+            "line": 2104,
             "description": "Start/restart/resume the execution of the TaskGroup.",
             "chainable": 1,
             "itemtype": "method",
