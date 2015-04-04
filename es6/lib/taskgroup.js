@@ -250,6 +250,20 @@ class BaseEventEmitter extends EventEmitter {
 	}
 
 	/**
+	Get extra state information for debugging.
+	@type String
+	@property stateInformation
+	@private
+	*/
+	prepareStateInformation () {
+		return require('util').inspect({
+			error: errorToString(this.state.error),
+			state: this.state,
+			config: this.cofnig
+		})
+	}
+
+	/**
 	Executes the passed function either synchronously if `config.sync` is `true` or delays it for the next tick.
 	@param {Function} fn - The function to execute
 	@chainable
@@ -565,14 +579,14 @@ class Task extends BaseEventEmitter {
 	}
 
 	/**
-	Handles the completion and error conditions for ourself.
+	What to do when our task method completes.
 	Should only ever execute once, if it executes more than once, then we error.
 	@param {Arguments} args - The arguments that will be applied to the {::result} variable. First argument is the {Error} if it exists.
 	@chainable
 	@method exit
 	@private
 	*/
-	exit (...args) {
+	itemCompletionCallback (...args) {
 		// Store the first error
 		let error = this.state.error
 		if ( args[0] && !error ) {
@@ -583,7 +597,26 @@ class Task extends BaseEventEmitter {
 		if ( this.completed === false ) {
 			// Apply the result if it exists
 			if ( args.length !== 0 ) this.state.result = args
+		}
 
+		// Finish up
+		this.finish()
+
+		// Chain
+		return this
+	}
+
+	/**
+	Set our task to the completed state.
+	@chainable
+	@method finish
+	@private
+	*/
+	finish () {
+		const error = this.state.error
+
+		// Complete for the first (and hopefully only) time
+		if ( this.completed === false ) {
 			// Set the status and emit depending on success or failure status
 			const status = (error ? 'failed' : 'passed')
 			this.state.status = status
@@ -595,21 +628,40 @@ class Task extends BaseEventEmitter {
 
 		// Error as we have already completed before
 		else if ( this.config.onError !== 'ignore' ) {
-			const result = this.state.result
-			const stateInformation = require('util').inspect({
-				error: errorToString(error),
-				previousResult: result,
-				currentArguments: args
-			})
-			const completedError = new Error(
-				`The task [${this.names}] just completed, but it had already completed earlier, this is unexpected. State information:
-				${stateInformation}`)
+			const completedError = new Error(`The task [${this.names}] just completed, but it had already completed earlier, this is unexpected.`)
 			this.emit('error', completedError)
 		}
 
 		// Chain
 		return this
 	}
+
+	/**
+	Allow the user to abort the execution of this task.
+	@chainable
+	@method abort
+	@private
+	*/
+	abort (error) {
+		if ( this.completed ) {
+			const error = new Error(`The task [${this.names}] cannot abort as the task has already completed, this is unexpected.`)
+			this.emit('error', error)
+		}
+		else {
+			// Update the error state if not yet set
+			if ( error && !this.state.error ) {
+				this.state.error = error
+			}
+
+			// Finish up
+			this.finish()
+		}
+
+		// Chain
+		return this
+	}
+
+
 
 	/**
 	Completetion Emitter. Used to emit the `completed` event and to cleanup our state.
@@ -718,7 +770,7 @@ class Task extends BaseEventEmitter {
 	}
 
 	/**
-	Destroy the task and prevent it from executing ever again.
+	Destroy ourself and prevent ourself from executing ever again.
 	@chainable
 	@method destroy
 	@public
@@ -762,7 +814,7 @@ class Task extends BaseEventEmitter {
 		const args = (this.config.args || []).slice()
 		let taskDomain = this.state.taskDomain
 		const useDomains = this.config.domain !== false
-		const exitMethod = this.exit.bind(this)
+		const exitMethod = this.itemCompletionCallback.bind(this)
 		let method = this.config.method
 
 		// Check that we have a method to fire
@@ -1764,11 +1816,15 @@ class TaskGroup extends BaseEventEmitter {
 		)
 	}
 
-	// Internal: Whether or not we are capable of firing more items.
-	//
-	// This is determined whether or not we are not paused, and we have remaning items, and we have slots able to execute those remaning items.
-	//
-	// Returns a {Boolean} which is `true` if we can fire more items.
+	/**
+	Whether or not we are capable of firing more items.
+
+	This is determined whether or not we are not paused, and we have remaning items, and we have slots able to execute those remaning items.
+
+	@type Boolean
+	@property shouldFire
+	@private
+	*/
 	get shouldFire () {
 		return (
 			!this.shouldPause &&
@@ -1777,16 +1833,22 @@ class TaskGroup extends BaseEventEmitter {
 		)
 	}
 
-	// Public: Whether or not we have no items left
-	//
-	// Returns a {Boolean} which is `true` if we have no more running or remaining items
+	/**
+	Whether or not we have no running or remaining items left.
+	@type Boolean
+	@property empty
+	@private
+	*/
 	get empty () {
 		return !this.hasItems
 	}
 
-	// Public: Have we finished its execution yet?
-	//
-	// Returns a {Boolean} which is `true` if we have finished execution
+	/**
+	Whether or not we have finished execution.
+	@type Boolean
+	@property exited
+	@private
+	*/
 	get exited () {
 		switch ( this.state.status ) {
 			case 'completed':
@@ -1798,14 +1860,22 @@ class TaskGroup extends BaseEventEmitter {
 		}
 	}
 
-	// Public: Have we started execution yet?
-	//
-	// Returns a {Boolean} which is `true` if we have commenced execution
+	/**
+	Whether or not we have started execution.
+	@type Boolean
+	@property started
+	@private
+	*/
 	get started () {
 		return this.state.status != null
 	}
 
-	// Public
+	/**
+	Whether or not we execution is currently paused.
+	@type Boolean
+	@property paused
+	@private
+	*/
 	get paused () {
 		return (
 			this.shouldPause &&
@@ -1813,11 +1883,15 @@ class TaskGroup extends BaseEventEmitter {
 		)
 	}
 
-	// Public: Have we completed its execution yet?
-	//
-	// Completion of executed is determined of whether or not we have started, and whether or not we are currently paused or have no remaining and running items left
-	//
-	// Returns a {Boolean} which is `true` if we have completed execution
+	/**
+	Whether or not we execution has completed.
+
+	Completion of executed is determined of whether or not we have started, and whether or not we are currently paused or have no remaining and running items left
+
+	@type Boolean
+	@property completed
+	@private
+	*/
 	get completed () {
 		return (
 			this.started &&
@@ -1832,7 +1906,12 @@ class TaskGroup extends BaseEventEmitter {
 	// ---------------------------------
 	// Firers
 
-	// Internal: Completetion Emitter. Used to emit the `completed` event and to cleanup our state.
+	/**
+	Completetion Emitter. Used to emit the `completed` event and to cleanup our state.
+	@chainable
+	@method complete
+	@private
+	*/
 	complete () {
 		const completed = this.completed
 
@@ -1861,10 +1940,14 @@ class TaskGroup extends BaseEventEmitter {
 		return completed
 	}
 
-	// Public: When Done Promise.
-	// Fires the listener, either on the next tick if we are already done, or if not, each time the `done` event fires.
-	//
-	// listener - The {Function} to attach or execute.
+	/**
+	When Done Promise.
+	Fires the listener, either on the next tick if we are already done, or if not, each time the `done` event fires.
+	@param {Function} listener - The {Function} to attach or execute.
+	@chainable
+	@method whenDone
+	@public
+	*/
 	whenDone (handler) {
 		if ( this.completed ) {
 			// avoid zalgo
@@ -1878,10 +1961,14 @@ class TaskGroup extends BaseEventEmitter {
 		return this
 	}
 
-	// Public: Once Done Promise.
-	// Fires the listener once, either on the next tick if we are already done, or if not, once the `done` event fires.
-	//
-	// listener - The {Function} to attach or execute.
+	/**
+	Once Done Promise.
+	Fires the listener once, either on the next tick if we are already done, or if not, each time the `done` event fires.
+	@param {Function} listener - The {Function} to attach or execute.
+	@chainable
+	@method onceDone
+	@public
+	*/
 	onceDone (handler) {
 		if ( this.completed ) {
 			// avoid zalgo
@@ -1895,9 +1982,13 @@ class TaskGroup extends BaseEventEmitter {
 		return this
 	}
 
-	// Internal: Reset the results.
-	//
-	// At this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.
+	/**
+	Reset the results.
+	At this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.
+	@chainable
+	@method resetResults
+	@private
+	*/
 	resetResults () {
 		this.state.results = []
 
@@ -1905,9 +1996,12 @@ class TaskGroup extends BaseEventEmitter {
 		return this
 	}
 
-	// Internal: Fire the next items.
-	//
-	// Returns either an {Array} items that was fired, or `false` if no items were fired.
+	/**
+	Fire the next items.
+	@return {Array|false} Either an {Array} of items that were fired or `false` if no items were fired.
+	@method fireNextItems
+	@private
+	*/
 	fireNextItems () {
 		// Prepare
 		const items = []
@@ -1928,9 +2022,12 @@ class TaskGroup extends BaseEventEmitter {
 		return result
 	}
 
-	// Internal: Fire the next item.
-	//
-	// Returns either the item that was fired, or `false` if no item was fired.
+	/**
+	Fire the next item.
+	@return {Task|TaskGroup|false} Either the {Task|TaskGroup} item that was fired or `false` if no item was fired.
+	@method fireNextItem
+	@private
+	*/
 	fireNextItem () {
 		// Prepare
 		let result = false
@@ -1963,7 +2060,14 @@ class TaskGroup extends BaseEventEmitter {
 		return result
 	}
 
-	// Internal: What to do when an item completes
+	/**
+	What to do when an item completes.
+	@chainable
+	@param {Task|TaskGroup} item - The item that has completed
+	@param {Arguments} ...args - The arguments that the item completed with.
+	@method itemCompletionCallback
+	@private
+	*/
 	itemCompletionCallback (item, ...args) {
 		// Prepare
 		let error = this.state.error
@@ -2015,13 +2119,19 @@ class TaskGroup extends BaseEventEmitter {
 		return this
 	}
 
-	// Internal: Either execute the reamining items we are not paused, or complete execution by exiting.
+	/**
+	Internal: Either execute the reamining items we are not paused, or complete execution by exiting.
+	@chainable
+	@method fire
+	@private
+	*/
 	fire () {
 		// Have we actually started?
 		if ( this.started ) {
 			// Check if we are complete, if so, exit
 			if ( this.completed ) {
-				this.exit()
+				// Finish up
+				this.finish()
 			}
 
 			// Otherwise continue firing items if we are wanting to pause
@@ -2034,7 +2144,12 @@ class TaskGroup extends BaseEventEmitter {
 		return this
 	}
 
-	// Public: Clear remaning items.
+	/**
+	Remove and destroy the remaining items.
+	@chainable
+	@method clearRemaining
+	@public
+	*/
 	clearRemaining () {
 		const itemsRemaining = this.state.itemsRemaining
 		while ( itemsRemaining.length !== 0 ) {
@@ -2045,13 +2160,23 @@ class TaskGroup extends BaseEventEmitter {
 		return this
 	}
 
-	// Public: Clear and destroy running items.
+	/**
+	Remove and destroy the running items. Here for verboseness.
+	@chainable
+	@method clearRunning
+	@private
+	*/
 	clearRunning () {
 		const error = new Error('Clearing running items is not possible. Instead remaining items and wait for running items to complete.')
 		this.emit('error', error)
 	}
 
-	// Public: Clear and destroy completed items.
+	/**
+	Remove and destroy the completed items.
+	@chainable
+	@method clearCompleted
+	@public
+	*/
 	clearCompleted () {
 		const itemsCompleted = this.state.itemsCompleted
 		if ( this.config.storeCompleted ) {
@@ -2069,12 +2194,22 @@ class TaskGroup extends BaseEventEmitter {
 		return this
 	}
 
-	// Public: Alias for clear remaining items.
+	/**
+	Alias for {{#crossLink "TaskGroup/clearRemaining"}}{{/crossLink}}
+	@chainable
+	@method clear
+	@public
+	*/
 	clear () {
 		return this.clearRemaining()
 	}
 
-	// Public: Destroy all remaining items and remove listeners.
+	/**
+	Destroy ourself and prevent ourself from executing ever again.
+	@chainable
+	@method destroy
+	@public
+	*/
 	destroy () {
 		// Clear remaining items to prevent them from running
 		this.clearRemaining()
@@ -2105,22 +2240,33 @@ class TaskGroup extends BaseEventEmitter {
 		return this
 	}
 
-
-	// Internal: We now want to exit.
-	exit (...args) {
-		// Store the first error
-		let error = this.state.error
-		if ( args[0] && !error ) {
-			this.state.error = error = args[0]
-		}
-
+	/**
+	Set our task to the completed state.
+	@chainable
+	@method finish
+	@private
+	*/
+	finish () {
 		// Set and emmit the appropriate status for our error or non-error
+		const error = this.state.error
 		const status = (error ? 'failed' : 'passed')
 		this.state.status = status
 		this.emit(status, error)
 
 		// Fire the completion callback
 		this.complete()
+	}
+
+	// Internal: We now want to exit.
+	abort (error) {
+		// Update the error state if not yet set
+		if ( error && !this.state.error ) {
+			this.state.error = error
+		}
+
+		// Finish up
+		// @TODO document how this works, will this stop new tasks from firing in the queue???
+		this.finish()
 
 		// Chain
 		return this
@@ -2134,6 +2280,12 @@ class TaskGroup extends BaseEventEmitter {
 	*/
 	run () {
 		this.queue(() => {
+			// Already destroyed?
+			if ( this.state.status === 'destroyed' ) {
+				const error = new Error(`The taskgroup [${this.names}] was just about to start, but it was destroyed earlier, this is unexpected.`)
+				this.emit('error', error)
+			}
+
 			// Apply our new status and notify our intention to run
 			const status = 'started'
 			this.state.status = status
