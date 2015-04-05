@@ -85,7 +85,7 @@
         </div>
 
         <div class="foundat">
-            Defined in: <a href="../files/es6_lib_taskgroup.js.html#l273"><code>es6&#x2F;lib&#x2F;taskgroup.js:273</code></a>
+            Defined in: <a href="../files/es6_lib_taskgroup.js.html#l287"><code>es6&#x2F;lib&#x2F;taskgroup.js:287</code></a>
         </div>
 
 
@@ -157,7 +157,7 @@ task = new Task('my task that passes an error', function(complete){
             <div class="meta">
                         <p>
                         Defined in
-                <a href="../files/es6_lib_taskgroup.js.html#l273"><code>es6&#x2F;lib&#x2F;taskgroup.js:273</code></a>
+                <a href="../files/es6_lib_taskgroup.js.html#l287"><code>es6&#x2F;lib&#x2F;taskgroup.js:287</code></a>
                 </p>
         
         
@@ -191,6 +191,10 @@ task = new Task('my task that passes an error', function(complete){
 
                     <ul class="index-list methods extends">
                             <li class="index-item method private">
+                                <a href="#method_abort">abort</a>
+
+                            </li>
+                            <li class="index-item method private">
                                 <a href="#method_clearDomain">clearDomain</a>
 
                             </li>
@@ -212,6 +216,10 @@ task = new Task('my task that passes an error', function(complete){
                             </li>
                             <li class="index-item method private">
                                 <a href="#method_exit">exit</a>
+
+                            </li>
+                            <li class="index-item method private">
+                                <a href="#method_finish">finish</a>
 
                             </li>
                             <li class="index-item method private">
@@ -294,6 +302,10 @@ task = new Task('my task that passes an error', function(complete){
                                 <a href="#property_started">started</a>
 
                             </li>
+                            <li class="index-item property private inherited">
+                                <a href="#property_stateInformation">stateInformation</a>
+
+                            </li>
                             <li class="index-item property protected">
                                 <a href="#property_status">status</a>
 
@@ -315,6 +327,39 @@ task = new Task('my task that passes an error', function(complete){
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
 
+<div id="method_abort" class="method item private">
+    <h3 class="name"><code>abort</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+        <span class="flag private">private</span>
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/es6_lib_taskgroup.js.html#l639"><code>es6&#x2F;lib&#x2F;taskgroup.js:639</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Allow the user to abort the execution of this task.</p>
+
+    </div>
+
+
+
+
+</div>
 <div id="method_clearDomain" class="method item private">
     <h3 class="name"><code>clearDomain</code></h3>
 
@@ -332,7 +377,7 @@ task = new Task('my task that passes an error', function(complete){
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l704"><code>es6&#x2F;lib&#x2F;taskgroup.js:704</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l756"><code>es6&#x2F;lib&#x2F;taskgroup.js:756</code></a>
         </p>
 
 
@@ -368,7 +413,7 @@ task = new Task('my task that passes an error', function(complete){
                 BaseEventEmitter
             </a>
             but overwritten in
-        <a href="../files/es6_lib_taskgroup.js.html#l614"><code>es6&#x2F;lib&#x2F;taskgroup.js:614</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l666"><code>es6&#x2F;lib&#x2F;taskgroup.js:666</code></a>
         </p>
 
 
@@ -403,7 +448,7 @@ task = new Task('my task that passes an error', function(complete){
                 BaseEventEmitter
             </a>
             but overwritten in
-        <a href="../files/es6_lib_taskgroup.js.html#l454"><code>es6&#x2F;lib&#x2F;taskgroup.js:454</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l468"><code>es6&#x2F;lib&#x2F;taskgroup.js:468</code></a>
         </p>
 
 
@@ -436,7 +481,7 @@ task = new Task('my task that passes an error', function(complete){
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l720"><code>es6&#x2F;lib&#x2F;taskgroup.js:720</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l772"><code>es6&#x2F;lib&#x2F;taskgroup.js:772</code></a>
         </p>
 
 
@@ -444,7 +489,7 @@ task = new Task('my task that passes an error', function(complete){
     </div>
 
     <div class="description">
-        <p>Destroy the task and prevent it from executing ever again.</p>
+        <p>Destroy ourself and prevent ourself from executing ever again.</p>
 
     </div>
 
@@ -533,7 +578,7 @@ task = new Task('my task that passes an error', function(complete){
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l567"><code>es6&#x2F;lib&#x2F;taskgroup.js:567</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l581"><code>es6&#x2F;lib&#x2F;taskgroup.js:581</code></a>
         </p>
 
 
@@ -541,7 +586,7 @@ task = new Task('my task that passes an error', function(complete){
     </div>
 
     <div class="description">
-        <p>Handles the completion and error conditions for ourself.
+        <p>What to do when our task method completes.
 Should only ever execute once, if it executes more than once, then we error.</p>
 
     </div>
@@ -569,6 +614,39 @@ Should only ever execute once, if it executes more than once, then we error.</p>
 
 
 </div>
+<div id="method_finish" class="method item private">
+    <h3 class="name"><code>finish</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+        <span class="flag private">private</span>
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/es6_lib_taskgroup.js.html#l609"><code>es6&#x2F;lib&#x2F;taskgroup.js:609</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Set our task to the completed state.</p>
+
+    </div>
+
+
+
+
+</div>
 <div id="method_fire" class="method item private">
     <h3 class="name"><code>fire</code></h3>
 
@@ -586,7 +664,7 @@ Should only ever execute once, if it executes more than once, then we error.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l754"><code>es6&#x2F;lib&#x2F;taskgroup.js:754</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l806"><code>es6&#x2F;lib&#x2F;taskgroup.js:806</code></a>
         </p>
 
 
@@ -628,7 +706,7 @@ Should only ever execute once, if it executes more than once, then we error.</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l342"><code>es6&#x2F;lib&#x2F;taskgroup.js:342</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l356"><code>es6&#x2F;lib&#x2F;taskgroup.js:356</code></a>
         </p>
 
 
@@ -698,7 +776,7 @@ Should only ever execute once, if it executes more than once, then we error.</p>
                 BaseEventEmitter
             </a>
             but overwritten in
-        <a href="../files/es6_lib_taskgroup.js.html#l668"><code>es6&#x2F;lib&#x2F;taskgroup.js:668</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l720"><code>es6&#x2F;lib&#x2F;taskgroup.js:720</code></a>
         </p>
 
 
@@ -757,7 +835,7 @@ Fires the listener once, either on the next tick if we are already done, or if n
     <div class="meta">
                 <p>Inherited from
                 <a href="../classes/BaseEventEmitter.html#method_queue">BaseEventEmitter</a>:
-        <a href="../files/es6_lib_taskgroup.js.html#l252"><code>es6&#x2F;lib&#x2F;taskgroup.js:252</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l266"><code>es6&#x2F;lib&#x2F;taskgroup.js:266</code></a>
         </p>
 
 
@@ -809,7 +887,7 @@ Fires the listener once, either on the next tick if we are already done, or if n
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l692"><code>es6&#x2F;lib&#x2F;taskgroup.js:692</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l744"><code>es6&#x2F;lib&#x2F;taskgroup.js:744</code></a>
         </p>
 
 
@@ -843,7 +921,7 @@ At this point this method is internal, as it's functionality may change in the f
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l852"><code>es6&#x2F;lib&#x2F;taskgroup.js:852</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l904"><code>es6&#x2F;lib&#x2F;taskgroup.js:904</code></a>
         </p>
 
 
@@ -883,7 +961,7 @@ Will emit an <code>error</code> event if the task has already started before.</p
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l484"><code>es6&#x2F;lib&#x2F;taskgroup.js:484</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l498"><code>es6&#x2F;lib&#x2F;taskgroup.js:498</code></a>
         </p>
 
 
@@ -1113,7 +1191,7 @@ Will emit an <code>error</code> event if the task has already started before.</p
                 BaseEventEmitter
             </a>
             but overwritten in
-        <a href="../files/es6_lib_taskgroup.js.html#l644"><code>es6&#x2F;lib&#x2F;taskgroup.js:644</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l696"><code>es6&#x2F;lib&#x2F;taskgroup.js:696</code></a>
         </p>
 
 
@@ -1166,7 +1244,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l391"><code>es6&#x2F;lib&#x2F;taskgroup.js:391</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l405"><code>es6&#x2F;lib&#x2F;taskgroup.js:405</code></a>
                             </p>
                     
                     
@@ -1192,7 +1270,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l381"><code>es6&#x2F;lib&#x2F;taskgroup.js:381</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l395"><code>es6&#x2F;lib&#x2F;taskgroup.js:395</code></a>
                             </p>
                     
                     
@@ -1218,7 +1296,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l412"><code>es6&#x2F;lib&#x2F;taskgroup.js:412</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l426"><code>es6&#x2F;lib&#x2F;taskgroup.js:426</code></a>
                             </p>
                     
                     
@@ -1244,7 +1322,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l428"><code>es6&#x2F;lib&#x2F;taskgroup.js:428</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l442"><code>es6&#x2F;lib&#x2F;taskgroup.js:442</code></a>
                             </p>
                     
                     
@@ -1271,7 +1349,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l364"><code>es6&#x2F;lib&#x2F;taskgroup.js:364</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l378"><code>es6&#x2F;lib&#x2F;taskgroup.js:378</code></a>
                             </p>
                     
                     
@@ -1376,7 +1454,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l437"><code>es6&#x2F;lib&#x2F;taskgroup.js:437</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l451"><code>es6&#x2F;lib&#x2F;taskgroup.js:451</code></a>
                             </p>
                     
                     
@@ -1403,7 +1481,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l354"><code>es6&#x2F;lib&#x2F;taskgroup.js:354</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l368"><code>es6&#x2F;lib&#x2F;taskgroup.js:368</code></a>
                             </p>
                     
                     
@@ -1411,6 +1489,32 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                     
                         <div class="description">
                             <p>Have we started execution yet?</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_stateInformation" class="property item private inherited">
+                        <h3 class="name"><code>stateInformation</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+                    
+                    
+                            <span class="flag private">private</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>Inherited from
+                                    <a href="../classes/BaseEventEmitter.html#property_stateInformation">BaseEventEmitter</a>:
+                            <a href="../files/es6_lib_taskgroup.js.html#l252"><code>es6&#x2F;lib&#x2F;taskgroup.js:252</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>&lt;p&gt;Get extra state information for debugging.&lt;/p&gt;</p>
                     
                         </div>
                     
@@ -1429,7 +1533,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l420"><code>es6&#x2F;lib&#x2F;taskgroup.js:420</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l434"><code>es6&#x2F;lib&#x2F;taskgroup.js:434</code></a>
                             </p>
                     
                     
@@ -1455,7 +1559,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l446"><code>es6&#x2F;lib&#x2F;taskgroup.js:446</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l460"><code>es6&#x2F;lib&#x2F;taskgroup.js:460</code></a>
                             </p>
                     
                     
@@ -1481,7 +1585,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l328"><code>es6&#x2F;lib&#x2F;taskgroup.js:328</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l342"><code>es6&#x2F;lib&#x2F;taskgroup.js:342</code></a>
                             </p>
                     
                     

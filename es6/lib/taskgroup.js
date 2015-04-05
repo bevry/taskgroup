@@ -121,23 +121,9 @@ class BaseEventEmitter extends EventEmitter {
 	constructor () {
 		super()
 
-		// Add support for the done event
-		// If we do have an error, then throw it if there is no existing or done listeners
-		this.on('error', (error) => {
-			// has done listener, forward to that
-			if ( this.listeners('done').length !== 0 ) {
-				this.emit('done', error)
-			}
-
-			// has error, but no done listener and no event listener, throw error
-			else if ( error && this.listeners('error').length === 1 ) {
-				// this isn't good enough, throw the error
-				console.error(errorToString(error))
-				throw error
-			}
-		})
-
-		this.on('completed', (...args) => {
+		// Generate our listener method that we will beind to different events
+		// to add support for the `done` event and better error/event handling
+		const listener = (event, ...args) => {
 			// Prepare
 			const error = args[0]
 
@@ -147,23 +133,21 @@ class BaseEventEmitter extends EventEmitter {
 			}
 
 			// has error, but no done listener and no event listener, throw error
-			else if ( error && this.listeners('completed').length === 1 ) {
-				// this isn't good enough, emit the error
-				this.emit('error', error)
+			else if ( error && this.listeners(event).length === 1 ) {
+				if ( event === 'error' ) {
+					console.error(errorToString(error))
+					throw error
+				}
+				else {
+					this.emit('error', error)
+				}
 			}
-		})
-	}
+		}
 
-	/**
-	Fire our completion event.
-	@chainable
-	@method complete
-	@private
-	*/
-	complete () {
-		const error = new Error('interface should provide this')
-		this.emit('error', error)
-		return this
+		// Listen to the different events without listener
+		this.on('error', listener.bind(this, 'done'))
+		this.on('completed', listener.bind(this, 'done'))
+		// this.on('halted', listener.bind(this, 'done'))
 	}
 
 	/**
@@ -1805,18 +1789,6 @@ class TaskGroup extends BaseEventEmitter {
 	}
 
 	/**
-	Whether or not we have errord and want to pause when we have an error.
-	@type Boolean
-	@property shouldPause
-	@private
-	*/
-	get shouldPause () {
-		return (
-			this.config.onError === 'exit' && this.hasError
-		)
-	}
-
-	/**
 	Whether or not we are capable of firing more items.
 
 	This is determined whether or not we are not paused, and we have remaning items, and we have slots able to execute those remaning items.
@@ -1830,6 +1802,31 @@ class TaskGroup extends BaseEventEmitter {
 			!this.shouldPause &&
 			this.hasRemaining &&
 			this.hasSlots
+		)
+	}
+
+	/**
+	Whether or not we have errord and want to pause when we have an error.
+	@type Boolean
+	@property shouldPause
+	@private
+	*/
+	get shouldPause () {
+		return (
+			this.config.onError === 'exit' && this.hasError
+		)
+	}
+
+	/**
+	Whether or not we execution is currently paused.
+	@type Boolean
+	@property paused
+	@private
+	*/
+	get paused () {
+		return (
+			this.shouldPause &&
+			!this.hasRunning
 		)
 	}
 
@@ -1868,19 +1865,6 @@ class TaskGroup extends BaseEventEmitter {
 	*/
 	get started () {
 		return this.state.status != null
-	}
-
-	/**
-	Whether or not we execution is currently paused.
-	@type Boolean
-	@property paused
-	@private
-	*/
-	get paused () {
-		return (
-			this.shouldPause &&
-			!this.hasRunning
-		)
 	}
 
 	/**
@@ -2242,6 +2226,7 @@ class TaskGroup extends BaseEventEmitter {
 
 	/**
 	Set our task to the completed state.
+	@TODO why is this here instead of inside .complete() ?
 	@chainable
 	@method finish
 	@private
@@ -2257,7 +2242,23 @@ class TaskGroup extends BaseEventEmitter {
 		this.complete()
 	}
 
-	// Internal: We now want to exit.
+	/**
+	We want to halt execution and trigger our completion callback.
+
+	@TODO figure out how this should actually work?
+	Should it be two methods? .halt() and .abort(error?)
+	Should it be a state?
+	Should it alter the state?
+	Should it clear or destroy?
+	What is the definition of pausing with this?
+	Perhaps we need to update the definition of pausing to be halted instead?
+	How can we apply this to Tasks instead?
+
+	@param {Error} error - An optional error to provide if not already set.
+	@chainable
+	@method abort
+	@public
+	*/
 	abort (error) {
 		// Update the error state if not yet set
 		if ( error && !this.state.error ) {
@@ -2265,8 +2266,8 @@ class TaskGroup extends BaseEventEmitter {
 		}
 
 		// Finish up
-		// @TODO document how this works, will this stop new tasks from firing in the queue???
-		this.finish()
+		const _error = new Error('TaskGroup::abort has not yet been implemented.')
+		this.emit('error', _error)
 
 		// Chain
 		return this
