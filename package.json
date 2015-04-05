@@ -70,9 +70,17 @@
   },
   "main": "./es6guardian.js",
   "scripts": {
+    "clean": "./node_modules/.bin/cake clean",
+    "setup": "./node_modules/.bin/cake setup",
+    "compile": "./node_modules/.bin/cake compile",
+    "watch": "./node_modules/.bin/cake watch",
+    "verify": "./node_modules/.bin/cake verify",
+    "meta": "./node_modules/.bin/cake meta",
+    "prepare": "./node_modules/.bin/cake prepare",
+    "release": "./node_modules/.bin/cake release",
     "test": "node --harmony ./coffeejs/test/taskgroup-test.js",
-    "profile": "node --harmony ./es5/test/profile.js",
-    "browserify": "./node_modules/.bin/browserify ./web/index.js -t babelify --outfile ./web/out.js"
+    "browserify": "./node_modules/.bin/browserify ./web/index.js -t babelify --outfile ./web/out.js",
+    "profile": "node --harmony ./es5/test/profile.js"
   },
   "cakeConfiguration": {
     "COFFEE_SRC_PATH": "coffee",
