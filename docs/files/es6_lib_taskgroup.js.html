@@ -204,23 +204,9 @@ class BaseEventEmitter extends EventEmitter {
     constructor () {
         super()
 
-        // Add support for the done event
-        // If we do have an error, then throw it if there is no existing or done listeners
-        this.on(&#x27;error&#x27;, (error) =&gt; {
-            // has done listener, forward to that
-            if ( this.listeners(&#x27;done&#x27;).length !== 0 ) {
-                this.emit(&#x27;done&#x27;, error)
-            }
-
-            // has error, but no done listener and no event listener, throw error
-            else if ( error &amp;&amp; this.listeners(&#x27;error&#x27;).length === 1 ) {
-                // this isn&#x27;t good enough, throw the error
-                console.error(errorToString(error))
-                throw error
-            }
-        })
-
-        this.on(&#x27;completed&#x27;, (...args) =&gt; {
+        // Generate our listener method that we will beind to different events
+        // to add support for the &#x60;done&#x60; event and better error/event handling
+        const listener = (event, ...args) =&gt; {
             // Prepare
             const error = args[0]
 
@@ -230,23 +216,21 @@ class BaseEventEmitter extends EventEmitter {
             }
 
             // has error, but no done listener and no event listener, throw error
-            else if ( error &amp;&amp; this.listeners(&#x27;completed&#x27;).length === 1 ) {
-                // this isn&#x27;t good enough, emit the error
-                this.emit(&#x27;error&#x27;, error)
+            else if ( error &amp;&amp; this.listeners(event).length === 1 ) {
+                if ( event === &#x27;error&#x27; ) {
+                    console.error(errorToString(error))
+                    throw error
+                }
+                else {
+                    this.emit(&#x27;error&#x27;, error)
+                }
             }
-        })
-    }
+        }
 
-    /**
-    Fire our completion event.
-    @chainable
-    @method complete
-    @private
-    */
-    complete () {
-        const error = new Error(&#x27;interface should provide this&#x27;)
-        this.emit(&#x27;error&#x27;, error)
-        return this
+        // Listen to the different events without listener
+        this.on(&#x27;error&#x27;, listener.bind(this, &#x27;done&#x27;))
+        this.on(&#x27;completed&#x27;, listener.bind(this, &#x27;done&#x27;))
+        // this.on(&#x27;halted&#x27;, listener.bind(this, &#x27;done&#x27;))
     }
 
     /**
@@ -452,7 +436,7 @@ class Task extends BaseEventEmitter {
     Have we started execution yet?
     @type Boolean
     @property started
-    @public
+    @private
     */
     get started () {
         return this.state.status != null
@@ -462,7 +446,7 @@ class Task extends BaseEventEmitter {
     Have we finished its execution yet?
     @type Boolean
     @property exited
-    @public
+    @private
     */
     get exited () {
         switch ( this.state.status ) {
@@ -479,7 +463,7 @@ class Task extends BaseEventEmitter {
     Have we been destroyed?
     @type Boolean
     @property destroyed
-    @public
+    @private
     */
     get destroyed () {
         return this.state.status === &#x27;destroyed&#x27;
@@ -489,7 +473,7 @@ class Task extends BaseEventEmitter {
     Have we completed its execution yet?
     @type Boolean
     @property completed
-    @public
+    @private
     */
     get completed () {
         switch ( this.state.status ) {
@@ -724,8 +708,16 @@ class Task extends BaseEventEmitter {
     @chainable
     @method abort
     @private
+    @TODO figure out how this should actually work
     */
     abort (error) {
+        // Not yet implemented
+        if ( true ) {
+            const error = new Error(&#x27;TaskGroup::abort has not yet been implemented.&#x27;)
+            this.emit(&#x27;error&#x27;, error)
+        }
+
+        // Don&#x27;t allow aborting if we have already completed
         if ( this.completed ) {
             const error = new Error(&#x60;The task [${this.names}] cannot abort as the task has already completed, this is unexpected.&#x60;)
             this.emit(&#x27;error&#x27;, error)
@@ -743,8 +735,6 @@ class Task extends BaseEventEmitter {
         // Chain
         return this
     }
-
-
 
     /**
     Completetion Emitter. Used to emit the &#x60;completed&#x60; event and to cleanup our state.
@@ -1244,11 +1234,11 @@ class TaskGroup extends BaseEventEmitter {
     /**
     Merged passed configuration into {config.nestedTaskConfig}.
     @param {Object} opts - The configuration to merge.
-    @type Object
-    @property nestedTaskConfig
+    @chainable
+    @method setNestedTaskConfig
     @public
     */
-    set nestedTaskConfig (opts) {
+    setNestedTaskConfig (opts) {
         // Fetch and copy options to the state&#x27;s nested task configuration
         copyObject(this.state.nestedTaskConfig, opts)
 
@@ -1259,11 +1249,11 @@ class TaskGroup extends BaseEventEmitter {
     /**
     Merged passed configuration into {config.nestedGroupConfig}.
     @param {Object} opts - The configuration to merge.
-    @type Object
-    @property nestedGroupConfig
+    @chainable
+    @method setNestedGroupConfig
     @public
     */
-    set nestedGroupConfig (opts) {
+    setNestedGroupConfig (opts) {
         // Fetch and copy options to the state&#x27;s nested configuration
         copyObject(this.state.nestedGroupConfig, opts)
 
@@ -1559,7 +1549,7 @@ class TaskGroup extends BaseEventEmitter {
     Same as {{#crossLink &quot;TaskGroup/addItem&quot;}}{{/crossLink}} but chains instead of returning the item.
     @chainable
     @method addItemChain
-    @private
+    @public
     */
     addItemChain (...args) {
         this.addItem(...args)
@@ -1570,7 +1560,7 @@ class TaskGroup extends BaseEventEmitter {
     Same as {{#crossLink &quot;TaskGroup/addItems&quot;}}{{/crossLink}} but chains instead of returning the item.
     @chainable
     @method addItemsChain
-    @private
+    @public
     */
     addItemsChain (...args) {
         this.addItems(...args)
@@ -1647,7 +1637,7 @@ class TaskGroup extends BaseEventEmitter {
     Same as {{#crossLink &quot;TaskGroup/addTask&quot;}}{{/crossLink}} but chains instead of returning the item.
     @chainable
     @method addTaskChain
-    @private
+    @public
     */
     addTaskChain (...args) {
         this.addTask(...args)
@@ -1658,7 +1648,7 @@ class TaskGroup extends BaseEventEmitter {
     Same as {{#crossLink &quot;TaskGroup/addTasks&quot;}}{{/crossLink}} but chains instead of returning the item.
     @chainable
     @method addTasksChain
-    @private
+    @public
     */
     addTasksChain (...args) {
         this.addTasks(...args)
@@ -1735,7 +1725,7 @@ class TaskGroup extends BaseEventEmitter {
     Same as {{#crossLink &quot;TaskGroup/addGroup&quot;}}{{/crossLink}} but chains instead of returning the item.
     @chainable
     @method addGroupChain
-    @private
+    @public
     */
     addGroupChain (...args) {
         this.addGroup(...args)
@@ -1746,7 +1736,7 @@ class TaskGroup extends BaseEventEmitter {
     Same as {{#crossLink &quot;TaskGroup/addGroups&quot;}}{{/crossLink}} but chains instead of returning the item.
     @chainable
     @method addGroupsChain
-    @private
+    @public
     */
     addGroupsChain (...args) {
         this.addGroups(...args)
@@ -1772,6 +1762,36 @@ class TaskGroup extends BaseEventEmitter {
     }
 
     /**
+    Gets the total number count of each of our item lists.
+
+    Returns an {Object} containg the hashes:
+
+    - remaining - A {Number} of the names of the remaining items.
+    - running - A {Number} of the names of the running items.
+    - completed - A {Number} of the names of the completed items.
+    - total - A {Number} of the total items we have.
+    - results - A {Number} of the total results we have.
+
+    @type Object
+    @property itemTotals
+    @public
+    */
+    get itemTotals () {
+        const running = this.state.itemsRunning.length
+        const remaining = this.state.itemsRemaining.length
+        const completed = this.state.itemsCompleted.length
+        const results = this.state.results.length
+        const total = running + remaining + completed
+        return {
+            remaining,
+            running,
+            completed,
+            total,
+            results
+        }
+    }
+
+    /**
     Gets the names of the items, the total number of items, and their results for the purpose of debugging.
 
     Returns an {Object} containg the hashes:
@@ -1784,7 +1804,7 @@ class TaskGroup extends BaseEventEmitter {
 
     @type Object
     @property itemNames
-    @public
+    @protected
     */
     get itemNames () {
         const running = this.state.itemsRunning.map((item) =&gt; item.name)
@@ -1792,29 +1812,6 @@ class TaskGroup extends BaseEventEmitter {
         const completed = this.state.itemsCompleted.map((item) =&gt; item.name || item)
         const results = this.state.results
         const total = running.length + remaining.length + completed.length
-        return {
-            remaining,
-            running,
-            completed,
-            total,
-            results
-        }
-    }
-
-    // Public: Gets the total number count of each of our item lists.
-    //
-    // Returns an {Object} containg the hashes:
-    //   :remaining - A {Number} of the total remaining items
-    //   :running - A {Number} of the total running items
-    //   :completed - A {Number} of the total completed items
-    //   :total - A {Number} of the total items we have
-    //   :results - A {Number} of the total results we have
-    get itemTotals () {
-        const running = this.state.itemsRunning.length
-        const remaining = this.state.itemsRemaining.length
-        const completed = this.state.itemsCompleted.length
-        const results = this.state.results.length
-        const total = running + remaining + completed
         return {
             remaining,
             running,
@@ -2278,16 +2275,6 @@ class TaskGroup extends BaseEventEmitter {
     }
 
     /**
-    Alias for {{#crossLink &quot;TaskGroup/clearRemaining&quot;}}{{/crossLink}}
-    @chainable
-    @method clear
-    @public
-    */
-    clear () {
-        return this.clearRemaining()
-    }
-
-    /**
     Destroy ourself and prevent ourself from executing ever again.
     @chainable
     @method destroy
@@ -2325,6 +2312,7 @@ class TaskGroup extends BaseEventEmitter {
 
     /**
     Set our task to the completed state.
+    @TODO why is this here instead of inside .complete() ?
     @chainable
     @method finish
     @private
@@ -2340,16 +2328,37 @@ class TaskGroup extends BaseEventEmitter {
         this.complete()
     }
 
-    // Internal: We now want to exit.
+    /**
+    We want to halt execution and trigger our completion callback.
+
+    @TODO figure out how this should actually work?
+    Should it be two methods? .halt() and .abort(error?)
+    Should it be a state?
+    Should it alter the state?
+    Should it clear or destroy?
+    What is the definition of pausing with this?
+    Perhaps we need to update the definition of pausing to be halted instead?
+    How can we apply this to Tasks instead?
+
+    @param {Error} error - An optional error to provide if not already set.
+    @chainable
+    @method abort
+    @private
+    */
     abort (error) {
+        // Not yet implemented
+        if ( true ) {
+            const error = new Error(&#x27;TaskGroup::abort has not yet been implemented.&#x27;)
+            this.emit(&#x27;error&#x27;, error)
+        }
+
         // Update the error state if not yet set
         if ( error &amp;&amp; !this.state.error ) {
             this.state.error = error
         }
 
         // Finish up
-        // @TODO document how this works, will this stop new tasks from firing in the queue???
-        this.finish()
+        // ...
 
         // Chain
         return this

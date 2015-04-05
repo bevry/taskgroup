@@ -1,8 +1,16 @@
 # History
 
 ## v5.0.0 Unreleased
+- Moved from CoffeeScript to ES6
+- Improved performance from 10,000 tasks in 13 seconds to 2.5 seconds
+- Completed tasks are no longer stored in `completedItems`, instead only their names are
+	- This is specified by the new configuration option `storeCompleted` and its default value of `false`
+	- This improves memory footprint of 10,000 tasks from 130MB to 4MB (taken during completion event)
 - Removed `nestedConfig`, use either `nestedGroupConfig` or `nestedTaskConfig` or both
-
+- Removed `exit` as it's functionality was ambiguous and undocumented
+- `addGroup`, `addGroups`, `addItem`, `addItems`, `addTask`, `addTasks` now return the added items instead of being chainable, if you want them to chain, instead use the new `addGroupChain`, etc methods.
+- `getTotalItems()`, `getItemTotals()` now changed to getters `totalItems`, `itemTotals`
+- A lot of previously `public` methods are now marked `private` or `protected`, this isn't really from a stability concern but from an isolation of responsibility concern
 
 ## v4.3.0 March 15, 2015
 - Module.exports now exports the TaskGroup class, of which `Task` and `TaskGroup` are now children

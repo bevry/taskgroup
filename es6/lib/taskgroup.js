@@ -353,7 +353,7 @@ class Task extends BaseEventEmitter {
 	Have we started execution yet?
 	@type Boolean
 	@property started
-	@public
+	@private
 	*/
 	get started () {
 		return this.state.status != null
@@ -363,7 +363,7 @@ class Task extends BaseEventEmitter {
 	Have we finished its execution yet?
 	@type Boolean
 	@property exited
-	@public
+	@private
 	*/
 	get exited () {
 		switch ( this.state.status ) {
@@ -380,7 +380,7 @@ class Task extends BaseEventEmitter {
 	Have we been destroyed?
 	@type Boolean
 	@property destroyed
-	@public
+	@private
 	*/
 	get destroyed () {
 		return this.state.status === 'destroyed'
@@ -390,7 +390,7 @@ class Task extends BaseEventEmitter {
 	Have we completed its execution yet?
 	@type Boolean
 	@property completed
-	@public
+	@private
 	*/
 	get completed () {
 		switch ( this.state.status ) {
@@ -625,8 +625,16 @@ class Task extends BaseEventEmitter {
 	@chainable
 	@method abort
 	@private
+	@TODO figure out how this should actually work
 	*/
 	abort (error) {
+		// Not yet implemented
+		if ( true ) {
+			const error = new Error('TaskGroup::abort has not yet been implemented.')
+			this.emit('error', error)
+		}
+
+		// Don't allow aborting if we have already completed
 		if ( this.completed ) {
 			const error = new Error(`The task [${this.names}] cannot abort as the task has already completed, this is unexpected.`)
 			this.emit('error', error)
@@ -644,8 +652,6 @@ class Task extends BaseEventEmitter {
 		// Chain
 		return this
 	}
-
-
 
 	/**
 	Completetion Emitter. Used to emit the `completed` event and to cleanup our state.
@@ -1145,11 +1151,11 @@ class TaskGroup extends BaseEventEmitter {
 	/**
 	Merged passed configuration into {config.nestedTaskConfig}.
 	@param {Object} opts - The configuration to merge.
-	@type Object
-	@property nestedTaskConfig
+	@chainable
+	@method setNestedTaskConfig
 	@public
 	*/
-	set nestedTaskConfig (opts) {
+	setNestedTaskConfig (opts) {
 		// Fetch and copy options to the state's nested task configuration
 		copyObject(this.state.nestedTaskConfig, opts)
 
@@ -1160,11 +1166,11 @@ class TaskGroup extends BaseEventEmitter {
 	/**
 	Merged passed configuration into {config.nestedGroupConfig}.
 	@param {Object} opts - The configuration to merge.
-	@type Object
-	@property nestedGroupConfig
+	@chainable
+	@method setNestedGroupConfig
 	@public
 	*/
-	set nestedGroupConfig (opts) {
+	setNestedGroupConfig (opts) {
 		// Fetch and copy options to the state's nested configuration
 		copyObject(this.state.nestedGroupConfig, opts)
 
@@ -1460,7 +1466,7 @@ class TaskGroup extends BaseEventEmitter {
 	Same as {{#crossLink "TaskGroup/addItem"}}{{/crossLink}} but chains instead of returning the item.
 	@chainable
 	@method addItemChain
-	@private
+	@public
 	*/
 	addItemChain (...args) {
 		this.addItem(...args)
@@ -1471,7 +1477,7 @@ class TaskGroup extends BaseEventEmitter {
 	Same as {{#crossLink "TaskGroup/addItems"}}{{/crossLink}} but chains instead of returning the item.
 	@chainable
 	@method addItemsChain
-	@private
+	@public
 	*/
 	addItemsChain (...args) {
 		this.addItems(...args)
@@ -1548,7 +1554,7 @@ class TaskGroup extends BaseEventEmitter {
 	Same as {{#crossLink "TaskGroup/addTask"}}{{/crossLink}} but chains instead of returning the item.
 	@chainable
 	@method addTaskChain
-	@private
+	@public
 	*/
 	addTaskChain (...args) {
 		this.addTask(...args)
@@ -1559,7 +1565,7 @@ class TaskGroup extends BaseEventEmitter {
 	Same as {{#crossLink "TaskGroup/addTasks"}}{{/crossLink}} but chains instead of returning the item.
 	@chainable
 	@method addTasksChain
-	@private
+	@public
 	*/
 	addTasksChain (...args) {
 		this.addTasks(...args)
@@ -1636,7 +1642,7 @@ class TaskGroup extends BaseEventEmitter {
 	Same as {{#crossLink "TaskGroup/addGroup"}}{{/crossLink}} but chains instead of returning the item.
 	@chainable
 	@method addGroupChain
-	@private
+	@public
 	*/
 	addGroupChain (...args) {
 		this.addGroup(...args)
@@ -1647,7 +1653,7 @@ class TaskGroup extends BaseEventEmitter {
 	Same as {{#crossLink "TaskGroup/addGroups"}}{{/crossLink}} but chains instead of returning the item.
 	@chainable
 	@method addGroupsChain
-	@private
+	@public
 	*/
 	addGroupsChain (...args) {
 		this.addGroups(...args)
@@ -1673,6 +1679,36 @@ class TaskGroup extends BaseEventEmitter {
 	}
 
 	/**
+	Gets the total number count of each of our item lists.
+
+	Returns an {Object} containg the hashes:
+
+	- remaining - A {Number} of the names of the remaining items.
+	- running - A {Number} of the names of the running items.
+	- completed - A {Number} of the names of the completed items.
+	- total - A {Number} of the total items we have.
+	- results - A {Number} of the total results we have.
+
+	@type Object
+	@property itemTotals
+	@public
+	*/
+	get itemTotals () {
+		const running = this.state.itemsRunning.length
+		const remaining = this.state.itemsRemaining.length
+		const completed = this.state.itemsCompleted.length
+		const results = this.state.results.length
+		const total = running + remaining + completed
+		return {
+			remaining,
+			running,
+			completed,
+			total,
+			results
+		}
+	}
+
+	/**
 	Gets the names of the items, the total number of items, and their results for the purpose of debugging.
 
 	Returns an {Object} containg the hashes:
@@ -1685,7 +1721,7 @@ class TaskGroup extends BaseEventEmitter {
 
 	@type Object
 	@property itemNames
-	@public
+	@protected
 	*/
 	get itemNames () {
 		const running = this.state.itemsRunning.map((item) => item.name)
@@ -1693,29 +1729,6 @@ class TaskGroup extends BaseEventEmitter {
 		const completed = this.state.itemsCompleted.map((item) => item.name || item)
 		const results = this.state.results
 		const total = running.length + remaining.length + completed.length
-		return {
-			remaining,
-			running,
-			completed,
-			total,
-			results
-		}
-	}
-
-	// Public: Gets the total number count of each of our item lists.
-	//
-	// Returns an {Object} containg the hashes:
-	//   :remaining - A {Number} of the total remaining items
-	//   :running - A {Number} of the total running items
-	//   :completed - A {Number} of the total completed items
-	//   :total - A {Number} of the total items we have
-	//   :results - A {Number} of the total results we have
-	get itemTotals () {
-		const running = this.state.itemsRunning.length
-		const remaining = this.state.itemsRemaining.length
-		const completed = this.state.itemsCompleted.length
-		const results = this.state.results.length
-		const total = running + remaining + completed
 		return {
 			remaining,
 			running,
@@ -2179,16 +2192,6 @@ class TaskGroup extends BaseEventEmitter {
 	}
 
 	/**
-	Alias for {{#crossLink "TaskGroup/clearRemaining"}}{{/crossLink}}
-	@chainable
-	@method clear
-	@public
-	*/
-	clear () {
-		return this.clearRemaining()
-	}
-
-	/**
 	Destroy ourself and prevent ourself from executing ever again.
 	@chainable
 	@method destroy
@@ -2257,17 +2260,22 @@ class TaskGroup extends BaseEventEmitter {
 	@param {Error} error - An optional error to provide if not already set.
 	@chainable
 	@method abort
-	@public
+	@private
 	*/
 	abort (error) {
+		// Not yet implemented
+		if ( true ) {
+			const error = new Error('TaskGroup::abort has not yet been implemented.')
+			this.emit('error', error)
+		}
+
 		// Update the error state if not yet set
 		if ( error && !this.state.error ) {
 			this.state.error = error
 		}
 
 		// Finish up
-		const _error = new Error('TaskGroup::abort has not yet been implemented.')
-		this.emit('error', _error)
+		// ...
 
 		// Chain
 		return this

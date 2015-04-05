@@ -85,7 +85,7 @@
         </div>
 
         <div class="foundat">
-            Defined in: <a href="../files/es6_lib_taskgroup.js.html#l940"><code>es6&#x2F;lib&#x2F;taskgroup.js:940</code></a>
+            Defined in: <a href="../files/es6_lib_taskgroup.js.html#l930"><code>es6&#x2F;lib&#x2F;taskgroup.js:930</code></a>
         </div>
 
 
@@ -138,7 +138,7 @@
             <div class="meta">
                         <p>
                         Defined in
-                <a href="../files/es6_lib_taskgroup.js.html#l940"><code>es6&#x2F;lib&#x2F;taskgroup.js:940</code></a>
+                <a href="../files/es6_lib_taskgroup.js.html#l930"><code>es6&#x2F;lib&#x2F;taskgroup.js:930</code></a>
                 </p>
         
         
@@ -171,11 +171,15 @@
                     <h3>Methods</h3>
 
                     <ul class="index-list methods extends">
+                            <li class="index-item method private">
+                                <a href="#method_abort">abort</a>
+
+                            </li>
                             <li class="index-item method public">
                                 <a href="#method_addGroup">addGroup</a>
 
                             </li>
-                            <li class="index-item method private">
+                            <li class="index-item method public">
                                 <a href="#method_addGroupChain">addGroupChain</a>
 
                             </li>
@@ -183,7 +187,7 @@
                                 <a href="#method_addGroups">addGroups</a>
 
                             </li>
-                            <li class="index-item method private">
+                            <li class="index-item method public">
                                 <a href="#method_addGroupsChain">addGroupsChain</a>
 
                             </li>
@@ -191,7 +195,7 @@
                                 <a href="#method_addItem">addItem</a>
 
                             </li>
-                            <li class="index-item method private">
+                            <li class="index-item method public">
                                 <a href="#method_addItemChain">addItemChain</a>
 
                             </li>
@@ -199,7 +203,7 @@
                                 <a href="#method_addItems">addItems</a>
 
                             </li>
-                            <li class="index-item method private">
+                            <li class="index-item method public">
                                 <a href="#method_addItemsChain">addItemsChain</a>
 
                             </li>
@@ -215,20 +219,16 @@
                                 <a href="#method_addTask">addTask</a>
 
                             </li>
-                            <li class="index-item method private">
+                            <li class="index-item method public">
                                 <a href="#method_addTaskChain">addTaskChain</a>
 
                             </li>
-                            <li class="index-item method private">
+                            <li class="index-item method public">
                                 <a href="#method_addTasksChain">addTasksChain</a>
 
                             </li>
                             <li class="index-item method private">
                                 <a href="#method_autoRun">autoRun</a>
-
-                            </li>
-                            <li class="index-item method public">
-                                <a href="#method_clear">clear</a>
 
                             </li>
                             <li class="index-item method public">
@@ -243,7 +243,7 @@
                                 <a href="#method_clearRunning">clearRunning</a>
 
                             </li>
-                            <li class="index-item method private inherited">
+                            <li class="index-item method private">
                                 <a href="#method_complete">complete</a>
 
                             </li>
@@ -312,6 +312,14 @@
                                 <a href="#method_setConfig">setConfig</a>
 
                             </li>
+                            <li class="index-item method public">
+                                <a href="#method_setNestedGroupConfig">setNestedGroupConfig</a>
+
+                            </li>
+                            <li class="index-item method public">
+                                <a href="#method_setNestedTaskConfig">setNestedTaskConfig</a>
+
+                            </li>
                             <li class="index-item method public inherited">
                                 <a href="#method_whenDone">whenDone</a>
 
@@ -371,7 +379,7 @@
                                 <a href="#property_hasRunning">hasRunning</a>
 
                             </li>
-                            <li class="index-item property public">
+                            <li class="index-item property protected">
                                 <a href="#property_itemNames">itemNames</a>
 
                             </li>
@@ -387,6 +395,10 @@
                                 <a href="#property_itemsRunning">itemsRunning</a>
 
                             </li>
+                            <li class="index-item property public">
+                                <a href="#property_itemTotals">itemTotals</a>
+
+                            </li>
                             <li class="index-item property public inherited">
                                 <a href="#property_name">name</a>
 
@@ -397,14 +409,6 @@
                             </li>
                             <li class="index-item property public inherited">
                                 <a href="#property_namesArray">namesArray</a>
-
-                            </li>
-                            <li class="index-item property public">
-                                <a href="#property_nestedGroupConfig">nestedGroupConfig</a>
-
-                            </li>
-                            <li class="index-item property public">
-                                <a href="#property_nestedTaskConfig">nestedTaskConfig</a>
 
                             </li>
                             <li class="index-item property private">
@@ -470,6 +474,64 @@
             <div id="methods" class="api-class-tabpanel">
                 <h2 class="off-left">Methods</h2>
 
+<div id="method_abort" class="method item private">
+    <h3 class="name"><code>abort</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>error</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag private">private</span>
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/es6_lib_taskgroup.js.html#l2248"><code>es6&#x2F;lib&#x2F;taskgroup.js:2248</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>We want to halt execution and trigger our completion callback.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">error</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Error" class="crosslink external" target="_blank">Error</a></span>
+
+
+                    <div class="param-description">
+                        <ul>
+<li>An optional error to provide if not already set.</li>
+</ul>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
 <div id="method_addGroup" class="method item public">
     <h3 class="name"><code>addGroup</code></h3>
 
@@ -495,7 +557,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l1619"><code>es6&#x2F;lib&#x2F;taskgroup.js:1619</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1609"><code>es6&#x2F;lib&#x2F;taskgroup.js:1609</code></a>
         </p>
 
 
@@ -539,14 +601,14 @@
 
 
 </div>
-<div id="method_addGroupChain" class="method item private">
+<div id="method_addGroupChain" class="method item public">
     <h3 class="name"><code>addGroupChain</code></h3>
 
         <span class="paren">()</span>
 
 
 
-        <span class="flag private">private</span>
+        <span class="flag public">public</span>
 
 
 
@@ -556,7 +618,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l1651"><code>es6&#x2F;lib&#x2F;taskgroup.js:1651</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1641"><code>es6&#x2F;lib&#x2F;taskgroup.js:1641</code></a>
         </p>
 
 
@@ -600,7 +662,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l1635"><code>es6&#x2F;lib&#x2F;taskgroup.js:1635</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1625"><code>es6&#x2F;lib&#x2F;taskgroup.js:1625</code></a>
         </p>
 
 
@@ -656,14 +718,14 @@
 
 
 </div>
-<div id="method_addGroupsChain" class="method item private">
+<div id="method_addGroupsChain" class="method item public">
     <h3 class="name"><code>addGroupsChain</code></h3>
 
         <span class="paren">()</span>
 
 
 
-        <span class="flag private">private</span>
+        <span class="flag public">public</span>
 
 
 
@@ -673,7 +735,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l1662"><code>es6&#x2F;lib&#x2F;taskgroup.js:1662</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1652"><code>es6&#x2F;lib&#x2F;taskgroup.js:1652</code></a>
         </p>
 
 
@@ -714,7 +776,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l1358"><code>es6&#x2F;lib&#x2F;taskgroup.js:1358</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1348"><code>es6&#x2F;lib&#x2F;taskgroup.js:1348</code></a>
         </p>
 
 
@@ -757,14 +819,14 @@
 
 
 </div>
-<div id="method_addItemChain" class="method item private">
+<div id="method_addItemChain" class="method item public">
     <h3 class="name"><code>addItemChain</code></h3>
 
         <span class="paren">()</span>
 
 
 
-        <span class="flag private">private</span>
+        <span class="flag public">public</span>
 
 
 
@@ -774,7 +836,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l1475"><code>es6&#x2F;lib&#x2F;taskgroup.js:1475</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1465"><code>es6&#x2F;lib&#x2F;taskgroup.js:1465</code></a>
         </p>
 
 
@@ -818,7 +880,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l1459"><code>es6&#x2F;lib&#x2F;taskgroup.js:1459</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1449"><code>es6&#x2F;lib&#x2F;taskgroup.js:1449</code></a>
         </p>
 
 
@@ -874,14 +936,14 @@
 
 
 </div>
-<div id="method_addItemsChain" class="method item private">
+<div id="method_addItemsChain" class="method item public">
     <h3 class="name"><code>addItemsChain</code></h3>
 
         <span class="paren">()</span>
 
 
 
-        <span class="flag private">private</span>
+        <span class="flag public">public</span>
 
 
 
@@ -891,7 +953,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l1486"><code>es6&#x2F;lib&#x2F;taskgroup.js:1486</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1476"><code>es6&#x2F;lib&#x2F;taskgroup.js:1476</code></a>
         </p>
 
 
@@ -935,7 +997,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l1298"><code>es6&#x2F;lib&#x2F;taskgroup.js:1298</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1288"><code>es6&#x2F;lib&#x2F;taskgroup.js:1288</code></a>
         </p>
 
 
@@ -1017,7 +1079,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l1531"><code>es6&#x2F;lib&#x2F;taskgroup.js:1531</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1521"><code>es6&#x2F;lib&#x2F;taskgroup.js:1521</code></a>
         </p>
 
 
@@ -1089,7 +1151,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l1547"><code>es6&#x2F;lib&#x2F;taskgroup.js:1547</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1537"><code>es6&#x2F;lib&#x2F;taskgroup.js:1537</code></a>
         </p>
 
 
@@ -1145,14 +1207,14 @@
 
 
 </div>
-<div id="method_addTaskChain" class="method item private">
+<div id="method_addTaskChain" class="method item public">
     <h3 class="name"><code>addTaskChain</code></h3>
 
         <span class="paren">()</span>
 
 
 
-        <span class="flag private">private</span>
+        <span class="flag public">public</span>
 
 
 
@@ -1162,7 +1224,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l1563"><code>es6&#x2F;lib&#x2F;taskgroup.js:1563</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1553"><code>es6&#x2F;lib&#x2F;taskgroup.js:1553</code></a>
         </p>
 
 
@@ -1178,14 +1240,14 @@
 
 
 </div>
-<div id="method_addTasksChain" class="method item private">
+<div id="method_addTasksChain" class="method item public">
     <h3 class="name"><code>addTasksChain</code></h3>
 
         <span class="paren">()</span>
 
 
 
-        <span class="flag private">private</span>
+        <span class="flag public">public</span>
 
 
 
@@ -1195,7 +1257,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l1574"><code>es6&#x2F;lib&#x2F;taskgroup.js:1574</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1564"><code>es6&#x2F;lib&#x2F;taskgroup.js:1564</code></a>
         </p>
 
 
@@ -1228,7 +1290,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l1315"><code>es6&#x2F;lib&#x2F;taskgroup.js:1315</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1305"><code>es6&#x2F;lib&#x2F;taskgroup.js:1305</code></a>
         </p>
 
 
@@ -1243,39 +1305,6 @@
 <li>if we the :run configuration is <code>true</code></li>
 </ul>
 <p>Used primarily to cause the :method to fire at the appropriate time when using inline style.</p>
-
-    </div>
-
-
-
-
-</div>
-<div id="method_clear" class="method item public">
-    <h3 class="name"><code>clear</code></h3>
-
-        <span class="paren">()</span>
-
-
-
-        <span class="flag public">public</span>
-
-
-
-        <span class="flag chainable">chainable</span>
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l2197"><code>es6&#x2F;lib&#x2F;taskgroup.js:2197</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>Alias for <a href="../classes/TaskGroup.html#method_clearRemaining" class="crosslink">clearRemaining</a></p>
 
     </div>
 
@@ -1300,7 +1329,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l2174"><code>es6&#x2F;lib&#x2F;taskgroup.js:2174</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l2171"><code>es6&#x2F;lib&#x2F;taskgroup.js:2171</code></a>
         </p>
 
 
@@ -1333,7 +1362,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l2147"><code>es6&#x2F;lib&#x2F;taskgroup.js:2147</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l2144"><code>es6&#x2F;lib&#x2F;taskgroup.js:2144</code></a>
         </p>
 
 
@@ -1366,7 +1395,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l2163"><code>es6&#x2F;lib&#x2F;taskgroup.js:2163</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l2160"><code>es6&#x2F;lib&#x2F;taskgroup.js:2160</code></a>
         </p>
 
 
@@ -1397,12 +1426,9 @@
 
 
     <div class="meta">
-            <p>Inherited from
-            <a href="../classes/BaseEventEmitter.html#method_complete">
-                BaseEventEmitter
-            </a>
-            but overwritten in
-        <a href="../files/es6_lib_taskgroup.js.html#l1909"><code>es6&#x2F;lib&#x2F;taskgroup.js:1909</code></a>
+                <p>
+                Defined in
+        <a href="../files/es6_lib_taskgroup.js.html#l1906"><code>es6&#x2F;lib&#x2F;taskgroup.js:1906</code></a>
         </p>
 
 
@@ -1437,7 +1463,7 @@
                 BaseEventEmitter
             </a>
             but overwritten in
-        <a href="../files/es6_lib_taskgroup.js.html#l1111"><code>es6&#x2F;lib&#x2F;taskgroup.js:1111</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1101"><code>es6&#x2F;lib&#x2F;taskgroup.js:1101</code></a>
         </p>
 
 
@@ -1478,7 +1504,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l1589"><code>es6&#x2F;lib&#x2F;taskgroup.js:1589</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1579"><code>es6&#x2F;lib&#x2F;taskgroup.js:1579</code></a>
         </p>
 
 
@@ -1547,7 +1573,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l1501"><code>es6&#x2F;lib&#x2F;taskgroup.js:1501</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1491"><code>es6&#x2F;lib&#x2F;taskgroup.js:1491</code></a>
         </p>
 
 
@@ -1608,7 +1634,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l2207"><code>es6&#x2F;lib&#x2F;taskgroup.js:2207</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l2194"><code>es6&#x2F;lib&#x2F;taskgroup.js:2194</code></a>
         </p>
 
 
@@ -1647,7 +1673,7 @@
     <div class="meta">
                 <p>Inherited from
                 <a href="../classes/BaseEventEmitter.html#method_done">BaseEventEmitter</a>:
-        <a href="../files/es6_lib_taskgroup.js.html#l203"><code>es6&#x2F;lib&#x2F;taskgroup.js:203</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l187"><code>es6&#x2F;lib&#x2F;taskgroup.js:187</code></a>
         </p>
 
 
@@ -1699,7 +1725,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l2243"><code>es6&#x2F;lib&#x2F;taskgroup.js:2243</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l2230"><code>es6&#x2F;lib&#x2F;taskgroup.js:2230</code></a>
         </p>
 
 
@@ -1732,7 +1758,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l2122"><code>es6&#x2F;lib&#x2F;taskgroup.js:2122</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l2119"><code>es6&#x2F;lib&#x2F;taskgroup.js:2119</code></a>
         </p>
 
 
@@ -1767,7 +1793,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l2025"><code>es6&#x2F;lib&#x2F;taskgroup.js:2025</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l2022"><code>es6&#x2F;lib&#x2F;taskgroup.js:2022</code></a>
         </p>
 
 
@@ -1811,7 +1837,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l1999"><code>es6&#x2F;lib&#x2F;taskgroup.js:1999</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1996"><code>es6&#x2F;lib&#x2F;taskgroup.js:1996</code></a>
         </p>
 
 
@@ -1862,7 +1888,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l987"><code>es6&#x2F;lib&#x2F;taskgroup.js:987</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l977"><code>es6&#x2F;lib&#x2F;taskgroup.js:977</code></a>
         </p>
 
 
@@ -1932,7 +1958,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l2063"><code>es6&#x2F;lib&#x2F;taskgroup.js:2063</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l2060"><code>es6&#x2F;lib&#x2F;taskgroup.js:2060</code></a>
         </p>
 
 
@@ -2007,7 +2033,7 @@
                 BaseEventEmitter
             </a>
             but overwritten in
-        <a href="../files/es6_lib_taskgroup.js.html#l1964"><code>es6&#x2F;lib&#x2F;taskgroup.js:1964</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1961"><code>es6&#x2F;lib&#x2F;taskgroup.js:1961</code></a>
         </p>
 
 
@@ -2066,7 +2092,7 @@ Fires the listener once, either on the next tick if we are already done, or if n
     <div class="meta">
                 <p>Inherited from
                 <a href="../classes/BaseEventEmitter.html#method_queue">BaseEventEmitter</a>:
-        <a href="../files/es6_lib_taskgroup.js.html#l266"><code>es6&#x2F;lib&#x2F;taskgroup.js:266</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l250"><code>es6&#x2F;lib&#x2F;taskgroup.js:250</code></a>
         </p>
 
 
@@ -2118,7 +2144,7 @@ Fires the listener once, either on the next tick if we are already done, or if n
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l1985"><code>es6&#x2F;lib&#x2F;taskgroup.js:1985</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1982"><code>es6&#x2F;lib&#x2F;taskgroup.js:1982</code></a>
         </p>
 
 
@@ -2152,7 +2178,7 @@ At this point this method is internal, as it's functionality may change in the f
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l2275"><code>es6&#x2F;lib&#x2F;taskgroup.js:2275</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l2284"><code>es6&#x2F;lib&#x2F;taskgroup.js:2284</code></a>
         </p>
 
 
@@ -2191,7 +2217,7 @@ At this point this method is internal, as it's functionality may change in the f
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l1191"><code>es6&#x2F;lib&#x2F;taskgroup.js:1191</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1181"><code>es6&#x2F;lib&#x2F;taskgroup.js:1181</code></a>
         </p>
 
 
@@ -2435,6 +2461,122 @@ At this point this method is internal, as it's functionality may change in the f
 
 
 </div>
+<div id="method_setNestedGroupConfig" class="method item public">
+    <h3 class="name"><code>setNestedGroupConfig</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>opts</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag public">public</span>
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/es6_lib_taskgroup.js.html#l1166"><code>es6&#x2F;lib&#x2F;taskgroup.js:1166</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Merged passed configuration into {config.nestedGroupConfig}.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">opts</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                        <ul>
+<li>The configuration to merge.</li>
+</ul>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_setNestedTaskConfig" class="method item public">
+    <h3 class="name"><code>setNestedTaskConfig</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>opts</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag public">public</span>
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/es6_lib_taskgroup.js.html#l1151"><code>es6&#x2F;lib&#x2F;taskgroup.js:1151</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Merged passed configuration into {config.nestedTaskConfig}.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">opts</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                        <ul>
+<li>The configuration to merge.</li>
+</ul>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
 <div id="method_whenDone" class="method item public">
     <h3 class="name"><code>whenDone</code></h3>
 
@@ -2461,7 +2603,7 @@ At this point this method is internal, as it's functionality may change in the f
                 BaseEventEmitter
             </a>
             but overwritten in
-        <a href="../files/es6_lib_taskgroup.js.html#l1943"><code>es6&#x2F;lib&#x2F;taskgroup.js:1943</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l1940"><code>es6&#x2F;lib&#x2F;taskgroup.js:1940</code></a>
         </p>
 
 
@@ -2514,7 +2656,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1886"><code>es6&#x2F;lib&#x2F;taskgroup.js:1886</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1883"><code>es6&#x2F;lib&#x2F;taskgroup.js:1883</code></a>
                             </p>
                     
                     
@@ -2541,7 +2683,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1044"><code>es6&#x2F;lib&#x2F;taskgroup.js:1044</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1034"><code>es6&#x2F;lib&#x2F;taskgroup.js:1034</code></a>
                             </p>
                     
                     
@@ -2567,7 +2709,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1849"><code>es6&#x2F;lib&#x2F;taskgroup.js:1849</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1846"><code>es6&#x2F;lib&#x2F;taskgroup.js:1846</code></a>
                             </p>
                     
                     
@@ -2593,7 +2735,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1052"><code>es6&#x2F;lib&#x2F;taskgroup.js:1052</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1042"><code>es6&#x2F;lib&#x2F;taskgroup.js:1042</code></a>
                             </p>
                     
                     
@@ -2619,7 +2761,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1068"><code>es6&#x2F;lib&#x2F;taskgroup.js:1068</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1058"><code>es6&#x2F;lib&#x2F;taskgroup.js:1058</code></a>
                             </p>
                     
                     
@@ -2645,7 +2787,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1859"><code>es6&#x2F;lib&#x2F;taskgroup.js:1859</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1856"><code>es6&#x2F;lib&#x2F;taskgroup.js:1856</code></a>
                             </p>
                     
                     
@@ -2671,7 +2813,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1774"><code>es6&#x2F;lib&#x2F;taskgroup.js:1774</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1771"><code>es6&#x2F;lib&#x2F;taskgroup.js:1771</code></a>
                             </p>
                     
                     
@@ -2697,7 +2839,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1764"><code>es6&#x2F;lib&#x2F;taskgroup.js:1764</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1761"><code>es6&#x2F;lib&#x2F;taskgroup.js:1761</code></a>
                             </p>
                     
                     
@@ -2723,7 +2865,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1794"><code>es6&#x2F;lib&#x2F;taskgroup.js:1794</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1791"><code>es6&#x2F;lib&#x2F;taskgroup.js:1791</code></a>
                             </p>
                     
                     
@@ -2749,7 +2891,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1784"><code>es6&#x2F;lib&#x2F;taskgroup.js:1784</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1781"><code>es6&#x2F;lib&#x2F;taskgroup.js:1781</code></a>
                             </p>
                     
                     
@@ -2775,7 +2917,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1754"><code>es6&#x2F;lib&#x2F;taskgroup.js:1754</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1751"><code>es6&#x2F;lib&#x2F;taskgroup.js:1751</code></a>
                             </p>
                     
                     
@@ -2801,7 +2943,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1744"><code>es6&#x2F;lib&#x2F;taskgroup.js:1744</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1741"><code>es6&#x2F;lib&#x2F;taskgroup.js:1741</code></a>
                             </p>
                     
                     
@@ -2815,19 +2957,19 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                     
                     
                     </div>
-                    <div id="property_itemNames" class="property item public">
+                    <div id="property_itemNames" class="property item protected">
                         <h3 class="name"><code>itemNames</code></h3>
                         <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
                     
                     
-                            <span class="flag public">public</span>
+                            <span class="flag protected">protected</span>
                     
                     
                     
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1691"><code>es6&#x2F;lib&#x2F;taskgroup.js:1691</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1711"><code>es6&#x2F;lib&#x2F;taskgroup.js:1711</code></a>
                             </p>
                     
                     
@@ -2861,7 +3003,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1085"><code>es6&#x2F;lib&#x2F;taskgroup.js:1085</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1075"><code>es6&#x2F;lib&#x2F;taskgroup.js:1075</code></a>
                             </p>
                     
                     
@@ -2887,7 +3029,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1102"><code>es6&#x2F;lib&#x2F;taskgroup.js:1102</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1092"><code>es6&#x2F;lib&#x2F;taskgroup.js:1092</code></a>
                             </p>
                     
                     
@@ -2913,7 +3055,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1093"><code>es6&#x2F;lib&#x2F;taskgroup.js:1093</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1083"><code>es6&#x2F;lib&#x2F;taskgroup.js:1083</code></a>
                             </p>
                     
                     
@@ -2921,6 +3063,40 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                     
                         <div class="description">
                             <p>An {Array} of each {Task} and {TaskGroup} in this group that are currently executing.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_itemTotals" class="property item public">
+                        <h3 class="name"><code>itemTotals</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                            <span class="flag public">public</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/es6_lib_taskgroup.js.html#l1681"><code>es6&#x2F;lib&#x2F;taskgroup.js:1681</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>Gets the total number count of each of our item lists.</p>
+                    <p>Returns an {Object} containg the hashes:</p>
+                    <ul>
+                    <li>remaining - A {Number} of the names of the remaining items.</li>
+                    <li>running - A {Number} of the names of the running items.</li>
+                    <li>completed - A {Number} of the names of the completed items.</li>
+                    <li>total - A {Number} of the total items we have.</li>
+                    <li>results - A {Number} of the total results we have.</li>
+                    </ul>
                     
                         </div>
                     
@@ -2939,7 +3115,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>Inherited from
                                     <a href="../classes/BaseEventEmitter.html#property_name">BaseEventEmitter</a>:
-                            <a href="../files/es6_lib_taskgroup.js.html#l241"><code>es6&#x2F;lib&#x2F;taskgroup.js:241</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l225"><code>es6&#x2F;lib&#x2F;taskgroup.js:225</code></a>
                             </p>
                     
                     
@@ -2966,7 +3142,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>Inherited from
                                     <a href="../classes/BaseEventEmitter.html#property_names">BaseEventEmitter</a>:
-                            <a href="../files/es6_lib_taskgroup.js.html#l230"><code>es6&#x2F;lib&#x2F;taskgroup.js:230</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l214"><code>es6&#x2F;lib&#x2F;taskgroup.js:214</code></a>
                             </p>
                     
                     
@@ -2992,7 +3168,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>Inherited from
                                     <a href="../classes/BaseEventEmitter.html#property_namesArray">BaseEventEmitter</a>:
-                            <a href="../files/es6_lib_taskgroup.js.html#l214"><code>es6&#x2F;lib&#x2F;taskgroup.js:214</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l198"><code>es6&#x2F;lib&#x2F;taskgroup.js:198</code></a>
                             </p>
                     
                     
@@ -3006,90 +3182,6 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                     
                     
                     </div>
-                    <div id="property_nestedGroupConfig" class="property item public">
-                        <h3 class="name"><code>nestedGroupConfig</code></h3>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
-                    
-                    
-                            <span class="flag public">public</span>
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1176"><code>es6&#x2F;lib&#x2F;taskgroup.js:1176</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Merged passed configuration into {config.nestedGroupConfig}.</p>
-                    
-                        </div>
-                    
-                    
-                    
-                            <h4>Sub-properties:</h4>
-                    
-                            <ul class="params-list">
-                                <li class="param">
-                                        <code class="param-name">opts</code>
-                                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
-                    
-                                    <div class="param-description">
-                                        <ul>
-                    <li>The configuration to merge.</li>
-                    </ul>
-                    
-                                    </div>
-                    
-                                </li>
-                            </ul>
-                    </div>
-                    <div id="property_nestedTaskConfig" class="property item public">
-                        <h3 class="name"><code>nestedTaskConfig</code></h3>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
-                    
-                    
-                            <span class="flag public">public</span>
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1161"><code>es6&#x2F;lib&#x2F;taskgroup.js:1161</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Merged passed configuration into {config.nestedTaskConfig}.</p>
-                    
-                        </div>
-                    
-                    
-                    
-                            <h4>Sub-properties:</h4>
-                    
-                            <ul class="params-list">
-                                <li class="param">
-                                        <code class="param-name">opts</code>
-                                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
-                    
-                                    <div class="param-description">
-                                        <ul>
-                    <li>The configuration to merge.</li>
-                    </ul>
-                    
-                                    </div>
-                    
-                                </li>
-                            </ul>
-                    </div>
                     <div id="property_paused" class="property item private">
                         <h3 class="name"><code>paused</code></h3>
                         <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
@@ -3102,7 +3194,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1836"><code>es6&#x2F;lib&#x2F;taskgroup.js:1836</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1833"><code>es6&#x2F;lib&#x2F;taskgroup.js:1833</code></a>
                             </p>
                     
                     
@@ -3128,7 +3220,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1076"><code>es6&#x2F;lib&#x2F;taskgroup.js:1076</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1066"><code>es6&#x2F;lib&#x2F;taskgroup.js:1066</code></a>
                             </p>
                     
                     
@@ -3155,7 +3247,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1807"><code>es6&#x2F;lib&#x2F;taskgroup.js:1807</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1804"><code>es6&#x2F;lib&#x2F;taskgroup.js:1804</code></a>
                             </p>
                     
                     
@@ -3182,7 +3274,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1824"><code>es6&#x2F;lib&#x2F;taskgroup.js:1824</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1821"><code>es6&#x2F;lib&#x2F;taskgroup.js:1821</code></a>
                             </p>
                     
                     
@@ -3208,7 +3300,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1876"><code>es6&#x2F;lib&#x2F;taskgroup.js:1876</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1873"><code>es6&#x2F;lib&#x2F;taskgroup.js:1873</code></a>
                             </p>
                     
                     
@@ -3234,7 +3326,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>Inherited from
                                     <a href="../classes/BaseEventEmitter.html#property_stateInformation">BaseEventEmitter</a>:
-                            <a href="../files/es6_lib_taskgroup.js.html#l252"><code>es6&#x2F;lib&#x2F;taskgroup.js:252</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l236"><code>es6&#x2F;lib&#x2F;taskgroup.js:236</code></a>
                             </p>
                     
                     
@@ -3260,7 +3352,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1060"><code>es6&#x2F;lib&#x2F;taskgroup.js:1060</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1050"><code>es6&#x2F;lib&#x2F;taskgroup.js:1050</code></a>
                             </p>
                     
                     
@@ -3286,7 +3378,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l999"><code>es6&#x2F;lib&#x2F;taskgroup.js:999</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l989"><code>es6&#x2F;lib&#x2F;taskgroup.js:989</code></a>
                             </p>
                     
                     
@@ -3314,7 +3406,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1020"><code>es6&#x2F;lib&#x2F;taskgroup.js:1020</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1010"><code>es6&#x2F;lib&#x2F;taskgroup.js:1010</code></a>
                             </p>
                     
                     
@@ -3342,7 +3434,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1030"><code>es6&#x2F;lib&#x2F;taskgroup.js:1030</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1020"><code>es6&#x2F;lib&#x2F;taskgroup.js:1020</code></a>
                             </p>
                     
                     
@@ -3369,7 +3461,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1008"><code>es6&#x2F;lib&#x2F;taskgroup.js:1008</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l998"><code>es6&#x2F;lib&#x2F;taskgroup.js:998</code></a>
                             </p>
                     
                     
@@ -3396,7 +3488,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l1677"><code>es6&#x2F;lib&#x2F;taskgroup.js:1677</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l1667"><code>es6&#x2F;lib&#x2F;taskgroup.js:1667</code></a>
                             </p>
                     
                     
@@ -3422,7 +3514,7 @@ Fires the listener, either on the next tick if we are already done, or if not, e
                         <div class="meta">
                                     <p>
                                     Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l973"><code>es6&#x2F;lib&#x2F;taskgroup.js:973</code></a>
+                            <a href="../files/es6_lib_taskgroup.js.html#l963"><code>es6&#x2F;lib&#x2F;taskgroup.js:963</code></a>
                             </p>
                     
                     
