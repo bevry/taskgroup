@@ -4,9 +4,7 @@
   "version": "4.3.0",
   "description": "Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.",
   "homepage": "https://github.com/bevry/taskgroup",
-  "license": {
-    "type": "MIT"
-  },
+  "license": "MIT",
   "badges": {
     "travis": true,
     "npm": true,
