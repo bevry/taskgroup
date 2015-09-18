@@ -42,13 +42,13 @@
   ],
   "author": "2013+ Bevry Pty Ltd <us@bevry.me> (http://bevry.me), 2011+ Benjamin Lupton <b@lupton.cc> (http://balupton.com)",
   "maintainers": [
-    "Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)"
+    "Benjamin Lupton <b@lupton.cc> (http://balupton.com)"
   ],
   "contributors": [
-    "Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)",
-    "crito (https://github.com/crito)",
-    "pflannery (https://github.com/pflannery)",
-    "sfrdmn (https://github.com/sfrdmn)"
+    "Benjamin Lupton <b@lupton.cc> (http://balupton.com)",
+    "crito <crito@cryptodrunks.net> (https://github.com/crito)",
+    "Peter Flannery (https://github.com/pflannery)",
+    "Sean Fridman <fridman@mail.sfsu.edu> (www.seanfridman.com)"
   ],
   "bugs": {
     "url": "https://github.com/bevry/taskgroup/issues"

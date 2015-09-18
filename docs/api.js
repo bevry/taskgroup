@@ -1,11 +1,12 @@
 YUI.add("yuidoc-meta", function(Y) {
    Y.YUIDoc = { meta: {
     "classes": [
-        "BaseEventEmitter",
+        "BaseInterface",
         "Task",
         "TaskGroup"
     ],
     "modules": [],
-    "allModules": []
+    "allModules": [],
+    "elements": []
 } };
 });

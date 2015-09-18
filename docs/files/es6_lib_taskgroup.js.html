@@ -38,10 +38,11 @@
                 
                         <div id="api-tabview-panel">
                             <ul id="api-classes" class="apis classes">
-                                <li><a href="../classes/BaseEventEmitter.html">BaseEventEmitter</a></li>
+                                <li><a href="../classes/BaseInterface.html">BaseInterface</a></li>
                                 <li><a href="../classes/Task.html">Task</a></li>
                                 <li><a href="../classes/TaskGroup.html">TaskGroup</a></li>
                             </ul>
+                
                 
                             <ul id="api-modules" class="apis modules">
                             </ul>
@@ -83,7 +84,6 @@
     <pre class="code prettyprint linenums">
 // Import
 const ambi = require(&#x27;ambi&#x27;)
-const csextends = require(&#x27;csextends&#x27;)
 const EventEmitter = require(&#x27;events&#x27;).EventEmitter /* .EventEmitter for Node 0.8 compatability*/
 // Domains are crippled in the browser and on node 0.8, so don&#x27;t use domains in those environments
 const domain = (process.browser || process.versions.node.substr(0, 3) === &#x27;0.8&#x27;) ? null : require(&#x27;domain&#x27;)
@@ -94,7 +94,9 @@ const hasMap = typeof Map !== &#x27;undefined&#x27;
 // Helpers
 
 // Make setTimeout a lot nicer
-const wait = (delay, fn) =&gt; setTimeout(fn, delay)
+function wait (delay, fn) {
+    setTimeout(fn, delay)
+}
 
 // Cross-platform (node 0.10+, node 0.8+, browser) compatible setImmediate
 const queue = (global || window).setImmediate || (process &amp;&amp; process.nextTick) || function (fn) {
@@ -102,7 +104,7 @@ const queue = (global || window).setImmediate || (process &amp;&amp; process.nex
 }
 
 // Convert an error to a string
-const errorToString = function (error) {
+function errorToString (error) {
     if ( !error ) {
         return null
     }
@@ -117,17 +119,8 @@ const errorToString = function (error) {
     }
 }
 
-// Copy all items from an object into another object
-const copyObject = function (obj1, obj2) {
-    if ( obj2 ) {
-        iterateObject(obj2, function (value, key) {
-            obj1[key] = value
-        })
-    }
-}
-
 // Iterate an object or a map fast
-const iterateObject = function (obj, iterator) {
+function iterateObject (obj, iterator) {
     if ( obj ) {
         if ( hasMap &amp;&amp; obj instanceof Map ) {  // performance of this is neglible
             obj.forEach(iterator)
@@ -143,42 +136,38 @@ const iterateObject = function (obj, iterator) {
     }
 }
 
+// Copy all items from an object into another object
+function copyObject (obj1, obj2) {
+    if ( obj2 ) {
+        iterateObject(obj2, function (value, key) {
+            obj1[key] = value
+        })
+    }
+}
+
 // Ensure that the passed array is actually an array
-const ensureArray = function (arr) {
+function ensureArray (arr) {
     if ( !Array.isArray(arr) ) arr = [arr]
     return arr
 }
 
 
 // =====================================
-// BaseEventEmitter
+// BaseInterface
 
 /**
 Base class containing common functionality for {{#crossLink &quot;Task&quot;}}{{/crossLink}} and {{#crossLink &quot;TaskGroup&quot;}}{{/crossLink}}.
 
-@class BaseEventEmitter
+@class BaseInterface
 @extends EventEmitter
 @constructor
 @private
 */
-class BaseEventEmitter extends EventEmitter {
+class BaseInterface extends EventEmitter {
     /**
-    A helper method to create a new subclass with our extensions.
-    @param {Object} extensions - The methods and properties to use.
-    @return {Object} A new instance of the sub class.
-
-    @static
-    @method subclass
-    @public
-    */
-    static subclass (...args) {
-        return csextends.apply(this, args)
-    }
-
-    /**
-    Creates a new {SubClass} instance.
+    Creates and returns new instance of this class.
     @param {Arguments} args - The arguments to be forwarded along to the constructor.
-    @return {SubClass} The new instance.
+    @return {Object} The new instance.
 
     @static
     @method create
@@ -189,7 +178,7 @@ class BaseEventEmitter extends EventEmitter {
     }
 
     /**
-    BaseEventEmitter Constructor
+    BaseInterface Constructor
 
     Adds support for the done event while
     ensuring that errors are always handled correctly.
@@ -268,7 +257,7 @@ class BaseEventEmitter extends EventEmitter {
     }
 
     /**
-    Alias for {{#crossLink &quot;BaseEventEmitter/onceDone&quot;}}{{/crossLink}}
+    Alias for {{#crossLink &quot;BaseInterface/onceDone&quot;}}{{/crossLink}}
     @param {Function} listener - Attaches to the &#x60;done&#x60; event.
     @chainable
     @method done
@@ -286,9 +275,9 @@ class BaseEventEmitter extends EventEmitter {
     */
     get namesArray () {
         // Fetch
-        const names = [], name = this.name, parent = this.config.parent
+        const names = [], parent = this.config.parent
         if ( parent )  names.push(...parent.namesArray)
-        if ( name )  names.push(name)
+        if ( this.config.name !== false )  names.push(this.name)
 
         // Return
         return names
@@ -313,7 +302,7 @@ class BaseEventEmitter extends EventEmitter {
     @public
     */
     get name () {
-        return this.config.name || &#x60;${this.type} ${Math.random()}&#x60;
+        return this.config.name || this.state.name
     }
 
     /**
@@ -401,11 +390,11 @@ task = new Task(&#x27;my task that passes an error&#x27;, function(complete){
 &#x60;&#x60;&#x60;
 
 @class Task
-@extends BaseEventEmitter
+@extends BaseInterface
 @constructor
 @public
 */
-class Task extends BaseEventEmitter {
+class Task extends BaseInterface {
     /**
     The type of our class.
 
@@ -429,7 +418,7 @@ class Task extends BaseEventEmitter {
     @public
     */
     static isTask (item) {
-        return (item &amp;&amp; item.type === &#x27;task&#x27;) || (item instanceof Task)
+        return (item &amp;&amp; item.type === &#x27;task&#x27;) || (item instanceof this)
     }
 
     /**
@@ -538,11 +527,12 @@ class Task extends BaseEventEmitter {
     @public
     */
     constructor (...args) {
-        // Initialise BaseEventEmitter
+        // Initialise BaseInterface
         super()
 
         // State defaults
         this.state = {
+            name: &#x60;${this.type} ${Math.random()}&#x60;,
             error: null,
             status: null,
             events: [&#x27;events&#x27;, &#x27;error&#x27;, &#x27;started&#x27;, &#x27;running&#x27;, &#x27;failed&#x27;, &#x27;passed&#x27;, &#x27;completed&#x27;, &#x27;done&#x27;, &#x27;destroyed&#x27;]
@@ -685,7 +675,7 @@ class Task extends BaseEventEmitter {
         // Complete for the first (and hopefully only) time
         if ( this.completed === false ) {
             // Set the status and emit depending on success or failure status
-            const status = (error ? &#x27;failed&#x27; : &#x27;passed&#x27;)
+            const status = error ? &#x27;failed&#x27; : &#x27;passed&#x27;
             this.state.status = status
             this.emit(status, error)
 
@@ -1039,10 +1029,10 @@ Available internal statuses:
 
 @constructor
 @class TaskGroup
-@extends BaseEventEmitter
+@extends BaseInterface
 @public
 */
-class TaskGroup extends BaseEventEmitter {
+class TaskGroup extends BaseInterface {
     /**
     The type of our class.
 
@@ -1066,7 +1056,7 @@ class TaskGroup extends BaseEventEmitter {
     @public
     */
     static isTaskGroup (group) {
-        return (group &amp;&amp; group.type === &#x27;taskgroup&#x27;) || group instanceof TaskGroup
+        return (group &amp;&amp; group.type === &#x27;taskgroup&#x27;) || group instanceof this
     }
 
     /**
@@ -1191,6 +1181,7 @@ class TaskGroup extends BaseEventEmitter {
 
         // State defaults
         this.state = {
+            id: &#x60;${this.type} ${Math.random()}&#x60;,
             error: null,
             status: null,
             events: [&#x27;error&#x27;, &#x27;started&#x27;, &#x27;running&#x27;, &#x27;passed&#x27;, &#x27;failed&#x27;, &#x27;completed&#x27;, &#x27;done&#x27;, &#x27;destroyed&#x27;],
@@ -1376,10 +1367,10 @@ class TaskGroup extends BaseEventEmitter {
     @method addMethod
     @private
     */
-    addMethod (method, opts={}) {
+    addMethod (method, opts = {}) {
         method = method.bind(this) // run the taskgroup method on the group, rather than itself
         method.isTaskGroupMethod = true
-        if ( !opts.name )  opts.name = &#x27;taskgroup method for &#x27;+this.name
+        if ( !opts.name )  opts.name = &#x27;taskgroup method for &#x27; + this.name
         if ( !opts.args )  opts.args = [this.addGroup.bind(this), this.addTask.bind(this)]
         if ( opts.includeInResults == null )  opts.includeInResults = false
         return this.addTask(method, opts)
@@ -1500,7 +1491,7 @@ class TaskGroup extends BaseEventEmitter {
 
         // Name default
         if ( !item.config.name ) {
-            item.config.name = &#x60;${item.type} ${this.totalItems+1} for [${this.name}]&#x60;
+            item.config.name = &#x60;${item.type} ${this.totalItems + 1} for [${this.name}]&#x60;
         }
 
         // Bubble the nested events if desired
@@ -1510,8 +1501,10 @@ class TaskGroup extends BaseEventEmitter {
                     me.emit(&#x60;item.${event}&#x60;, item, ...args)
                 })
             })
-            this.emit(&#x27;item.add&#x27;, item)
         }
+
+        // Emit
+        this.emit(&#x27;item.add&#x27;, item)
 
         // Handle item completion and errors once
         // we can&#x27;t just do item.done, or item.once(&#x27;done&#x27;), because we need the item to be the argument, rather than &#x60;this&#x60;
@@ -2320,7 +2313,7 @@ class TaskGroup extends BaseEventEmitter {
     finish () {
         // Set and emmit the appropriate status for our error or non-error
         const error = this.state.error
-        const status = (error ? &#x27;failed&#x27; : &#x27;passed&#x27;)
+        const status = error ? &#x27;failed&#x27; : &#x27;passed&#x27;
         this.state.status = status
         this.emit(status, error)
 

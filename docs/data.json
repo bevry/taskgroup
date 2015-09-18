@@ -11,7 +11,7 @@
             "name": "es6/lib/taskgroup.js",
             "modules": {},
             "classes": {
-                "BaseEventEmitter": 1,
+                "BaseInterface": 1,
                 "Task": 1,
                 "TaskGroup": 1
             },
@@ -21,16 +21,16 @@
     },
     "modules": {},
     "classes": {
-        "BaseEventEmitter": {
-            "name": "BaseEventEmitter",
-            "shortname": "BaseEventEmitter",
+        "BaseInterface": {
+            "name": "BaseInterface",
+            "shortname": "BaseInterface",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
             "file": "es6/lib/taskgroup.js",
-            "line": 73,
+            "line": 74,
             "description": "Base class containing common functionality for {{#crossLink \"Task\"}}{{/crossLink}} and {{#crossLink \"TaskGroup\"}}{{/crossLink}}.",
             "extends": "EventEmitter",
             "is_constructor": 1,
@@ -46,9 +46,9 @@
             "plugin_for": [],
             "extension_for": [],
             "file": "es6/lib/taskgroup.js",
-            "line": 271,
+            "line": 259,
             "description": "Our Task Class\n\nAvailable configuration is documented in {{#crossLink \"Task/setConfig\"}}{{/crossLink}}.\n\nAvailable events:\n\n- `started()` - emitted when we start execution\n- `running()` - emitted when the method starts execution\n- `failed(error)` - emitted when execution exited with a failure\n- `passed()` - emitted when execution exited with a success\n- `completed(error, ...resultArguments)` - emitted when execution exited, `resultArguments` are the result arguments from the method\n- `error(error)` - emtited if an unexpected error occurs without ourself\n- `done(error, ...resultArguments)` - emitted when either execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)\n\nAvailable internal statuses:\n\n- `null` - execution has not yet started\n- `'started'` - execution has begun\n- `'running'` - execution of our method has begun\n- `'failed'` - execution of our method has failed\n- `'passed'` - execution of our method has succeeded\n- `'destroyed'` - we've been destroyed and can no longer execute\n\nExample:\n\n``` javascript\nvar Task = require('taskgroup').Task\nvar task\n\ntask = new Task('my synchronous task', function(){\n\treturn 5\n}).done(console.info).run()  // [null, 5]\n\ntask = new Task('my asynchronous task', function(complete){\n\tcomplete(null, 5)\n}).done(console.info).run()  // [null, 5]\n\ntask = new Task('my task that returns an error', function(){\n\tvar error = new Error('deliberate error')\n\treturn error\n}).done(console.info).run()  // [Error('deliberator error')]\n\ntask = new Task('my task that passes an error', function(complete){\n\tvar error = new Error('deliberate error')\n\tcomplete(error)\n}).done(console.info).run()  // [Error('deliberator error')]\n```",
-            "extends": "BaseEventEmitter",
+            "extends": "BaseInterface",
             "is_constructor": 1,
             "access": "public",
             "tagname": ""
@@ -62,41 +62,20 @@
             "plugin_for": [],
             "extension_for": [],
             "file": "es6/lib/taskgroup.js",
-            "line": 930,
+            "line": 919,
             "description": "Our TaskGroup class.\n\nAvailable configuration is documented in {{#crossLink \"TaskGroup/setConfig\"}}{{/crossLink}}.\n\nAvailable events:\n\n- `started()` - emitted when we start execution\n- `running()` - emitted when the first item starts execution\n- `failed(error)` - emitted when execution exited with a failure\n- `passed()` - emitted when execution exited with a success\n- `completed(error, results)` - emitted when execution exited, `results` is an {Array} of the result arguments for each item that executed\n- `error(error)` - emtited if an unexpected error occured within ourself\n- `done(error, results)` - emitted when either the execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)\n- `item.*(...)` - bubbled events from an added item\n- `task.*(...)` - bubbled events from an added {Task}\n- `group.*(...)` - bubbled events from an added {TaskGroup}\n\nAvailable internal statuses:\n\n- `null` - execution has not yet started\n- `'started'` - execution has begun\n- `'running'` - execution of items has begun\n- `'failed'` - execution has exited with failure status\n- `'passed'` - execution has exited with success status\n- `'destroyed'` - we've been destroyed and can no longer execute",
             "is_constructor": 1,
-            "extends": "BaseEventEmitter",
+            "extends": "BaseInterface",
             "access": "public",
             "tagname": ""
         }
     },
+    "elements": {},
     "classitems": [
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 82,
-            "description": "A helper method to create a new subclass with our extensions.",
-            "params": [
-                {
-                    "name": "extensions",
-                    "description": "- The methods and properties to use.",
-                    "type": "Object"
-                }
-            ],
-            "return": {
-                "description": "A new instance of the sub class.",
-                "type": "Object"
-            },
-            "static": 1,
-            "itemtype": "method",
-            "name": "subclass",
-            "access": "public",
-            "tagname": "",
-            "class": "BaseEventEmitter"
-        },
-        {
-            "file": "es6/lib/taskgroup.js",
-            "line": 95,
-            "description": "Creates a new {SubClass} instance.",
+            "line": 83,
+            "description": "Creates and returns new instance of this class.",
             "params": [
                 {
                     "name": "args",
@@ -106,26 +85,26 @@
             ],
             "return": {
                 "description": "The new instance.",
-                "type": "SubClass"
+                "type": "Object"
             },
             "static": 1,
             "itemtype": "method",
             "name": "create",
             "access": "public",
             "tagname": "",
-            "class": "BaseEventEmitter"
+            "class": "BaseInterface"
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 108,
-            "description": "BaseEventEmitter Constructor\n\nAdds support for the done event while\nensuring that errors are always handled correctly.\nIt does this by listening to the `error` and `completed` events,\nand when the emit, we check if there is a `done` listener:\n\n- if there is, then emit the done event with the original event arguments\n- if there isn't, then output the error to stderr and throw it.",
+            "line": 96,
+            "description": "BaseInterface Constructor\n\nAdds support for the done event while\nensuring that errors are always handled correctly.\nIt does this by listening to the `error` and `completed` events,\nand when the emit, we check if there is a `done` listener:\n\n- if there is, then emit the done event with the original event arguments\n- if there isn't, then output the error to stderr and throw it.",
             "itemtype": "method",
             "name": "constructor",
-            "class": "BaseEventEmitter"
+            "class": "BaseInterface"
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 153,
+            "line": 141,
             "description": "Attaches the listener to the `done` event to be emitted each time.",
             "params": [
                 {
@@ -139,11 +118,11 @@
             "name": "whenDone",
             "access": "public",
             "tagname": "",
-            "class": "BaseEventEmitter"
+            "class": "BaseInterface"
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 170,
+            "line": 158,
             "description": "Attaches the listener to the `done` event to be emitted only once, then removed to not fire again.",
             "params": [
                 {
@@ -157,12 +136,12 @@
             "name": "onceDone",
             "access": "public",
             "tagname": "",
-            "class": "BaseEventEmitter"
+            "class": "BaseInterface"
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 187,
-            "description": "Alias for {{#crossLink \"BaseEventEmitter/onceDone\"}}{{/crossLink}}",
+            "line": 175,
+            "description": "Alias for {{#crossLink \"BaseInterface/onceDone\"}}{{/crossLink}}",
             "params": [
                 {
                     "name": "listener",
@@ -175,55 +154,55 @@
             "name": "done",
             "access": "public",
             "tagname": "",
-            "class": "BaseEventEmitter"
+            "class": "BaseInterface"
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 198,
+            "line": 186,
             "description": "Gets our name prepended by all of our parents names",
             "type": "Array",
             "itemtype": "property",
             "name": "namesArray",
             "access": "public",
             "tagname": "",
-            "class": "BaseEventEmitter"
+            "class": "BaseInterface"
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 214,
+            "line": 202,
             "description": "Gets our name prefixed by all of our parents names",
             "type": "String",
             "itemtype": "property",
             "name": "names",
             "access": "public",
             "tagname": "",
-            "class": "BaseEventEmitter"
+            "class": "BaseInterface"
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 225,
+            "line": 213,
             "description": "Get the name of our instance.\nIf the name was never configured, then return the name in the format of `'#{this.type} #{Math.random()}'` to output something like `task 0.2123`",
             "type": "String",
             "itemtype": "property",
             "name": "name",
             "access": "public",
             "tagname": "",
-            "class": "BaseEventEmitter"
+            "class": "BaseInterface"
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 236,
+            "line": 224,
             "description": "Get extra state information for debugging.",
             "type": "String",
             "itemtype": "property",
             "name": "stateInformation",
             "access": "private",
             "tagname": "",
-            "class": "BaseEventEmitter"
+            "class": "BaseInterface"
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 250,
+            "line": 238,
             "description": "Executes the passed function either synchronously if `config.sync` is `true` or delays it for the next tick.",
             "params": [
                 {
@@ -237,11 +216,11 @@
             "name": "queue",
             "access": "private",
             "tagname": "",
-            "class": "BaseEventEmitter"
+            "class": "BaseInterface"
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 326,
+            "line": 314,
             "description": "The type of our class.\n\nUsed for the purpose of duck typing\nwhich is needed when working with node virtual machines\nas instanceof will not work in those environments.",
             "type": "String",
             "itemtype": "property",
@@ -253,7 +232,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 340,
+            "line": 328,
             "description": "A helper method to check if the passed argument is an instanceof a {Task}.",
             "params": [
                 {
@@ -275,7 +254,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 352,
+            "line": 340,
             "description": "Have we started execution yet?",
             "type": "Boolean",
             "itemtype": "property",
@@ -286,7 +265,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 362,
+            "line": 350,
             "description": "Have we finished its execution yet?",
             "type": "Boolean",
             "itemtype": "property",
@@ -297,7 +276,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 379,
+            "line": 367,
             "description": "Have we been destroyed?",
             "type": "Boolean",
             "itemtype": "property",
@@ -308,7 +287,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 389,
+            "line": 377,
             "description": "Have we completed its execution yet?",
             "type": "Boolean",
             "itemtype": "property",
@@ -319,7 +298,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 410,
+            "line": 398,
             "description": "The first {Error} that has occured.",
             "type": "Error",
             "itemtype": "property",
@@ -330,7 +309,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 418,
+            "line": 406,
             "description": "A {String} containing our current status. See our {Task} description for available values.",
             "type": "String",
             "itemtype": "property",
@@ -341,7 +320,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 426,
+            "line": 414,
             "description": "An {Array} of the events that we may emit. Events that will be executed can be found in the {Task} description.",
             "type": "Array",
             "itemtype": "property",
@@ -353,7 +332,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 435,
+            "line": 423,
             "description": "An {Array} representing the returned result or the passed {Arguments} of our method.\nThe first item in the array should be the {Error} if it exists.",
             "type": "Array",
             "itemtype": "property",
@@ -364,7 +343,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 444,
+            "line": 432,
             "description": "The {Domain} that we create to capture errors for our method.",
             "type": "Domain",
             "itemtype": "property",
@@ -375,7 +354,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 452,
+            "line": 440,
             "description": "Initialize our new {Task} instance. Forwards arguments onto {{#crossLink \"Task/setConfig\"}}{{/crossLink}}.",
             "itemtype": "method",
             "name": "constructor",
@@ -385,7 +364,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 482,
+            "line": 471,
             "description": "Set the configuration for our instance.",
             "params": [
                 {
@@ -487,7 +466,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 565,
+            "line": 554,
             "description": "What to do when our task method completes.\nShould only ever execute once, if it executes more than once, then we error.",
             "params": [
                 {
@@ -505,7 +484,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 593,
+            "line": 582,
             "description": "Set our task to the completed state.",
             "chainable": 1,
             "itemtype": "method",
@@ -516,7 +495,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 623,
+            "line": 612,
             "description": "Allow the user to abort the execution of this task.",
             "chainable": 1,
             "itemtype": "method",
@@ -530,7 +509,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 656,
+            "line": 645,
             "description": "Completetion Emitter. Used to emit the `completed` event and to cleanup our state.",
             "chainable": 1,
             "itemtype": "method",
@@ -541,7 +520,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 686,
+            "line": 675,
             "description": "When Done Promise.\nFires the listener, either on the next tick if we are already done, or if not, each time the `done` event fires.",
             "params": [
                 {
@@ -559,7 +538,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 710,
+            "line": 699,
             "description": "Once Done Promise.\nFires the listener once, either on the next tick if we are already done, or if not, each time the `done` event fires.",
             "params": [
                 {
@@ -577,7 +556,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 734,
+            "line": 723,
             "description": "Reset the results.\nAt this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.",
             "chainable": 1,
             "itemtype": "method",
@@ -588,7 +567,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 746,
+            "line": 735,
             "description": "Clear the domain",
             "chainable": 1,
             "itemtype": "method",
@@ -599,7 +578,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 762,
+            "line": 751,
             "description": "Destroy ourself and prevent ourself from executing ever again.",
             "chainable": 1,
             "itemtype": "method",
@@ -610,7 +589,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 796,
+            "line": 785,
             "description": "Fire the task method with our config arguments and wrapped in a domain.",
             "chainable": 1,
             "itemtype": "method",
@@ -621,7 +600,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 894,
+            "line": 883,
             "description": "Start the execution of the task.\nWill emit an `error` event if the task has already started before.",
             "chainable": 1,
             "itemtype": "method",
@@ -632,7 +611,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 963,
+            "line": 952,
             "description": "The type of our class.\n\nUsed for the purpose of duck typing\nwhich is needed when working with node virtual machines\nas instanceof will not work in those environments.",
             "type": "String",
             "itemtype": "property",
@@ -644,7 +623,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 977,
+            "line": 966,
             "description": "A helper method to check if the passed argument is an instanceof a {TaskGroup}.",
             "params": [
                 {
@@ -666,7 +645,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 989,
+            "line": 978,
             "description": "A reference to the {Task} class for use in {::createTask} if we want to override it.",
             "type": "Task",
             "itemtype": "property",
@@ -678,7 +657,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 998,
+            "line": 987,
             "description": "A reference to the {TaskGroup} class for use in {::createGroup} if we want to override it.",
             "type": "TaskGroup",
             "itemtype": "property",
@@ -690,7 +669,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1010,
+            "line": 999,
             "description": "A reference to the {Task} class.",
             "type": "Task",
             "itemtype": "property",
@@ -703,7 +682,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1020,
+            "line": 1009,
             "description": "A reference to the {TaskGroup} class.",
             "type": "TaskGroup",
             "itemtype": "property",
@@ -716,7 +695,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1034,
+            "line": 1023,
             "description": "The {config.concurrency} property.",
             "type": "Number",
             "itemtype": "property",
@@ -727,7 +706,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1042,
+            "line": 1031,
             "description": "The first {Error} that has occured.",
             "type": "Error",
             "itemtype": "property",
@@ -738,7 +717,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1050,
+            "line": 1039,
             "description": "A {String} containing our current status. See our {TaskGroup} description for available values.",
             "type": "String",
             "itemtype": "property",
@@ -749,7 +728,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1058,
+            "line": 1047,
             "description": "An {Array} of the events that we may emit. Events that will be executed can be found in the {Task} description.",
             "type": "Array",
             "itemtype": "property",
@@ -760,7 +739,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1066,
+            "line": 1055,
             "description": "An {Array} that contains the result property for each completed {Task} and {TaskGroup}.\nAn item can disable having its result property added to this results array by setting its {includeInResults} configuration option to `false`.",
             "type": "Array",
             "itemtype": "property",
@@ -771,7 +750,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1075,
+            "line": 1064,
             "description": "An {Array} of each {Task} and {TaskGroup} in this group that are still yet to execute.",
             "type": "Array",
             "itemtype": "property",
@@ -782,7 +761,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1083,
+            "line": 1072,
             "description": "An {Array} of each {Task} and {TaskGroup} in this group that are currently executing.",
             "todo": [
                 "offer the ability to disable this completely via `storeRunningItems: false`"
@@ -796,7 +775,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1092,
+            "line": 1081,
             "description": "An {Array} of each {Task} and {TaskGroup} in this group that have completed.",
             "todo": [
                 "offer the ability to disable this completely via `storeCompletedItems: false`"
@@ -810,7 +789,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1101,
+            "line": 1090,
             "description": "Initialize our new {TaskGroup} instance. Forwards arguments onto {{#crossLink \"TaskGroup/setConfig\"}}{{/crossLink}}.",
             "itemtype": "method",
             "name": "constructor",
@@ -820,7 +799,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1151,
+            "line": 1141,
             "description": "Merged passed configuration into {config.nestedTaskConfig}.",
             "params": [
                 {
@@ -838,7 +817,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1166,
+            "line": 1156,
             "description": "Merged passed configuration into {config.nestedGroupConfig}.",
             "params": [
                 {
@@ -856,7 +835,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1181,
+            "line": 1171,
             "description": "Set the configuration for our instance.\n\nDespite accepting an {Object} of configuration, we can also accept an {Array} of configuration.\tWhen using an array, a {String} becomes the :name, a {Function} becomes the :method, and an {Object} becomes the :config",
             "params": [
                 {
@@ -976,7 +955,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1288,
+            "line": 1278,
             "description": "Prepare the method and it's configuration, and add it as a task to be executed.",
             "params": [
                 {
@@ -1002,7 +981,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1305,
+            "line": 1295,
             "description": "Autorun ourself under certain conditions.\n\nThose conditions being:\n\n- if we the :method configuration is defined, and we have no :parent\n- if we the :run configuration is `true`\n\nUsed primarily to cause the :method to fire at the appropriate time when using inline style.",
             "chainable": 1,
             "itemtype": "method",
@@ -1013,7 +992,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1348,
+            "line": 1338,
             "description": "Adds a {Task|TaskGroup} instance and configures it from the arguments.",
             "params": [
                 {
@@ -1035,7 +1014,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1449,
+            "line": 1441,
             "description": "Adds {Task|TaskGroup} instances and configures them from the arguments.",
             "params": [
                 {
@@ -1062,7 +1041,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1465,
+            "line": 1457,
             "description": "Same as {{#crossLink \"TaskGroup/addItem\"}}{{/crossLink}} but chains instead of returning the item.",
             "chainable": 1,
             "itemtype": "method",
@@ -1073,7 +1052,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1476,
+            "line": 1468,
             "description": "Same as {{#crossLink \"TaskGroup/addItems\"}}{{/crossLink}} but chains instead of returning the item.",
             "chainable": 1,
             "itemtype": "method",
@@ -1084,7 +1063,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1491,
+            "line": 1483,
             "description": "Creates a {Task} instance and configures it from the arguments.\n\nIf the first argument is already a {Task} instance, then we configure it with the remaining arguments, instead of creating a new {Task} instance.",
             "params": [
                 {
@@ -1106,7 +1085,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1521,
+            "line": 1513,
             "description": "Adds a {Task} instance and configures it from the arguments.\n\nIf a {Task} instance is not supplied, a {Task} instance is created from the arguments.",
             "params": [
                 {
@@ -1128,7 +1107,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1537,
+            "line": 1529,
             "description": "Adds {Task} instances and configures them from the arguments.",
             "params": [
                 {
@@ -1155,7 +1134,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1553,
+            "line": 1545,
             "description": "Same as {{#crossLink \"TaskGroup/addTask\"}}{{/crossLink}} but chains instead of returning the item.",
             "chainable": 1,
             "itemtype": "method",
@@ -1166,7 +1145,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1564,
+            "line": 1556,
             "description": "Same as {{#crossLink \"TaskGroup/addTasks\"}}{{/crossLink}} but chains instead of returning the item.",
             "chainable": 1,
             "itemtype": "method",
@@ -1177,7 +1156,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1579,
+            "line": 1571,
             "description": "Creates a {TaskGroup} instance and configures it from the arguments.\n\nIf the first argument is already a {TaskGroup} instance, then we configure it with the remaining arguments, instead of creating a new {TaskGroup} instance.",
             "params": [
                 {
@@ -1199,7 +1178,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1609,
+            "line": 1601,
             "description": "Adds a {TaskGroup} instance and configures it from the arguments.\n\nIf a {TaskGroup} instance is not supplied, a {TaskGroup} instance is created from the arguments.",
             "params": [
                 {
@@ -1221,7 +1200,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1625,
+            "line": 1617,
             "description": "Adds {TaskGroup} instances and configures them from the arguments.",
             "params": [
                 {
@@ -1248,7 +1227,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1641,
+            "line": 1633,
             "description": "Same as {{#crossLink \"TaskGroup/addGroup\"}}{{/crossLink}} but chains instead of returning the item.",
             "chainable": 1,
             "itemtype": "method",
@@ -1259,7 +1238,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1652,
+            "line": 1644,
             "description": "Same as {{#crossLink \"TaskGroup/addGroups\"}}{{/crossLink}} but chains instead of returning the item.",
             "chainable": 1,
             "itemtype": "method",
@@ -1270,7 +1249,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1667,
+            "line": 1659,
             "description": "Gets the total number of items inside our task group.",
             "type": "Number",
             "itemtype": "property",
@@ -1281,7 +1260,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1681,
+            "line": 1673,
             "description": "Gets the total number count of each of our item lists.\n\nReturns an {Object} containg the hashes:\n\n- remaining - A {Number} of the names of the remaining items.\n- running - A {Number} of the names of the running items.\n- completed - A {Number} of the names of the completed items.\n- total - A {Number} of the total items we have.\n- results - A {Number} of the total results we have.",
             "type": "Object",
             "itemtype": "property",
@@ -1292,7 +1271,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1711,
+            "line": 1703,
             "description": "Gets the names of the items, the total number of items, and their results for the purpose of debugging.\n\nReturns an {Object} containg the hashes:\n\n- remaining - An {Array} of the names of the remaining items\n- running - An {Array} of the names of the running items\n- completed - An {Array} of the names of the completed items\n- total - A {Number} of the total items we have\n- results - An {Array} of the results of the compelted items",
             "type": "Object",
             "itemtype": "property",
@@ -1303,7 +1282,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1741,
+            "line": 1733,
             "description": "Whether or not we have any running items.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1314,7 +1293,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1751,
+            "line": 1743,
             "description": "Whether or not we have any items yet to execute.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1325,7 +1304,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1761,
+            "line": 1753,
             "description": "Whether or not we have any items running or remaining.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1336,7 +1315,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1771,
+            "line": 1763,
             "description": "Whether or not we have an error.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1347,7 +1326,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1781,
+            "line": 1773,
             "description": "Whether or not we have an error or a result.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1358,7 +1337,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1791,
+            "line": 1783,
             "description": "Whether or not we have any available slots to execute more items.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1369,7 +1348,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1804,
+            "line": 1796,
             "description": "Whether or not we are capable of firing more items.\n\nThis is determined whether or not we are not paused, and we have remaning items, and we have slots able to execute those remaning items.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1380,7 +1359,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1821,
+            "line": 1813,
             "description": "Whether or not we have errord and want to pause when we have an error.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1391,7 +1370,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1833,
+            "line": 1825,
             "description": "Whether or not we execution is currently paused.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1402,7 +1381,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1846,
+            "line": 1838,
             "description": "Whether or not we have no running or remaining items left.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1413,7 +1392,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1856,
+            "line": 1848,
             "description": "Whether or not we have finished execution.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1424,7 +1403,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1873,
+            "line": 1865,
             "description": "Whether or not we have started execution.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1435,7 +1414,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1883,
+            "line": 1875,
             "description": "Whether or not we execution has completed.\n\nCompletion of executed is determined of whether or not we have started, and whether or not we are currently paused or have no remaining and running items left",
             "type": "Boolean",
             "itemtype": "property",
@@ -1446,7 +1425,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1906,
+            "line": 1898,
             "description": "Completetion Emitter. Used to emit the `completed` event and to cleanup our state.",
             "chainable": 1,
             "itemtype": "method",
@@ -1457,7 +1436,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1940,
+            "line": 1932,
             "description": "When Done Promise.\nFires the listener, either on the next tick if we are already done, or if not, each time the `done` event fires.",
             "params": [
                 {
@@ -1475,7 +1454,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1961,
+            "line": 1953,
             "description": "Once Done Promise.\nFires the listener once, either on the next tick if we are already done, or if not, each time the `done` event fires.",
             "params": [
                 {
@@ -1493,7 +1472,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1982,
+            "line": 1974,
             "description": "Reset the results.\nAt this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.",
             "chainable": 1,
             "itemtype": "method",
@@ -1504,7 +1483,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 1996,
+            "line": 1988,
             "description": "Fire the next items.",
             "return": {
                 "description": "Either an {Array} of items that were fired or `false` if no items were fired.",
@@ -1518,7 +1497,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 2022,
+            "line": 2014,
             "description": "Fire the next item.",
             "return": {
                 "description": "Either the {Task|TaskGroup} item that was fired or `false` if no item was fired.",
@@ -1532,7 +1511,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 2060,
+            "line": 2052,
             "description": "What to do when an item completes.",
             "chainable": 1,
             "params": [
@@ -1556,7 +1535,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 2119,
+            "line": 2111,
             "description": "Internal: Either execute the reamining items we are not paused, or complete execution by exiting.",
             "chainable": 1,
             "itemtype": "method",
@@ -1567,7 +1546,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 2144,
+            "line": 2136,
             "description": "Remove and destroy the remaining items.",
             "chainable": 1,
             "itemtype": "method",
@@ -1578,7 +1557,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 2160,
+            "line": 2152,
             "description": "Remove and destroy the running items. Here for verboseness.",
             "chainable": 1,
             "itemtype": "method",
@@ -1589,7 +1568,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 2171,
+            "line": 2163,
             "description": "Remove and destroy the completed items.",
             "chainable": 1,
             "itemtype": "method",
@@ -1600,7 +1579,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 2194,
+            "line": 2186,
             "description": "Destroy ourself and prevent ourself from executing ever again.",
             "chainable": 1,
             "itemtype": "method",
@@ -1611,7 +1590,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 2230,
+            "line": 2222,
             "description": "Set our task to the completed state.",
             "todo": [
                 "why is this here instead of inside .complete() ?"
@@ -1625,7 +1604,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 2248,
+            "line": 2240,
             "description": "We want to halt execution and trigger our completion callback.",
             "todo": [
                 "figure out how this should actually work?\nShould it be two methods? .halt() and .abort(error?)\nShould it be a state?\nShould it alter the state?\nShould it clear or destroy?\nWhat is the definition of pausing with this?\nPerhaps we need to update the definition of pausing to be halted instead?\nHow can we apply this to Tasks instead?"
@@ -1646,7 +1625,7 @@
         },
         {
             "file": "es6/lib/taskgroup.js",
-            "line": 2284,
+            "line": 2276,
             "description": "Start/restart/resume the execution of the TaskGroup.",
             "chainable": 1,
             "itemtype": "method",

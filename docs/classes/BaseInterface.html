@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>BaseEventEmitter - TaskGroup API</title>
+    <title>BaseInterface - TaskGroup API</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -38,10 +38,11 @@
                 
                         <div id="api-tabview-panel">
                             <ul id="api-classes" class="apis classes">
-                                <li><a href="../classes/BaseEventEmitter.html">BaseEventEmitter</a></li>
+                                <li><a href="../classes/BaseInterface.html">BaseInterface</a></li>
                                 <li><a href="../classes/Task.html">Task</a></li>
                                 <li><a href="../classes/TaskGroup.html">TaskGroup</a></li>
                             </ul>
+                
                 
                             <ul id="api-modules" class="apis modules">
                             </ul>
@@ -77,7 +78,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-<h1>BaseEventEmitter Class</h1>
+<h1>BaseInterface Class</h1>
 <div class="box meta">
 
         <div class="extends">
@@ -85,7 +86,7 @@
         </div>
 
         <div class="foundat">
-            Defined in: <a href="../files/es6_lib_taskgroup.js.html#l73"><code>es6&#x2F;lib&#x2F;taskgroup.js:73</code></a>
+            Defined in: <a href="../files/es6_lib_taskgroup.js.html#l74"><code>es6&#x2F;lib&#x2F;taskgroup.js:74</code></a>
         </div>
 
 
@@ -99,37 +100,37 @@
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_BaseEventEmitter" class="method item private">
-            <h3 class="name"><code>BaseEventEmitter</code></h3>
+<div id="method_BaseInterface" class="method item private">
+    <h3 class="name"><code>BaseInterface</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+        <span class="flag private">private</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/es6_lib_taskgroup.js.html#l74"><code>es6&#x2F;lib&#x2F;taskgroup.js:74</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
         
-                <span class="paren">()</span>
-        
-        
-        
-                <span class="flag private">private</span>
-        
-        
-        
-        
-        
-            <div class="meta">
-                        <p>
-                        Defined in
-                <a href="../files/es6_lib_taskgroup.js.html#l73"><code>es6&#x2F;lib&#x2F;taskgroup.js:73</code></a>
-                </p>
-        
-        
-        
-            </div>
-        
-            <div class="description">
-                
-            </div>
-        
-        
-        
-        
-        </div>
+    </div>
+
+
+
+
+</div>
     </div>
 
 <div id="classdocs" class="tabview">
@@ -168,11 +169,6 @@
                             <li class="index-item method private">
                                 <a href="#method_queue">queue</a>
 
-                            </li>
-                            <li class="index-item method public">
-                                <a href="#method_subclass">subclass</a>
-
-                                    <span class="flag static">static</span>
                             </li>
                             <li class="index-item method public">
                                 <a href="#method_whenDone">whenDone</a>
@@ -225,7 +221,7 @@
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l108"><code>es6&#x2F;lib&#x2F;taskgroup.js:108</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l96"><code>es6&#x2F;lib&#x2F;taskgroup.js:96</code></a>
         </p>
 
 
@@ -233,7 +229,7 @@
     </div>
 
     <div class="description">
-        <p>BaseEventEmitter Constructor</p>
+        <p>BaseInterface Constructor</p>
 <p>Adds support for the done event while
 ensuring that errors are always handled correctly.
 It does this by listening to the <code>error</code> and <code>completed</code> events,
@@ -261,7 +257,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
         </div>
 
         <span class="returns-inline">
-            <span class="type">SubClass</span>
+            <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
         </span>
 
 
@@ -275,7 +271,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l95"><code>es6&#x2F;lib&#x2F;taskgroup.js:95</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l83"><code>es6&#x2F;lib&#x2F;taskgroup.js:83</code></a>
         </p>
 
 
@@ -283,7 +279,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
     </div>
 
     <div class="description">
-        <p>Creates a new {SubClass} instance.</p>
+        <p>Creates and returns new instance of this class.</p>
 
     </div>
 
@@ -311,7 +307,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
             <h4>Returns:</h4>
 
             <div class="returns-description">
-                        <span class="type">SubClass</span>:
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>:
                     <p>The new instance.</p>
 
             </div>
@@ -342,7 +338,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l187"><code>es6&#x2F;lib&#x2F;taskgroup.js:187</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l175"><code>es6&#x2F;lib&#x2F;taskgroup.js:175</code></a>
         </p>
 
 
@@ -350,7 +346,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
     </div>
 
     <div class="description">
-        <p>Alias for <a href="../classes/BaseEventEmitter.html#method_onceDone" class="crosslink">onceDone</a></p>
+        <p>Alias for <a href="../classes/BaseInterface.html#method_onceDone" class="crosslink">onceDone</a></p>
 
     </div>
 
@@ -360,7 +356,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
             <ul class="params-list">
                 <li class="param">
                         <code class="param-name">listener</code>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
 
 
                     <div class="param-description">
@@ -400,7 +396,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l170"><code>es6&#x2F;lib&#x2F;taskgroup.js:170</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l158"><code>es6&#x2F;lib&#x2F;taskgroup.js:158</code></a>
         </p>
 
 
@@ -418,7 +414,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
             <ul class="params-list">
                 <li class="param">
                         <code class="param-name">listener</code>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
 
 
                     <div class="param-description">
@@ -458,7 +454,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l250"><code>es6&#x2F;lib&#x2F;taskgroup.js:250</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l238"><code>es6&#x2F;lib&#x2F;taskgroup.js:238</code></a>
         </p>
 
 
@@ -476,7 +472,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
             <ul class="params-list">
                 <li class="param">
                         <code class="param-name">fn</code>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
 
 
                     <div class="param-description">
@@ -490,76 +486,6 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
             </ul>
         </div>
 
-
-
-</div>
-<div id="method_subclass" class="method item public">
-    <h3 class="name"><code>subclass</code></h3>
-
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-                <li class="arg">
-                        <code>extensions</code>
-                </li>
-            </ul><span class="paren">)</span>
-        </div>
-
-        <span class="returns-inline">
-            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
-        </span>
-
-
-        <span class="flag public">public</span>
-
-
-        <span class="flag static">static</span>
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l82"><code>es6&#x2F;lib&#x2F;taskgroup.js:82</code></a>
-        </p>
-
-
-
-    </div>
-
-    <div class="description">
-        <p>A helper method to create a new subclass with our extensions.</p>
-
-    </div>
-
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-                <li class="param">
-                        <code class="param-name">extensions</code>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
-
-
-                    <div class="param-description">
-                        <ul>
-<li>The methods and properties to use.</li>
-</ul>
-
-                    </div>
-
-                </li>
-            </ul>
-        </div>
-
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>:
-                    <p>A new instance of the sub class.</p>
-
-            </div>
-        </div>
 
 
 </div>
@@ -586,7 +512,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/es6_lib_taskgroup.js.html#l153"><code>es6&#x2F;lib&#x2F;taskgroup.js:153</code></a>
+        <a href="../files/es6_lib_taskgroup.js.html#l141"><code>es6&#x2F;lib&#x2F;taskgroup.js:141</code></a>
         </p>
 
 
@@ -604,7 +530,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
             <ul class="params-list">
                 <li class="param">
                         <code class="param-name">listener</code>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+                        <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
 
 
                     <div class="param-description">
@@ -626,111 +552,111 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
             <div id="properties" class="api-class-tabpanel">
                 <h2 class="off-left">Properties</h2>
 
-                    <div id="property_name" class="property item public">
-                        <h3 class="name"><code>name</code></h3>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
-                    
-                    
-                            <span class="flag public">public</span>
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l225"><code>es6&#x2F;lib&#x2F;taskgroup.js:225</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Get the name of our instance.
-                    If the name was never configured, then return the name in the format of <code>'#{this.type} #{Math.random()}'</code> to output something like <code>task 0.2123</code></p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_names" class="property item public">
-                        <h3 class="name"><code>names</code></h3>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
-                    
-                    
-                            <span class="flag public">public</span>
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l214"><code>es6&#x2F;lib&#x2F;taskgroup.js:214</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Gets our name prefixed by all of our parents names</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_namesArray" class="property item public">
-                        <h3 class="name"><code>namesArray</code></h3>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
-                    
-                    
-                            <span class="flag public">public</span>
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l198"><code>es6&#x2F;lib&#x2F;taskgroup.js:198</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Gets our name prepended by all of our parents names</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
-                    <div id="property_stateInformation" class="property item private">
-                        <h3 class="name"><code>stateInformation</code></h3>
-                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
-                    
-                    
-                            <span class="flag private">private</span>
-                    
-                    
-                    
-                        <div class="meta">
-                                    <p>
-                                    Defined in
-                            <a href="../files/es6_lib_taskgroup.js.html#l236"><code>es6&#x2F;lib&#x2F;taskgroup.js:236</code></a>
-                            </p>
-                    
-                    
-                        </div>
-                    
-                        <div class="description">
-                            <p>Get extra state information for debugging.</p>
-                    
-                        </div>
-                    
-                    
-                    
-                    </div>
+<div id="property_name" class="property item public">
+    <h3 class="name"><code>name</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+
+        <span class="flag public">public</span>
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/es6_lib_taskgroup.js.html#l213"><code>es6&#x2F;lib&#x2F;taskgroup.js:213</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>Get the name of our instance.
+If the name was never configured, then return the name in the format of <code>'#{this.type} #{Math.random()}'</code> to output something like <code>task 0.2123</code></p>
+
+    </div>
+
+
+
+</div>
+<div id="property_names" class="property item public">
+    <h3 class="name"><code>names</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+
+        <span class="flag public">public</span>
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/es6_lib_taskgroup.js.html#l202"><code>es6&#x2F;lib&#x2F;taskgroup.js:202</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>Gets our name prefixed by all of our parents names</p>
+
+    </div>
+
+
+
+</div>
+<div id="property_namesArray" class="property item public">
+    <h3 class="name"><code>namesArray</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+
+
+        <span class="flag public">public</span>
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/es6_lib_taskgroup.js.html#l186"><code>es6&#x2F;lib&#x2F;taskgroup.js:186</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>Gets our name prepended by all of our parents names</p>
+
+    </div>
+
+
+
+</div>
+<div id="property_stateInformation" class="property item private">
+    <h3 class="name"><code>stateInformation</code></h3>
+    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+
+        <span class="flag private">private</span>
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/es6_lib_taskgroup.js.html#l224"><code>es6&#x2F;lib&#x2F;taskgroup.js:224</code></a>
+        </p>
+
+
+    </div>
+
+    <div class="description">
+        <p>Get extra state information for debugging.</p>
+
+    </div>
+
+
+
+</div>
             </div>
 
 
