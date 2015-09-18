@@ -1417,8 +1417,10 @@ class TaskGroup extends BaseInterface {
 					me.emit(`item.${event}`, item, ...args)
 				})
 			})
-			this.emit('item.add', item)
 		}
+
+		// Emit
+		this.emit('item.add', item)
 
 		// Handle item completion and errors once
 		// we can't just do item.done, or item.once('done'), because we need the item to be the argument, rather than `this`
