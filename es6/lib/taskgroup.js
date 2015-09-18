@@ -11,7 +11,9 @@ const hasMap = typeof Map !== 'undefined'
 // Helpers
 
 // Make setTimeout a lot nicer
-const wait = (delay, fn) => setTimeout(fn, delay)
+function wait (delay, fn) {
+	setTimeout(fn, delay)
+}
 
 // Cross-platform (node 0.10+, node 0.8+, browser) compatible setImmediate
 const queue = (global || window).setImmediate || (process && process.nextTick) || function (fn) {
@@ -19,7 +21,7 @@ const queue = (global || window).setImmediate || (process && process.nextTick) |
 }
 
 // Convert an error to a string
-const errorToString = function (error) {
+function errorToString (error) {
 	if ( !error ) {
 		return null
 	}
@@ -34,17 +36,8 @@ const errorToString = function (error) {
 	}
 }
 
-// Copy all items from an object into another object
-const copyObject = function (obj1, obj2) {
-	if ( obj2 ) {
-		iterateObject(obj2, function (value, key) {
-			obj1[key] = value
-		})
-	}
-}
-
 // Iterate an object or a map fast
-const iterateObject = function (obj, iterator) {
+function iterateObject (obj, iterator) {
 	if ( obj ) {
 		if ( hasMap && obj instanceof Map ) {  // performance of this is neglible
 			obj.forEach(iterator)
@@ -60,8 +53,17 @@ const iterateObject = function (obj, iterator) {
 	}
 }
 
+// Copy all items from an object into another object
+function copyObject (obj1, obj2) {
+	if ( obj2 ) {
+		iterateObject(obj2, function (value, key) {
+			obj1[key] = value
+		})
+	}
+}
+
 // Ensure that the passed array is actually an array
-const ensureArray = function (arr) {
+function ensureArray (arr) {
 	if ( !Array.isArray(arr) ) arr = [arr]
 	return arr
 }
@@ -602,7 +604,7 @@ class Task extends BaseEventEmitter {
 		// Complete for the first (and hopefully only) time
 		if ( this.completed === false ) {
 			// Set the status and emit depending on success or failure status
-			const status = (error ? 'failed' : 'passed')
+			const status = error ? 'failed' : 'passed'
 			this.state.status = status
 			this.emit(status, error)
 
@@ -1293,10 +1295,10 @@ class TaskGroup extends BaseEventEmitter {
 	@method addMethod
 	@private
 	*/
-	addMethod (method, opts={}) {
+	addMethod (method, opts = {}) {
 		method = method.bind(this) // run the taskgroup method on the group, rather than itself
 		method.isTaskGroupMethod = true
-		if ( !opts.name )  opts.name = 'taskgroup method for '+this.name
+		if ( !opts.name )  opts.name = 'taskgroup method for ' + this.name
 		if ( !opts.args )  opts.args = [this.addGroup.bind(this), this.addTask.bind(this)]
 		if ( opts.includeInResults == null )  opts.includeInResults = false
 		return this.addTask(method, opts)
@@ -1417,7 +1419,7 @@ class TaskGroup extends BaseEventEmitter {
 
 		// Name default
 		if ( !item.config.name ) {
-			item.config.name = `${item.type} ${this.totalItems+1} for [${this.name}]`
+			item.config.name = `${item.type} ${this.totalItems + 1} for [${this.name}]`
 		}
 
 		// Bubble the nested events if desired
@@ -2237,7 +2239,7 @@ class TaskGroup extends BaseEventEmitter {
 	finish () {
 		// Set and emmit the appropriate status for our error or non-error
 		const error = this.state.error
-		const status = (error ? 'failed' : 'passed')
+		const status = error ? 'failed' : 'passed'
 		this.state.status = status
 		this.emit(status, error)
 
