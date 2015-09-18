@@ -334,7 +334,7 @@ class Task extends BaseEventEmitter {
 	@public
 	*/
 	static isTask (item) {
-		return (item && item.type === 'task') || (item instanceof Task)
+		return (item && item.type === 'task') || (item instanceof this)
 	}
 
 	/**
@@ -971,7 +971,7 @@ class TaskGroup extends BaseEventEmitter {
 	@public
 	*/
 	static isTaskGroup (group) {
-		return (group && group.type === 'taskgroup') || group instanceof TaskGroup
+		return (group && group.type === 'taskgroup') || group instanceof this
 	}
 
 	/**
