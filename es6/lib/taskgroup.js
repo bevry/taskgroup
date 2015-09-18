@@ -69,17 +69,17 @@ function ensureArray (arr) {
 
 
 // =====================================
-// BaseEventEmitter
+// BaseInterface
 
 /**
 Base class containing common functionality for {{#crossLink "Task"}}{{/crossLink}} and {{#crossLink "TaskGroup"}}{{/crossLink}}.
 
-@class BaseEventEmitter
+@class BaseInterface
 @extends EventEmitter
 @constructor
 @private
 */
-class BaseEventEmitter extends EventEmitter {
+class BaseInterface extends EventEmitter {
 	/**
 	Creates and returns new instance of this class.
 	@param {Arguments} args - The arguments to be forwarded along to the constructor.
@@ -94,7 +94,7 @@ class BaseEventEmitter extends EventEmitter {
 	}
 
 	/**
-	BaseEventEmitter Constructor
+	BaseInterface Constructor
 
 	Adds support for the done event while
 	ensuring that errors are always handled correctly.
@@ -173,7 +173,7 @@ class BaseEventEmitter extends EventEmitter {
 	}
 
 	/**
-	Alias for {{#crossLink "BaseEventEmitter/onceDone"}}{{/crossLink}}
+	Alias for {{#crossLink "BaseInterface/onceDone"}}{{/crossLink}}
 	@param {Function} listener - Attaches to the `done` event.
 	@chainable
 	@method done
@@ -191,9 +191,9 @@ class BaseEventEmitter extends EventEmitter {
 	*/
 	get namesArray () {
 		// Fetch
-		const names = [], name = this.name, parent = this.config.parent
+		const names = [], parent = this.config.parent
 		if ( parent )  names.push(...parent.namesArray)
-		if ( name )  names.push(name)
+		if ( this.config.name !== false )  names.push(this.name)
 
 		// Return
 		return names
@@ -218,7 +218,7 @@ class BaseEventEmitter extends EventEmitter {
 	@public
 	*/
 	get name () {
-		return this.config.name || `${this.type} ${Math.random()}`
+		return this.config.name || this.state.name
 	}
 
 	/**
@@ -306,11 +306,11 @@ task = new Task('my task that passes an error', function(complete){
 ```
 
 @class Task
-@extends BaseEventEmitter
+@extends BaseInterface
 @constructor
 @public
 */
-class Task extends BaseEventEmitter {
+class Task extends BaseInterface {
 	/**
 	The type of our class.
 
@@ -443,11 +443,12 @@ class Task extends BaseEventEmitter {
 	@public
 	*/
 	constructor (...args) {
-		// Initialise BaseEventEmitter
+		// Initialise BaseInterface
 		super()
 
 		// State defaults
 		this.state = {
+			name: `${this.type} ${Math.random()}`,
 			error: null,
 			status: null,
 			events: ['events', 'error', 'started', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed']
@@ -944,10 +945,10 @@ Available internal statuses:
 
 @constructor
 @class TaskGroup
-@extends BaseEventEmitter
+@extends BaseInterface
 @public
 */
-class TaskGroup extends BaseEventEmitter {
+class TaskGroup extends BaseInterface {
 	/**
 	The type of our class.
 
@@ -1096,6 +1097,7 @@ class TaskGroup extends BaseEventEmitter {
 
 		// State defaults
 		this.state = {
+			id: `${this.type} ${Math.random()}`,
 			error: null,
 			status: null,
 			events: ['error', 'started', 'running', 'passed', 'failed', 'completed', 'done', 'destroyed'],
