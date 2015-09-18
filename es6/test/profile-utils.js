@@ -1,4 +1,6 @@
-const fsUtil = require('fs'), pathUtil = require('path'), profiler = require('v8-profiler')
+const fsUtil = require('fs')
+const pathUtil = require('path')
+const profiler = require('v8-profiler')
 
 const writeFile = function (filepath, data, next) {
 	try {
