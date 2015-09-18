@@ -1,6 +1,5 @@
 // Import
 const ambi = require('ambi')
-const csextends = require('csextends')
 const EventEmitter = require('events').EventEmitter /* .EventEmitter for Node 0.8 compatability*/
 // Domains are crippled in the browser and on node 0.8, so don't use domains in those environments
 const domain = (process.browser || process.versions.node.substr(0, 3) === '0.8') ? null : require('domain')
@@ -82,22 +81,9 @@ Base class containing common functionality for {{#crossLink "Task"}}{{/crossLink
 */
 class BaseEventEmitter extends EventEmitter {
 	/**
-	A helper method to create a new subclass with our extensions.
-	@param {Object} extensions - The methods and properties to use.
-	@return {Object} A new instance of the sub class.
-
-	@static
-	@method subclass
-	@public
-	*/
-	static subclass (...args) {
-		return csextends.apply(this, args)
-	}
-
-	/**
-	Creates a new {SubClass} instance.
+	Creates and returns new instance of this class.
 	@param {Arguments} args - The arguments to be forwarded along to the constructor.
-	@return {SubClass} The new instance.
+	@return {Object} The new instance.
 
 	@static
 	@method create
