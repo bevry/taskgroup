@@ -15,7 +15,7 @@ const writeFile = function (filepath, data, next) {
 
 export const saveSnapshot = function (testname, next) {
 	// https://github.com/node-inspector/v8-profiler/blob/851baf05bb8c98936751e0b3984a4e4195c3e3af/test/cpu_cprofiler.js#L200-L212
-	const filename = testname+'.heapsnapshot'
+	const filename = testname + '.heapsnapshot'
 	const filepath = pathUtil.join(process.cwd(), filename)
 	let result = '' // not a buffer
 	let snapshot = profiler.takeSnapshot(testname)
@@ -43,7 +43,7 @@ export const startProfile = function (testname) {
 }
 
 export const stopProfile = function (testname, next) {
-	const filename = testname+'.cpuprofile'
+	const filename = testname + '.cpuprofile'
 	const filepath = pathUtil.join(process.cwd(), filename)
 	let cpuProfile = profiler.stopProfiling(testname)
 	let profileJSON = JSON.stringify(cpuProfile)

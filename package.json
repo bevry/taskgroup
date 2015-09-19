@@ -40,7 +40,7 @@
     "batch",
     "concurrency"
   ],
-  "author": "2013+ Bevry Pty Ltd <us@bevry.me> (http://bevry.me), 2011+ Benjamin Lupton <b@lupton.cc> (http://balupton.com)",
+  "author": "2013+ Bevry Pty Ltd <us@bevry.me> (http://bevry.me), Benjamin Lupton <b@lupton.cc> (http://balupton.com)",
   "maintainers": [
     "Benjamin Lupton <b@lupton.cc> (http://balupton.com)"
   ],
@@ -71,7 +71,6 @@
     "babel-eslint": "^4.1.1",
     "babelify": "^6.0.1",
     "browserify": "^11.0.1",
-    "coffee-script": "^1.9.1",
     "eslint": "^1.3.1",
     "joe": "^1.6.0",
     "joe-reporter-console": "^1.2.1",
@@ -81,7 +80,7 @@
     "yuidocjs": "^0.9.0"
   },
   "main": "./esnextguardian.js",
-  "browser": "./es5/lib/taskgroup.js",
+  "browser": "./es5/lib/index.js",
   "scripts": {
     "clean": "node --harmony nakefile.js clean",
     "setup": "node --harmony nakefile.js setup",
@@ -91,14 +90,13 @@
     "meta": "node --harmony nakefile.js meta",
     "prepare": "node --harmony nakefile.js prepare",
     "release": "node --harmony nakefile.js release",
-    "test": "node --harmony ./coffeejs/test/taskgroup-test.js",
+    "test": "node --harmony ./es5/test/index.js",
     "browserify": "./node_modules/.bin/browserify ./web/index.js -t babelify --outfile ./web/out.js",
     "bench": "node --harmony ./es5/test/bench.js"
   },
   "cakeConfiguration": {
-    "COFFEE_SRC_PATH": "coffee",
-    "COFFEE_OUT_PATH": "coffeejs",
     "BABEL_SRC_PATH": "esnext",
-    "ESLINT_SRC_PATH": "esnext"
+    "ESLINT_SRC_PATH": "esnext",
+    "YUIDOC_SRC_PATH": "esnext"
   }
 }
