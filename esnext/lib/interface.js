@@ -34,6 +34,10 @@ export default class BaseInterface extends require('events').EventEmitter {
 	- if there is, then emit the done event with the original event arguments
 	- if there isn't, then output the error to stderr and throw it.
 
+	Sets the following configuration:
+
+	- `nameSeparator` defaults to `' ➞  '`, used to stringify the result of `.names`
+
 	@method constructor
 	*/
 	constructor () {
@@ -42,6 +46,8 @@ export default class BaseInterface extends require('events').EventEmitter {
 		// Set state and config
 		if ( this.state == null )  this.state = {}
 		if ( this.config == null )  this.config = {}
+		if ( !this.config.nameSeparator )  this.config.nameSeparator = ' ➞  '
+
 		// Generate our listener method that we will beind to different events
 		// to add support for the `done` event and better error/event handling
 		const listener = (event, ...args) => {
@@ -119,29 +125,21 @@ export default class BaseInterface extends require('events').EventEmitter {
 	/**
 	Gets our name prepended by all of our parents names
 	@type Array
-	@property namesArray
-	@public
-	*/
-	get namesArray () {
-		// Fetch
-		const names = [], parent = this.config.parent
-		if ( parent )  names.push(...parent.namesArray)
-		if ( this.config.name !== false )  names.push(this.name)
-
-		// Return
-		return names
-	}
-
-	/**
-	Gets our name prefixed by all of our parents names
-	@type String
 	@property names
 	@public
 	*/
 	get names () {
-		return this.namesArray.join(' ➞  ')
-	}
+		// Fetch
+		const names = [], parent = this.config.parent
+		if ( parent )  names.push(...parent.names)
+		if ( this.config.name !== false )  names.push(this.name)
+		names.toString = () => {
+			return names.join(this.config.nameSeparator)
+		}
 
+		// Return
+		return names
+	}
 
 	/**
 	Get the name of our instance.
