@@ -63,7 +63,8 @@
   },
   "dependencies": {
     "ambi": "^2.2.0",
-    "esnextguardian": "^1.0.2"
+    "esnextguardian": "^1.0.2",
+    "extendr": "^3.0.0"
   },
   "devDependencies": {
     "assert-helpers": "^3.0.0",

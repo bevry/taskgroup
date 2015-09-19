@@ -2,6 +2,7 @@
 const BaseInterface = require('./interface')
 const Task = require('./task')
 const {copyObject, iterateObject, ensureArray, errorToString} = require('./util')
+const extendr = require('extendr')
 
 /**
 Our TaskGroup class.
@@ -180,10 +181,10 @@ class TaskGroup extends BaseInterface {
 	@public
 	*/
 	constructor (...args) {
-		super(...args)
+		super()
 
 		// State defaults
-		this.state = {
+		extendr.defaults(this.state, {
 			id: `${this.type} ${Math.random()}`,
 			error: null,
 			status: null,
@@ -192,10 +193,10 @@ class TaskGroup extends BaseInterface {
 			itemsRemaining: [],
 			itemsRunning: [],
 			itemsCompleted: []
-		}
+		})
 
 		// Configuration defaults
-		this.config = {
+		extendr.defaults(this.config, {
 			// @TODO update storeCompleted to actually not store anything
 			// this will require tests to be updated (as task names no longer will be stored)
 			// as well as a counter inserted for the total completed (we may even get rid of that)
@@ -210,7 +211,7 @@ class TaskGroup extends BaseInterface {
 			concurrency: 1,
 			onError: 'exit',
 			sync: false
-		}
+		})
 
 		// Apply user configuration
 		this.setConfig(...args)
@@ -1179,7 +1180,8 @@ class TaskGroup extends BaseInterface {
 		else {
 			// As it will no longer be destroyed in the complete() handler, destroy it here
 			item.destroy()
-			// Push the item name instead to keep getItemNames() working while keeping our footprint low
+
+			// Push the item name rather than the entire item, so that our itemsCompleted will have a low footprint
 			itemsCompleted.push(item.name)
 		}
 

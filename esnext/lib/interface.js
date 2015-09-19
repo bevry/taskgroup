@@ -39,6 +39,9 @@ export default class BaseInterface extends require('events').EventEmitter {
 	constructor () {
 		super()
 
+		// Set state and config
+		if ( this.state == null )  this.state = {}
+		if ( this.config == null )  this.config = {}
 		// Generate our listener method that we will beind to different events
 		// to add support for the `done` event and better error/event handling
 		const listener = (event, ...args) => {

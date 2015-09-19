@@ -2,6 +2,7 @@
 const BaseInterface = require('./interface')
 const {copyObject, iterateObject, queue, domain} = require('./util')
 const ambi = require('ambi')
+const extendr = require('extendr')
 
 /**
 Our Task Class
@@ -194,22 +195,22 @@ export default class Task extends BaseInterface {
 		super()
 
 		// State defaults
-		this.state = {
+		extendr.defaults(this.state, {
 			name: `${this.type} ${Math.random()}`,
 			error: null,
 			status: null,
 			events: ['events', 'error', 'started', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed']
-		}
+		})
 
 		// Configuration defaults
-		this.config = {
+		extendr.defaults(this.config, {
 			run: false,
 			onError: 'exit',
 			ambi: true,
 			domain: true,
 			sync: false,
 			args: null
-		}
+		})
 
 		// Apply user configuration
 		this.setConfig(...args)
