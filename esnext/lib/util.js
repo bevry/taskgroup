@@ -4,11 +4,6 @@ const hasMap = typeof Map !== 'undefined'
 // Domains are crippled in the browser and on node 0.8, so don't use domains in those environments
 export const domain = (process.browser || process.versions.node.substr(0, 3) === '0.8') ? null : require('domain')
 
-// Make setTimeout a lot nicer
-export function wait (delay, fn) {
-	setTimeout(fn, delay)
-}
-
 // Cross-platform (node 0.10+, node 0.8+, browser) compatible setImmediate
 export const queue = (global || window).setImmediate || (process && process.nextTick) || function (fn) {
 	setTimeout(fn, 0)

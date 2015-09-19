@@ -1,6 +1,6 @@
 // Imports
 const BaseInterface = require('./interface')
-const {copyObject, iterateObject, queue, wait, domain} = require('./util')
+const {copyObject, iterateObject, queue, domain} = require('./util')
 const ambi = require('ambi')
 
 /**
@@ -597,12 +597,12 @@ export default class Task extends BaseInterface {
 		// Setup timeout if appropriate
 		const timeoutDuration = this.config.timeout
 		if ( timeoutDuration ) {
-			this.state.timeout = wait(timeoutDuration, () => {
+			this.state.timeout = setTimeout(() => {
 				if ( !this.completed ) {
 					const error = new Error(`The task [${this.names}] has timed out.`)
 					exitMethod(error)
 				}
-			})
+			}, timeoutDuration)
 		}
 
 		// Notify that we are now running

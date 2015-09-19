@@ -1,1188 +1,1339 @@
-###
-@TODO
+/* eslint consistent-this:0 */
 
-- Add tests for nested configuration
-###
+// @TODO
+// - Add tests for nested configuration
 
-# Import
-util = require('util')
-joe = require('joe')
-{wait, equal, deepEqual, errorEqual} = require('assert-helpers')
-{Task,TaskGroup} = require('../../')
+// Imports
+const joe = require('joe')
+const {equal, deepEqual, errorEqual} = require('assert-helpers')
+const {wait} = require('./test-util')
+const {Task, TaskGroup} = require('../../')
 
-# Prepare
-delay = 100
+// Prepare
+const delay = 100
 
-# Task
-joe.describe 'task', (describe,it) ->
-	# Basic
-	describe "basic", (suite,it) ->
-		# Async
-		# Test that the task executes correctly asynchronously
-		it 'should work with async', (done) ->
-			# Specify how many special checks we are expecting
-			checks = []
+// Task
+joe.suite('task', function (suite, test) {
+	// Basic
+	suite('basic', function (suite, test) {
+		// Async
+		// Test that the task executes correctly asynchronously
+		test('should work with async', function (done) {
+			// Specify how many special checks we are expecting
+			const checks = []
 
-			# Create our asynchronous task
-			task = Task.create (complete) ->
-				checks.push 'task 1 - before wait'
-				# Wait a while as this is an async test
-				wait delay, ->
-					checks.push 'task 1 - after wait'
+			// Create our asynchronous task
+			const task = Task.create(function (complete) {
+				checks.push('task 1 - before wait')
+				// Wait a while as this is an async test
+				wait(delay, function () {
+					checks.push('task 1 - after wait')
 					equal(task.status, 'running', 'status to be running as we are within the task')
-					equal(task.result, null, "result to be null as we haven't set it yet")
-					# Return no error, and the result to the completion callback completing the task
+					equal(task.result, null, 'result to be null as we haven\'t set it yet')
+					// Return no error, and the result to the completion callback completing the task
 					complete(null, 10)
+				})
+			})
 
-			# Check the task completed as expected
-			task.done (err,result) ->
-				checks.push 'completion callback'
+			// Check the task completed as expected
+			task.done(function (err, result) {
+				checks.push('completion callback')
+				errorEqual(err, null, 'the callback error to be null as we did not error')
+				equal(result, 10, 'the callback result to be as expected')
+				deepEqual(task.result, [err, result], 'the set result to be as expected as the task has completed')
 				equal(task.status, 'passed', 'status to be passed as we are within the completion callback')
-				deepEqual(task.result, [err,result], "the set result to be as expected as the task has completed")
-				errorEqual(err, null, "the callback error to be null as we did not error")
-				equal(result, 10, "the callback result to be as expected")
+			})
 
-			# Check task hasn't run yet
-			equal(task.status, null, "status to be null as we haven't started running yet")
-			equal(task.result, null, "result to be null as we haven't started running yet")
+			// Check task hasn't run yet
+			equal(task.status, null, 'status to be null as we haven\'t started running yet')
+			equal(task.result, null, 'result to be null as we haven\'t started running yet')
 
-			# Run thet ask
+			// Run thet ask
 			task.run()
 
-			# Check task hasn't run yet
-			equal(task.status, null, "status to be null as we haven't started running yet")
+			// Check task hasn't run yet
+			equal(task.status, null, 'status to be null as we haven\'t started running yet')
 			equal(task.result, null, 'result to be null as tasks execute asynchronously')
 
-			# Check that all our special checks have run
-			wait delay*2, ->
+			// Check that all our special checks have run
+			wait(delay * 2, function () {
 				deepEqual(checks, [
-					'task 1 - before wait'
-					'task 1 - after wait'
+					'task 1 - before wait',
+					'task 1 - after wait',
 					'completion callback'
 				], 'all testing checks fired correctly')
 				done()
+			})
+		})
 
-		# Sync
-		# Test that the task
-		it 'should work with sync', (done) ->
-			# Specify how many special checks we are expecting
-			checks = 0
+		// Sync
+		// Test that the task
+		test('should work with sync', function (done) {
+			// Specify how many special checks we are expecting
+			let checks = 0
 
-			# Create our synchronous task
-			task = new Task ->
+			// Create our synchronous task
+			const task = new Task(function () {
 				++checks
 				equal(task.status, 'running', 'status to be running as we are within the task')
-				equal(task.result, null, "result to be null as we haven't set it yet")
-				# Return our result completing the task
+				equal(task.result, null, 'result to be null as we haven\'t set it yet')
+				// Return our result completing the task
 				return 10
+			})
 
-			# Check the task completed as expected
-			task.done (err,result) ->
+			// Check the task completed as expected
+			task.done(function (err, result) {
 				++checks
+				errorEqual(err, null, 'the callback error to be null as we did not error')
+				equal(result, 10, 'the callback result to be as expected')
+				deepEqual(task.result, [err, result], 'the set result to be as expected as the task has completed')
 				equal(task.status, 'passed', 'status to be passed as we are within the completion callback')
-				deepEqual(task.result, [err,result], "the set result to be as expected as the task has completed")
-				errorEqual(err, null, "the callback error to be null as we did not error")
-				equal(result, 10, "the callback result to be as expected")
+			})
 
-			# Check task hasn't run yet
-			equal(task.status, null, "status to be null as we haven't started running yet")
-			equal(task.result, null, "result to be null as we haven't started running yet")
+			// Check task hasn't run yet
+			equal(task.status, null, 'status to be null as we haven\'t started running yet')
+			equal(task.result, null, 'result to be null as we haven\'t started running yet')
 
-			# Run
+			// Run
 			task.run()
 
-			# Check task hasn't run yet
-			equal(task.status, null, "status to be null as we haven't started running yet")
+			// Check task hasn't run yet
+			equal(task.status, null, 'status to be null as we haven\'t started running yet')
 			equal(task.result, null, 'result to be null as tasks execute asynchronously')
 
-			# Check that all our special checks have run
-			wait delay, ->
+			// Check that all our special checks have run
+			wait(delay, function () {
 				++checks
-				equal(checks, 3, "all our special checks have run")
+				equal(checks, 3, 'all our special checks have run')
 				done()
+			})
+		})
+	})
 
-	# Sync Flag
-	describe "sync flag", (suite,it) ->
-		# Async
-		# Test that the task executes correctly asynchronously
-		it 'should work with async', (done) ->
-			# Specify how many special checks we are expecting
-			checks = []
+	// Sync Flag
+	suite('sync flag', function (suite, test) {
+		// Async
+		// Test that the task executes correctly asynchronously
+		test('should work with async', function (done) {
+			// Specify how many special checks we are expecting
+			const checks = []
 
-			# Create our asynchronous task
-			task = Task.create {sync:true}, (complete) ->
-				checks.push 'task 1 - before wait'
-				# Wait a while as this is an async test
-				wait delay, ->
-					checks.push 'task 1 - after wait'
+			// Create our asynchronous task
+			const task = Task.create({sync: true}, function (complete) {
+				checks.push('task 1 - before wait')
+				// Wait a while as this is an async test
+				wait(delay, function () {
+					checks.push('task 1 - after wait')
 					equal(task.status, 'running', 'status to be running as we are within the task')
-					equal(task.result, null, "result to be null as we haven't set it yet")
-					# Return no error, and the result to the completion callback completing the task
+					equal(task.result, null, 'result to be null as we haven\'t set it yet')
+					// Return no error, and the result to the completion callback completing the task
 					complete(null, 10)
+				})
+			})
 
-			# Check the task completed as expected
-			task.done (err,result) ->
-				checks.push 'completion callback'
+			// Check the task completed as expected
+			task.done(function (err, result) {
+				checks.push('completion callback')
+				equal(err, null, 'the callback error to be null as we did not error')
+				equal(result, 10, 'the callback result to be as expected')
+				deepEqual(task.result, [err, result], 'the set result to be as expected as the task has completed')
 				equal(task.status, 'passed', 'status to be passed as we are within the completion callback')
-				deepEqual(task.result, [err,result], "the set result to be as expected as the task has completed")
-				equal(err, null, "the callback error to be null as we did not error")
-				equal(result, 10, "the callback result to be as expected")
+			})
 
-			# Check task hasn't run yet
-			equal(task.status, null, "status to be null as we haven't started running yet")
-			equal(task.result, null, "result to be null as we haven't started running yet")
+			// Check task hasn't run yet
+			equal(task.status, null, 'status to be null as we haven\'t started running yet')
+			equal(task.result, null, 'result to be null as we haven\'t started running yet')
 
-			# Run thet ask
+			// Run thet ask
 			task.run()
 
-			# Check task hasn't run yet
-			equal(task.status, 'running', "status to be running as we have started running due to sync flag")
+			// Check task hasn't run yet
+			equal(task.status, 'running', 'status to be running as we have started running due to sync flag')
 			equal(task.result, null, 'result to be set as tasks execute asynchronously')
 
-			# Check that all our special checks have run
-			wait delay*2, ->
-				deepEqual(
-					checks
-					[
-						'task 1 - before wait'
-						'task 1 - after wait'
-						'completion callback'
-					]
-				)
+			// Check that all our special checks have run
+			wait(delay * 2, function () {
+				deepEqual(checks, [
+					'task 1 - before wait',
+					'task 1 - after wait',
+					'completion callback'
+				], 'all testing checks fired correctly')
 				done()
+			})
+		})
 
-		# Sync
-		# Test that the task
-		it 'should work with sync', (done) ->
-			# Specify how many special checks we are expecting
-			checks = 0
+		// Sync
+		// Test that the task
+		test('should work with sync', function (done) {
+			// Specify how many special checks we are expecting
+			let checks = 0
 
-			# Create our synchronous task
-			task = new Task {sync:true}, ->
+			// Create our synchronous task
+			const task = new Task({sync: true}, function () {
 				++checks
 				equal(task.status, 'running', 'status to be running as we are within the task')
-				equal(task.result, null, "result to be null as we haven't set it yet")
-				# Return our result completing the task
+				equal(task.result, null, 'result to be null as we haven\'t set it yet')
+				// Return our result completing the task
 				return 10
+			})
 
-			# Check the task completed as expected
-			task.done (err,result) ->
+			// Check the task completed as expected
+			task.done(function (err, result) {
 				++checks
+				equal(err, null, 'the callback error to be null as we did not error')
+				equal(result, 10, 'the callback result to be as expected')
+				deepEqual(task.result, [err, result], 'the set result to be as expected as the task has completed')
 				equal(task.status, 'passed', 'status to be passed as we are within the completion callback')
-				deepEqual(task.result, [err,result], "the set result to be as expected as the task has completed")
-				equal(err, null, "the callback error to be null as we did not error")
-				equal(result, 10, "the callback result to be as expected")
+			})
 
-			# Check task hasn't run yet
-			equal(task.status, null, "status to be null as we haven't started running yet")
-			equal(task.result, null, "result to be null as we haven't started running yet")
+			// Check task hasn't run yet
+			equal(task.status, null, 'status to be null as we haven\'t started running yet')
+			equal(task.result, null, 'result to be null as we haven\'t started running yet')
 
-			# Run
+			// Run
 			task.run()
 
-			# Check task hasn't run yet
-			equal(task.status, 'passed', "status to be passed as we have already finished due to the sync flag")
+			// Check task hasn't run yet
+			equal(task.status, 'passed', 'status to be passed as we have already finished due to the sync flag')
 			deepEqual(task.result, [null, 10], 'result to be set as we have already finished due to the sync flag')
 
-			# Check that all our special checks have run
-			wait delay, ->
+			// Check that all our special checks have run
+			wait(delay, function () {
 				++checks
-				equal(checks, 3, "all our special checks have run")
+				equal(checks, 3, 'all our special checks have run')
 				done()
+			})
+		})
+	})
 
-	# Error Handling
-	describe "errors", (suite,it) ->
-		it 'should detect return error on synchronous task', (done) ->
-			# Specify how many special checks we are expecting
-			checks = 0
-			errMessage = 'deliberate return error'
-			err = new Error(errMessage)
+	// Error Handling
+	suite('errors', function (suite, test) {
+		test('should detect return error on synchronous task', function (done) {
+			// Specify how many special checks we are expecting
+			let checks = 0
+			const errMessage = 'deliberate return error'
+			const err = new Error(errMessage)
 
-			# Create our synchronous task
-			task = new Task ->
+			// Create our synchronous task
+			const task = new Task(function () {
 				++checks
 				equal(task.status, 'running', 'status to be running as we are within the task')
-				equal(task.result, null, "result to be null as we haven't set it yet")
+				equal(task.result, null, 'result to be null as we haven\'t set it yet')
 				return err
+			})
 
-			# Check the task completed as expected
-			task.done (_err,result) ->
+			// Check the task completed as expected
+			task.done(function (_err, result) {
 				++checks
 				equal(task.status, 'failed', 'status to be failed as we are within the completion callback')
-				deepEqual(task.result, [err], "the set result to be as expected as the task has completed")
-				equal(_err, err, "the callback error to be set as we errord")
-				equal(result, null, "the callback result to be null we errord")
+				deepEqual(task.result, [err], 'the set result to be as expected as the task has completed')
+				equal(_err, err, 'the callback error to be set as we errord')
+				equal(result, null, 'the callback result to be null we errord')
+			})
 
-			# Check task hasn't run yet
-			equal(task.status, null, "status to be null as we haven't started running yet")
-			equal(task.result, null, "result to be null as we haven't started running yet")
+			// Check task hasn't run yet
+			equal(task.status, null, 'status to be null as we haven\'t started running yet')
+			equal(task.result, null, 'result to be null as we haven\'t started running yet')
 
-			# Run
+			// Run
 			task.run()
 
-			# Check task hasn't run yet
-			equal(task.status, null, "status to be null as we haven't started running yet")
+			// Check task hasn't run yet
+			equal(task.status, null, 'status to be null as we haven\'t started running yet')
 			equal(task.result, null, 'result to be null as tasks execute asynchronously')
 
-			# Check that all our special checks have run
-			wait delay, ->
+			// Check that all our special checks have run
+			wait(delay, function () {
 				++checks
-				equal(checks, 3, "all our special checks have run")
+				equal(checks, 3, 'all our special checks have run')
 				done()
+			})
+		})
 
-		it 'should detect sync throw error on synchronous task', (done) ->
-			# Specify how many special checks we are expecting
-			checks = 0
-			neverReached = false
-			errMessage = 'deliberate sync throw error'
-			err = new Error(errMessage)
+		test('should detect sync throw error on synchronous task', function (done) {
+			// Specify how many special checks we are expecting
+			let checks = 0
+			const neverReached = false
+			const errMessage = 'deliberate sync throw error'
+			const err = new Error(errMessage)
 
-			# Create our synchronous task
-			task = new Task ->
+			// Create our synchronous task
+			const task = new Task(function () {
 				++checks
-				equal(task.result, null, "result to be null as we haven't set it yet")
+				equal(task.result, null, 'result to be null as we haven\'t set it yet')
 				equal(task.status, 'running', 'status to be running as we are within the task')
 				throw err
+			})
 
-			# Check the task completed as expected
-			task.done (_err,result) ->
+			// Check the task completed as expected
+			task.done(function (_err, result) {
 				++checks
 				equal(task.status, 'failed', 'status to be failed as we are within the completion callback')
-				equal(_err, err, "the callback error to be set as we errord")
+				equal(_err, err, 'the callback error to be set as we errord')
+			})
 
-			# Check task hasn't run yet
-			equal(task.status, null, "status to be null as we haven't started running yet")
-			equal(task.result, null, "result to be null as we haven't started running yet")
+			// Check task hasn't run yet
+			equal(task.status, null, 'status to be null as we haven\'t started running yet')
+			equal(task.result, null, 'result to be null as we haven\'t started running yet')
 
-			# Run
+			// Run
 			task.run()
 
-			# Check task hasn't run yet
-			equal(task.status, null, "status to be null as we haven't started running yet")
+			// Check task hasn't run yet
+			equal(task.status, null, 'status to be null as we haven\'t started running yet')
 			equal(task.result, null, 'result to be null as tasks execute asynchronously')
 
-			# Check that all our special checks have run
-			wait delay, ->
+			// Check that all our special checks have run
+			wait(delay, function () {
 				++checks
-				equal(checks, 3, "all our special checks have run")
+				equal(checks, 3, 'all our special checks have run')
 				done()
+			})
+		})
 
-		it 'should detect async throw error on asynchronous task', (done) ->
-			# Check node version
-			if process.versions.node.substr(0,3) is '0.8'
-				console.log 'skip this test on node 0.8 because domains behave differently'
+		test('should detect async throw error on asynchronous task', function (done) {
+			// Check node version
+			if ( process.versions.node.substr(0, 3) === '0.8' ) {
+				console.log('skip this test on node 0.8 because domains behave differently')
 				return done()
+			}
 
-			# Specify how many special checks we are expecting
-			checks = 0
-			neverReached = false
-			errMessage = 'deliberate async throw error'
-			err = new Error(errMessage)
+			// Specify how many special checks we are expecting
+			let checks = 0
+			const neverReached = false
+			const errMessage = 'deliberate async throw error'
+			const err = new Error(errMessage)
 
-			# Create our asynchronous task
-			task = new Task (done) ->
-				wait delay, ->
+			// Create our asynchronous task
+			const task = new Task(function (done) {
+				wait(delay, function () {
 					++checks
 					equal(task.status, 'running', 'status to be running as we are within the task')
-					equal(task.result, null, "result to be null as we haven't set it yet")
+					equal(task.result, null, 'result to be null as we haven\'t set it yet')
 					throw err
+				})
+			})
 
-			# Check the task completed as expected
-			task.done (_err,result) ->
+			// Check the task completed as expected
+			task.done(function (_err, result) {
 				++checks
 				equal(task.status, 'failed', 'status to be failed as we are within the completion callback')
-				equal(_err, err, "the callback error to be set as we errord")
+				equal(_err, err, 'the callback error to be set as we errord')
+			})
 
-			# Check task hasn't run yet
-			equal(task.status, null, "status to be null as we haven't started running yet")
-			equal(task.result, null, "result to be null as we haven't started running yet")
+			// Check task hasn't run yet
+			equal(task.status, null, 'status to be null as we haven\'t started running yet')
+			equal(task.result, null, 'result to be null as we haven\'t started running yet')
 
-			# Run
+			// Run
 			task.run()
 
-			# Check task hasn't run yet
-			equal(task.status, null, "status to be null as we haven't started running yet")
+			// Check task hasn't run yet
+			equal(task.status, null, 'status to be null as we haven\'t started running yet')
 			equal(task.result, null, 'result to be null as tasks execute asynchronously')
 
-			# Check that all our special checks have run
-			wait delay*2, ->
+			// Check that all our special checks have run
+			wait(delay * 2, function () {
 				++checks
-				equal(checks, 3, "all our special checks have run")
-				equal(neverReached, false, "never reached to be false")
+				equal(checks, 3, 'all our special checks have run')
+				equal(neverReached, false, 'never reached to be false')
 				done()
+			})
+		})
 
-		it 'should error when a timeout has exceeded', (done) ->
-			# Specify how many special checks we are expecting
-			checks = []
+		test('should error when a timeout has exceeded', function (done) {
+			// Specify how many special checks we are expecting
+			const checks = []
 
-			# Create our asynchronous task
-			task = Task.create timeout:delay, (complete) ->
-				wait delay*2, ->
+			// Create our asynchronous task
+			const task = Task.create({timeout: delay}, function (complete) {
+				wait(delay * 2, function () {
 					complete()
+				})
+			})
 
-			# Check the task completed as expected
-			task.whenDone (err,result) ->
-				if checks.length is 0
+			// Check the task completed as expected
+			task.whenDone(function (err, result) {
+				if ( checks.length === 0 ) {
 					checks.push('timeout')
 					errorEqual(err, 'timed out')
-				else if checks.length is 1
+				}
+				else if ( checks.length === 1 ) {
 					checks.push('completed twice')
 					errorEqual(err, 'already completed')
 					done()
+				}
+			})
 
-			# Run
+			// Run
 			task.run()
+		})
 
-		it 'should not error when a timeout has not exceeded', (done) ->
-			# Specify how many special checks we are expecting
-			checks = []
+		test('should not error when a timeout has not exceeded', function (done) {
+			// Specify how many special checks we are expecting
+			const checks = []
 
-			# Create our asynchronous task
-			task = Task.create timeout:delay*2, (complete) ->
-				wait delay, ->
+			// Create our asynchronous task
+			const task = Task.create({timeout: delay * 2}, function (complete) {
+				wait(delay, function () {
 					complete()
+				})
+			})
 
-			# Check the task completed as expected
+			// Check the task completed as expected
 			task.whenDone(done)
 
-			# Run
+			// Run
 			task.run()
+		})
 
-		# https://github.com/bevry/taskgroup/issues/17
-		it 'it should not catch errors within the completion callback: issue 17', (done) ->
-			# Run our test file
-			require('safeps').exec 'node issue17.js', {cwd:__dirname}, (err, stdout, stderr) ->
-				# Check if we got the error we expected
-				if stderr.indexOf("Error: goodbye world\n    at Task.") isnt -1
+		// https://github.com/bevry/taskgroup/issues/17
+		test('it should not catch errors within the completion callback: issue 17', function (done) {
+			// Run our test file
+			/* eslint handle-callback-err:0 */
+			require('safeps').exec(`node ${__dirname}/test-issue17.js`, {cwd: __dirname}, function (err, stdout, stderr) {
+				// Check if we got the error we expected
+				if ( stderr.indexOf('Error: goodbye world\n    at Task.') !== -1 ) {
 					done()
-				else
-					err = new Error('Issue 17 check did not execute correctly')
+				}
+				else {
+					const err = new Error('Issue 17 check did not execute correctly')
 					console.log('stdout:\n', stdout, '\nstderr:\n', stderr, '\n')
 					done(err)
+				}
+			})
+		})
+	})
 
-	# Basic
-	describe "arguments", (suite,it) ->
-		# Sync
-		it 'should work with arguments in sync', (done) ->
-			# Prepare
-			checks = []
+	// Basic
+	suite('arguments', function (suite, test) {
+		// Sync
+		test('should work with arguments in sync', function (done) {
+			// Prepare
+			const checks = []
 
-			# Create
-			task = new Task (a,b) ->
+			// Create
+			const task = new Task(function (a, b) {
 				checks.push('my task')
 				equal(task.result, null)
-				return a*b
+				return a * b
+			})
 
-			# Apply the arguments
-			task.setConfig(args:[2,5])
+			// Apply the arguments
+			task.setConfig({args: [2, 5]})
 
-			# Check
-			task.done (err,result) ->
+			// Check
+			task.done(function (err, result) {
 				checks.push('completion callback')
-				deepEqual(task.result, [err,result])
+				deepEqual(task.result, [err, result])
 				equal(err, null)
 				equal(result, 10)
+			})
 
-			# Check
-			wait delay, ->
+			// Check
+			wait(delay, function () {
 				deepEqual(checks, ['my task', 'completion callback'])
 				done()
+			})
 
-			# Run
+			// Run
 			task.run()
+		})
 
-		# Async
-		it 'should work with arguments in async', (done) ->
-			# Prepare
-			checks = []
+		// Async
+		test('should work with arguments in async', function (done) {
+			// Prepare
+			const checks = []
 
-			# Create
-			task = new Task (a,b,complete) ->
+			// Create
+			const task = new Task(function (a, b, complete) {
 				checks.push('my task - before wait')
-				wait delay, ->
+				wait(delay, function () {
 					checks.push('my task - after wait')
 					equal(task.result, null)
-					complete(null, a*b)
+					complete(null, a * b)
+				})
+			})
 
-			# Apply the arguments
-			task.setConfig(args:[2,5])
+			// Apply the arguments
+			task.setConfig({args: [2, 5]})
 
-			# Check
-			task.done (err,result) ->
+			// Check
+			task.done(function (err, result) {
 				checks.push('completion callback')
-				deepEqual(task.result, [err,result])
+				deepEqual(task.result, [err, result])
 				equal(err, null)
 				equal(result, 10)
+			})
 
-			# Check
-			wait delay*2, ->
+			// Check
+			wait(delay * 2, function () {
 				deepEqual(checks, ['my task - before wait', 'my task - after wait', 'completion callback'])
 				done()
+			})
 
-			# Run
+			// Run
 			task.run()
+		})
+	})
+})
 
-# Task Group
-joe.describe 'taskgroup', (describe,it) ->
-	# Basic
-	describe "basic", (suite,it) ->
-		# Serial
-		it 'should work when running in serial', (done) ->
-			tasks = new TaskGroup({name:'my tests',concurrency:1}).done (err,results) ->
+// Task Group
+joe.suite('taskgroup', function (suite, test) {
+	// Basic
+	suite('basic', function (suite, test) {
+		// Serial
+		test('should work when running in serial', function (done) {
+			const tasks = new TaskGroup({name: 'my tests', concurrency: 1}).done(function (err, results) {
 				equal(err, null)
 				equal(tasks.status, 'passed', 'status to be passed as we are within the completion callback')
 				equal(tasks.concurrency, 1)
 
-				actualItems = tasks.itemNames
-				expectedItems =
-					remaining: []
-					running: []
-					completed: ['my task 1', 'my task 2']
-					total: 2
-					results: [[null,10], [null,20]]
+				const actualItems = tasks.itemNames
+				const expectedItems = {
+					remaining: [],
+					running: [],
+					completed: ['my task 1', 'my task 2'],
+					total: 2,
+					results: [[null, 10], [null, 20]]
+				}
 
 				deepEqual(results, expectedItems.results)
 				deepEqual(actualItems, expectedItems, 'completion items')
 
 				done()
+			})
 
-			tasks.addTask 'my task 1', (complete) ->
-				actualItems = tasks.itemNames
-				expectedItems =
-					remaining: ['my task 2']
-					running: ['my task 1']
-					completed: []
-					total: 2
+			tasks.addTask('my task 1', function (complete) {
+				const actualItems = tasks.itemNames
+				const expectedItems = {
+					remaining: ['my task 2'],
+					running: ['my task 1'],
+					completed: [],
+					total: 2,
 					results: []
+				}
 				deepEqual(actualItems, expectedItems, 'task 1 items before wait items')
 
-				wait delay, ->
-					actualItems = tasks.itemNames
+				wait(delay, function () {
+					const actualItems = tasks.itemNames
 					deepEqual(actualItems, expectedItems, 'task 1 items after wait items')
 
 					complete(null, 10)
+				})
+			})
 
-
-			tasks.addTask 'my task 2', ->
-				actualItems = tasks.itemNames
-				expectedItems =
-					remaining: []
-					running: ['my task 2']
-					completed: ['my task 1']
-					total: 2
-					results:  [[null,10]]
+			tasks.addTask('my task 2', function () {
+				const actualItems = tasks.itemNames
+				const expectedItems = {
+					remaining: [],
+					running: ['my task 2'],
+					completed: ['my task 1'],
+					total: 2,
+					results: [[null, 10]]
+				}
 				deepEqual(actualItems, expectedItems, 'task 2 items')
 
 				return 20
+			})
 
 			tasks.run()
 
-			actualItems = tasks.itemNames
-			expectedItems =
-				remaining: ['my task 1', 'my task 2']
-				running: []
-				completed: []
-				total: 2
+			const actualItems = tasks.itemNames
+			const expectedItems = {
+				remaining: ['my task 1', 'my task 2'],
+				running: [],
+				completed: [],
+				total: 2,
 				results: []
+			}
 			deepEqual(actualItems, expectedItems, 'tasks totals')
+		})
 
-		# Parallel with new API
-		it 'should work when running in parallel', (done) ->
-			tasks = new TaskGroup({concurrency:0}).done (err,results) ->
+		// Parallel with new API
+		test('should work when running in parallel', function (done) {
+			const tasks = new TaskGroup({concurrency: 0}).done(function (err, results) {
 				equal(err, null)
 				equal(tasks.status, 'passed', 'status to be passed as we are within the completion callback')
 				equal(tasks.concurrency, 0)
 
-				actualItems = tasks.itemNames
-				expectedItems =
-					remaining: []
-					running: []
-					completed: ['task 2', 'task 1']
-					total: 2
-					results: [[null,20], [null,10]]
+				const actualItems = tasks.itemNames
+				const expectedItems = {
+					remaining: [],
+					running: [],
+					completed: ['task 2', 'task 1'],
+					total: 2,
+					results: [[null, 20], [null, 10]]
+				}
 
 				deepEqual(results, expectedItems.results)
 				deepEqual(actualItems, expectedItems, 'completion items')
 
 				done()
+			})
 
-			tasks.addTask 'task 1', (complete) ->
-
-				actualItems = tasks.itemNames
-				expectedItems =
-					remaining: []
-					running: ['task 1', 'task 2']
-					completed: []
-					total: 2
+			tasks.addTask('task 1', function (complete) {
+				const actualItems = tasks.itemNames
+				const expectedItems = {
+					remaining: [],
+					running: ['task 1', 'task 2'],
+					completed: [],
+					total: 2,
 					results: []
+				}
 				deepEqual(actualItems, expectedItems, 'task 1 before wait items')
 
-				wait delay, ->
-
-					actualItems = tasks.itemNames
-					expectedItems =
-						remaining: []
-						running: ['task 1']
-						completed: ['task 2']
-						total: 2
-						results: [[null,20]]
+				wait(delay, function () {
+					const actualItems = tasks.itemNames
+					const expectedItems = {
+						remaining: [],
+						running: ['task 1'],
+						completed: ['task 2'],
+						total: 2,
+						results: [[null, 20]]
+					}
 					deepEqual(actualItems, expectedItems, 'task 1 after wait items')
 
-					complete(null,10)
+					complete(null, 10)
+				})
+			})
 
-			tasks.addTask 'task 2', ->
-				actualItems = tasks.itemNames
-				expectedItems =
-					remaining: []
-					running: ['task 1', 'task 2']
-					completed: []
-					total: 2
+			tasks.addTask('task 2', function () {
+				const actualItems = tasks.itemNames
+				const expectedItems = {
+					remaining: [],
+					running: ['task 1', 'task 2'],
+					completed: [],
+					total: 2,
 					results: []
+				}
 				deepEqual(actualItems, expectedItems, 'task 2 items')
 
 				return 20
+			})
 
 			tasks.run()
 
-			actualItems = tasks.itemNames
-			expectedItems =
-				remaining: ['task 1', 'task 2']
-				running: []
-				completed: []
-				total: 2
+			const actualItems = tasks.itemNames
+			const expectedItems = {
+				remaining: ['task 1', 'task 2'],
+				running: [],
+				completed: [],
+				total: 2,
 				results: []
+			}
 			deepEqual(actualItems, expectedItems, 'tasks totals')
+		})
 
-		# Parallel
-		it 'should work when running in parallel with new API', (done) ->
-			tasks = TaskGroup.create(
-				name: 'my tasks'
-				concurrency: 0
-				next: (err,results) ->
+		// Parallel
+		test('should work when running in parallel with new API', function (done) {
+			const tasks = TaskGroup.create({
+				name: 'my tasks',
+				concurrency: 0,
+				next: function (err, results) {
 					equal(err, null)
 					equal(tasks.status, 'passed', 'status to be passed as we are within the completion callback')
 					equal(tasks.concurrency, 0)
 
-					actualItems = tasks.itemNames
-					expectedItems =
-						remaining: []
-						running: []
-						completed: ['task 2 for [my tasks]', 'task 1 for [my tasks]']
-						total: 2
-						results: [[null,20], [null,10]]
+					const actualItems = tasks.itemNames
+					const expectedItems = {
+						remaining: [],
+						running: [],
+						completed: ['task 2 for [my tasks]', 'task 1 for [my tasks]'],
+						total: 2,
+						results: [[null, 20], [null, 10]]
+					}
 					deepEqual(results, expectedItems.results)
 					deepEqual(actualItems, expectedItems, 'completion items')
 
 					done()
+				},
 
 				tasks: [
-					(complete) ->
-						actualItems = tasks.itemNames
-						expectedItems =
-							remaining: []
-							running: ['task 1 for [my tasks]', 'task 2 for [my tasks]']
-							completed: []
-							total: 2
+					function (complete) {
+						const actualItems = tasks.itemNames
+						const expectedItems = {
+							remaining: [],
+							running: ['task 1 for [my tasks]', 'task 2 for [my tasks]'],
+							completed: [],
+							total: 2,
 							results: []
+						}
 						deepEqual(actualItems, expectedItems, 'task 1 before wait items')
 
-						wait delay, ->
-							actualItems = tasks.itemNames
-							expectedItems =
-								remaining: []
-								running: ['task 1 for [my tasks]']
-								completed: ['task 2 for [my tasks]']
-								total: 2
-								results: [[null,20]]
+						wait(delay, function () {
+							const actualItems = tasks.itemNames
+							const expectedItems = {
+								remaining: [],
+								running: ['task 1 for [my tasks]'],
+								completed: ['task 2 for [my tasks]'],
+								total: 2,
+								results: [[null, 20]]
+							}
 							deepEqual(actualItems, expectedItems, 'task 1 after wait items')
 
 							complete(null, 10)
-
-					->
-						actualItems = tasks.itemNames
-						expectedItems =
-							remaining: []
-							running: ['task 1 for [my tasks]', 'task 2 for [my tasks]']
-							completed: []
-							total: 2
+						})
+					},
+					function () {
+						const actualItems = tasks.itemNames
+						const expectedItems = {
+							remaining: [],
+							running: ['task 1 for [my tasks]', 'task 2 for [my tasks]'],
+							completed: [],
+							total: 2,
 							results: []
+						}
 						deepEqual(actualItems, expectedItems, 'task 1 after wait items')
 
 						return 20
+					}
 				]
-			).run()
+			}).run()
 
-			actualItems = tasks.itemNames
-			expectedItems =
-				remaining: ['task 1 for [my tasks]', 'task 2 for [my tasks]']
-				running: []
-				completed: []
-				total: 2
+			const actualItems = tasks.itemNames
+			const expectedItems = {
+				remaining: ['task 1 for [my tasks]', 'task 2 for [my tasks]'],
+				running: [],
+				completed: [],
+				total: 2,
 				results: []
+			}
 			deepEqual(actualItems, expectedItems, 'tasks totals')
+		})
+	})
 
-	# Sync flag
-	describe "sync flag", (suite,it) ->
-		# Serial
-		it 'should work when running in serial', (done) ->
-			tasks = new TaskGroup({sync:true, name:'my tests', concurrency:1}).done (err,results) ->
+	// Sync flag
+	suite('sync flag', function (suite, test) {
+		// Serial
+		test('should work when running in serial', function (done) {
+			const tasks = new TaskGroup({sync: true, name: 'my tests', concurrency: 1}).done(function (err, results) {
 				equal(err, null)
 				equal(tasks.status, 'passed', 'status to be passed as we are within the completion callback')
 				equal(tasks.concurrency, 1)
 
-				actualItems = tasks.itemNames
-				expectedItems =
-					remaining: []
-					running: []
-					completed: ['task 1', 'task 2']
-					total: 2
-					results: [[null,10], [null,20]]
+				const actualItems = tasks.itemNames
+				const expectedItems = {
+					remaining: [],
+					running: [],
+					completed: ['task 1', 'task 2'],
+					total: 2,
+					results: [[null, 10], [null, 20]]
+				}
 
 				deepEqual(results, expectedItems.results)
 				deepEqual(actualItems, expectedItems, 'completion items')
 
 				done()
+			})
 
-			tasks.addTask 'task 1', (complete) ->
-				actualItems = tasks.itemNames
-				expectedItems =
-					remaining: ['task 2']
-					running: ['task 1']
-					completed: []
-					total: 2
+			tasks.addTask('task 1', function (complete) {
+				const actualItems = tasks.itemNames
+				const expectedItems = {
+					remaining: ['task 2'],
+					running: ['task 1'],
+					completed: [],
+					total: 2,
 					results: []
+				}
 				deepEqual(actualItems, expectedItems, 'task 1 items before wait items')
 
-				wait delay, ->
-					actualItems = tasks.itemNames
+				wait(delay, function () {
+					const actualItems = tasks.itemNames
 					deepEqual(actualItems, expectedItems, 'task 1 items after wait items')
 
 					complete(null, 10)
+				})
+			})
 
-			tasks.addTask 'task 2', ->
-				actualItems = tasks.itemNames
-				expectedItems =
-					remaining: []
-					running: ['task 2']
-					completed: ['task 1']
-					total: 2
-					results:  [[null,10]]
+			tasks.addTask('task 2', function () {
+				const actualItems = tasks.itemNames
+				const expectedItems = {
+					remaining: [],
+					running: ['task 2'],
+					completed: ['task 1'],
+					total: 2,
+					results: [[null, 10]]
+				}
 				deepEqual(actualItems, expectedItems, 'task 2 items')
 
 				return 20
+			})
 
 			tasks.run()
 
-			actualItems = tasks.itemNames
-			expectedItems =
-				remaining: ['task 2']
-				running: ['task 1']
-				completed: []
-				total: 2
+			const actualItems = tasks.itemNames
+			const expectedItems = {
+				remaining: ['task 2'],
+				running: ['task 1'],
+				completed: [],
+				total: 2,
 				results: []
+			}
 			deepEqual(actualItems, expectedItems, 'tasks totals')
+		})
+	})
 
-	# Serial
-	it 'should work when running in serial with sync tasks', (done) ->
-		tasks = new TaskGroup({sync:true,name:'my tests',concurrency:1}).done (err,results) ->
+	// Serial
+	test('should work when running in serial with sync tasks', function (done) {
+		const tasks = new TaskGroup({sync: true, name: 'my tests', concurrency: 1}).done(function (err, results) {
 			equal(err, null)
 			equal(tasks.status, 'passed', 'status to be passed as we are within the completion callback')
 			equal(tasks.concurrency, 1)
 
-			actualItems = tasks.itemNames
-			expectedItems =
-				remaining: []
-				running: []
-				completed: ['task 1', 'task 2']
-				total: 2
-				results: [[null,10], [null,20]]
+			const actualItems = tasks.itemNames
+			const expectedItems = {
+				remaining: [],
+				running: [],
+				completed: ['task 1', 'task 2'],
+				total: 2,
+				results: [[null, 10], [null, 20]]
+			}
 
 			deepEqual(results, expectedItems.results)
 			deepEqual(actualItems, expectedItems, 'completion items')
+		})
 
-		tasks.addTask 'task 1', (complete) ->
-			actualItems = tasks.itemNames
-			expectedItems =
-				remaining: ['task 2']
-				running: ['task 1']
-				completed: []
-				total: 2
+		tasks.addTask('task 1', function (complete) {
+			const actualItems = tasks.itemNames
+			const expectedItems = {
+				remaining: ['task 2'],
+				running: ['task 1'],
+				completed: [],
+				total: 2,
 				results: []
+			}
 			deepEqual(actualItems, expectedItems, 'task 1 items')
 			complete(null, 10)
+		})
 
-		tasks.addTask 'task 2', ->
-			actualItems = tasks.itemNames
-			expectedItems =
-				remaining: []
-				running: ['task 2']
-				completed: ['task 1']
-				total: 2
-				results:  [[null,10]]
+		tasks.addTask('task 2', function () {
+			const actualItems = tasks.itemNames
+			const expectedItems = {
+				remaining: [],
+				running: ['task 2'],
+				completed: ['task 1'],
+				total: 2,
+				results: [[null, 10]]
+			}
 			deepEqual(actualItems, expectedItems, 'task 2 items')
 			return 20
+		})
 
 		tasks.run()
 
-		actualItems = tasks.itemNames
-		expectedItems =
-			remaining: []
-			running: []
-			completed: []
-			total: 0
-			results: [[null,10], [null,20]]
+		const actualItems = tasks.itemNames
+		const expectedItems = {
+			remaining: [],
+			running: [],
+			completed: [],
+			total: 0,
+			results: [[null, 10], [null, 20]]
+		}
 		deepEqual(actualItems, expectedItems, 'tasks totals')
 
 		setTimeout(done, 1000)
+	})
 
-	# Basic
-	describe "errors", (suite,it) ->
-		err1 = new Error('deliberate error')
-		err2 = new Error('unexpected error')
+	// Basic
+	suite('errors', function (suite, test) {
+		const err1 = new Error('deliberate error')
+		const err2 = new Error('unexpected error')
 
-		# Error Serial
-		it 'should handle error correctly in serial', (done) ->
-			tasks = new TaskGroup({name:'my tasks', concurrency:1}).done (err,results) ->
+		// Error Serial
+		test('should handle error correctly in serial', function (done) {
+			const tasks = new TaskGroup({name: 'my tasks', concurrency: 1}).done(function (err, results) {
 				errorEqual(err, 'deliberate error')
 				equal(tasks.concurrency, 1)
 				equal(tasks.status, 'failed')
 				equal(tasks.error, err)
 
-				actualItems = tasks.itemNames
-				expectedItems =
-					remaining: ['task 2 for [my tasks]']
-					running: []
-					completed: ['task 1 for [my tasks]']
-					total: 2
+				const actualItems = tasks.itemNames
+				const expectedItems = {
+					remaining: ['task 2 for [my tasks]'],
+					running: [],
+					completed: ['task 1 for [my tasks]'],
+					total: 2,
 					results: [[err1]]
+				}
 				deepEqual(results, expectedItems.results)
 				deepEqual(actualItems, expectedItems, 'completion items')
 
 				done()
+			})
 
-			tasks.addTask (complete) ->
-				actualItems = tasks.itemNames
-				expectedItems =
-					remaining: ['task 2 for [my tasks]']
-					running: ['task 1 for [my tasks]']
-					completed: []
-					total: 2
+			tasks.addTask(function (complete) {
+				const actualItems = tasks.itemNames
+				const expectedItems = {
+					remaining: ['task 2 for [my tasks]'],
+					running: ['task 1 for [my tasks]'],
+					completed: [],
+					total: 2,
 					results: []
+				}
 				deepEqual(actualItems, expectedItems, 'task 1 items')
 
 				complete(err1)
+			})
 
-			tasks.addTask ->
+			tasks.addTask(function () {
 				throw err2
+			})
 
 			tasks.run()
+		})
 
-		# Parallel
-		it 'should handle error correctly in parallel', (done) ->
-			tasks = new TaskGroup({name:'my tasks', concurrency:0}).done (err,results) ->
+		// Parallel
+		test('should handle error correctly in parallel', function (done) {
+			const tasks = new TaskGroup({name: 'my tasks', concurrency: 0}).done(function (err, results) {
 				errorEqual(err, err2)
 				equal(tasks.status, 'failed')
 				equal(tasks.error, err)
 				equal(tasks.concurrency, 0)
 
-				actualItems = tasks.itemNames
-				expectedItems =
-					remaining: []
-					running: []
-					completed: ['task 2 for [my tasks]', 'task 1 for [my tasks]']
-					total: 2
+				const actualItems = tasks.itemNames
+				const expectedItems = {
+					remaining: [],
+					running: [],
+					completed: ['task 2 for [my tasks]', 'task 1 for [my tasks]'],
+					total: 2,
 					results: [[err2], [err1]]
+				}
 				deepEqual(results, expectedItems.results)
 				deepEqual(actualItems, expectedItems, 'completion items')
 
 				done()
+			})
 
-			# Error via completion callback
-			tasks.addTask (complete) ->
-				actualItems = tasks.itemNames
-				expectedItems =
-					remaining: []
-					running: ['task 1 for [my tasks]', 'task 2 for [my tasks]']
-					completed: []
-					total: 2
+			// Error via completion callback
+			tasks.addTask(function (complete) {
+				const actualItems = tasks.itemNames
+				const expectedItems = {
+					remaining: [],
+					running: ['task 1 for [my tasks]', 'task 2 for [my tasks]'],
+					completed: [],
+					total: 2,
 					results: []
+				}
 				deepEqual(actualItems, expectedItems, 'task 1 before wait items')
 
-				wait delay, ->
-					actualItems = tasks.itemNames
-					expectedItems =
-						remaining: []
-						running: ['task 1 for [my tasks]']
-						completed: ['task 2 for [my tasks]']
-						total: 2
+				wait(delay, function () {
+					const actualItems = tasks.itemNames
+					const expectedItems = {
+						remaining: [],
+						running: ['task 1 for [my tasks]'],
+						completed: ['task 2 for [my tasks]'],
+						total: 2,
 						results: [[err2]]
+					}
 					deepEqual(actualItems, expectedItems, 'task 1 after wait items')
 
 					complete(err1)
-				return null
+				})
 
-			# Error via return
-			tasks.addTask ->
-				actualItems = tasks.itemNames
-				expectedItems =
-					remaining: []
-					running: ['task 1 for [my tasks]', 'task 2 for [my tasks]']
-					completed: []
-					total: 2
+				return null
+			})
+
+			// Error via return
+			tasks.addTask(function () {
+				const actualItems = tasks.itemNames
+				const expectedItems = {
+					remaining: [],
+					running: ['task 1 for [my tasks]', 'task 2 for [my tasks]'],
+					completed: [],
+					total: 2,
 					results: []
+				}
 				deepEqual(actualItems, expectedItems, 'task 1 before wait items')
 
 				return err2
+			})
 
-			# Run tasks
+			// Run tasks
 			tasks.run()
+		})
+	})
+})
 
+// Test Runner
+joe.suite('nested', function (suite, test) {
+	// Inline
+	test('inline format', function (done) {
+		const checks = []
 
+		const tasks = new TaskGroup('my tests', function (addGroup, addTask) {
+			equal(this.name, 'my tests')
 
-# Test Runner
-joe.describe 'nested', (describe,it) ->
-	# Inline
-	it 'inline format', (done) ->
-		checks = []
-
-		tasks = new TaskGroup 'my tests', (addGroup,addTask) ->
-			equal(@name, 'my tests')
-
-			addTask 'my task', (complete) ->
+			addTask('my task', function (complete) {
 				checks.push('my task 1')
-				equal(@name, 'my task')
+				equal(this.name, 'my task')
 
-				# totals for parent group
-				actualItems = tasks.itemNames
-				expectedItems =
-					remaining: ['my group']
-					running: ['my task']
-					completed: ['taskgroup method for my tests']
-					total: 3
+				// totals for parent group
+				const actualItems = tasks.itemNames
+				const expectedItems = {
+					remaining: ['my group'],
+					running: ['my task'],
+					completed: ['taskgroup method for my tests'],
+					total: 3,
 					results: []
+				}
 				deepEqual(actualItems, expectedItems, 'my task items before wait')
 
-				wait delay, ->
+				wait(delay, function () {
 					checks.push('my task 2')
 
-					# totals for parent group
-					actualItems = tasks.itemNames
+					// totals for parent group
+					const actualItems = tasks.itemNames
 					deepEqual(actualItems, expectedItems, 'my task items after wait')
 
 					complete(null, 10)
+				})
+			})
 
-			addGroup 'my group', (addGroup,addTask) ->
-				myGroup = @
+			addGroup('my group', function (addGroup, addTask) {
+				const myGroup = this
 				checks.push('my group')
-				equal(@name, 'my group')
+				equal(this.name, 'my group')
 
-				# totals for parent group
-				actualItems = tasks.itemNames
-				expectedItems =
-					remaining: []
-					running: ['my group']
-					completed: ['taskgroup method for my tests', 'my task']
-					total: 3
-					results: [[null,10]]
+				// totals for parent group
+				let actualItems = tasks.itemNames
+				let expectedItems = {
+					remaining: [],
+					running: ['my group'],
+					completed: ['taskgroup method for my tests', 'my task'],
+					total: 3,
+					results: [[null, 10]]
+				}
 				deepEqual(actualItems, expectedItems, 'my group parent items')
 
-				# totals for sub group
+				// totals for sub group
 				actualItems = myGroup.itemNames
-				expectedItems =
-					remaining: []
-					running: ['taskgroup method for my group']
-					completed: []
-					total: 1
+				expectedItems = {
+					remaining: [],
+					running: ['taskgroup method for my group'],
+					completed: [],
+					total: 1,
 					results: []
+				}
 				deepEqual(actualItems, expectedItems, 'my group items')
 
-				addTask 'my second task', ->
+				addTask('my second task', function () {
 					checks.push('my second task')
-					equal(@name, 'my second task')
+					equal(this.name, 'my second task')
 
-					# totals for parent group
-					actualItems = tasks.itemNames
-					expectedItems =
-						remaining: []
-						running: ['my group']
-						completed: ['taskgroup method for my tests', 'my task']
-						total: 3
-						results: [[null,10]]
+					// totals for parent group
+					let actualItems = tasks.itemNames
+					let expectedItems = {
+						remaining: [],
+						running: ['my group'],
+						completed: ['taskgroup method for my tests', 'my task'],
+						total: 3,
+						results: [[null, 10]]
+					}
 					deepEqual(actualItems, expectedItems, 'my group parent items')
 
-					# totals for sub group
+					// totals for sub group
 					actualItems = myGroup.itemNames
-					expectedItems =
-						remaining: []
-						running: ['my second task']
-						completed: ['taskgroup method for my group']
-						total: 2
+					expectedItems = {
+						remaining: [],
+						running: ['my second task'],
+						completed: ['taskgroup method for my group'],
+						total: 2,
 						results: []
+					}
 					deepEqual(actualItems, expectedItems, 'my group items')
 
 					return 20
+				})
+			})
+		})
 
-		tasks.done (err, results) ->
+		tasks.done(function (err, results) {
 			equal(err, null, 'inline taskgroup executed without error')
 
-			console.log(checks)  if checks.length isnt 4
+			if ( checks.length !== 4 )  console.log(checks)
 			equal(checks.length, 4, 'all the expected checks ran')
 
-			# totals for parent group
-			actualItems = tasks.itemNames
-			expectedItems =
-				remaining: []
-				running: []
-				completed: ['taskgroup method for my tests', 'my task', 'my group']
-				total: 3
+			// totals for parent group
+			const actualItems = tasks.itemNames
+			const expectedItems = {
+				remaining: [],
+				running: [],
+				completed: ['taskgroup method for my tests', 'my task', 'my group'],
+				total: 3,
 				results: [
-					[null,10],
+					[null, 10],
 					[null, [
-						[null,20]
+						[null, 20]
 					]]
 				]
+			}
 			deepEqual(results, expectedItems.results)
 			deepEqual(actualItems, expectedItems, 'completion items')
 
 			done()
+		})
+	})
 
-	# Traditional
-	it 'traditional format', (done) ->
-		checks = []
+	// Traditional
+	test('traditional format', function (done) {
+		const checks = []
 
-		tasks = new TaskGroup(name: 'my tests').run()
+		const tasks = new TaskGroup({name: 'my tests'}).run()
 
-		tasks.addTask 'my task', (complete) ->
+		tasks.addTask('my task', function (complete) {
 			checks.push('my task 1')
-			equal(@name, 'my task')
+			equal(this.name, 'my task')
 
-			# totals for parent group
-			actualItems = tasks.itemNames
-			expectedItems =
-				remaining: ['my group']
-				running: ['my task']
-				completed: []
-				total: 2
+			// totals for parent group
+			const actualItems = tasks.itemNames
+			const expectedItems = {
+				remaining: ['my group'],
+				running: ['my task'],
+				completed: [],
+				total: 2,
 				results: []
+			}
 			deepEqual(actualItems, expectedItems, 'my task items before wait')
 
-			wait delay, ->
+			wait(delay, function () {
 				checks.push('my task 2')
 
-				# totals for parent group
-				actualItems = tasks.itemNames
+				// totals for parent group
+				const actualItems = tasks.itemNames
 				deepEqual(actualItems, expectedItems, 'my task items after wait')
 
 				complete(null, 10)
+			})
+		})
 
-		tasks.addGroup 'my group', ->
-			myGroup = @
+		tasks.addGroup('my group', function () {
+			const myGroup = this
 			checks.push('my group')
-			equal(@name, 'my group')
+			equal(this.name, 'my group')
 
-			# totals for parent group
-			actualItems = tasks.itemNames
-			expectedItems =
-				remaining: []
-				running: ['my group']
-				completed: ['my task']
-				total: 2
-				results: [[null,10]]
+			// totals for parent group
+			let actualItems = tasks.itemNames
+			let expectedItems = {
+				remaining: [],
+				running: ['my group'],
+				completed: ['my task'],
+				total: 2,
+				results: [[null, 10]]
+			}
 			deepEqual(actualItems, expectedItems, 'my group parent items')
 
-			# totals for sub group
+			// totals for sub group
 			actualItems = myGroup.itemNames
-			expectedItems =
-				remaining: []
-				running: ['taskgroup method for my group']
-				completed: []
-				total: 1
+			expectedItems = {
+				remaining: [],
+				running: ['taskgroup method for my group'],
+				completed: [],
+				total: 1,
 				results: []
+			}
 			deepEqual(actualItems, expectedItems, 'my group items')
 
-			@addTask 'my second task', ->
+			this.addTask('my second task', function () {
 				checks.push('my second task')
-				equal(@name, 'my second task')
+				equal(this.name, 'my second task')
 
-				# totals for parent group
-				actualItems = tasks.itemNames
-				expectedItems =
-					remaining: []
-					running: ['my group']
-					completed: ['my task']
-					total: 2
-					results: [[null,10]]
+				// totals for parent group
+				let actualItems = tasks.itemNames
+				expectedItems = {
+					remaining: [],
+					running: ['my group'],
+					completed: ['my task'],
+					total: 2,
+					results: [[null, 10]]
+				}
 				deepEqual(actualItems, expectedItems, 'my group parent items')
 
-				# totals for sub group
+				// totals for sub group
 				actualItems = myGroup.itemNames
-				expectedItems =
-					remaining: []
-					running: ['my second task']
-					completed: ['taskgroup method for my group']
-					total: 2
+				expectedItems = {
+					remaining: [],
+					running: ['my second task'],
+					completed: ['taskgroup method for my group'],
+					total: 2,
 					results: []
+				}
 				deepEqual(actualItems, expectedItems, 'my group items')
 
 				return 20
+			})
+		})
 
-
-		tasks.done (err, results) ->
+		tasks.done(function (err, results) {
 			equal(err, null, 'traditional format taskgroup executed without error')
 
-			console.log(checks)  if checks.length isnt 4
+			if ( checks.length !== 4 )  console.log(checks)
 			equal(checks.length, 4, 'all the expected checks ran')
 
-			# totals for parent group
-			actualItems = tasks.itemNames
-			expectedItems =
-				remaining: []
-				running: []
-				completed: ['my task', 'my group']
-				total: 2
+			// totals for parent group
+			const actualItems = tasks.itemNames
+			const expectedItems = {
+				remaining: [],
+				running: [],
+				completed: ['my task', 'my group'],
+				total: 2,
 				results: [
-					[null,10],
+					[null, 10],
 					[null, [
-						[null,20]
+						[null, 20]
 					]]
 				]
+			}
 			deepEqual(results, expectedItems.results)
 			deepEqual(actualItems, expectedItems, 'completion items')
 
 			done()
+		})
+	})
 
-	# Mixed
-	it 'mixed format', (done) ->
-		checks = []
+	// Mixed
+	test('mixed format', function (done) {
+		const checks = []
 
-		tasks = new TaskGroup(name: 'my tests')
+		const tasks = new TaskGroup({name: 'my tests'})
 
-		tasks.addTask 'my task 1', ->
+		tasks.addTask('my task 1', function () {
 			checks.push('my task 1')
 
-			# totals for parent group
-			actualItems = tasks.itemNames
-			expectedItems =
-				remaining: ['my group 1', 'my task 3']
-				running: ['my task 1']
-				completed: []
-				total: 3
+			// totals for parent group
+			const actualItems = tasks.itemNames
+			const expectedItems = {
+				remaining: ['my group 1', 'my task 3'],
+				running: ['my task 1'],
+				completed: [],
+				total: 3,
 				results: []
+			}
 			deepEqual(actualItems, expectedItems, 'my task 1 items')
 
 			return 10
+		})
 
-		tasks.addGroup 'my group 1', ->
-			myGroup = @
+		tasks.addGroup('my group 1', function () {
+			const myGroup = this
 			checks.push('my group 1')
-			equal(@name, 'my group 1')
+			equal(this.name, 'my group 1')
 
-			# totals for parent group
-			actualItems = tasks.itemNames
-			expectedItems =
-				remaining: ['my task 3']
-				running: ['my group 1']
-				completed: ['my task 1']
-				total: 3
-				results: [[null,10]]
+			// totals for parent group
+			let actualItems = tasks.itemNames
+			let expectedItems = {
+				remaining: ['my task 3'],
+				running: ['my group 1'],
+				completed: ['my task 1'],
+				total: 3,
+				results: [[null, 10]]
+			}
 			deepEqual(actualItems, expectedItems, 'my group 1 parent items')
 
-			# totals for sub group
+			// totals for sub group
 			actualItems = myGroup.itemNames
-			expectedItems =
-				remaining: []
-				running: ['taskgroup method for my group 1']
-				completed: []
-				total: 1
+			expectedItems = {
+				remaining: [],
+				running: ['taskgroup method for my group 1'],
+				completed: [],
+				total: 1,
 				results: []
+			}
 			deepEqual(actualItems, expectedItems, 'my group 1 items')
 
-
-			@addTask 'my task 2', ->
+			this.addTask('my task 2', function () {
 				checks.push('my task 2')
-				equal(@name, 'my task 2')
+				equal(this.name, 'my task 2')
 
-				# totals for parent group
-				actualItems = tasks.itemNames
-				expectedItems =
-					remaining: ['my task 3']
-					running: ['my group 1']
-					completed: ['my task 1']
-					total: 3
-					results: [[null,10]]
+				// totals for parent group
+				let actualItems = tasks.itemNames
+				let expectedItems = {
+					remaining: ['my task 3'],
+					running: ['my group 1'],
+					completed: ['my task 1'],
+					total: 3,
+					results: [[null, 10]]
+				}
 				deepEqual(actualItems, expectedItems, 'my group 1 after wait parent items')
 
-				# totals for sub group
+				// totals for sub group
 				actualItems = myGroup.itemNames
-				expectedItems =
-					remaining: []
-					running: ['my task 2']
-					completed: ['taskgroup method for my group 1']
-					total: 2
+				expectedItems = {
+					remaining: [],
+					running: ['my task 2'],
+					completed: ['taskgroup method for my group 1'],
+					total: 2,
 					results: []
+				}
 				deepEqual(actualItems, expectedItems, 'my group 1 items')
 
 				return 20
+			})
+		})
 
-		tasks.addTask 'my task 3', ->
+		tasks.addTask('my task 3', function () {
 			checks.push('my task 3')
-			equal(@name, 'my task 3')
+			equal(this.name, 'my task 3')
 
-			# totals for parent group
-			actualItems = tasks.itemNames
-			expectedItems =
-				remaining: []
-				running: ['my task 3']
-				completed: ['my task 1', 'my group 1']
-				total: 3
+			// totals for parent group
+			const actualItems = tasks.itemNames
+			const expectedItems = {
+				remaining: [],
+				running: ['my task 3'],
+				completed: ['my task 1', 'my group 1'],
+				total: 3,
 				results: [
-					[null,10],
+					[null, 10],
 					[null, [
-						[null,20]
+						[null, 20]
 					]]
 				]
+			}
 			deepEqual(actualItems, expectedItems, 'my task 3 items')
 
 			return 30
+		})
 
-		tasks.done (err, results) ->
+		tasks.done(function (err, results) {
 			equal(err, null, 'mixed format taskgroup executed without error')
 
-			console.log(checks)  if checks.length isnt 4
+			if ( checks.length !== 4 )  console.log(checks)
 			equal(checks.length, 4, 'all the expected checks ran')
 
-			# totals for parent group
-			actualItems = tasks.itemNames
-			expectedItems =
-				remaining: []
-				running: []
-				completed: ['my task 1', 'my group 1', 'my task 3']
-				total: 3
+			// totals for parent group
+			const actualItems = tasks.itemNames
+			const expectedItems = {
+				remaining: [],
+				running: [],
+				completed: ['my task 1', 'my group 1', 'my task 3'],
+				total: 3,
 				results: [
-					[null,10],
+					[null, 10],
 					[null, [
-						[null,20]
-					]]
-					[null,30],
+						[null, 20]
+					]],
+					[null, 30]
 				]
+			}
 			deepEqual(results, expectedItems.results)
 			deepEqual(actualItems, expectedItems, 'completion items')
 
-
 			done()
+		})
 
 		tasks.run()
+	})
 
-	###
-	# Idle
-	it 'idling', (done) ->
+	/*
+	// Idle
+	test('idling', function (done) {
 		checks = []
 
 		tasks = new TaskGroup()
 
-		task = tasks.addTask 'my task 1', (complete) ->
+		task = tasks(addTask 'my task 1', function (complete) {
 			checks.push('my task 1')
-			equal(@name, 'my task 1')
+			equal(this.name, 'my task 1')
 			equal(tasks.remaining.length, 0)
 			equal(tasks.running, 1)
 
@@ -1201,4 +1352,5 @@ joe.describe 'nested', (describe,it) ->
 			tasks.destroy()
 
 		tasks.run()
-	###
+	*/
+})

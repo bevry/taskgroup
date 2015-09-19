@@ -1,13 +1,15 @@
-{wait} = require('assert-helpers')
-{Task,TaskGroup} = require('../../')
+const {Task} = require('../../')
 
-myTask = new Task (complete) ->
+const myTask = new Task(function (complete) {
 	complete()
+})
 
-myTask.done (err) ->
+myTask.done(function () {
 	throw new Error('goodbye world')
+})
 
 myTask.run()
 
-backup = wait 1000, ->
+setTimeout(function () {
 	throw new Error("world still exists! this shouldn't have happend")
+}, 1000)

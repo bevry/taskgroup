@@ -84,7 +84,7 @@
     <pre class="code prettyprint linenums">
 // Imports
 const BaseInterface = require(&#x27;./interface&#x27;)
-const {copyObject, iterateObject, queue, wait, domain} = require(&#x27;./util&#x27;)
+const {copyObject, iterateObject, queue, domain} = require(&#x27;./util&#x27;)
 const ambi = require(&#x27;ambi&#x27;)
 
 /**
@@ -681,12 +681,12 @@ export default class Task extends BaseInterface {
         // Setup timeout if appropriate
         const timeoutDuration = this.config.timeout
         if ( timeoutDuration ) {
-            this.state.timeout = wait(timeoutDuration, () =&gt; {
+            this.state.timeout = setTimeout(() =&gt; {
                 if ( !this.completed ) {
                     const error = new Error(&#x60;The task [${this.names}] has timed out.&#x60;)
                     exitMethod(error)
                 }
-            })
+            }, timeoutDuration)
         }
 
         // Notify that we are now running
