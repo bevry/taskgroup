@@ -1,3 +1,5 @@
+'use strict'
+
 // Imports
 const BaseInterface = require('./interface')
 const {queue, domain} = require('./util')
