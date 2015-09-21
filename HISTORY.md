@@ -13,7 +13,7 @@
 - A lot of previously `public` methods are now marked `private` or `protected`, this isn't really from a stability concern but from an isolation of responsibility concern
 
 ## v4.3.0 March 15, 2015
-- Module.exports now exports the TaskGroup class, of which `Task` and `TaskGroup` are now children
+- Now exports the TaskGroup class, of which `Task` and `TaskGroup` are now children
 - Added `Task` attribute on the TaskGroup class to allow over-riding of what should be the sub-task class
 - Added `TaskGroup` attribute on the TaskGroup class to allow over-riding of what should be the sub-taskgroup class
 - Added the `sync` configuration option, which when set to `true` will allow the execution of a Task or TaskGroup to execute synchronously
@@ -96,7 +96,7 @@
 ## v3.3.9 May 4, 2014
 - Added [extendonclass](https://github.com/bevry/extendonclass) support
 - Added `Task.create` and `TaskGroup.create` helpers
-- Will no longer fall over if an invalid argument is passed as configuration
+- Will no longer fail if an invalid argument is passed as configuration
 - Updated dependencies
 
 ## v3.3.8 February 5, 2014
@@ -143,7 +143,7 @@
 - Component.io compatibility
 
 ## v3.2.1 August 19, 2013
-- Republish with older verson of joe dev dependency to try and stop cyclic errors
+- Republish with older version of joe dev dependency to try and stop cyclic errors
 - Better node 0.8 support when catching thrown errors
 
 ## v3.2.0 August 19, 2013
