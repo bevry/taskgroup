@@ -52,7 +52,7 @@ export default class BaseInterface extends require('events').EventEmitter {
 
 		// Generate our listener method that we will beind to different events
 		// to add support for the `done` event and better error/event handling
-		const listener = (event, ...args) => {
+		function listener (event, ...args) {
 			// Prepare
 			const error = args[0]
 
@@ -64,6 +64,7 @@ export default class BaseInterface extends require('events').EventEmitter {
 			// has error, but no done listener and no event listener, throw error
 			else if ( error && this.listeners(event).length === 1 ) {
 				if ( event === 'error' ) {
+					/* eslint no-console:0 */
 					console.error(errorToString(error))
 					throw error
 				}

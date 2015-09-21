@@ -1,3 +1,4 @@
+/* eslint no-extra-parens:0 func-style:0 */
 'use strict'
 
 // Imports
