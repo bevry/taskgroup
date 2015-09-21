@@ -57,9 +57,8 @@
     "type": "git",
     "url": "http://github.com/bevry/taskgroup.git"
   },
-  "browsers": true,
   "engines": {
-    "node": ">=0.8"
+    "node": ">=0.12"
   },
   "dependencies": {
     "ambi": "^2.3.0",
@@ -83,6 +82,9 @@
   },
   "main": "./esnextguardian.js",
   "browser": "./es5/lib/index.js",
+  "jspm": {
+    "main": "./esnext/lib/index.js"
+  },
   "scripts": {
     "clean": "node --harmony nakefile.js clean",
     "setup": "node --harmony nakefile.js setup",
