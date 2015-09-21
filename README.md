@@ -119,7 +119,7 @@ These amazing people have contributed code to this project:
 Unless stated otherwise all works are:
 
 <ul><li>Copyright &copy; 2013+ <a href="http://bevry.me">Bevry Pty Ltd</a></li>
-<li>Copyright &copy; <a href="http://balupton.com">Benjamin Lupton</a></li></ul>
+<li>Copyright &copy; 2011-2012 <a href="http://balupton.com">Benjamin Lupton</a></li></ul>
 
 and licensed under:
 
