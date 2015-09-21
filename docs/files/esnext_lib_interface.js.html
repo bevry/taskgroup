@@ -82,6 +82,8 @@
 
 <div class="file">
     <pre class="code prettyprint linenums">
+&#x27;use strict&#x27;
+
 // Imports
 const {queue, errorToString} = require(&#x27;./util&#x27;)
 
@@ -134,7 +136,7 @@ export default class BaseInterface extends require(&#x27;events&#x27;).EventEmit
 
         // Generate our listener method that we will beind to different events
         // to add support for the &#x60;done&#x60; event and better error/event handling
-        const listener = (event, ...args) =&gt; {
+        function listener (event, ...args) {
             // Prepare
             const error = args[0]
 
@@ -146,6 +148,7 @@ export default class BaseInterface extends require(&#x27;events&#x27;).EventEmit
             // has error, but no done listener and no event listener, throw error
             else if ( error &amp;&amp; this.listeners(event).length === 1 ) {
                 if ( event === &#x27;error&#x27; ) {
+                    /* eslint no-console:0 */
                     console.error(errorToString(error))
                     throw error
                 }

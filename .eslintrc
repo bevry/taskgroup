@@ -1,4 +1,4 @@
-// 16 September 2015
+// 20 September 2015
 // https://github.com/bevry/base
 // http://eslint.org
 {
@@ -401,8 +401,8 @@
 		// Commas go last, we have tooling to detect if we forget a comma
 		"comma-style": [2, "last"],
 
-		// When aliasing this, call it "me"
-		"consistent-this": [2, "me"],
+		// Enabling this was incredibly annoying when doing layers of nesting
+		"consistent-this": 0,
 
 		// Enable to make UNIX people's lives easier
 		"eol-last": 2,

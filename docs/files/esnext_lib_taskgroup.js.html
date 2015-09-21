@@ -354,8 +354,8 @@ class TaskGroup extends BaseInterface {
     @param {String} [config.name] - What we would like our name to be, useful for debugging.
     @param {Function} [config.done] - Passed to {{#crossLink &quot;TaskGroup/onceDone&quot;}}{{/crossLink}} (aliases are &#x60;onceDone&#x60;, and &#x60;next&#x60;)
     @param {Function} [config.whenDone] - Passed to {{#crossLink &quot;TaskGroup/whenDone&quot;}}{{/crossLink}}
-    @param {Object} [config.on] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}.
-    @param {Object} [config.once] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}.
+    @param {Object} [config.on] - An object of event names linking to listener functions that we would like bounded via {EventEmitter.on}.
+    @param {Object} [config.once] - An object of event names linking to listener functions that we would like bounded via {EventEmitter.once}.
     @param {TaskGroup} [config.parent] - A parent {{#crossLink &quot;TaskGroup&quot;}}{{/crossLink}} that we may be attached to.
     @param {String} [config.onError] - Either &#x60;&#x27;exit&#x27;&#x60; or &#x60;&#x27;ignore&#x27;&#x60;, when &#x60;&#x27;ignore&#x27;&#x60; duplicate run errors are not reported, useful when combined with the timeout option.
     @param {Boolean} [config.sync=false] - Whether or not we should execute certain calls asynchronously (set to &#x60;false&#x60;) or synchronously (set to &#x60;true&#x60;).

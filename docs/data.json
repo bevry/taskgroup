@@ -46,7 +46,7 @@
             "plugin_for": [],
             "extension_for": [],
             "file": "esnext/lib/interface.js",
-            "line": 4,
+            "line": 6,
             "description": "Base class containing common functionality for {{#crossLink \"Task\"}}{{/crossLink}} and {{#crossLink \"TaskGroup\"}}{{/crossLink}}.",
             "extends": "EventEmitter",
             "is_constructor": 1,
@@ -62,7 +62,7 @@
             "plugin_for": [],
             "extension_for": [],
             "file": "esnext/lib/task.js",
-            "line": 8,
+            "line": 11,
             "description": "Our Task Class\n\nAvailable configuration is documented in {{#crossLink \"Task/setConfig\"}}{{/crossLink}}.\n\nAvailable events:\n\n- `started()` - emitted when we start execution\n- `running()` - emitted when the method starts execution\n- `failed(error)` - emitted when execution exited with a failure\n- `passed()` - emitted when execution exited with a success\n- `completed(error, ...resultArguments)` - emitted when execution exited, `resultArguments` are the result arguments from the method\n- `error(error)` - emtited if an unexpected error occurs without ourself\n- `done(error, ...resultArguments)` - emitted when either execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)\n\nAvailable internal statuses:\n\n- `null` - execution has not yet started\n- `'started'` - execution has begun\n- `'running'` - execution of our method has begun\n- `'failed'` - execution of our method has failed\n- `'passed'` - execution of our method has succeeded\n- `'destroyed'` - we've been destroyed and can no longer execute\n\nExample:\n\n``` javascript\nvar Task = require('taskgroup').Task\nvar task\n\ntask = new Task('my synchronous task', function(){\n\treturn 5\n}).done(console.info).run()  // [null, 5]\n\ntask = new Task('my asynchronous task', function(complete){\n\tcomplete(null, 5)\n}).done(console.info).run()  // [null, 5]\n\ntask = new Task('my task that returns an error', function(){\n\tvar error = new Error('deliberate error')\n\treturn error\n}).done(console.info).run()  // [Error('deliberator error')]\n\ntask = new Task('my task that passes an error', function(complete){\n\tvar error = new Error('deliberate error')\n\tcomplete(error)\n}).done(console.info).run()  // [Error('deliberator error')]\n```",
             "extends": "BaseInterface",
             "is_constructor": 1,
@@ -90,7 +90,7 @@
     "classitems": [
         {
             "file": "esnext/lib/interface.js",
-            "line": 13,
+            "line": 15,
             "description": "Creates and returns new instance of this class.",
             "params": [
                 {
@@ -112,7 +112,7 @@
         },
         {
             "file": "esnext/lib/interface.js",
-            "line": 26,
+            "line": 28,
             "description": "BaseInterface Constructor\n\nAdds support for the done event while\nensuring that errors are always handled correctly.\nIt does this by listening to the `error` and `completed` events,\nand when the emit, we check if there is a `done` listener:\n\n- if there is, then emit the done event with the original event arguments\n- if there isn't, then output the error to stderr and throw it.\n\nSets the following configuration:\n\n- `nameSeparator` defaults to `' ➞  '`, used to stringify the result of `.names`",
             "itemtype": "method",
             "name": "constructor",
@@ -120,7 +120,7 @@
         },
         {
             "file": "esnext/lib/interface.js",
-            "line": 80,
+            "line": 83,
             "description": "Attaches the listener to the `done` event to be emitted each time.",
             "params": [
                 {
@@ -138,7 +138,7 @@
         },
         {
             "file": "esnext/lib/interface.js",
-            "line": 97,
+            "line": 100,
             "description": "Attaches the listener to the `done` event to be emitted only once, then removed to not fire again.",
             "params": [
                 {
@@ -156,7 +156,7 @@
         },
         {
             "file": "esnext/lib/interface.js",
-            "line": 114,
+            "line": 117,
             "description": "Alias for {{#crossLink \"BaseInterface/onceDone\"}}{{/crossLink}}",
             "params": [
                 {
@@ -174,7 +174,7 @@
         },
         {
             "file": "esnext/lib/interface.js",
-            "line": 125,
+            "line": 128,
             "description": "Gets our name prepended by all of our parents names",
             "type": "Array",
             "itemtype": "property",
@@ -185,7 +185,7 @@
         },
         {
             "file": "esnext/lib/interface.js",
-            "line": 144,
+            "line": 147,
             "description": "Get the name of our instance.\nIf the name was never configured, then return the name in the format of `'#{this.type} #{Math.random()}'` to output something like `task 0.2123`",
             "type": "String",
             "itemtype": "property",
@@ -196,7 +196,7 @@
         },
         {
             "file": "esnext/lib/interface.js",
-            "line": 155,
+            "line": 158,
             "description": "Get extra state information for debugging.",
             "type": "String",
             "itemtype": "property",
@@ -207,7 +207,7 @@
         },
         {
             "file": "esnext/lib/interface.js",
-            "line": 169,
+            "line": 172,
             "description": "Executes the passed function either synchronously if `config.sync` is `true` or delays it for the next tick.",
             "params": [
                 {
@@ -225,7 +225,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 63,
+            "line": 66,
             "description": "The type of our class.\n\nUsed for the purpose of duck typing\nwhich is needed when working with node virtual machines\nas instanceof will not work in those environments.",
             "type": "String",
             "itemtype": "property",
@@ -237,7 +237,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 77,
+            "line": 80,
             "description": "A helper method to check if the passed argument is an instanceof a {Task}.",
             "params": [
                 {
@@ -259,7 +259,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 89,
+            "line": 92,
             "description": "Have we started execution yet?",
             "type": "Boolean",
             "itemtype": "property",
@@ -270,7 +270,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 99,
+            "line": 102,
             "description": "Have we finished its execution yet?",
             "type": "Boolean",
             "itemtype": "property",
@@ -281,7 +281,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 116,
+            "line": 119,
             "description": "Have we been destroyed?",
             "type": "Boolean",
             "itemtype": "property",
@@ -292,7 +292,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 126,
+            "line": 129,
             "description": "Have we completed its execution yet?",
             "type": "Boolean",
             "itemtype": "property",
@@ -303,7 +303,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 147,
+            "line": 150,
             "description": "The first {Error} that has occured.",
             "type": "Error",
             "itemtype": "property",
@@ -314,7 +314,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 155,
+            "line": 158,
             "description": "A {String} containing our current status. See our {Task} description for available values.",
             "type": "String",
             "itemtype": "property",
@@ -325,7 +325,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 163,
+            "line": 166,
             "description": "An {Array} of the events that we may emit. Events that will be executed can be found in the {Task} description.",
             "type": "Array",
             "itemtype": "property",
@@ -337,7 +337,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 172,
+            "line": 175,
             "description": "An {Array} representing the returned result or the passed {Arguments} of our method.\nThe first item in the array should be the {Error} if it exists.",
             "type": "Array",
             "itemtype": "property",
@@ -348,7 +348,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 181,
+            "line": 184,
             "description": "The {Domain} that we create to capture errors for our method.",
             "type": "Domain",
             "itemtype": "property",
@@ -359,7 +359,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 189,
+            "line": 192,
             "description": "Initialize our new {Task} instance. Forwards arguments onto {{#crossLink \"Task/setConfig\"}}{{/crossLink}}.",
             "itemtype": "method",
             "name": "constructor",
@@ -369,7 +369,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 220,
+            "line": 223,
             "description": "Set the configuration for our instance.",
             "params": [
                 {
@@ -471,7 +471,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 303,
+            "line": 306,
             "description": "What to do when our task method completes.\nShould only ever execute once, if it executes more than once, then we error.",
             "params": [
                 {
@@ -489,7 +489,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 331,
+            "line": 334,
             "description": "Set our task to the completed state.",
             "chainable": 1,
             "itemtype": "method",
@@ -500,7 +500,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 361,
+            "line": 364,
             "description": "Allow the user to abort the execution of this task.",
             "chainable": 1,
             "itemtype": "method",
@@ -514,7 +514,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 394,
+            "line": 397,
             "description": "Completetion Emitter. Used to emit the `completed` event and to cleanup our state.",
             "chainable": 1,
             "itemtype": "method",
@@ -525,7 +525,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 424,
+            "line": 427,
             "description": "When Done Promise.\nFires the listener, either on the next tick if we are already done, or if not, each time the `done` event fires.",
             "params": [
                 {
@@ -543,7 +543,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 448,
+            "line": 451,
             "description": "Once Done Promise.\nFires the listener once, either on the next tick if we are already done, or if not, each time the `done` event fires.",
             "params": [
                 {
@@ -561,7 +561,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 472,
+            "line": 475,
             "description": "Reset the results.\nAt this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.",
             "chainable": 1,
             "itemtype": "method",
@@ -572,7 +572,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 484,
+            "line": 487,
             "description": "Clear the domain",
             "chainable": 1,
             "itemtype": "method",
@@ -583,7 +583,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 500,
+            "line": 503,
             "description": "Destroy ourself and prevent ourself from executing ever again.",
             "chainable": 1,
             "itemtype": "method",
@@ -594,7 +594,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 534,
+            "line": 537,
             "description": "Fire the task method with our config arguments and wrapped in a domain.",
             "chainable": 1,
             "itemtype": "method",
@@ -605,7 +605,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 632,
+            "line": 635,
             "description": "Start the execution of the task.\nWill emit an `error` event if the task has already started before.",
             "chainable": 1,
             "itemtype": "method",
@@ -869,13 +869,13 @@
                         },
                         {
                             "name": "on",
-                            "description": "- A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}.",
+                            "description": "- An object of event names linking to listener functions that we would like bounded via {EventEmitter.on}.",
                             "type": "Object",
                             "optional": true
                         },
                         {
                             "name": "once",
-                            "description": "- A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}.",
+                            "description": "- An object of event names linking to listener functions that we would like bounded via {EventEmitter.once}.",
                             "type": "Object",
                             "optional": true
                         },
