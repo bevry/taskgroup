@@ -113,14 +113,6 @@ class TaskGroup extends BaseInterface {
 	// @TODO Decide if the following is still needed
 
 	/**
-	The {config.concurrency} property.
-	@type Number
-	@property concurrency
-	@protected
-	*/
-	get concurrency () { return this.config.concurrency }
-
-	/**
 	The first {Error} that has occured.
 	@type Error
 	@property error
@@ -142,7 +134,9 @@ class TaskGroup extends BaseInterface {
 	@property events
 	@protected
 	*/
-	get events () { return this.state.events }
+	get events () {
+		return ['error', 'started', 'running', 'passed', 'failed', 'completed', 'done', 'destroyed']
+	}
 
 	/**
 	An {Array} that contains the result property for each completed {Task} and {TaskGroup}.
@@ -152,32 +146,6 @@ class TaskGroup extends BaseInterface {
 	@protected
 	*/
 	get results () { return this.state.results }
-
-	/**
-	An {Array} of each {Task} and {TaskGroup} in this group that are still yet to execute.
-	@type Array
-	@property itemsRemaining
-	@protected
-	*/
-	get itemsRemaining () { return this.state.itemsRemaining }
-
-	/**
-	An {Array} of each {Task} and {TaskGroup} in this group that are currently executing.
-	@TODO offer the ability to disable this completely via `storeRunningItems: false`
-	@type Array
-	@property itemsRunning
-	@protected
-	*/
-	get itemsRunning () { return this.state.itemsRunning }
-
-	/**
-	An {Array} of each {Task} and {TaskGroup} in this group that have completed.
-	@TODO offer the ability to disable this completely via `storeCompletedItems: false`
-	@type Array
-	@property itemsRunning
-	@protected
-	*/
-	get itemsCompleted () { return this.state.itemsCompleted }
 
 	/**
 	Initialize our new {TaskGroup} instance. Forwards arguments onto {{#crossLink "TaskGroup/setConfig"}}{{/crossLink}}.
@@ -192,24 +160,17 @@ class TaskGroup extends BaseInterface {
 			id: `${this.type} ${Math.random()}`,
 			error: null,
 			status: null,
-			events: ['error', 'started', 'running', 'passed', 'failed', 'completed', 'done', 'destroyed'],
 			results: [],
 			itemsRemaining: [],
-			itemsRunning: [],
-			itemsCompleted: []
+			itemsRunningCount: 0,
+			itemsCompletedCount: 0
 		})
 
 		// Configuration defaults
 		extendr.defaults(this.config, {
-			// @TODO update storeCompleted to actually not store anything
-			// this will require tests to be updated (as task names no longer will be stored)
-			// as well as a counter inserted for the total completed (we may even get rid of that)
-			storeCompleted: false,
-			// @TODO implement one or both of the following to ensure taskgroups successfully die once completed
-			//   should also implement this for the task class too
-			// storeResults: false,
-			// onExit: 'destroy',
-			nestedEvents: false,
+			destroyCompleted: true,
+			onExit: 'destroy',
+			emitNestedEvents: false,
 			nestedTaskConfig: {},
 			nestedGroupConfig: {},
 			concurrency: 1,
@@ -452,7 +413,7 @@ class TaskGroup extends BaseInterface {
 		// Extract
 		const nestedGroupConfig = this.config.nestedGroupConfig
 		const nestedTaskConfig = this.config.nestedTaskConfig
-		const nestedEvents = this.config.nestedEvents
+		const emitNestedEvents = this.config.emitNestedEvents
 
 		// Bubble task events
 		if ( Task.isTask(item) ) {
@@ -460,7 +421,7 @@ class TaskGroup extends BaseInterface {
 			item.setConfig(itemConfig, nestedTaskConfig, ...args)
 
 			// Bubble the nested events if desired
-			if ( nestedEvents ) {
+			if ( emitNestedEvents ) {
 				item.state.events.forEach(function (event) {
 					item.on(event, function (...args) {
 						me.emit(`task.${event}`, item, ...args)
@@ -478,7 +439,7 @@ class TaskGroup extends BaseInterface {
 			item.setConfig(itemConfig, {nestedTaskConfig, nestedGroupConfig}, nestedGroupConfig, ...args)
 
 			// Bubble the nested events if desired
-			if ( nestedEvents ) {
+			if ( emitNestedEvents ) {
 				item.state.events.forEach(function (event) {
 					item.on(event, function (...args) {
 						me.emit(`group.${event}`, item, ...args)
@@ -503,7 +464,7 @@ class TaskGroup extends BaseInterface {
 		}
 
 		// Bubble the nested events if desired
-		if ( nestedEvents ) {
+		if ( emitNestedEvents ) {
 			item.state.events.forEach(function (event) {
 				item.on(event, function (...args) {
 					me.emit(`item.${event}`, item, ...args)
@@ -755,9 +716,9 @@ class TaskGroup extends BaseInterface {
 	@public
 	*/
 	get totalItems () {
-		const running = this.state.itemsRunning.length
 		const remaining = this.state.itemsRemaining.length
-		const completed = this.state.itemsCompleted.length
+		const running = this.state.itemsRunningCount
+		const completed = this.state.itemsCompletedCount
 		const total = running + remaining + completed
 		return total
 	}
@@ -778,9 +739,9 @@ class TaskGroup extends BaseInterface {
 	@public
 	*/
 	get itemTotals () {
-		const running = this.state.itemsRunning.length
 		const remaining = this.state.itemsRemaining.length
-		const completed = this.state.itemsCompleted.length
+		const running = this.state.itemsRunningCount
+		const completed = this.state.itemsCompletedCount
 		const results = this.state.results.length
 		const total = running + remaining + completed
 		return {
@@ -793,33 +754,13 @@ class TaskGroup extends BaseInterface {
 	}
 
 	/**
-	Gets the names of the items, the total number of items, and their results for the purpose of debugging.
-
-	Returns an {Object} containg the hashes:
-
-	- remaining - An {Array} of the names of the remaining items
-	- running - An {Array} of the names of the running items
-	- completed - An {Array} of the names of the completed items
-	- total - A {Number} of the total items we have
-	- results - An {Array} of the results of the compelted items
-
-	@type Object
-	@property itemNames
-	@protected
+	Whether or not we have any items yet to execute.
+	@type Boolean
+	@property hasRunning
+	@private
 	*/
-	get itemNames () {
-		const running = this.state.itemsRunning.map((item) => item.name)
-		const remaining = this.state.itemsRemaining.map((item) => item.name)
-		const completed = this.state.itemsCompleted.map((item) => item.name || item)
-		const results = this.state.results
-		const total = running.length + remaining.length + completed.length
-		return {
-			remaining,
-			running,
-			completed,
-			total,
-			results
-		}
+	get hasRemaining () {
+		return this.state.itemsRemaining.length !== 0
 	}
 
 	/**
@@ -829,17 +770,7 @@ class TaskGroup extends BaseInterface {
 	@private
 	*/
 	get hasRunning () {
-		return this.state.itemsRunning.length !== 0
-	}
-
-	/**
-	Whether or not we have any items yet to execute.
-	@type Boolean
-	@property hasRunning
-	@private
-	*/
-	get hasRemaining () {
-		return this.state.itemsRemaining.length !== 0
+		return this.state.itemsRunningCount !== 0
 	}
 
 	/**
@@ -880,7 +811,7 @@ class TaskGroup extends BaseInterface {
 	*/
 	get hasSlots () {
 		const concurrency = this.config.concurrency
-		return concurrency === 0 || this.state.itemsRunning.length < concurrency
+		return concurrency === 0 || this.state.itemsRunningCount < concurrency
 	}
 
 	/**
@@ -893,11 +824,7 @@ class TaskGroup extends BaseInterface {
 	@private
 	*/
 	get shouldFire () {
-		return (
-			!this.shouldPause &&
-			this.hasRemaining &&
-			this.hasSlots
-		)
+		return !this.shouldPause && this.hasRemaining && this.hasSlots
 	}
 
 	/**
@@ -984,40 +911,6 @@ class TaskGroup extends BaseInterface {
 
 	// ---------------------------------
 	// Firers
-
-	/**
-	Completetion Emitter. Used to emit the `completed` event and to cleanup our state.
-	@chainable
-	@method complete
-	@private
-	*/
-	complete () {
-		const completed = this.completed
-
-		if ( completed ) {
-			// Notity our listners we have completed
-			this.emit('completed', this.state.error, this.state.results)
-
-			// Prevent the error from persisting
-			this.state.error = null
-
-			// Clear and destroy completed
-			this.clearCompleted()
-
-			// Should we reset results?
-			// this.state.results = []
-			// no, it would break the promise nature of done
-			// as it would mean that if multiple done handlers are added, they would each get different results
-			// if they wish to reset the results, they should do so manually via resetResults
-
-			// Should we reset the status?
-			// this.state.status = null
-			// no, it would break the promise nature of done
-			// as it would mean that once a done is fired, no more can be fired, until run is called again
-		}
-
-		return completed
-	}
 
 	/**
 	When Done Promise.
@@ -1122,13 +1015,9 @@ class TaskGroup extends BaseInterface {
 				this.emit(status)
 			}
 
-			// Get the next item
+			// Get the next item and bump the running count
 			const item = this.state.itemsRemaining.shift()
-
-			// Add it to the remaining items
-			this.state.itemsRunning.push(item)
-
-			// Run it
+			++this.state.itemsRunningCount
 			item.run()
 
 			// Return the item
@@ -1150,8 +1039,6 @@ class TaskGroup extends BaseInterface {
 	itemCompletionCallback (item, ...args) {
 		// Prepare
 		let error = this.state.error
-		const itemsRunning = this.state.itemsRunning
-		const itemsCompleted = this.state.itemsCompleted
 		const results = this.state.results
 
 		// Update error if it exists
@@ -1161,36 +1048,18 @@ class TaskGroup extends BaseInterface {
 			}
 		}
 
-		// Mark that one less item is running
-		const index = itemsRunning.indexOf(item)
-		if ( index === -1 ) {
-			// this should never happen, but maybe it could, in which case we definitely want to know about it
-			const indexError = new Error(`Could not find [${item.names}] in the running queue`)
-			/* eslint no-console:0 */
-			console.error(errorToString(indexError))
-			if ( !error ) {
-				this.state.error = error = indexError
-			}
-		}
-		else {
-			itemsRunning.splice(index, 1)
-		}
-
-		// Add to the completed queue
-		if ( this.config.storeCompleted ) {
-			itemsCompleted.push(item)
-		}
-		else {
-			// As it will no longer be destroyed in the complete() handler, destroy it here
-			item.destroy()
-
-			// Push the item name rather than the entire item, so that our itemsCompleted will have a low footprint
-			itemsCompleted.push(item.name)
-		}
-
 		// Add the result
 		if ( item.config.includeInResults !== false ) {
 			results.push(args)
+		}
+
+		// Mark that one less item is running and one more item completed
+		--this.state.itemsRunningCount
+		++this.state.itemsCompletedCount
+
+		// As we no longer have any use for this item, as it has completed, destroy it if desired
+		if ( this.config.destroyCompleted ) {
+			item.destroy()
 		}
 
 		// Fire
@@ -1253,29 +1122,6 @@ class TaskGroup extends BaseInterface {
 	}
 
 	/**
-	Remove and destroy the completed items.
-	@chainable
-	@method clearCompleted
-	@public
-	*/
-	clearCompleted () {
-		const itemsCompleted = this.state.itemsCompleted
-		if ( this.config.storeCompleted ) {
-			while ( itemsCompleted.length !== 0 ) {
-				itemsCompleted.pop().destroy()
-			}
-		}
-		else {
-			// jscs:disable disallowEmptyBlocks
-			while ( itemsCompleted.pop() ) { }
-			// jscs:enable requireCurlyBraces
-		}
-
-		// Chain
-		return this
-	}
-
-	/**
 	Destroy ourself and prevent ourself from executing ever again.
 	@chainable
 	@method destroy
@@ -1292,8 +1138,6 @@ class TaskGroup extends BaseInterface {
 
 			// Are we already destroyed?
 			if ( status === 'destroyed' ) return
-
-			// We don't need to call clear completed items as done() will have done that for us
 
 			// Update our status and notify our listeners
 			this.state.status = status = 'destroyed'
@@ -1325,45 +1169,30 @@ class TaskGroup extends BaseInterface {
 		this.state.status = status
 		this.emit(status, error)
 
-		// Fire the completion callback
-		this.complete()
+		// Notity our listners we have completed
+		this.emit('completed', this.state.error, this.state.results)
+
+		// Prevent the error from persisting
+		this.state.error = null
+
+		// Destroy if desired
+		if ( this.config.onExit === 'destroy' ) {
+			this.destroy()
+		}
 	}
 
 	/**
-	We want to halt execution and trigger our completion callback.
-
-	@TODO figure out how this should actually work?
+	@NOTE Perhaps at some point, we can add abort/exit functionality, but these things have to be considered:
+	What will happen to currently running items?
+	What will happen to remaining items?
 	Should it be two methods? .halt() and .abort(error?)
 	Should it be a state?
 	Should it alter the state?
 	Should it clear or destroy?
 	What is the definition of pausing with this?
 	Perhaps we need to update the definition of pausing to be halted instead?
-	How can we apply this to Tasks instead?
-
-	@param {Error} error - An optional error to provide if not already set.
-	@chainable
-	@method abort
-	@private
+	How can we apply this to Task and TaskGroup consistently?
 	*/
-	abort (error) {
-		// This method is not yet implemented
-		if ( true ) {
-			const error = new Error('TaskGroup::abort has not yet been implemented.')
-			this.emit('error', error)
-		}
-
-		// Update the error state if not yet set
-		if ( error && !this.state.error ) {
-			this.state.error = error
-		}
-
-		// Finish up
-		// ...
-
-		// Chain
-		return this
-	}
 
 	/**
 	Start/restart/resume the execution of the TaskGroup.

@@ -3,9 +3,9 @@
 ## v5.0.0 Unreleased
 - Moved from CoffeeScript to ES6
 - Improved performance from 10,000 tasks in 13 seconds to 2.5 seconds
-- Completed tasks are no longer stored in `completedItems`, instead only their names are
-	- This is specified by the new configuration option `storeCompleted` and its default value of `false`
+- Running and completed tasks are no longer stored, if you wish to store them, use the event listeners
 	- This improves memory footprint of 10,000 tasks from 130MB to 4MB (taken during completion event)
+- Nested events will no longer be emitted, unless `emitNestedEvents` is `true`
 - Removed `nestedConfig`, use either `nestedGroupConfig` or `nestedTaskConfig` or both
 - Removed `exit` as it's functionality was ambiguous and undocumented
 - `addGroup`, `addGroups`, `addItem`, `addItems`, `addTask`, `addTasks` now return the added items instead of being chainable, if you want them to chain, instead use the new `addGroupChain`, etc methods.

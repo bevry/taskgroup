@@ -5,9 +5,81 @@
 
 // Imports
 const joe = require('joe')
+const eachr = require('eachr')
 const {equal, deepEqual, errorEqual} = require('assert-helpers')
 const {wait} = require('./test-util')
 const {Task, TaskGroup} = require('../../')
+
+// Helpers
+class TaskGroupTracker {
+	constructor (tasks) {
+		if ( tasks )  this.taskGroup = tasks
+	}
+
+	set taskGroup (tasks) {
+		if ( this._taskGroup )  throw new Error('already set')
+		this._taskGroup = tasks
+		this.items = {}
+		tasks.on('item.add', (item) => {
+			this.items[item.name] = 'remaining'
+			item.once('run', () => {
+				this.items[item.name] = 'running'
+			})
+			item.once('completed', () => {
+				this.items[item.name] = 'completed'
+			})
+		})
+	}
+	get taskGroup () {
+		return this._taskGroup
+	}
+
+	get details () {
+		const totals = this.taskGroup.itemTotals
+		const details = {
+			remaining: this.remaining,
+			running: this.running,
+			completed: this.completed,
+			total: this.taskGroup.totalItems,
+			results: this.taskGroup.results
+		}
+		equal(totals.remaining, details.remaining.length, 'item totals and item details has the same count for remaining')
+		equal(totals.running, details.running.length, 'item totals and item details has the same count for running')
+		equal(totals.completed, details.completed.length, 'item totals and item details has the same count for completed')
+		equal(totals.results, details.results.length, 'item totals and item details has the same count for results')
+		return details
+	}
+
+	get remaining () {
+		const arr = []
+		eachr(this.items, function (status, name) {
+			if ( status === 'remaining' ) {
+				arr.push(name)
+			}
+		})
+		return arr
+	}
+
+	get running () {
+		const arr = []
+		eachr(this.items, function (status, name) {
+			if ( status === 'running' ) {
+				arr.push(name)
+			}
+		})
+		return arr
+	}
+
+	get completed () {
+		const arr = []
+		eachr(this.items, function (status, name) {
+			if ( status === 'completed' ) {
+				arr.push(name)
+			}
+		})
+		return arr
+	}
+}
 
 // Prepare
 const delay = 100
@@ -194,7 +266,7 @@ joe.suite('task', function (suite, test) {
 			task.run()
 
 			// Check task hasn't run yet
-			equal(task.status, 'passed', 'status to be passed as we have already finished due to the sync flag')
+			equal(task.status, 'destroyed', 'status to be destroyed as we have already finished due to the sync flag')
 			deepEqual(task.result, [null, 10], 'result to be set as we have already finished due to the sync flag')
 
 			// Check that all our special checks have run
@@ -484,12 +556,14 @@ joe.suite('taskgroup', function (suite, test) {
 	suite('basic', function (suite, test) {
 		// Serial
 		test('should work when running in serial', function (done) {
-			const tasks = new TaskGroup({name: 'my tests', concurrency: 1}).done(function (err, results) {
+			const tracker = new TaskGroupTracker()
+			const tasks = tracker.taskGroup = new TaskGroup({name: 'my tests'})
+			tasks.done(function (err, results) {
 				equal(err, null)
 				equal(tasks.status, 'passed', 'status to be passed as we are within the completion callback')
 				equal(tasks.concurrency, 1)
 
-				const actualItems = tasks.itemNames
+				const actualItems = tracker.details
 				const expectedItems = {
 					remaining: [],
 					running: [],
@@ -505,7 +579,7 @@ joe.suite('taskgroup', function (suite, test) {
 			})
 
 			tasks.addTask('my task 1', function (complete) {
-				const actualItems = tasks.itemNames
+				const actualItems = tracker.details
 				const expectedItems = {
 					remaining: ['my task 2'],
 					running: ['my task 1'],
@@ -516,7 +590,7 @@ joe.suite('taskgroup', function (suite, test) {
 				deepEqual(actualItems, expectedItems, 'task 1 items before wait items')
 
 				wait(delay, function () {
-					const actualItems = tasks.itemNames
+					const actualItems = tracker.details
 					deepEqual(actualItems, expectedItems, 'task 1 items after wait items')
 
 					complete(null, 10)
@@ -524,7 +598,7 @@ joe.suite('taskgroup', function (suite, test) {
 			})
 
 			tasks.addTask('my task 2', function () {
-				const actualItems = tasks.itemNames
+				const actualItems = tracker.details
 				const expectedItems = {
 					remaining: [],
 					running: ['my task 2'],
@@ -539,7 +613,7 @@ joe.suite('taskgroup', function (suite, test) {
 
 			tasks.run()
 
-			const actualItems = tasks.itemNames
+			const actualItems = tracker.details
 			const expectedItems = {
 				remaining: ['my task 1', 'my task 2'],
 				running: [],
@@ -552,12 +626,14 @@ joe.suite('taskgroup', function (suite, test) {
 
 		// Parallel with new API
 		test('should work when running in parallel', function (done) {
-			const tasks = new TaskGroup({concurrency: 0}).done(function (err, results) {
+			const tracker = new TaskGroupTracker()
+			const tasks = tracker.taskGroup = new TaskGroup({concurrency: 0})
+			tasks.done(function (err, results) {
 				equal(err, null)
 				equal(tasks.status, 'passed', 'status to be passed as we are within the completion callback')
 				equal(tasks.concurrency, 0)
 
-				const actualItems = tasks.itemNames
+				const actualItems = tracker.details
 				const expectedItems = {
 					remaining: [],
 					running: [],
@@ -573,7 +649,7 @@ joe.suite('taskgroup', function (suite, test) {
 			})
 
 			tasks.addTask('task 1', function (complete) {
-				const actualItems = tasks.itemNames
+				const actualItems = tracker.details
 				const expectedItems = {
 					remaining: [],
 					running: ['task 1', 'task 2'],
@@ -584,7 +660,7 @@ joe.suite('taskgroup', function (suite, test) {
 				deepEqual(actualItems, expectedItems, 'task 1 before wait items')
 
 				wait(delay, function () {
-					const actualItems = tasks.itemNames
+					const actualItems = tracker.details
 					const expectedItems = {
 						remaining: [],
 						running: ['task 1'],
@@ -599,7 +675,7 @@ joe.suite('taskgroup', function (suite, test) {
 			})
 
 			tasks.addTask('task 2', function () {
-				const actualItems = tasks.itemNames
+				const actualItems = tracker.details
 				const expectedItems = {
 					remaining: [],
 					running: ['task 1', 'task 2'],
@@ -614,7 +690,7 @@ joe.suite('taskgroup', function (suite, test) {
 
 			tasks.run()
 
-			const actualItems = tasks.itemNames
+			const actualItems = tracker.details
 			const expectedItems = {
 				remaining: ['task 1', 'task 2'],
 				running: [],
@@ -627,7 +703,8 @@ joe.suite('taskgroup', function (suite, test) {
 
 		// Parallel
 		test('should work when running in parallel with new API', function (done) {
-			const tasks = TaskGroup.create({
+			const tracker = new TaskGroupTracker()
+			const tasks = tracker.taskGroup = TaskGroup.create({
 				name: 'my tasks',
 				concurrency: 0,
 				next: function (err, results) {
@@ -635,7 +712,7 @@ joe.suite('taskgroup', function (suite, test) {
 					equal(tasks.status, 'passed', 'status to be passed as we are within the completion callback')
 					equal(tasks.concurrency, 0)
 
-					const actualItems = tasks.itemNames
+					const actualItems = tracker.details
 					const expectedItems = {
 						remaining: [],
 						running: [],
@@ -651,7 +728,7 @@ joe.suite('taskgroup', function (suite, test) {
 
 				tasks: [
 					function (complete) {
-						const actualItems = tasks.itemNames
+						const actualItems = tracker.details
 						const expectedItems = {
 							remaining: [],
 							running: ['task 1 for [my tasks]', 'task 2 for [my tasks]'],
@@ -662,7 +739,7 @@ joe.suite('taskgroup', function (suite, test) {
 						deepEqual(actualItems, expectedItems, 'task 1 before wait items')
 
 						wait(delay, function () {
-							const actualItems = tasks.itemNames
+							const actualItems = tracker.details
 							const expectedItems = {
 								remaining: [],
 								running: ['task 1 for [my tasks]'],
@@ -676,7 +753,7 @@ joe.suite('taskgroup', function (suite, test) {
 						})
 					},
 					function () {
-						const actualItems = tasks.itemNames
+						const actualItems = tracker.details
 						const expectedItems = {
 							remaining: [],
 							running: ['task 1 for [my tasks]', 'task 2 for [my tasks]'],
@@ -689,9 +766,10 @@ joe.suite('taskgroup', function (suite, test) {
 						return 20
 					}
 				]
-			}).run()
+			})
+			tasks.run()
 
-			const actualItems = tasks.itemNames
+			const actualItems = tracker.details
 			const expectedItems = {
 				remaining: ['task 1 for [my tasks]', 'task 2 for [my tasks]'],
 				running: [],
@@ -707,12 +785,13 @@ joe.suite('taskgroup', function (suite, test) {
 	suite('sync flag', function (suite, test) {
 		// Serial
 		test('should work when running in serial', function (done) {
-			const tasks = new TaskGroup({sync: true, name: 'my tests', concurrency: 1}).done(function (err, results) {
+			const tracker = new TaskGroupTracker()
+			const tasks = tracker.taskGroup = new TaskGroup({sync: true, name: 'my tests', concurrency: 1}).done(function (err, results) {
 				equal(err, null)
 				equal(tasks.status, 'passed', 'status to be passed as we are within the completion callback')
 				equal(tasks.concurrency, 1)
 
-				const actualItems = tasks.itemNames
+				const actualItems = tracker.details
 				const expectedItems = {
 					remaining: [],
 					running: [],
@@ -728,7 +807,7 @@ joe.suite('taskgroup', function (suite, test) {
 			})
 
 			tasks.addTask('task 1', function (complete) {
-				const actualItems = tasks.itemNames
+				const actualItems = tracker.details
 				const expectedItems = {
 					remaining: ['task 2'],
 					running: ['task 1'],
@@ -739,7 +818,7 @@ joe.suite('taskgroup', function (suite, test) {
 				deepEqual(actualItems, expectedItems, 'task 1 items before wait items')
 
 				wait(delay, function () {
-					const actualItems = tasks.itemNames
+					const actualItems = tracker.details
 					deepEqual(actualItems, expectedItems, 'task 1 items after wait items')
 
 					complete(null, 10)
@@ -747,7 +826,7 @@ joe.suite('taskgroup', function (suite, test) {
 			})
 
 			tasks.addTask('task 2', function () {
-				const actualItems = tasks.itemNames
+				const actualItems = tracker.details
 				const expectedItems = {
 					remaining: [],
 					running: ['task 2'],
@@ -762,7 +841,7 @@ joe.suite('taskgroup', function (suite, test) {
 
 			tasks.run()
 
-			const actualItems = tasks.itemNames
+			const actualItems = tracker.details
 			const expectedItems = {
 				remaining: ['task 2'],
 				running: ['task 1'],
@@ -776,12 +855,13 @@ joe.suite('taskgroup', function (suite, test) {
 
 	// Serial
 	test('should work when running in serial with sync tasks', function (done) {
-		const tasks = new TaskGroup({sync: true, name: 'my tests', concurrency: 1}).done(function (err, results) {
+		const tracker = new TaskGroupTracker()
+		const tasks = tracker.taskGroup = new TaskGroup({sync: true, name: 'my tests', concurrency: 1}).done(function (err, results) {
 			equal(err, null)
 			equal(tasks.status, 'passed', 'status to be passed as we are within the completion callback')
 			equal(tasks.concurrency, 1)
 
-			const actualItems = tasks.itemNames
+			const actualItems = tracker.details
 			const expectedItems = {
 				remaining: [],
 				running: [],
@@ -795,7 +875,7 @@ joe.suite('taskgroup', function (suite, test) {
 		})
 
 		tasks.addTask('task 1', function (complete) {
-			const actualItems = tasks.itemNames
+			const actualItems = tracker.details
 			const expectedItems = {
 				remaining: ['task 2'],
 				running: ['task 1'],
@@ -808,7 +888,7 @@ joe.suite('taskgroup', function (suite, test) {
 		})
 
 		tasks.addTask('task 2', function () {
-			const actualItems = tasks.itemNames
+			const actualItems = tracker.details
 			const expectedItems = {
 				remaining: [],
 				running: ['task 2'],
@@ -822,7 +902,7 @@ joe.suite('taskgroup', function (suite, test) {
 
 		tasks.run()
 
-		const actualItems = tasks.itemNames
+		const actualItems = tracker.details
 		const expectedItems = {
 			remaining: [],
 			running: [],
@@ -842,13 +922,14 @@ joe.suite('taskgroup', function (suite, test) {
 
 		// Error Serial
 		test('should handle error correctly in serial', function (done) {
-			const tasks = new TaskGroup({name: 'my tasks', concurrency: 1}).done(function (err, results) {
+			const tracker = new TaskGroupTracker()
+			const tasks = tracker.taskGroup = new TaskGroup({name: 'my tasks', concurrency: 1}).done(function (err, results) {
 				errorEqual(err, 'deliberate error')
 				equal(tasks.concurrency, 1)
 				equal(tasks.status, 'failed')
 				equal(tasks.error, err)
 
-				const actualItems = tasks.itemNames
+				const actualItems = tracker.details
 				const expectedItems = {
 					remaining: ['task 2 for [my tasks]'],
 					running: [],
@@ -863,7 +944,7 @@ joe.suite('taskgroup', function (suite, test) {
 			})
 
 			tasks.addTask(function (complete) {
-				const actualItems = tasks.itemNames
+				const actualItems = tracker.details
 				const expectedItems = {
 					remaining: ['task 2 for [my tasks]'],
 					running: ['task 1 for [my tasks]'],
@@ -885,13 +966,14 @@ joe.suite('taskgroup', function (suite, test) {
 
 		// Parallel
 		test('should handle error correctly in parallel', function (done) {
-			const tasks = new TaskGroup({name: 'my tasks', concurrency: 0}).done(function (err, results) {
+			const tracker = new TaskGroupTracker()
+			const tasks = tracker.taskGroup = new TaskGroup({name: 'my tasks', concurrency: 0}).done(function (err, results) {
 				errorEqual(err, err2)
 				equal(tasks.status, 'failed')
 				equal(tasks.error, err)
 				equal(tasks.concurrency, 0)
 
-				const actualItems = tasks.itemNames
+				const actualItems = tracker.details
 				const expectedItems = {
 					remaining: [],
 					running: [],
@@ -907,7 +989,7 @@ joe.suite('taskgroup', function (suite, test) {
 
 			// Error via completion callback
 			tasks.addTask(function (complete) {
-				const actualItems = tasks.itemNames
+				const actualItems = tracker.details
 				const expectedItems = {
 					remaining: [],
 					running: ['task 1 for [my tasks]', 'task 2 for [my tasks]'],
@@ -918,7 +1000,7 @@ joe.suite('taskgroup', function (suite, test) {
 				deepEqual(actualItems, expectedItems, 'task 1 before wait items')
 
 				wait(delay, function () {
-					const actualItems = tasks.itemNames
+					const actualItems = tracker.details
 					const expectedItems = {
 						remaining: [],
 						running: ['task 1 for [my tasks]'],
@@ -936,7 +1018,7 @@ joe.suite('taskgroup', function (suite, test) {
 
 			// Error via return
 			tasks.addTask(function () {
-				const actualItems = tasks.itemNames
+				const actualItems = tracker.details
 				const expectedItems = {
 					remaining: [],
 					running: ['task 1 for [my tasks]', 'task 2 for [my tasks]'],
@@ -961,7 +1043,8 @@ joe.suite('nested', function (suite, test) {
 	test('inline format', function (done) {
 		const checks = []
 
-		const tasks = new TaskGroup('my tests', function (addGroup, addTask) {
+		const tracker = new TaskGroupTracker()
+		const tasks = tracker.taskGroup = new TaskGroup('my tests', function (addGroup, addTask) {
 			equal(this.name, 'my tests')
 
 			addTask('my task', function (complete) {
@@ -969,7 +1052,7 @@ joe.suite('nested', function (suite, test) {
 				equal(this.name, 'my task')
 
 				// totals for parent group
-				const actualItems = tasks.itemNames
+				const actualItems = tracker.details
 				const expectedItems = {
 					remaining: ['my group'],
 					running: ['my task'],
@@ -983,7 +1066,7 @@ joe.suite('nested', function (suite, test) {
 					checks.push('my task 2')
 
 					// totals for parent group
-					const actualItems = tasks.itemNames
+					const actualItems = tracker.details
 					deepEqual(actualItems, expectedItems, 'my task items after wait')
 
 					complete(null, 10)
@@ -996,7 +1079,7 @@ joe.suite('nested', function (suite, test) {
 				equal(this.name, 'my group')
 
 				// totals for parent group
-				let actualItems = tasks.itemNames
+				let actualItems = tracker.details
 				let expectedItems = {
 					remaining: [],
 					running: ['my group'],
@@ -1022,7 +1105,7 @@ joe.suite('nested', function (suite, test) {
 					equal(this.name, 'my second task')
 
 					// totals for parent group
-					let actualItems = tasks.itemNames
+					let actualItems = tracker.details
 					let expectedItems = {
 						remaining: [],
 						running: ['my group'],
@@ -1055,7 +1138,7 @@ joe.suite('nested', function (suite, test) {
 			equal(checks.length, 4, 'all the expected checks ran')
 
 			// totals for parent group
-			const actualItems = tasks.itemNames
+			const actualItems = tracker.details
 			const expectedItems = {
 				remaining: [],
 				running: [],
@@ -1079,14 +1162,15 @@ joe.suite('nested', function (suite, test) {
 	test('traditional format', function (done) {
 		const checks = []
 
-		const tasks = new TaskGroup({name: 'my tests'}).run()
+		const tracker = new TaskGroupTracker()
+		const tasks = tracker.taskGroup = new TaskGroup({name: 'my tests'}).run()
 
 		tasks.addTask('my task', function (complete) {
 			checks.push('my task 1')
 			equal(this.name, 'my task')
 
 			// totals for parent group
-			const actualItems = tasks.itemNames
+			const actualItems = tracker.details
 			const expectedItems = {
 				remaining: ['my group'],
 				running: ['my task'],
@@ -1100,7 +1184,7 @@ joe.suite('nested', function (suite, test) {
 				checks.push('my task 2')
 
 				// totals for parent group
-				const actualItems = tasks.itemNames
+				const actualItems = tracker.details
 				deepEqual(actualItems, expectedItems, 'my task items after wait')
 
 				complete(null, 10)
@@ -1113,7 +1197,7 @@ joe.suite('nested', function (suite, test) {
 			equal(this.name, 'my group')
 
 			// totals for parent group
-			let actualItems = tasks.itemNames
+			let actualItems = tracker.details
 			let expectedItems = {
 				remaining: [],
 				running: ['my group'],
@@ -1139,7 +1223,7 @@ joe.suite('nested', function (suite, test) {
 				equal(this.name, 'my second task')
 
 				// totals for parent group
-				let actualItems = tasks.itemNames
+				let actualItems = tracker.details
 				expectedItems = {
 					remaining: [],
 					running: ['my group'],
@@ -1171,7 +1255,7 @@ joe.suite('nested', function (suite, test) {
 			equal(checks.length, 4, 'all the expected checks ran')
 
 			// totals for parent group
-			const actualItems = tasks.itemNames
+			const actualItems = tracker.details
 			const expectedItems = {
 				remaining: [],
 				running: [],
@@ -1195,13 +1279,14 @@ joe.suite('nested', function (suite, test) {
 	test('mixed format', function (done) {
 		const checks = []
 
-		const tasks = new TaskGroup({name: 'my tests'})
+		const tracker = new TaskGroupTracker()
+		const tasks = tracker.taskGroup = new TaskGroup({name: 'my tests'})
 
 		tasks.addTask('my task 1', function () {
 			checks.push('my task 1')
 
 			// totals for parent group
-			const actualItems = tasks.itemNames
+			const actualItems = tracker.details
 			const expectedItems = {
 				remaining: ['my group 1', 'my task 3'],
 				running: ['my task 1'],
@@ -1220,7 +1305,7 @@ joe.suite('nested', function (suite, test) {
 			equal(this.name, 'my group 1')
 
 			// totals for parent group
-			let actualItems = tasks.itemNames
+			let actualItems = tracker.details
 			let expectedItems = {
 				remaining: ['my task 3'],
 				running: ['my group 1'],
@@ -1246,7 +1331,7 @@ joe.suite('nested', function (suite, test) {
 				equal(this.name, 'my task 2')
 
 				// totals for parent group
-				let actualItems = tasks.itemNames
+				let actualItems = tracker.details
 				let expectedItems = {
 					remaining: ['my task 3'],
 					running: ['my group 1'],
@@ -1276,7 +1361,7 @@ joe.suite('nested', function (suite, test) {
 			equal(this.name, 'my task 3')
 
 			// totals for parent group
-			const actualItems = tasks.itemNames
+			const actualItems = tracker.details
 			const expectedItems = {
 				remaining: [],
 				running: ['my task 3'],
@@ -1301,7 +1386,7 @@ joe.suite('nested', function (suite, test) {
 			equal(checks.length, 4, 'all the expected checks ran')
 
 			// totals for parent group
-			const actualItems = tasks.itemNames
+			const actualItems = tracker.details
 			const expectedItems = {
 				remaining: [],
 				running: [],

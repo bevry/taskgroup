@@ -170,7 +170,9 @@ export default class Task extends BaseInterface {
 	@default ['events', 'error', 'started', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed']
 	@protected
 	*/
-	get events () { return this.state.events }
+	get events () {
+		return ['events', 'error', 'started', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed']
+	}
 
 	/**
 	An {Array} representing the returned result or the passed {Arguments} of our method.
@@ -202,14 +204,14 @@ export default class Task extends BaseInterface {
 		extendr.defaults(this.state, {
 			name: `${this.type} ${Math.random()}`,
 			error: null,
-			status: null,
-			events: ['events', 'error', 'started', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed']
+			status: null
 		})
 
 		// Configuration defaults
 		extendr.defaults(this.config, {
 			run: false,
 			onError: 'exit',
+			onExit: 'destroy',
 			ambi: true,
 			domain: true,
 			sync: false,
@@ -319,7 +321,7 @@ export default class Task extends BaseInterface {
 		}
 
 		// Complete for the first (and hopefully only) time
-		if ( this.completed === false ) {
+		if ( !this.completed ) {
 			// Apply the result if it exists
 			if ( args.length !== 0 ) this.state.result = args
 		}
@@ -341,14 +343,23 @@ export default class Task extends BaseInterface {
 		const error = this.state.error
 
 		// Complete for the first (and hopefully only) time
-		if ( this.completed === false ) {
+		if ( !this.completed ) {
 			// Set the status and emit depending on success or failure status
 			const status = error ? 'failed' : 'passed'
 			this.state.status = status
 			this.emit(status, error)
 
-			// Fire the completion callback
-			this.complete()
+			// Notify our listeners we have completed
+			const args = this.state.result || []
+			this.emit('completed', ...args)
+
+			// Prevent the error from persisting
+			this.state.error = null
+
+			// Destroy if desired
+			if ( this.config.onExit === 'destroy' ) {
+				this.destroy()
+			}
 		}
 
 		// Error as we have already completed before
@@ -359,69 +370,6 @@ export default class Task extends BaseInterface {
 
 		// Chain
 		return this
-	}
-
-	/**
-	Allow the user to abort the execution of this task.
-	@chainable
-	@method abort
-	@private
-	@TODO figure out how this should actually work
-	*/
-	abort (error) {
-		// Not yet implemented
-		if ( true ) {
-			const error = new Error('TaskGroup::abort has not yet been implemented.')
-			this.emit('error', error)
-		}
-
-		// Don't allow aborting if we have already completed
-		if ( this.completed ) {
-			const error = new Error(`The task [${this.names}] cannot abort as the task has already completed, this is unexpected.`)
-			this.emit('error', error)
-		}
-		else {
-			// Update the error state if not yet set
-			if ( error && !this.state.error ) {
-				this.state.error = error
-			}
-
-			// Finish up
-			this.finish()
-		}
-
-		// Chain
-		return this
-	}
-
-	/**
-	Completetion Emitter. Used to emit the `completed` event and to cleanup our state.
-	@chainable
-	@method complete
-	@private
-	*/
-	complete () {
-		const completed = this.completed
-		if ( completed ) {
-			// Notify our listeners we have completed
-			const args = this.state.result || []
-			this.emit('completed', ...args)
-
-			// Prevent the error from persisting
-			this.state.error = null
-
-			// Should we reset results?
-			// this.results = []
-			// no, it would break the promise nature of done
-			// as it would mean that if multiple done listener are added, they would each get different results
-			// if they wish to reset the results, they should do so manually via resetResults
-
-			// Should we reset the status?
-			// this.status = null
-			// no, it would break the promise nature of done
-			// as it would mean that once a done is fired, no more can be fired, until run is called again
-		}
-		return completed
 	}
 
 	/**
@@ -519,11 +467,10 @@ export default class Task extends BaseInterface {
 			this.emit(status)
 
 			// Clear results
-			this.resetResults()
-			// item arrays should already be wiped due to done completion
+			// this.resetResults()
+			// ^ don't bother, nothing listens to this, not essential
 
-			// Remove all isteners
-			// thisTODO should we exit or dispose of the domain?
+			// Remove all listeners
 			this.removeAllListeners()
 
 			// Clear the domain

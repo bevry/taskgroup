@@ -16,8 +16,10 @@ function createTask (name, value) {
 	}
 }
 
-// Create the taskgroup
+// Log
 console.log('Running benchmarks on:', process.versions)
+
+// Create the taskgroup
 const start = (new Date()).getTime()
 const tasks = TaskGroup.create()
 
