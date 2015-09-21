@@ -82,10 +82,15 @@
 
 <div class="file">
     <pre class="code prettyprint linenums">
+/* eslint no-extra-parens:0 */
+&#x27;use strict&#x27;
+
 // Imports
 const BaseInterface = require(&#x27;./interface&#x27;)
 const Task = require(&#x27;./task&#x27;)
-const {copyObject, iterateObject, ensureArray, errorToString} = require(&#x27;./util&#x27;)
+const {ensureArray, errorToString} = require(&#x27;./util&#x27;)
+const extendr = require(&#x27;extendr&#x27;)
+const eachr = require(&#x27;eachr&#x27;)
 
 /**
 Our TaskGroup class.
@@ -143,7 +148,7 @@ class TaskGroup extends BaseInterface {
     @public
     */
     static isTaskGroup (group) {
-        return (group &amp;&amp; group.type === &#x27;taskgroup&#x27;) || group instanceof this
+        return group &amp;&amp; group.type === &#x27;taskgroup&#x27; || group instanceof this
     }
 
     /**
@@ -264,10 +269,10 @@ class TaskGroup extends BaseInterface {
     @public
     */
     constructor (...args) {
-        super(...args)
+        super()
 
         // State defaults
-        this.state = {
+        extendr.defaults(this.state, {
             id: &#x60;${this.type} ${Math.random()}&#x60;,
             error: null,
             status: null,
@@ -276,10 +281,10 @@ class TaskGroup extends BaseInterface {
             itemsRemaining: [],
             itemsRunning: [],
             itemsCompleted: []
-        }
+        })
 
         // Configuration defaults
-        this.config = {
+        extendr.defaults(this.config, {
             // @TODO update storeCompleted to actually not store anything
             // this will require tests to be updated (as task names no longer will be stored)
             // as well as a counter inserted for the total completed (we may even get rid of that)
@@ -294,7 +299,7 @@ class TaskGroup extends BaseInterface {
             concurrency: 1,
             onError: &#x27;exit&#x27;,
             sync: false
-        }
+        })
 
         // Apply user configuration
         this.setConfig(...args)
@@ -318,7 +323,7 @@ class TaskGroup extends BaseInterface {
     */
     setNestedTaskConfig (opts) {
         // Fetch and copy options to the state&#x27;s nested task configuration
-        copyObject(this.state.nestedTaskConfig, opts)
+        extendr.deep(this.state.nestedTaskConfig, opts)
 
         // Chain
         return this
@@ -333,7 +338,7 @@ class TaskGroup extends BaseInterface {
     */
     setNestedGroupConfig (opts) {
         // Fetch and copy options to the state&#x27;s nested configuration
-        copyObject(this.state.nestedGroupConfig, opts)
+        extendr.deep(this.state.nestedGroupConfig, opts)
 
         // Chain
         return this
@@ -383,7 +388,7 @@ class TaskGroup extends BaseInterface {
                     opts.method = arg
                     break
                 case &#x27;object&#x27;:
-                    copyObject(opts, arg)
+                    extendr.deep(opts, arg)
                     break
                 default:
                     const error = new Error(&#x60;Unknown argument type of [${type}] given to TaskGroup::setConfig()&#x60;)
@@ -392,17 +397,17 @@ class TaskGroup extends BaseInterface {
         })
 
         // Apply the configuration directly to our instance
-        iterateObject(opts, (value, key) =&gt; {
+        eachr(opts, (value, key) =&gt; {
             if ( value == null )  return
             switch ( key ) {
                 case &#x27;on&#x27;:
-                    iterateObject(value, (value, key) =&gt; {
+                    eachr(value, (value, key) =&gt; {
                         if ( value )  this.on(key, value)
                     })
                     break
 
                 case &#x27;once&#x27;:
-                    iterateObject(value, (value, key) =&gt; {
+                    eachr(value, (value, key) =&gt; {
                         if ( value )  this.once(key, value)
                     })
                     break
@@ -959,9 +964,7 @@ class TaskGroup extends BaseInterface {
     */
     get hasSlots () {
         const concurrency = this.config.concurrency
-        return (
-            concurrency === 0 || this.state.itemsRunning.length &lt; concurrency
-        )
+        return concurrency === 0 || this.state.itemsRunning.length &lt; concurrency
     }
 
     /**
@@ -1247,6 +1250,7 @@ class TaskGroup extends BaseInterface {
         if ( index === -1 ) {
             // this should never happen, but maybe it could, in which case we definitely want to know about it
             const indexError = new Error(&#x60;Could not find [${item.names}] in the running queue&#x60;)
+            /* eslint no-console:0 */
             console.error(errorToString(indexError))
             if ( !error ) {
                 this.state.error = error = indexError
@@ -1263,7 +1267,8 @@ class TaskGroup extends BaseInterface {
         else {
             // As it will no longer be destroyed in the complete() handler, destroy it here
             item.destroy()
-            // Push the item name instead to keep getItemNames() working while keeping our footprint low
+
+            // Push the item name rather than the entire item, so that our itemsCompleted will have a low footprint
             itemsCompleted.push(item.name)
         }
 
@@ -1392,7 +1397,7 @@ class TaskGroup extends BaseInterface {
 
     /**
     Set our task to the completed state.
-    @TODO why is this here instead of inside .complete() ?
+    @NOTE This doesn&#x27;t have to be a separate method, it could just go inside &#x60;fire&#x60; however, it is nice to have here to keep &#x60;fire&#x60; simple
     @chainable
     @method finish
     @private
@@ -1426,7 +1431,7 @@ class TaskGroup extends BaseInterface {
     @private
     */
     abort (error) {
-        // Not yet implemented
+        // This method is not yet implemented
         if ( true ) {
             const error = new Error(&#x27;TaskGroup::abort has not yet been implemented.&#x27;)
             this.emit(&#x27;error&#x27;, error)

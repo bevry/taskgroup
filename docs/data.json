@@ -62,7 +62,7 @@
             "plugin_for": [],
             "extension_for": [],
             "file": "esnext/lib/task.js",
-            "line": 6,
+            "line": 8,
             "description": "Our Task Class\n\nAvailable configuration is documented in {{#crossLink \"Task/setConfig\"}}{{/crossLink}}.\n\nAvailable events:\n\n- `started()` - emitted when we start execution\n- `running()` - emitted when the method starts execution\n- `failed(error)` - emitted when execution exited with a failure\n- `passed()` - emitted when execution exited with a success\n- `completed(error, ...resultArguments)` - emitted when execution exited, `resultArguments` are the result arguments from the method\n- `error(error)` - emtited if an unexpected error occurs without ourself\n- `done(error, ...resultArguments)` - emitted when either execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)\n\nAvailable internal statuses:\n\n- `null` - execution has not yet started\n- `'started'` - execution has begun\n- `'running'` - execution of our method has begun\n- `'failed'` - execution of our method has failed\n- `'passed'` - execution of our method has succeeded\n- `'destroyed'` - we've been destroyed and can no longer execute\n\nExample:\n\n``` javascript\nvar Task = require('taskgroup').Task\nvar task\n\ntask = new Task('my synchronous task', function(){\n\treturn 5\n}).done(console.info).run()  // [null, 5]\n\ntask = new Task('my asynchronous task', function(complete){\n\tcomplete(null, 5)\n}).done(console.info).run()  // [null, 5]\n\ntask = new Task('my task that returns an error', function(){\n\tvar error = new Error('deliberate error')\n\treturn error\n}).done(console.info).run()  // [Error('deliberator error')]\n\ntask = new Task('my task that passes an error', function(complete){\n\tvar error = new Error('deliberate error')\n\tcomplete(error)\n}).done(console.info).run()  // [Error('deliberator error')]\n```",
             "extends": "BaseInterface",
             "is_constructor": 1,
@@ -78,7 +78,7 @@
             "plugin_for": [],
             "extension_for": [],
             "file": "esnext/lib/taskgroup.js",
-            "line": 6,
+            "line": 11,
             "description": "Our TaskGroup class.\n\nAvailable configuration is documented in {{#crossLink \"TaskGroup/setConfig\"}}{{/crossLink}}.\n\nAvailable events:\n\n- `started()` - emitted when we start execution\n- `running()` - emitted when the first item starts execution\n- `failed(error)` - emitted when execution exited with a failure\n- `passed()` - emitted when execution exited with a success\n- `completed(error, results)` - emitted when execution exited, `results` is an {Array} of the result arguments for each item that executed\n- `error(error)` - emtited if an unexpected error occured within ourself\n- `done(error, results)` - emitted when either the execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)\n- `item.*(...)` - bubbled events from an added item\n- `task.*(...)` - bubbled events from an added {Task}\n- `group.*(...)` - bubbled events from an added {TaskGroup}\n\nAvailable internal statuses:\n\n- `null` - execution has not yet started\n- `'started'` - execution has begun\n- `'running'` - execution of items has begun\n- `'failed'` - execution has exited with failure status\n- `'passed'` - execution has exited with success status\n- `'destroyed'` - we've been destroyed and can no longer execute",
             "is_constructor": 1,
             "extends": "BaseInterface",
@@ -113,14 +113,14 @@
         {
             "file": "esnext/lib/interface.js",
             "line": 26,
-            "description": "BaseInterface Constructor\n\nAdds support for the done event while\nensuring that errors are always handled correctly.\nIt does this by listening to the `error` and `completed` events,\nand when the emit, we check if there is a `done` listener:\n\n- if there is, then emit the done event with the original event arguments\n- if there isn't, then output the error to stderr and throw it.",
+            "description": "BaseInterface Constructor\n\nAdds support for the done event while\nensuring that errors are always handled correctly.\nIt does this by listening to the `error` and `completed` events,\nand when the emit, we check if there is a `done` listener:\n\n- if there is, then emit the done event with the original event arguments\n- if there isn't, then output the error to stderr and throw it.\n\nSets the following configuration:\n\n- `nameSeparator` defaults to `' ➞  '`, used to stringify the result of `.names`",
             "itemtype": "method",
             "name": "constructor",
             "class": "BaseInterface"
         },
         {
             "file": "esnext/lib/interface.js",
-            "line": 71,
+            "line": 80,
             "description": "Attaches the listener to the `done` event to be emitted each time.",
             "params": [
                 {
@@ -138,7 +138,7 @@
         },
         {
             "file": "esnext/lib/interface.js",
-            "line": 88,
+            "line": 97,
             "description": "Attaches the listener to the `done` event to be emitted only once, then removed to not fire again.",
             "params": [
                 {
@@ -156,7 +156,7 @@
         },
         {
             "file": "esnext/lib/interface.js",
-            "line": 105,
+            "line": 114,
             "description": "Alias for {{#crossLink \"BaseInterface/onceDone\"}}{{/crossLink}}",
             "params": [
                 {
@@ -174,20 +174,9 @@
         },
         {
             "file": "esnext/lib/interface.js",
-            "line": 116,
+            "line": 125,
             "description": "Gets our name prepended by all of our parents names",
             "type": "Array",
-            "itemtype": "property",
-            "name": "namesArray",
-            "access": "public",
-            "tagname": "",
-            "class": "BaseInterface"
-        },
-        {
-            "file": "esnext/lib/interface.js",
-            "line": 132,
-            "description": "Gets our name prefixed by all of our parents names",
-            "type": "String",
             "itemtype": "property",
             "name": "names",
             "access": "public",
@@ -196,7 +185,7 @@
         },
         {
             "file": "esnext/lib/interface.js",
-            "line": 143,
+            "line": 144,
             "description": "Get the name of our instance.\nIf the name was never configured, then return the name in the format of `'#{this.type} #{Math.random()}'` to output something like `task 0.2123`",
             "type": "String",
             "itemtype": "property",
@@ -207,7 +196,7 @@
         },
         {
             "file": "esnext/lib/interface.js",
-            "line": 154,
+            "line": 155,
             "description": "Get extra state information for debugging.",
             "type": "String",
             "itemtype": "property",
@@ -218,7 +207,7 @@
         },
         {
             "file": "esnext/lib/interface.js",
-            "line": 168,
+            "line": 169,
             "description": "Executes the passed function either synchronously if `config.sync` is `true` or delays it for the next tick.",
             "params": [
                 {
@@ -236,7 +225,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 61,
+            "line": 63,
             "description": "The type of our class.\n\nUsed for the purpose of duck typing\nwhich is needed when working with node virtual machines\nas instanceof will not work in those environments.",
             "type": "String",
             "itemtype": "property",
@@ -248,7 +237,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 75,
+            "line": 77,
             "description": "A helper method to check if the passed argument is an instanceof a {Task}.",
             "params": [
                 {
@@ -270,7 +259,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 87,
+            "line": 89,
             "description": "Have we started execution yet?",
             "type": "Boolean",
             "itemtype": "property",
@@ -281,7 +270,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 97,
+            "line": 99,
             "description": "Have we finished its execution yet?",
             "type": "Boolean",
             "itemtype": "property",
@@ -292,7 +281,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 114,
+            "line": 116,
             "description": "Have we been destroyed?",
             "type": "Boolean",
             "itemtype": "property",
@@ -303,7 +292,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 124,
+            "line": 126,
             "description": "Have we completed its execution yet?",
             "type": "Boolean",
             "itemtype": "property",
@@ -314,7 +303,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 145,
+            "line": 147,
             "description": "The first {Error} that has occured.",
             "type": "Error",
             "itemtype": "property",
@@ -325,7 +314,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 153,
+            "line": 155,
             "description": "A {String} containing our current status. See our {Task} description for available values.",
             "type": "String",
             "itemtype": "property",
@@ -336,7 +325,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 161,
+            "line": 163,
             "description": "An {Array} of the events that we may emit. Events that will be executed can be found in the {Task} description.",
             "type": "Array",
             "itemtype": "property",
@@ -348,7 +337,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 170,
+            "line": 172,
             "description": "An {Array} representing the returned result or the passed {Arguments} of our method.\nThe first item in the array should be the {Error} if it exists.",
             "type": "Array",
             "itemtype": "property",
@@ -359,7 +348,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 179,
+            "line": 181,
             "description": "The {Domain} that we create to capture errors for our method.",
             "type": "Domain",
             "itemtype": "property",
@@ -370,7 +359,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 187,
+            "line": 189,
             "description": "Initialize our new {Task} instance. Forwards arguments onto {{#crossLink \"Task/setConfig\"}}{{/crossLink}}.",
             "itemtype": "method",
             "name": "constructor",
@@ -380,7 +369,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 218,
+            "line": 220,
             "description": "Set the configuration for our instance.",
             "params": [
                 {
@@ -482,7 +471,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 301,
+            "line": 303,
             "description": "What to do when our task method completes.\nShould only ever execute once, if it executes more than once, then we error.",
             "params": [
                 {
@@ -500,7 +489,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 329,
+            "line": 331,
             "description": "Set our task to the completed state.",
             "chainable": 1,
             "itemtype": "method",
@@ -511,7 +500,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 359,
+            "line": 361,
             "description": "Allow the user to abort the execution of this task.",
             "chainable": 1,
             "itemtype": "method",
@@ -525,7 +514,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 392,
+            "line": 394,
             "description": "Completetion Emitter. Used to emit the `completed` event and to cleanup our state.",
             "chainable": 1,
             "itemtype": "method",
@@ -536,7 +525,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 422,
+            "line": 424,
             "description": "When Done Promise.\nFires the listener, either on the next tick if we are already done, or if not, each time the `done` event fires.",
             "params": [
                 {
@@ -554,7 +543,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 446,
+            "line": 448,
             "description": "Once Done Promise.\nFires the listener once, either on the next tick if we are already done, or if not, each time the `done` event fires.",
             "params": [
                 {
@@ -572,7 +561,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 470,
+            "line": 472,
             "description": "Reset the results.\nAt this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.",
             "chainable": 1,
             "itemtype": "method",
@@ -583,7 +572,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 482,
+            "line": 484,
             "description": "Clear the domain",
             "chainable": 1,
             "itemtype": "method",
@@ -594,7 +583,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 498,
+            "line": 500,
             "description": "Destroy ourself and prevent ourself from executing ever again.",
             "chainable": 1,
             "itemtype": "method",
@@ -605,7 +594,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 532,
+            "line": 534,
             "description": "Fire the task method with our config arguments and wrapped in a domain.",
             "chainable": 1,
             "itemtype": "method",
@@ -616,7 +605,7 @@
         },
         {
             "file": "esnext/lib/task.js",
-            "line": 630,
+            "line": 632,
             "description": "Start the execution of the task.\nWill emit an `error` event if the task has already started before.",
             "chainable": 1,
             "itemtype": "method",
@@ -627,7 +616,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 39,
+            "line": 44,
             "description": "The type of our class.\n\nUsed for the purpose of duck typing\nwhich is needed when working with node virtual machines\nas instanceof will not work in those environments.",
             "type": "String",
             "itemtype": "property",
@@ -639,7 +628,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 53,
+            "line": 58,
             "description": "A helper method to check if the passed argument is an instanceof a {TaskGroup}.",
             "params": [
                 {
@@ -661,7 +650,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 65,
+            "line": 70,
             "description": "A reference to the {Task} class for use in {::createTask} if we want to override it.",
             "type": "Task",
             "itemtype": "property",
@@ -673,7 +662,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 74,
+            "line": 79,
             "description": "A reference to the {TaskGroup} class for use in {::createGroup} if we want to override it.",
             "type": "TaskGroup",
             "itemtype": "property",
@@ -685,7 +674,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 86,
+            "line": 91,
             "description": "A reference to the {Task} class.",
             "type": "Task",
             "itemtype": "property",
@@ -698,7 +687,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 96,
+            "line": 101,
             "description": "A reference to the {TaskGroup} class.",
             "type": "TaskGroup",
             "itemtype": "property",
@@ -711,7 +700,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 110,
+            "line": 115,
             "description": "The {config.concurrency} property.",
             "type": "Number",
             "itemtype": "property",
@@ -722,7 +711,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 118,
+            "line": 123,
             "description": "The first {Error} that has occured.",
             "type": "Error",
             "itemtype": "property",
@@ -733,7 +722,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 126,
+            "line": 131,
             "description": "A {String} containing our current status. See our {TaskGroup} description for available values.",
             "type": "String",
             "itemtype": "property",
@@ -744,7 +733,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 134,
+            "line": 139,
             "description": "An {Array} of the events that we may emit. Events that will be executed can be found in the {Task} description.",
             "type": "Array",
             "itemtype": "property",
@@ -755,7 +744,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 142,
+            "line": 147,
             "description": "An {Array} that contains the result property for each completed {Task} and {TaskGroup}.\nAn item can disable having its result property added to this results array by setting its {includeInResults} configuration option to `false`.",
             "type": "Array",
             "itemtype": "property",
@@ -766,7 +755,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 151,
+            "line": 156,
             "description": "An {Array} of each {Task} and {TaskGroup} in this group that are still yet to execute.",
             "type": "Array",
             "itemtype": "property",
@@ -777,7 +766,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 159,
+            "line": 164,
             "description": "An {Array} of each {Task} and {TaskGroup} in this group that are currently executing.",
             "todo": [
                 "offer the ability to disable this completely via `storeRunningItems: false`"
@@ -791,7 +780,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 168,
+            "line": 173,
             "description": "An {Array} of each {Task} and {TaskGroup} in this group that have completed.",
             "todo": [
                 "offer the ability to disable this completely via `storeCompletedItems: false`"
@@ -805,7 +794,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 177,
+            "line": 182,
             "description": "Initialize our new {TaskGroup} instance. Forwards arguments onto {{#crossLink \"TaskGroup/setConfig\"}}{{/crossLink}}.",
             "itemtype": "method",
             "name": "constructor",
@@ -815,7 +804,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 228,
+            "line": 233,
             "description": "Merged passed configuration into {config.nestedTaskConfig}.",
             "params": [
                 {
@@ -833,7 +822,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 243,
+            "line": 248,
             "description": "Merged passed configuration into {config.nestedGroupConfig}.",
             "params": [
                 {
@@ -851,7 +840,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 258,
+            "line": 263,
             "description": "Set the configuration for our instance.\n\nDespite accepting an {Object} of configuration, we can also accept an {Array} of configuration.\tWhen using an array, a {String} becomes the :name, a {Function} becomes the :method, and an {Object} becomes the :config",
             "params": [
                 {
@@ -971,7 +960,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 365,
+            "line": 370,
             "description": "Prepare the method and it's configuration, and add it as a task to be executed.",
             "params": [
                 {
@@ -997,7 +986,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 382,
+            "line": 387,
             "description": "Autorun ourself under certain conditions.\n\nThose conditions being:\n\n- if we the :method configuration is defined, and we have no :parent\n- if we the :run configuration is `true`\n\nUsed primarily to cause the :method to fire at the appropriate time when using inline style.",
             "chainable": 1,
             "itemtype": "method",
@@ -1008,7 +997,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 425,
+            "line": 430,
             "description": "Adds a {Task|TaskGroup} instance and configures it from the arguments.",
             "params": [
                 {
@@ -1030,7 +1019,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 528,
+            "line": 533,
             "description": "Adds {Task|TaskGroup} instances and configures them from the arguments.",
             "params": [
                 {
@@ -1057,7 +1046,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 544,
+            "line": 549,
             "description": "Same as {{#crossLink \"TaskGroup/addItem\"}}{{/crossLink}} but chains instead of returning the item.",
             "chainable": 1,
             "itemtype": "method",
@@ -1068,7 +1057,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 555,
+            "line": 560,
             "description": "Same as {{#crossLink \"TaskGroup/addItems\"}}{{/crossLink}} but chains instead of returning the item.",
             "chainable": 1,
             "itemtype": "method",
@@ -1079,7 +1068,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 570,
+            "line": 575,
             "description": "Creates a {Task} instance and configures it from the arguments.\n\nIf the first argument is already a {Task} instance, then we configure it with the remaining arguments, instead of creating a new {Task} instance.",
             "params": [
                 {
@@ -1101,7 +1090,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 600,
+            "line": 605,
             "description": "Adds a {Task} instance and configures it from the arguments.\n\nIf a {Task} instance is not supplied, a {Task} instance is created from the arguments.",
             "params": [
                 {
@@ -1123,7 +1112,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 616,
+            "line": 621,
             "description": "Adds {Task} instances and configures them from the arguments.",
             "params": [
                 {
@@ -1150,7 +1139,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 632,
+            "line": 637,
             "description": "Same as {{#crossLink \"TaskGroup/addTask\"}}{{/crossLink}} but chains instead of returning the item.",
             "chainable": 1,
             "itemtype": "method",
@@ -1161,7 +1150,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 643,
+            "line": 648,
             "description": "Same as {{#crossLink \"TaskGroup/addTasks\"}}{{/crossLink}} but chains instead of returning the item.",
             "chainable": 1,
             "itemtype": "method",
@@ -1172,7 +1161,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 658,
+            "line": 663,
             "description": "Creates a {TaskGroup} instance and configures it from the arguments.\n\nIf the first argument is already a {TaskGroup} instance, then we configure it with the remaining arguments, instead of creating a new {TaskGroup} instance.",
             "params": [
                 {
@@ -1194,7 +1183,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 688,
+            "line": 693,
             "description": "Adds a {TaskGroup} instance and configures it from the arguments.\n\nIf a {TaskGroup} instance is not supplied, a {TaskGroup} instance is created from the arguments.",
             "params": [
                 {
@@ -1216,7 +1205,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 704,
+            "line": 709,
             "description": "Adds {TaskGroup} instances and configures them from the arguments.",
             "params": [
                 {
@@ -1243,7 +1232,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 720,
+            "line": 725,
             "description": "Same as {{#crossLink \"TaskGroup/addGroup\"}}{{/crossLink}} but chains instead of returning the item.",
             "chainable": 1,
             "itemtype": "method",
@@ -1254,7 +1243,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 731,
+            "line": 736,
             "description": "Same as {{#crossLink \"TaskGroup/addGroups\"}}{{/crossLink}} but chains instead of returning the item.",
             "chainable": 1,
             "itemtype": "method",
@@ -1265,7 +1254,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 746,
+            "line": 751,
             "description": "Gets the total number of items inside our task group.",
             "type": "Number",
             "itemtype": "property",
@@ -1276,7 +1265,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 760,
+            "line": 765,
             "description": "Gets the total number count of each of our item lists.\n\nReturns an {Object} containg the hashes:\n\n- remaining - A {Number} of the names of the remaining items.\n- running - A {Number} of the names of the running items.\n- completed - A {Number} of the names of the completed items.\n- total - A {Number} of the total items we have.\n- results - A {Number} of the total results we have.",
             "type": "Object",
             "itemtype": "property",
@@ -1287,7 +1276,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 790,
+            "line": 795,
             "description": "Gets the names of the items, the total number of items, and their results for the purpose of debugging.\n\nReturns an {Object} containg the hashes:\n\n- remaining - An {Array} of the names of the remaining items\n- running - An {Array} of the names of the running items\n- completed - An {Array} of the names of the completed items\n- total - A {Number} of the total items we have\n- results - An {Array} of the results of the compelted items",
             "type": "Object",
             "itemtype": "property",
@@ -1298,7 +1287,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 820,
+            "line": 825,
             "description": "Whether or not we have any running items.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1309,7 +1298,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 830,
+            "line": 835,
             "description": "Whether or not we have any items yet to execute.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1320,7 +1309,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 840,
+            "line": 845,
             "description": "Whether or not we have any items running or remaining.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1331,7 +1320,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 850,
+            "line": 855,
             "description": "Whether or not we have an error.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1342,7 +1331,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 860,
+            "line": 865,
             "description": "Whether or not we have an error or a result.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1353,7 +1342,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 870,
+            "line": 875,
             "description": "Whether or not we have any available slots to execute more items.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1364,7 +1353,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 883,
+            "line": 886,
             "description": "Whether or not we are capable of firing more items.\n\nThis is determined whether or not we are not paused, and we have remaning items, and we have slots able to execute those remaning items.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1375,7 +1364,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 900,
+            "line": 903,
             "description": "Whether or not we have errord and want to pause when we have an error.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1386,7 +1375,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 912,
+            "line": 915,
             "description": "Whether or not we execution is currently paused.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1397,7 +1386,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 925,
+            "line": 928,
             "description": "Whether or not we have no running or remaining items left.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1408,7 +1397,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 935,
+            "line": 938,
             "description": "Whether or not we have finished execution.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1419,7 +1408,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 952,
+            "line": 955,
             "description": "Whether or not we have started execution.",
             "type": "Boolean",
             "itemtype": "property",
@@ -1430,7 +1419,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 962,
+            "line": 965,
             "description": "Whether or not we execution has completed.\n\nCompletion of executed is determined of whether or not we have started, and whether or not we are currently paused or have no remaining and running items left",
             "type": "Boolean",
             "itemtype": "property",
@@ -1441,7 +1430,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 985,
+            "line": 988,
             "description": "Completetion Emitter. Used to emit the `completed` event and to cleanup our state.",
             "chainable": 1,
             "itemtype": "method",
@@ -1452,7 +1441,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 1019,
+            "line": 1022,
             "description": "When Done Promise.\nFires the listener, either on the next tick if we are already done, or if not, each time the `done` event fires.",
             "params": [
                 {
@@ -1470,7 +1459,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 1040,
+            "line": 1043,
             "description": "Once Done Promise.\nFires the listener once, either on the next tick if we are already done, or if not, each time the `done` event fires.",
             "params": [
                 {
@@ -1488,7 +1477,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 1061,
+            "line": 1064,
             "description": "Reset the results.\nAt this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.",
             "chainable": 1,
             "itemtype": "method",
@@ -1499,7 +1488,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 1075,
+            "line": 1078,
             "description": "Fire the next items.",
             "return": {
                 "description": "Either an {Array} of items that were fired or `false` if no items were fired.",
@@ -1513,7 +1502,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 1101,
+            "line": 1104,
             "description": "Fire the next item.",
             "return": {
                 "description": "Either the {Task|TaskGroup} item that was fired or `false` if no item was fired.",
@@ -1527,7 +1516,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 1139,
+            "line": 1142,
             "description": "What to do when an item completes.",
             "chainable": 1,
             "params": [
@@ -1551,7 +1540,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 1198,
+            "line": 1203,
             "description": "Internal: Either execute the reamining items we are not paused, or complete execution by exiting.",
             "chainable": 1,
             "itemtype": "method",
@@ -1562,7 +1551,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 1223,
+            "line": 1228,
             "description": "Remove and destroy the remaining items.",
             "chainable": 1,
             "itemtype": "method",
@@ -1573,7 +1562,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 1239,
+            "line": 1244,
             "description": "Remove and destroy the running items. Here for verboseness.",
             "chainable": 1,
             "itemtype": "method",
@@ -1584,7 +1573,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 1250,
+            "line": 1255,
             "description": "Remove and destroy the completed items.",
             "chainable": 1,
             "itemtype": "method",
@@ -1595,7 +1584,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 1273,
+            "line": 1278,
             "description": "Destroy ourself and prevent ourself from executing ever again.",
             "chainable": 1,
             "itemtype": "method",
@@ -1606,11 +1595,9 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 1309,
+            "line": 1314,
             "description": "Set our task to the completed state.",
-            "todo": [
-                "why is this here instead of inside .complete() ?"
-            ],
+            "note": "This doesn't have to be a separate method, it could just go inside `fire` however, it is nice to have here to keep `fire` simple",
             "chainable": 1,
             "itemtype": "method",
             "name": "finish",
@@ -1620,7 +1607,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 1327,
+            "line": 1332,
             "description": "We want to halt execution and trigger our completion callback.",
             "todo": [
                 "figure out how this should actually work?\nShould it be two methods? .halt() and .abort(error?)\nShould it be a state?\nShould it alter the state?\nShould it clear or destroy?\nWhat is the definition of pausing with this?\nPerhaps we need to update the definition of pausing to be halted instead?\nHow can we apply this to Tasks instead?"
@@ -1641,7 +1628,7 @@
         },
         {
             "file": "esnext/lib/taskgroup.js",
-            "line": 1363,
+            "line": 1368,
             "description": "Start/restart/resume the execution of the TaskGroup.",
             "chainable": 1,
             "itemtype": "method",
@@ -1651,5 +1638,10 @@
             "class": "TaskGroup"
         }
     ],
-    "warnings": []
+    "warnings": [
+        {
+            "message": "unknown tag: note",
+            "line": " esnext/lib/taskgroup.js:1314"
+        }
+    ]
 }

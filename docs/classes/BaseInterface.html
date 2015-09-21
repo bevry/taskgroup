@@ -189,10 +189,6 @@
                                 <a href="#property_names">names</a>
 
                             </li>
-                            <li class="index-item property public">
-                                <a href="#property_namesArray">namesArray</a>
-
-                            </li>
                             <li class="index-item property private">
                                 <a href="#property_stateInformation">stateInformation</a>
 
@@ -237,6 +233,10 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
 <ul>
 <li>if there is, then emit the done event with the original event arguments</li>
 <li>if there isn't, then output the error to stderr and throw it.</li>
+</ul>
+<p>Sets the following configuration:</p>
+<ul>
+<li><code>nameSeparator</code> defaults to <code>' ➞ '</code>, used to stringify the result of <code>.names</code></li>
 </ul>
 
     </div>
@@ -338,7 +338,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/esnext_lib_interface.js.html#l105"><code>esnext&#x2F;lib&#x2F;interface.js:105</code></a>
+        <a href="../files/esnext_lib_interface.js.html#l114"><code>esnext&#x2F;lib&#x2F;interface.js:114</code></a>
         </p>
 
 
@@ -396,7 +396,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/esnext_lib_interface.js.html#l88"><code>esnext&#x2F;lib&#x2F;interface.js:88</code></a>
+        <a href="../files/esnext_lib_interface.js.html#l97"><code>esnext&#x2F;lib&#x2F;interface.js:97</code></a>
         </p>
 
 
@@ -454,7 +454,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/esnext_lib_interface.js.html#l168"><code>esnext&#x2F;lib&#x2F;interface.js:168</code></a>
+        <a href="../files/esnext_lib_interface.js.html#l169"><code>esnext&#x2F;lib&#x2F;interface.js:169</code></a>
         </p>
 
 
@@ -512,7 +512,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/esnext_lib_interface.js.html#l71"><code>esnext&#x2F;lib&#x2F;interface.js:71</code></a>
+        <a href="../files/esnext_lib_interface.js.html#l80"><code>esnext&#x2F;lib&#x2F;interface.js:80</code></a>
         </p>
 
 
@@ -564,7 +564,7 @@ and when the emit, we check if there is a <code>done</code> listener:</p>
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/esnext_lib_interface.js.html#l143"><code>esnext&#x2F;lib&#x2F;interface.js:143</code></a>
+        <a href="../files/esnext_lib_interface.js.html#l144"><code>esnext&#x2F;lib&#x2F;interface.js:144</code></a>
         </p>
 
 
@@ -581,32 +581,6 @@ If the name was never configured, then return the name in the format of <code>'#
 </div>
 <div id="property_names" class="property item public">
     <h3 class="name"><code>names</code></h3>
-    <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
-
-
-        <span class="flag public">public</span>
-
-
-
-    <div class="meta">
-                <p>
-                Defined in
-        <a href="../files/esnext_lib_interface.js.html#l132"><code>esnext&#x2F;lib&#x2F;interface.js:132</code></a>
-        </p>
-
-
-    </div>
-
-    <div class="description">
-        <p>Gets our name prefixed by all of our parents names</p>
-
-    </div>
-
-
-
-</div>
-<div id="property_namesArray" class="property item public">
-    <h3 class="name"><code>namesArray</code></h3>
     <span class="type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
 
 
@@ -617,7 +591,7 @@ If the name was never configured, then return the name in the format of <code>'#
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/esnext_lib_interface.js.html#l116"><code>esnext&#x2F;lib&#x2F;interface.js:116</code></a>
+        <a href="../files/esnext_lib_interface.js.html#l125"><code>esnext&#x2F;lib&#x2F;interface.js:125</code></a>
         </p>
 
 
@@ -643,7 +617,7 @@ If the name was never configured, then return the name in the format of <code>'#
     <div class="meta">
                 <p>
                 Defined in
-        <a href="../files/esnext_lib_interface.js.html#l154"><code>esnext&#x2F;lib&#x2F;interface.js:154</code></a>
+        <a href="../files/esnext_lib_interface.js.html#l155"><code>esnext&#x2F;lib&#x2F;interface.js:155</code></a>
         </p>
 
 

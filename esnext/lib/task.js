@@ -1,8 +1,9 @@
 // Imports
 const BaseInterface = require('./interface')
-const {copyObject, iterateObject, queue, domain} = require('./util')
+const {queue, domain} = require('./util')
 const ambi = require('ambi')
 const extendr = require('extendr')
+const eachr = require('eachr')
 
 /**
 Our Task Class
@@ -255,7 +256,7 @@ export default class Task extends BaseInterface {
 					opts.method = arg
 					break
 				case 'object':
-					copyObject(opts, arg)
+					extendr.deep(opts, arg)
 					break
 				default:
 					const error = new Error(`Unknown argument type of [${type}] given to Task::setConfig()`)
@@ -264,17 +265,17 @@ export default class Task extends BaseInterface {
 		})
 
 		// Apply the configuration directly to our instance
-		iterateObject(opts, (value, key) => {
+		eachr(opts, (value, key) => {
 			if ( value == null )  return
 			switch ( key ) {
 				case 'on':
-					iterateObject(value, (value, key) => {
+					eachr(value, (value, key) => {
 						if ( value ) this.on(key, value)
 					})
 					break
 
 				case 'once':
-					iterateObject(value, (value, key) => {
+					eachr(value, (value, key) => {
 						if ( value ) this.once(key, value)
 					})
 					break

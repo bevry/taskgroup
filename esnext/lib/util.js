@@ -1,5 +1,4 @@
-// Prepare
-const hasMap = typeof Map !== 'undefined'
+/* eslint no-extra-parens:0 */
 
 // Domains are crippled in the browser and on node 0.8, so don't use domains in those environments
 export const domain = (process.browser || process.versions.node.substr(0, 3) === '0.8') ? null : require('domain')
@@ -22,32 +21,6 @@ export function errorToString (error) {
 	}
 	else {
 		return error.toString()
-	}
-}
-
-// Iterate an object or a map fast
-export function iterateObject (obj, iterator) {
-	if ( obj ) {
-		if ( hasMap && obj instanceof Map ) {  // performance of this is neglible
-			obj.forEach(iterator)
-		}
-		else {
-			let key
-			for ( key in obj ) {
-				if ( obj.hasOwnProperty(key) ) {
-					iterator(obj[key], key)
-				}
-			}
-		}
-	}
-}
-
-// Copy all items from an object into another object
-export function copyObject (obj1, obj2) {
-	if ( obj2 ) {
-		iterateObject(obj2, function (value, key) {
-			obj1[key] = value
-		})
 	}
 }
 

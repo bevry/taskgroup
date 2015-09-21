@@ -1,8 +1,12 @@
+/* eslint no-extra-parens:0 */
+'use strict'
+
 // Imports
 const BaseInterface = require('./interface')
 const Task = require('./task')
-const {copyObject, iterateObject, ensureArray, errorToString} = require('./util')
+const {ensureArray, errorToString} = require('./util')
 const extendr = require('extendr')
+const eachr = require('eachr')
 
 /**
 Our TaskGroup class.
@@ -60,7 +64,7 @@ class TaskGroup extends BaseInterface {
 	@public
 	*/
 	static isTaskGroup (group) {
-		return (group && group.type === 'taskgroup') || group instanceof this
+		return group && group.type === 'taskgroup' || group instanceof this
 	}
 
 	/**
@@ -235,7 +239,7 @@ class TaskGroup extends BaseInterface {
 	*/
 	setNestedTaskConfig (opts) {
 		// Fetch and copy options to the state's nested task configuration
-		copyObject(this.state.nestedTaskConfig, opts)
+		extendr.deep(this.state.nestedTaskConfig, opts)
 
 		// Chain
 		return this
@@ -250,7 +254,7 @@ class TaskGroup extends BaseInterface {
 	*/
 	setNestedGroupConfig (opts) {
 		// Fetch and copy options to the state's nested configuration
-		copyObject(this.state.nestedGroupConfig, opts)
+		extendr.deep(this.state.nestedGroupConfig, opts)
 
 		// Chain
 		return this
@@ -266,8 +270,8 @@ class TaskGroup extends BaseInterface {
 	@param {String} [config.name] - What we would like our name to be, useful for debugging.
 	@param {Function} [config.done] - Passed to {{#crossLink "TaskGroup/onceDone"}}{{/crossLink}} (aliases are `onceDone`, and `next`)
 	@param {Function} [config.whenDone] - Passed to {{#crossLink "TaskGroup/whenDone"}}{{/crossLink}}
-	@param {Object} [config.on] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}.
-	@param {Object} [config.once] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}.
+	@param {Object} [config.on] - An object of event names linking to listener functions that we would like bounded via {EventEmitter.on}.
+	@param {Object} [config.once] - An object of event names linking to listener functions that we would like bounded via {EventEmitter.once}.
 	@param {TaskGroup} [config.parent] - A parent {{#crossLink "TaskGroup"}}{{/crossLink}} that we may be attached to.
 	@param {String} [config.onError] - Either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.
 	@param {Boolean} [config.sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`).
@@ -300,7 +304,7 @@ class TaskGroup extends BaseInterface {
 					opts.method = arg
 					break
 				case 'object':
-					copyObject(opts, arg)
+					extendr.deep(opts, arg)
 					break
 				default:
 					const error = new Error(`Unknown argument type of [${type}] given to TaskGroup::setConfig()`)
@@ -309,17 +313,17 @@ class TaskGroup extends BaseInterface {
 		})
 
 		// Apply the configuration directly to our instance
-		iterateObject(opts, (value, key) => {
+		eachr(opts, (value, key) => {
 			if ( value == null )  return
 			switch ( key ) {
 				case 'on':
-					iterateObject(value, (value, key) => {
+					eachr(value, (value, key) => {
 						if ( value )  this.on(key, value)
 					})
 					break
 
 				case 'once':
-					iterateObject(value, (value, key) => {
+					eachr(value, (value, key) => {
 						if ( value )  this.once(key, value)
 					})
 					break
@@ -876,9 +880,7 @@ class TaskGroup extends BaseInterface {
 	*/
 	get hasSlots () {
 		const concurrency = this.config.concurrency
-		return (
-			concurrency === 0 || this.state.itemsRunning.length < concurrency
-		)
+		return concurrency === 0 || this.state.itemsRunning.length < concurrency
 	}
 
 	/**
@@ -1164,6 +1166,7 @@ class TaskGroup extends BaseInterface {
 		if ( index === -1 ) {
 			// this should never happen, but maybe it could, in which case we definitely want to know about it
 			const indexError = new Error(`Could not find [${item.names}] in the running queue`)
+			/* eslint no-console:0 */
 			console.error(errorToString(indexError))
 			if ( !error ) {
 				this.state.error = error = indexError
@@ -1310,7 +1313,7 @@ class TaskGroup extends BaseInterface {
 
 	/**
 	Set our task to the completed state.
-	@TODO why is this here instead of inside .complete() ?
+	@NOTE This doesn't have to be a separate method, it could just go inside `fire` however, it is nice to have here to keep `fire` simple
 	@chainable
 	@method finish
 	@private
@@ -1344,7 +1347,7 @@ class TaskGroup extends BaseInterface {
 	@private
 	*/
 	abort (error) {
-		// Not yet implemented
+		// This method is not yet implemented
 		if ( true ) {
 			const error = new Error('TaskGroup::abort has not yet been implemented.')
 			this.emit('error', error)

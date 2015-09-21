@@ -84,8 +84,10 @@
     <pre class="code prettyprint linenums">
 // Imports
 const BaseInterface = require(&#x27;./interface&#x27;)
-const {copyObject, iterateObject, queue, domain} = require(&#x27;./util&#x27;)
+const {queue, domain} = require(&#x27;./util&#x27;)
 const ambi = require(&#x27;ambi&#x27;)
+const extendr = require(&#x27;extendr&#x27;)
+const eachr = require(&#x27;eachr&#x27;)
 
 /**
 Our Task Class
@@ -278,22 +280,22 @@ export default class Task extends BaseInterface {
         super()
 
         // State defaults
-        this.state = {
+        extendr.defaults(this.state, {
             name: &#x60;${this.type} ${Math.random()}&#x60;,
             error: null,
             status: null,
             events: [&#x27;events&#x27;, &#x27;error&#x27;, &#x27;started&#x27;, &#x27;running&#x27;, &#x27;failed&#x27;, &#x27;passed&#x27;, &#x27;completed&#x27;, &#x27;done&#x27;, &#x27;destroyed&#x27;]
-        }
+        })
 
         // Configuration defaults
-        this.config = {
+        extendr.defaults(this.config, {
             run: false,
             onError: &#x27;exit&#x27;,
             ambi: true,
             domain: true,
             sync: false,
             args: null
-        }
+        })
 
         // Apply user configuration
         this.setConfig(...args)
@@ -338,7 +340,7 @@ export default class Task extends BaseInterface {
                     opts.method = arg
                     break
                 case &#x27;object&#x27;:
-                    copyObject(opts, arg)
+                    extendr.deep(opts, arg)
                     break
                 default:
                     const error = new Error(&#x60;Unknown argument type of [${type}] given to Task::setConfig()&#x60;)
@@ -347,17 +349,17 @@ export default class Task extends BaseInterface {
         })
 
         // Apply the configuration directly to our instance
-        iterateObject(opts, (value, key) =&gt; {
+        eachr(opts, (value, key) =&gt; {
             if ( value == null )  return
             switch ( key ) {
                 case &#x27;on&#x27;:
-                    iterateObject(value, (value, key) =&gt; {
+                    eachr(value, (value, key) =&gt; {
                         if ( value ) this.on(key, value)
                     })
                     break
 
                 case &#x27;once&#x27;:
-                    iterateObject(value, (value, key) =&gt; {
+                    eachr(value, (value, key) =&gt; {
                         if ( value ) this.once(key, value)
                     })
                     break
