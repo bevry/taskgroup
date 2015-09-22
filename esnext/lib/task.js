@@ -145,7 +145,7 @@ export default class Task extends BaseInterface {
 	}
 
 	// -----------------------------------
-	// @TODO Decide if the following is still needed
+	// State Access Helpers
 
 	/**
 	The first {Error} that has occured.
@@ -182,14 +182,6 @@ export default class Task extends BaseInterface {
 	@protected
 	*/
 	get result () { return this.state.result }
-
-	/**
-	The {Domain} that we create to capture errors for our method.
-	@type Domain
-	@property taskDomain
-	@protected
-	*/
-	get taskDomain () { return this.state.taskDomain }
 
 	/**
 	Initialize our new {Task} instance. Forwards arguments onto {{#crossLink "Task/setConfig"}}{{/crossLink}}.
