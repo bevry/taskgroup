@@ -1049,7 +1049,7 @@ class TaskGroup extends BaseInterface {
 		}
 
 		// Add the result
-		if ( item.config.includeInResults !== false ) {
+		if ( !item.config.includeInResults ) {
 			results.push(args)
 		}
 
