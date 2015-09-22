@@ -57,9 +57,9 @@ joe.suite('task', function (suite, test) {
 // Taskgroup
 joe.suite('taskgroup', function (suite, test) {
 	// failure: done with no run
-	test('TaskGroup.create().addTaskChain(...).done(...) should time out when run was not called', function (complete) {
+	test('TaskGroup.create().addTask(...).done(...) should time out when run was not called', function (complete) {
 		TaskGroup.create()
-			.addTaskChain(returnViaCallback(5))
+			.addTask(returnViaCallback(5))
 			.done(throwUnexpected)
 		wait(delay, complete)
 	})
@@ -73,21 +73,21 @@ joe.suite('taskgroup', function (suite, test) {
 	})
 
 	// success: run then done then add
-	test('TaskGroup.create().run().done(...).addTaskChain(...) should complete with the tasks results', function (complete) {
+	test('TaskGroup.create().run().done(...).addTask(...) should complete with the tasks results', function (complete) {
 		TaskGroup.create()
 			.run()
 			.done(expectViaCallback(null, [[null, 5]]))
 			.done(complete)
-			.addTaskChain(returnViaCallback(5))
+			.addTask(returnViaCallback(5))
 	})
 
 	// success: done then task then run then done
-	test('TaskGroup.create().done().addTaskChain(...).run().addTaskChain(...).done(...) should complete correctly', function (complete) {
+	test('TaskGroup.create().done().addTask(...).run().addTask(...).done(...) should complete correctly', function (complete) {
 		TaskGroup.create()
 			.done(expectViaCallback(null, [[null, 5], [null, 10]]))
-			.addTaskChain('task 1 that will return 5', returnViaCallback(5))
+			.addTask('task 1 that will return 5', returnViaCallback(5))
 			.run()
-			.addTaskChain('task 2 that will return 10', returnViaCallback(10))
+			.addTask('task 2 that will return 10', returnViaCallback(10))
 			.done(complete)
 	})
 
@@ -95,21 +95,21 @@ joe.suite('taskgroup', function (suite, test) {
 	test('TaskGroup.create().run().run().done(...) should complete only once', function (complete) {
 		TaskGroup.create()
 			.done(expectViaCallback(null, [[null, 5], [null, 10]]))
-			.addTaskChain(returnViaCallback(5))
+			.addTask(returnViaCallback(5))
 			.run().run()
-			.addTaskChain(returnViaCallback(10))
+			.addTask(returnViaCallback(10))
 			.done(complete)
 	})
 
 	// success: multiple runs
 	test('Taskgroup should be able to complete multiple times', function (complete) {
 		const tasks = TaskGroup.create()
-			.addTaskChain(returnViaCallback(5))
+			.addTask(returnViaCallback(5))
 			.run()
 			.done(expectViaCallback(null, [[null, 5]]))
 		wait(delay, function () {
 			tasks
-				.addTaskChain(returnViaCallback(10))
+				.addTask(returnViaCallback(10))
 				.done(expectViaCallback(null, [[null, 5], [null, 10]]))
 				.done(complete)
 		})
@@ -119,9 +119,9 @@ joe.suite('taskgroup', function (suite, test) {
 	test('Taskgroup should pause when encountering an error', function (complete) {
 		const err = new Error('fail after 5')
 		TaskGroup.create()
-			.addTaskChain(returnViaCallback(5))
-			.addTaskChain(returnViaCallback(err))
-			.addTaskChain(returnViaCallback(10))
+			.addTask(returnViaCallback(5))
+			.addTask(returnViaCallback(err))
+			.addTask(returnViaCallback(10))
 			.run()
 			.done(expectViaCallback(err, [[null, 5], [err]]))
 			.done(function () {
@@ -133,14 +133,14 @@ joe.suite('taskgroup', function (suite, test) {
 	test('Taskgroup should be able to resume after an error', function (complete) {
 		const err = new Error('fail after 5')
 		const tasks = TaskGroup.create()
-			.addTaskChain(returnViaCallback(5))
-			.addTaskChain(returnViaCallback(err))
-			.addTaskChain(returnViaCallback(10))
+			.addTask(returnViaCallback(5))
+			.addTask(returnViaCallback(err))
+			.addTask(returnViaCallback(10))
 			.run()
 			.done(expectViaCallback(err, [[null, 5], [err]]))
 		wait(delay, function () {
 			tasks
-				.addTaskChain(returnViaCallback(15))
+				.addTask(returnViaCallback(15))
 				.done(expectViaCallback(null, [[null, 5], [err], [null, 10], [null, 15]]))
 				.done(complete)
 		})
@@ -150,9 +150,9 @@ joe.suite('taskgroup', function (suite, test) {
 	test('Taskgroup should ignore when encountering an error with different config', function (complete) {
 		const err = new Error('fail after 5')
 		TaskGroup.create({onError: 'ignore'})
-			.addTaskChain(returnViaCallback(5))
-			.addTaskChain(returnViaCallback(err))
-			.addTaskChain(returnViaCallback(10))
+			.addTask(returnViaCallback(5))
+			.addTask(returnViaCallback(err))
+			.addTask(returnViaCallback(10))
 			.run()
 			.done(expectViaCallback(null, [
 				[null, 5], [err], [null, 10]
@@ -171,9 +171,9 @@ joe.suite('taskgroup', function (suite, test) {
 					onError: 'ignore'
 				}
 			})
-			.addTaskChain(returnViaCallback(5))
-			.addTaskChain(completeViaCallback(10, delay * 2))
-			.addTaskChain(returnViaCallback(15))
+			.addTask(returnViaCallback(5))
+			.addTask(completeViaCallback(10, delay * 2))
+			.addTask(returnViaCallback(15))
 			.run()
 			.done(expectErrorViaCallback('timed out', 'error was as expected', complete))
 	})

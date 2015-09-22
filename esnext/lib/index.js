@@ -1,1 +1,3 @@
-export default require('./taskgroup')
+export const Task = require('./task')
+export const TaskGroup = require('./taskgroup')
+export default TaskGroup

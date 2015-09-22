@@ -63,6 +63,10 @@ task = new Task('my task that passes an error', function(complete){
 @public
 */
 export default class Task extends BaseInterface {
+
+	// ===================================
+	// Typing Helpers
+
 	/**
 	The type of our class.
 
@@ -78,7 +82,7 @@ export default class Task extends BaseInterface {
 	get type () { return 'task' }
 
 	/**
-	A helper method to check if the passed argument is an instanceof a {Task}.
+	A helper method to check if the passed argument is a {Task} via instanceof and duck typing.
 	@param {Task} item - The possible instance of the {Task} that we want to check
 	@return {Boolean} Whether or not the item is a {Task} instance.
 	@method isTask
@@ -88,6 +92,54 @@ export default class Task extends BaseInterface {
 	static isTask (item) {
 		return (item && item.type === 'task') || (item instanceof this)
 	}
+
+
+	// ===================================
+	// Accessors
+
+	/**
+	An {Array} of the events that we may emit.
+	@type Array
+	@property events
+	@default ['events', 'error', 'started', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed']
+	@protected
+	*/
+	get events () {
+		return ['events', 'error', 'started', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed']
+	}
+
+
+	// -----------------------------------
+	// State Accessors
+
+	/**
+	The first {Error} that has occured.
+	@type Error
+	@property error
+	@protected
+	*/
+	get error () { return this.state.error }
+
+	/**
+	A {String} containing our current status. See our {Task} description for available values.
+	@type String
+	@property status
+	@protected
+	*/
+	get status () { return this.state.status }
+
+	/**
+	An {Array} representing the returned result or the passed {Arguments} of our method.
+	The first item in the array should be the {Error} if it exists.
+	@type Array
+	@property result
+	@protected
+	*/
+	get result () { return this.state.result }
+
+
+	// ---------------------------------
+	// Status Accessors
 
 	/**
 	Have we started execution yet?
@@ -144,44 +196,9 @@ export default class Task extends BaseInterface {
 		}
 	}
 
-	// -----------------------------------
-	// State Access Helpers
 
-	/**
-	The first {Error} that has occured.
-	@type Error
-	@property error
-	@protected
-	*/
-	get error () { return this.state.error }
-
-	/**
-	A {String} containing our current status. See our {Task} description for available values.
-	@type String
-	@property status
-	@protected
-	*/
-	get status () { return this.state.status }
-
-	/**
-	An {Array} of the events that we may emit. Events that will be executed can be found in the {Task} description.
-	@type Array
-	@property events
-	@default ['events', 'error', 'started', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed']
-	@protected
-	*/
-	get events () {
-		return ['events', 'error', 'started', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed']
-	}
-
-	/**
-	An {Array} representing the returned result or the passed {Arguments} of our method.
-	The first item in the array should be the {Error} if it exists.
-	@type Array
-	@property result
-	@protected
-	*/
-	get result () { return this.state.result }
+	// ===================================
+	// Initialization
 
 	/**
 	Initialize our new {Task} instance. Forwards arguments onto {{#crossLink "Task/setConfig"}}{{/crossLink}}.
@@ -297,6 +314,58 @@ export default class Task extends BaseInterface {
 		return this
 	}
 
+
+	// ===================================
+	// Workflow
+
+	/**
+	When Done Promise.
+	Fires the listener, either on the next tick if we are already done, or if not, each time the `done` event fires.
+	@param {Function} listener - The {Function} to attach or execute.
+	@chainable
+	@method whenDone
+	@public
+	*/
+	whenDone (listener) {
+		if ( this.completed ) {
+			// avoid zalgo
+			this.queue(() => {
+				const result = this.state.result || []
+				listener.apply(this, result)
+			})
+		}
+		else {
+			super.whenDone(listener)
+		}
+
+		// Chain
+		return this
+	}
+
+	/**
+	Once Done Promise.
+	Fires the listener once, either on the next tick if we are already done, or if not, each time the `done` event fires.
+	@param {Function} listener - The {Function} to attach or execute.
+	@chainable
+	@method onceDone
+	@public
+	*/
+	onceDone (listener) {
+		if ( this.completed ) {
+			// avoid zalgo
+			this.queue(() => {
+				const result = this.state.result || []
+				listener.apply(this, result)
+			})
+		}
+		else {
+			super.onceDone(listener)
+		}
+
+		// Chain
+		return this
+	}
+
 	/**
 	What to do when our task method completes.
 	Should only ever execute once, if it executes more than once, then we error.
@@ -361,82 +430,6 @@ export default class Task extends BaseInterface {
 		}
 
 		// Chain
-		return this
-	}
-
-	/**
-	When Done Promise.
-	Fires the listener, either on the next tick if we are already done, or if not, each time the `done` event fires.
-	@param {Function} listener - The {Function} to attach or execute.
-	@chainable
-	@method whenDone
-	@public
-	*/
-	whenDone (listener) {
-		if ( this.completed ) {
-			// avoid zalgo
-			this.queue(() => {
-				const result = this.state.result || []
-				listener.apply(this, result)
-			})
-		}
-		else {
-			super.whenDone(listener)
-		}
-
-		// Chain
-		return this
-	}
-
-	/**
-	Once Done Promise.
-	Fires the listener once, either on the next tick if we are already done, or if not, each time the `done` event fires.
-	@param {Function} listener - The {Function} to attach or execute.
-	@chainable
-	@method onceDone
-	@public
-	*/
-	onceDone (listener) {
-		if ( this.completed ) {
-			// avoid zalgo
-			this.queue(() => {
-				const result = this.state.result || []
-				listener.apply(this, result)
-			})
-		}
-		else {
-			super.onceDone(listener)
-		}
-
-		// Chain
-		return this
-	}
-
-	/**
-	Reset the results.
-	At this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.
-	@chainable
-	@method resetResults
-	@private
-	*/
-	resetResults () {
-		this.state.result = []
-		return this
-	}
-
-	/**
-	Clear the domain
-	@chainable
-	@method clearDomain
-	@private
-	*/
-	clearDomain () {
-		const taskDomain = this.state.taskDomain
-		if ( taskDomain ) {
-			taskDomain.exit()
-			taskDomain.removeAllListeners()
-			this.state.taskDomain = null
-		}
 		return this
 	}
 

@@ -8,7 +8,6 @@
 - Nested events will no longer be emitted, unless `emitNestedEvents` is `true`
 - Removed `nestedConfig`, use either `nestedGroupConfig` or `nestedTaskConfig` or both
 - Removed `exit` as it's functionality was ambiguous and undocumented
-- `addGroup`, `addGroups`, `addItem`, `addItems`, `addTask`, `addTasks` now return the added items instead of being chainable, if you want them to chain, instead use the new `addGroupChain`, etc methods.
 - `getTotalItems()`, `getItemTotals()` now changed to getters `totalItems`, `itemTotals`
 - A lot of previously `public` methods are now marked `private` or `protected`, this isn't really from a stability concern but from an isolation of responsibility concern
 

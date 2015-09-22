@@ -1191,7 +1191,7 @@ joe.suite('nested', function (suite, test) {
 			})
 		})
 
-		tasks.addGroup('my group', function () {
+		tasks.addTaskGroup('my group', function () {
 			const myGroup = this
 			checks.push('my group')
 			equal(this.name, 'my group')
@@ -1299,7 +1299,7 @@ joe.suite('nested', function (suite, test) {
 			return 10
 		})
 
-		tasks.addGroup('my group 1', function () {
+		tasks.addTaskGroup('my group 1', function () {
 			const myGroup = this
 			checks.push('my group 1')
 			equal(this.name, 'my group 1')

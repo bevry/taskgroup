@@ -41,13 +41,14 @@ Available internal statuses:
 @public
 */
 class TaskGroup extends BaseInterface {
+
+	// ===================================
+	// Typing Helpers
+
 	/**
 	The type of our class.
-
-	Used for the purpose of duck typing
-	which is needed when working with node virtual machines
+	Used for the purpose of duck typing which is needed when working with node virtual machines
 	as instanceof will not work in those environments.
-
 	@type String
 	@property type
 	@default 'taskgroup'
@@ -56,7 +57,7 @@ class TaskGroup extends BaseInterface {
 	get type () { return 'taskgroup' }
 
 	/**
-	A helper method to check if the passed argument is an instanceof a {TaskGroup}.
+	A helper method to check if the passed argument is a {TaskGroup} via instanceof and duck typing.
 	@param {TaskGroup} item - The possible instance of the {TaskGroup} that we want to check
 	@return {Boolean} Whether or not the item is a {TaskGroup} instance.
 	@method isTaskGroup
@@ -77,7 +78,7 @@ class TaskGroup extends BaseInterface {
 	get Task () { return Task }
 
 	/**
-	A reference to the {TaskGroup} class for use in {::createGroup} if we want to override it.
+	A reference to the {TaskGroup} class for use in {::createTaskGroup} if we want to override it.
 	@type TaskGroup
 	@property TaskGroup
 	@default TaskGroup
@@ -85,32 +86,23 @@ class TaskGroup extends BaseInterface {
 	*/
 	get TaskGroup () { return TaskGroup }
 
-	// -----------------------------------
-	// Export API
+
+	// ===================================
+	// Accessors
 
 	/**
-	A reference to the {Task} class.
-	@type Task
-	@property Task
-	@default Task
-	@static
-	@public
+	An {Array} of the events that we may emit.
+	@type Array
+	@property events
+	@protected
 	*/
-	static get Task () { return Task }
-
-	/**
-	A reference to the {TaskGroup} class.
-	@type TaskGroup
-	@property TaskGroup
-	@default TaskGroup
-	@static
-	@public
-	*/
-	static get TaskGroup () { return TaskGroup }
+	get events () {
+		return ['error', 'started', 'running', 'passed', 'failed', 'completed', 'done', 'destroyed']
+	}
 
 
 	// -----------------------------------
-	// @TODO Decide if the following is still needed
+	// State Accessors
 
 	/**
 	The first {Error} that has occured.
@@ -129,16 +121,6 @@ class TaskGroup extends BaseInterface {
 	get status () { return this.state.status }
 
 	/**
-	An {Array} of the events that we may emit. Events that will be executed can be found in the {Task} description.
-	@type Array
-	@property events
-	@protected
-	*/
-	get events () {
-		return ['error', 'started', 'running', 'passed', 'failed', 'completed', 'done', 'destroyed']
-	}
-
-	/**
 	An {Array} that contains the result property for each completed {Task} and {TaskGroup}.
 	An item can disable having its result property added to this results array by setting its {includeInResults} configuration option to `false`.
 	@type Array
@@ -147,567 +129,9 @@ class TaskGroup extends BaseInterface {
 	*/
 	get results () { return this.state.results }
 
-	/**
-	Initialize our new {TaskGroup} instance. Forwards arguments onto {{#crossLink "TaskGroup/setConfig"}}{{/crossLink}}.
-	@method constructor
-	@public
-	*/
-	constructor (...args) {
-		super()
-
-		// State defaults
-		extendr.defaults(this.state, {
-			id: `${this.type} ${Math.random()}`,
-			error: null,
-			status: null,
-			results: [],
-			itemsRemaining: [],
-			itemsRunningCount: 0,
-			itemsCompletedCount: 0
-		})
-
-		// Configuration defaults
-		extendr.defaults(this.config, {
-			destroyCompleted: true,
-			onExit: 'destroy',
-			emitNestedEvents: false,
-			nestedTaskConfig: {},
-			nestedGroupConfig: {},
-			concurrency: 1,
-			onError: 'exit',
-			sync: false
-		})
-
-		// Apply user configuration
-		this.setConfig(...args)
-
-		// Give setConfig enough chance to fire
-		// Changing this to setImmediate breaks a lot of things
-		// As tasks inside nested taskgroups will fire in any order
-		this.queue(this.autoRun.bind(this))
-	}
-
 
 	// ---------------------------------
-	// Configuration
-
-	/**
-	Merged passed configuration into {config.nestedTaskConfig}.
-	@param {Object} opts - The configuration to merge.
-	@chainable
-	@method setNestedTaskConfig
-	@public
-	*/
-	setNestedTaskConfig (opts) {
-		// Fetch and copy options to the state's nested task configuration
-		extendr.deep(this.state.nestedTaskConfig, opts)
-
-		// Chain
-		return this
-	}
-
-	/**
-	Merged passed configuration into {config.nestedGroupConfig}.
-	@param {Object} opts - The configuration to merge.
-	@chainable
-	@method setNestedGroupConfig
-	@public
-	*/
-	setNestedGroupConfig (opts) {
-		// Fetch and copy options to the state's nested configuration
-		extendr.deep(this.state.nestedGroupConfig, opts)
-
-		// Chain
-		return this
-	}
-
-	/**
-	Set the configuration for our instance.
-
-	Despite accepting an {Object} of configuration, we can also accept an {Array} of configuration.	When using an array, a {String} becomes the :name, a {Function} becomes the :method, and an {Object} becomes the :config
-
-	@param {Object} [config]
-
-	@param {String} [config.name] - What we would like our name to be, useful for debugging.
-	@param {Function} [config.done] - Passed to {{#crossLink "TaskGroup/onceDone"}}{{/crossLink}} (aliases are `onceDone`, and `next`)
-	@param {Function} [config.whenDone] - Passed to {{#crossLink "TaskGroup/whenDone"}}{{/crossLink}}
-	@param {Object} [config.on] - An object of event names linking to listener functions that we would like bounded via {EventEmitter.on}.
-	@param {Object} [config.once] - An object of event names linking to listener functions that we would like bounded via {EventEmitter.once}.
-	@param {TaskGroup} [config.parent] - A parent {{#crossLink "TaskGroup"}}{{/crossLink}} that we may be attached to.
-	@param {String} [config.onError] - Either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.
-	@param {Boolean} [config.sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`).
-
-	@param {Function} [config.method] - The {Function} to execute for our {TaskGroup} when using inline execution style.
-	@param {Boolean} [config.run=true] - A {Boolean} for whether or not to the :method (if specified) automatically.
-	@param {Number} [config.concurrency=1] - The amount of items that we would like to execute at the same time. Use `0` for unlimited. `1` accomplishes serial execution, everything else accomplishes parallel execution.
-	@param {Object} [config.nestedGroupConfig] - The nested configuration to be applied to all {TaskGroup} descendants of this group.
-	@param {Object} [config.nestedTaskConfig] - The nested configuration to be applied to all {Task} descendants of this group.
-	@param {Array} [config.tasks] - An {Array} of {Task} instances to be added to this group.
-	@param {Array} [config.groups] - An {Array} of {TaskGroup} instances to be added to this group.
-	@param {Array} [config.items] - An {Array} of {Task} and/or {TaskGroup} instances to be added to this group.
-
-	@chainable
-	@method setConfig
-	@public
-	*/
-	setConfig (...args) {
-		const opts = {}
-
-		// Extract the configuration from the arguments
-		args.forEach(function (arg) {
-			if ( arg == null )  return
-			const type = typeof arg
-			switch ( type ) {
-				case 'string':
-					opts.name = arg
-					break
-				case 'function':
-					opts.method = arg
-					break
-				case 'object':
-					extendr.deep(opts, arg)
-					break
-				default:
-					const error = new Error(`Unknown argument type of [${type}] given to TaskGroup::setConfig()`)
-					throw error
-			}
-		})
-
-		// Apply the configuration directly to our instance
-		eachr(opts, (value, key) => {
-			if ( value == null )  return
-			switch ( key ) {
-				case 'on':
-					eachr(value, (value, key) => {
-						if ( value )  this.on(key, value)
-					})
-					break
-
-				case 'once':
-					eachr(value, (value, key) => {
-						if ( value )  this.once(key, value)
-					})
-					break
-
-				case 'whenDone':
-					this.whenDone(value)
-					break
-
-				case 'onceDone':
-				case 'done':
-				case 'next':
-					this.done(value)
-					break
-
-				case 'task':
-				case 'tasks':
-					this.addTasks(value)
-					break
-
-				case 'group':
-				case 'groups':
-					this.addGroups(value)
-					break
-
-				case 'item':
-				case 'items':
-					this.addItems(value)
-					break
-
-				default:
-					this.config[key] = value
-					break
-			}
-		})
-
-		// Chain
-		return this
-	}
-
-
-	// ---------------------------------
-	// TaskGroup Method
-
-	/**
-	Prepare the method and it's configuration, and add it as a task to be executed.
-	@param {Function} method - The function we want to execute as the method of this TaskGroup.
-	@param {Object} config - Optional configuration for the task to be created for the method.
-	@return {Task} The task for the method.
-	@method addMethod
-	@private
-	*/
-	addMethod (method, opts = {}) {
-		method = method.bind(this) // run the taskgroup method on the group, rather than itself
-		method.isTaskGroupMethod = true
-		if ( !opts.name )  opts.name = 'taskgroup method for ' + this.name
-		if ( !opts.args )  opts.args = [this.addGroup.bind(this), this.addTask.bind(this)]
-		if ( opts.includeInResults == null )  opts.includeInResults = false
-		return this.addTask(method, opts)
-	}
-
-	/**
-	Autorun ourself under certain conditions.
-
-	Those conditions being:
-
-	- if we the :method configuration is defined, and we have no :parent
-	- if we the :run configuration is `true`
-
-	Used primarily to cause the :method to fire at the appropriate time when using inline style.
-
-	@chainable
-	@method autoRun
-	@private
-	*/
-	autoRun () {
-		// Prepare
-		const method = this.config.method
-		let run = this.config.run
-
-		// Auto run if we are going the inline style and have no parent
-		if ( method ) {
-			// Add the function as our first unamed task with the extra arguments
-			this.addMethod(method)
-
-			// If we are the topmost group default run to true
-			if ( !this.config.parent && run == null ) {
-				this.state.run = run = true
-			}
-		}
-
-		// Auto run if we are configured to
-		if ( run ) {
-			this.run()
-		}
-
-		// Chain
-		return this
-	}
-
-
-	// ---------------------------------
-	// Add Item
-
-	/**
-	Adds a {Task|TaskGroup} instance and configures it from the arguments.
-
-	@param {Arguments} ...args - Arguments used to configure the {Task|TaskGroup} instance.
-
-	@return {Task|TaskGroup}
-	@method addItem
-	@public
-	*/
-	addItem (item, ...args) {
-		// Prepare
-		const me = this
-
-		// Only add the item if it exists
-		if ( !item ) return null
-
-		// Link our item to ourself
-		const itemConfig = {
-			parent: this,
-			sync: this.config.sync
-		}
-
-		// Extract
-		const nestedGroupConfig = this.config.nestedGroupConfig
-		const nestedTaskConfig = this.config.nestedTaskConfig
-		const emitNestedEvents = this.config.emitNestedEvents
-
-		// Bubble task events
-		if ( Task.isTask(item) ) {
-			// Nested configuration
-			item.setConfig(itemConfig, nestedTaskConfig, ...args)
-
-			// Bubble the nested events if desired
-			if ( emitNestedEvents ) {
-				item.state.events.forEach(function (event) {
-					item.on(event, function (...args) {
-						me.emit(`task.${event}`, item, ...args)
-					})
-				})
-			}
-
-			// Notify our intention
-			this.emit('task.add', item)
-		}
-
-		// Bubble group events
-		else if ( TaskGroup.isTaskGroup(item) ) {
-			// Nested configuration
-			item.setConfig(itemConfig, {nestedTaskConfig, nestedGroupConfig}, nestedGroupConfig, ...args)
-
-			// Bubble the nested events if desired
-			if ( emitNestedEvents ) {
-				item.state.events.forEach(function (event) {
-					item.on(event, function (...args) {
-						me.emit(`group.${event}`, item, ...args)
-					})
-				})
-			}
-
-			// Notify our intention
-			this.emit('group.add', item)
-		}
-
-		// Unknown type
-		else {
-			let error = new Error('Unknown item type')
-			this.emit('error', error)
-			return this
-		}
-
-		// Name default
-		if ( !item.config.name ) {
-			item.config.name = `${item.type} ${this.totalItems + 1} for [${this.name}]`
-		}
-
-		// Bubble the nested events if desired
-		if ( emitNestedEvents ) {
-			item.state.events.forEach(function (event) {
-				item.on(event, function (...args) {
-					me.emit(`item.${event}`, item, ...args)
-				})
-			})
-		}
-
-		// Emit
-		this.emit('item.add', item)
-
-		// Handle item completion and errors once
-		// we can't just do item.done, or item.once('done'), because we need the item to be the argument, rather than `this`
-		item.done(function (...args) {
-			me.itemCompletionCallback(item, ...args)
-		})
-
-		// Add the item
-		this.state.itemsRemaining.push(item)
-
-		// We may be running and expecting items, if so, fire
-		this.fire()
-
-		// Return the item
-		return item
-	}
-
-	/**
-	Adds {Task|TaskGroup} instances and configures them from the arguments.
-
-	@param {Array} items - Array of {Task|TaskGroup} instances to add to this task group.
-	@param {Arguments} ...args - Arguments used to configure the {Task|TaskGroup} instances.
-
-	@return {Array}
-	@method addItems
-	@public
-	*/
-	addItems (items, ...args) {
-		items = ensureArray(items)
-		items.map((item) => this.addItem(item, ...args))
-		return items
-	}
-
-	/**
-	Same as {{#crossLink "TaskGroup/addItem"}}{{/crossLink}} but chains instead of returning the item.
-	@chainable
-	@method addItemChain
-	@public
-	*/
-	addItemChain (...args) {
-		this.addItem(...args)
-		return this
-	}
-
-	/**
-	Same as {{#crossLink "TaskGroup/addItems"}}{{/crossLink}} but chains instead of returning the item.
-	@chainable
-	@method addItemsChain
-	@public
-	*/
-	addItemsChain (...args) {
-		this.addItems(...args)
-		return this
-	}
-
-
-	// ---------------------------------
-	// Add Task
-
-	/**
-	Creates a {Task} instance and configures it from the arguments.
-
-	If the first argument is already a {Task} instance, then we configure it with the remaining arguments, instead of creating a new {Task} instance.
-
-	@param {Arguments} ...args - Arguments used to configure the {Task} instance.
-
-	@return {Task}
-	@method createTask
-	@public
-	*/
-	createTask (...args) {
-		// Prepare
-		let task
-
-		// Support receiving an existing task instance
-		if ( Task.isTask(args[0]) ) {
-			task = args[0]
-			task.setConfig(...args.slice(1))
-		}
-
-		// Support receiving arguments to create a task instance
-		else {
-			task = new this.Task(...args)
-		}
-
-		// Return the new task
-		return task
-	}
-
-	/**
-	Adds a {Task} instance and configures it from the arguments.
-
-	If a {Task} instance is not supplied, a {Task} instance is created from the arguments.
-
-	@param {Arguments} ...args - Arguments used to configure the {Task} instance.
-
-	@return {Task}
-	@method addTask
-	@public
-	*/
-	addTask (...args) {
-		const task = this.createTask(...args)
-		return this.addItem(task)
-	}
-
-	/**
-	Adds {Task} instances and configures them from the arguments.
-
-	@param {Array} items - Array of {Task} instances to add to this task group.
-	@param {Arguments} ...args - Arguments used to configure the {Task} instances.
-
-	@return {Array}
-	@method addTask
-	@public
-	*/
-	addTasks (items, ...args) {
-		items = ensureArray(items)
-		items.map((item) => this.addTask(item, ...args))
-		return items
-	}
-
-	/**
-	Same as {{#crossLink "TaskGroup/addTask"}}{{/crossLink}} but chains instead of returning the item.
-	@chainable
-	@method addTaskChain
-	@public
-	*/
-	addTaskChain (...args) {
-		this.addTask(...args)
-		return this
-	}
-
-	/**
-	Same as {{#crossLink "TaskGroup/addTasks"}}{{/crossLink}} but chains instead of returning the item.
-	@chainable
-	@method addTasksChain
-	@public
-	*/
-	addTasksChain (...args) {
-		this.addTasks(...args)
-		return this
-	}
-
-
-	// ---------------------------------
-	// Add Group
-
-	/**
-	Creates a {TaskGroup} instance and configures it from the arguments.
-
-	If the first argument is already a {TaskGroup} instance, then we configure it with the remaining arguments, instead of creating a new {TaskGroup} instance.
-
-	@param {Arguments} ...args - Arguments used to configure the {TaskGroup} instance.
-
-	@return {TaskGroup}
-	@method createGroup
-	@public
-	*/
-	createGroup (...args) {
-		// Prepare
-		let group
-
-		// Support receiving an existing group instance
-		if ( TaskGroup.isTaskGroup(args[0]) ) {
-			group = args[0]
-			group.setConfig(...args.slice(1))
-		}
-
-		// Support receiving arguments to create a group instance
-		else {
-			group = new this.TaskGroup(...args)
-		}
-
-		// Return the new group
-		return group
-	}
-
-	/**
-	Adds a {TaskGroup} instance and configures it from the arguments.
-
-	If a {TaskGroup} instance is not supplied, a {TaskGroup} instance is created from the arguments.
-
-	@param {Arguments} ...args - Arguments used to configure the {TaskGroup} instance.
-
-	@return {TaskGroup}
-	@method addGroup
-	@public
-	*/
-	addGroup (...args) {
-		const group = this.createGroup(...args)
-		return this.addItem(group)
-	}
-
-	/**
-	Adds {TaskGroup} instances and configures them from the arguments.
-
-	@param {Array} items - Array of {TaskGroup} instances to add to this task group.
-	@param {Arguments} ...args - Arguments used to configure the {TaskGroup} instances.
-
-	@return {Array}
-	@method addGroups
-	@public
-	*/
-	addGroups (items, ...args) {
-		items = ensureArray(items)
-		items.map((item) => this.addGroup(item, ...args))
-		return items
-	}
-
-	/**
-	Same as {{#crossLink "TaskGroup/addGroup"}}{{/crossLink}} but chains instead of returning the item.
-	@chainable
-	@method addGroupChain
-	@public
-	*/
-	addGroupChain (...args) {
-		this.addGroup(...args)
-		return this
-	}
-
-	/**
-	Same as {{#crossLink "TaskGroup/addGroups"}}{{/crossLink}} but chains instead of returning the item.
-	@chainable
-	@method addGroupsChain
-	@public
-	*/
-	addGroupsChain (...args) {
-		this.addGroups(...args)
-		return this
-	}
-
-
-	// ---------------------------------
-	// Status Indicators
+	// Status Accessors
 
 	/**
 	Gets the total number of items inside our task group.
@@ -816,9 +240,7 @@ class TaskGroup extends BaseInterface {
 
 	/**
 	Whether or not we are capable of firing more items.
-
 	This is determined whether or not we are not paused, and we have remaning items, and we have slots able to execute those remaning items.
-
 	@type Boolean
 	@property shouldFire
 	@private
@@ -891,9 +313,7 @@ class TaskGroup extends BaseInterface {
 
 	/**
 	Whether or not we execution has completed.
-
 	Completion of executed is determined of whether or not we have started, and whether or not we are currently paused or have no remaining and running items left
-
 	@type Boolean
 	@property completed
 	@private
@@ -908,9 +328,528 @@ class TaskGroup extends BaseInterface {
 		)
 	}
 
+	// ---------------------------------
+	// State Changers
+
+	/**
+	Reset the results.
+	At this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.
+	@chainable
+	@method resetResults
+	@private
+	*/
+	resetResults () {
+		this.state.results = []
+
+		// Chain
+		return this
+	}
+
+	/**
+	Remove and destroy the remaining items.
+	@chainable
+	@method clearRemaining
+	@public
+	*/
+	clearRemaining () {
+		const itemsRemaining = this.state.itemsRemaining
+		while ( itemsRemaining.length !== 0 ) {
+			itemsRemaining.pop().destroy()
+		}
+
+		// Chain
+		return this
+	}
+
+	/**
+	Remove and destroy the running items. Here for verboseness.
+	@chainable
+	@method clearRunning
+	@private
+	*/
+	clearRunning () {
+		const error = new Error('Clearing running items is not possible. Instead remaining items and wait for running items to complete.')
+		this.emit('error', error)
+	}
+
+
+	// ===================================
+	// Initialization
+
+	/**
+	Initialize our new {TaskGroup} instance. Forwards arguments onto {{#crossLink "TaskGroup/setConfig"}}{{/crossLink}}.
+	@method constructor
+	@public
+	*/
+	constructor (...args) {
+		super()
+
+		// State defaults
+		extendr.defaults(this.state, {
+			id: `${this.type} ${Math.random()}`,
+			error: null,
+			status: null,
+			results: [],
+			itemsRemaining: [],
+			itemsRunningCount: 0,
+			itemsCompletedCount: 0
+		})
+
+		// Configuration defaults
+		extendr.defaults(this.config, {
+			destroyCompleted: true,
+			onExit: 'destroy',
+			emitNestedEvents: false,
+			nestedTaskConfig: {},
+			nestedGroupConfig: {},
+			concurrency: 1,
+			onError: 'exit',
+			sync: false
+		})
+
+		// Apply user configuration
+		this.setConfig(...args)
+
+		// Give setConfig enough chance to fire
+		// Changing this to setImmediate breaks a lot of things
+		// As tasks inside nested taskgroups will fire in any order
+		this.queue(this.autoRun.bind(this))
+	}
+
+	/**
+	Autorun ourself under certain conditions.
+
+	Those conditions being:
+
+	- if we the :method configuration is defined, and we have no :parent
+	- if we the :run configuration is `true`
+
+	Used primarily to cause the :method to fire at the appropriate time when using inline style.
+
+	@chainable
+	@method autoRun
+	@private
+	*/
+	autoRun () {
+		// Prepare
+		const method = this.config.method
+		let run = this.config.run
+
+		// Auto run if we are going the inline style and have no parent
+		if ( method ) {
+			// Add the function as our first unamed task with the extra arguments
+			this.addMethod(method)
+
+			// If we are the topmost group default run to true
+			if ( !this.config.parent && run == null ) {
+				this.state.run = run = true
+			}
+		}
+
+		// Auto run if we are configured to
+		if ( run ) {
+			this.run()
+		}
+
+		// Chain
+		return this
+	}
+
+	/**
+	Set the configuration for our instance.
+
+	Despite accepting an {Object} of configuration, we can also accept an {Array} of configuration.	When using an array, a {String} becomes the :name, a {Function} becomes the :method, and an {Object} becomes the :config
+
+	@param {Object} [config]
+
+	@param {String} [config.name] - What we would like our name to be, useful for debugging.
+	@param {Function} [config.done] - Passed to {{#crossLink "TaskGroup/onceDone"}}{{/crossLink}} (aliases are `onceDone`, and `next`)
+	@param {Function} [config.whenDone] - Passed to {{#crossLink "TaskGroup/whenDone"}}{{/crossLink}}
+	@param {Object} [config.on] - An object of event names linking to listener functions that we would like bounded via {EventEmitter.on}.
+	@param {Object} [config.once] - An object of event names linking to listener functions that we would like bounded via {EventEmitter.once}.
+	@param {TaskGroup} [config.parent] - A parent {{#crossLink "TaskGroup"}}{{/crossLink}} that we may be attached to.
+	@param {String} [config.onError] - Either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.
+	@param {Boolean} [config.sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`).
+
+	@param {Function} [config.method] - The {Function} to execute for our {TaskGroup} when using inline execution style.
+	@param {Boolean} [config.run=true] - A {Boolean} for whether or not to the :method (if specified) automatically.
+	@param {Number} [config.concurrency=1] - The amount of items that we would like to execute at the same time. Use `0` for unlimited. `1` accomplishes serial execution, everything else accomplishes parallel execution.
+	@param {Object} [config.nestedGroupConfig] - The nested configuration to be applied to all {TaskGroup} descendants of this group.
+	@param {Object} [config.nestedTaskConfig] - The nested configuration to be applied to all {Task} descendants of this group.
+	@param {Array} [config.tasks] - An {Array} of {Task} instances to be added to this group.
+	@param {Array} [config.groups] - An {Array} of {TaskGroup} instances to be added to this group.
+	@param {Array} [config.items] - An {Array} of {Task} and/or {TaskGroup} instances to be added to this group.
+
+	@chainable
+	@method setConfig
+	@public
+	*/
+	setConfig (...args) {
+		const opts = {}
+
+		// Extract the configuration from the arguments
+		args.forEach(function (arg) {
+			if ( arg == null )  return
+			const type = typeof arg
+			switch ( type ) {
+				case 'string':
+					opts.name = arg
+					break
+				case 'function':
+					opts.method = arg
+					break
+				case 'object':
+					extendr.deep(opts, arg)
+					break
+				default:
+					const error = new Error(`Unknown argument type of [${type}] given to TaskGroup::setConfig()`)
+					throw error
+			}
+		})
+
+		// Apply the configuration directly to our instance
+		eachr(opts, (value, key) => {
+			if ( value == null )  return
+			switch ( key ) {
+				case 'on':
+					eachr(value, (value, key) => {
+						if ( value )  this.on(key, value)
+					})
+					break
+
+				case 'once':
+					eachr(value, (value, key) => {
+						if ( value )  this.once(key, value)
+					})
+					break
+
+				case 'whenDone':
+					this.whenDone(value)
+					break
+
+				case 'onceDone':
+				case 'done':
+				case 'next':
+					this.done(value)
+					break
+
+				case 'task':
+				case 'tasks':
+					this.addTasks(value)
+					break
+
+				case 'group':
+				case 'groups':
+					this.addTaskGroups(value)
+					break
+
+				case 'item':
+				case 'items':
+					this.addItems(value)
+					break
+
+				default:
+					this.config[key] = value
+					break
+			}
+		})
+
+		// Chain
+		return this
+	}
+
+	/**
+	Merged passed configuration into {config.nestedTaskConfig}.
+	@param {Object} opts - The configuration to merge.
+	@chainable
+	@method setNestedTaskConfig
+	@public
+	*/
+	setNestedTaskConfig (opts) {
+		// Fetch and copy options to the state's nested task configuration
+		extendr.deep(this.state.nestedTaskConfig, opts)
+
+		// Chain
+		return this
+	}
+
+	/**
+	Merged passed configuration into {config.nestedGroupConfig}.
+	@param {Object} opts - The configuration to merge.
+	@chainable
+	@method setNestedGroupConfig
+	@public
+	*/
+	setNestedGroupConfig (opts) {
+		// Fetch and copy options to the state's nested configuration
+		extendr.deep(this.state.nestedGroupConfig, opts)
+
+		// Chain
+		return this
+	}
+
+
+	// ===================================
+	// Items
 
 	// ---------------------------------
-	// Firers
+	// TaskGroup Method
+
+	/**
+	Prepare the method and it's configuration, and add it as a task to be executed.
+	@param {Function} method - The function we want to execute as the method of this TaskGroup.
+	@param {Object} config - Optional configuration for the task to be created for the method.
+	@chainable
+	@method addMethod
+	@private
+	*/
+	addMethod (method, opts = {}) {
+		method = method.bind(this) // run the taskgroup method on the group, rather than itself
+		method.isTaskGroupMethod = true
+		if ( !opts.name )  opts.name = 'taskgroup method for ' + this.name
+		if ( !opts.args )  opts.args = [this.addTaskGroup.bind(this), this.addTask.bind(this)]
+		if ( opts.includeInResults == null )  opts.includeInResults = false
+		this.addTask(method, opts)
+		return this
+	}
+
+
+	// ---------------------------------
+	// Add Item
+
+	/**
+	Adds a {Task|TaskGroup} instance and configures it from the arguments.
+	@param {Arguments} ...args - Arguments used to configure the {Task|TaskGroup} instance.
+	@chainable
+	@method addItem
+	@public
+	*/
+	addItem (item, ...args) {
+		// Prepare
+		const me = this
+
+		// Only add the item if it exists
+		if ( !item ) return null
+
+		// Link our item to ourself
+		const itemConfig = {
+			parent: this,
+			sync: this.config.sync
+		}
+
+		// Extract
+		const nestedGroupConfig = this.config.nestedGroupConfig
+		const nestedTaskConfig = this.config.nestedTaskConfig
+		const emitNestedEvents = this.config.emitNestedEvents
+
+		// Bubble task events
+		if ( Task.isTask(item) ) {
+			// Nested configuration
+			item.setConfig(itemConfig, nestedTaskConfig, ...args)
+
+			// Bubble the nested events if desired
+			if ( emitNestedEvents ) {
+				item.state.events.forEach(function (event) {
+					item.on(event, function (...args) {
+						me.emit(`task.${event}`, item, ...args)
+					})
+				})
+			}
+
+			// Notify our intention
+			this.emit('task.add', item)
+		}
+
+		// Bubble group events
+		else if ( TaskGroup.isTaskGroup(item) ) {
+			// Nested configuration
+			item.setConfig(itemConfig, {nestedTaskConfig, nestedGroupConfig}, nestedGroupConfig, ...args)
+
+			// Bubble the nested events if desired
+			if ( emitNestedEvents ) {
+				item.state.events.forEach(function (event) {
+					item.on(event, function (...args) {
+						me.emit(`group.${event}`, item, ...args)
+					})
+				})
+			}
+
+			// Notify our intention
+			this.emit('group.add', item)
+		}
+
+		// Unknown type
+		else {
+			let error = new Error('Unknown item type')
+			this.emit('error', error)
+			return this
+		}
+
+		// Name default
+		if ( !item.config.name ) {
+			item.config.name = `${item.type} ${this.totalItems + 1} for [${this.name}]`
+		}
+
+		// Bubble the nested events if desired
+		if ( emitNestedEvents ) {
+			item.state.events.forEach(function (event) {
+				item.on(event, function (...args) {
+					me.emit(`item.${event}`, item, ...args)
+				})
+			})
+		}
+
+		// Emit
+		this.emit('item.add', item)
+
+		// Handle item completion and errors once
+		// we can't just do item.done, or item.once('done'), because we need the item to be the argument, rather than `this`
+		item.done(function (...args) {
+			me.itemCompletionCallback(item, ...args)
+		})
+
+		// Add the item
+		this.state.itemsRemaining.push(item)
+
+		// We may be running and expecting items, if so, fire
+		this.fire()
+
+		// Chain
+		return this
+	}
+
+	/**
+	Adds {Task|TaskGroup} instances and configures them from the arguments.
+	@param {Array} items - Array of {Task|TaskGroup} instances to add to this task group.
+	@param {Arguments} ...args - Arguments used to configure the {Task|TaskGroup} instances.
+	@chainable
+	@method addItems
+	@public
+	*/
+	addItems (items, ...args) {
+		ensureArray(items).forEach((item) => this.addItem(item, ...args))
+		return this
+	}
+
+
+	// ---------------------------------
+	// Add Task
+
+	/**
+	Creates a {Task} instance and configures it from the arguments.
+	If the first argument is already a {Task} instance, then we configure it with the remaining arguments, instead of creating a new {Task} instance.
+	@param {Arguments} ...args - Arguments used to configure the {Task} instance.
+	@return {Task}
+	@method createTask
+	@public
+	*/
+	createTask (...args) {
+		// Prepare
+		let task
+
+		// Support receiving an existing task instance
+		if ( Task.isTask(args[0]) ) {
+			task = args[0]
+			task.setConfig(...args.slice(1))
+		}
+
+		// Support receiving arguments to create a task instance
+		else {
+			task = new this.Task(...args)
+		}
+
+		// Return the new task
+		return task
+	}
+
+	/**
+	Adds a {Task} instance and configures it from the arguments.
+	If a {Task} instance is not supplied, a {Task} instance is created from the arguments.
+	@param {Arguments} ...args - Arguments used to configure the {Task} instance.
+	@chainable
+	@method addTask
+	@public
+	*/
+	addTask (...args) {
+		const task = this.createTask(...args)
+		this.addItem(task)
+		return this
+	}
+
+	/**
+	Adds {Task} instances and configures them from the arguments.
+	@param {Array} items - Array of {Task} instances to add to this task group.
+	@param {Arguments} ...args - Arguments used to configure the {Task} instances.
+	@chainable
+	@method addTask
+	@public
+	*/
+	addTasks (items, ...args) {
+		ensureArray(items).forEach((item) => this.addTask(item, ...args))
+		return this
+	}
+
+
+	// ---------------------------------
+	// Add Group
+
+	/**
+	Creates a {TaskGroup} instance and configures it from the arguments.
+	If the first argument is already a {TaskGroup} instance, then we configure it with the remaining arguments, instead of creating a new {TaskGroup} instance.
+	@param {Arguments} ...args - Arguments used to configure the {TaskGroup} instance.
+	@return {TaskGroup}
+	@method createTaskGroup
+	@public
+	*/
+	createTaskGroup (...args) {
+		// Prepare
+		let group
+
+		// Support receiving an existing group instance
+		if ( TaskGroup.isTaskGroup(args[0]) ) {
+			group = args[0]
+			group.setConfig(...args.slice(1))
+		}
+
+		// Support receiving arguments to create a group instance
+		else {
+			group = new this.TaskGroup(...args)
+		}
+
+		// Return the new group
+		return group
+	}
+
+	/**
+	Adds a {TaskGroup} instance and configures it from the arguments.
+	If a {TaskGroup} instance is not supplied, a {TaskGroup} instance is created from the arguments.
+	@param {Arguments} ...args - Arguments used to configure the {TaskGroup} instance.
+	@chainable
+	@method addGroup
+	@public
+	*/
+	addTaskGroup (...args) {
+		const group = this.createTaskGroup(...args)
+		this.addItem(group)
+		return this
+	}
+
+	/**
+	Adds {TaskGroup} instances and configures them from the arguments.
+	@param {Array} items - Array of {TaskGroup} instances to add to this task group.
+	@param {Arguments} ...args - Arguments used to configure the {TaskGroup} instances.
+	@chainable
+	@method addGroups
+	@public
+	*/
+	addTaskGroups (items, ...args) {
+		ensureArray(items).forEach((item) => this.addTaskGroup(item, ...args))
+		return this
+	}
+
+
+	// ===================================
+	// Workflow
 
 	/**
 	When Done Promise.
@@ -949,20 +888,6 @@ class TaskGroup extends BaseInterface {
 		else {
 			super.onceDone(handler)
 		}
-
-		// Chain
-		return this
-	}
-
-	/**
-	Reset the results.
-	At this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.
-	@chainable
-	@method resetResults
-	@private
-	*/
-	resetResults () {
-		this.state.results = []
 
 		// Chain
 		return this
@@ -1070,55 +995,29 @@ class TaskGroup extends BaseInterface {
 	}
 
 	/**
-	Internal: Either execute the reamining items we are not paused, or complete execution by exiting.
+	Set our task to the completed state.
+	@NOTE This doesn't have to be a separate method, it could just go inside `fire` however, it is nice to have here to keep `fire` simple
 	@chainable
-	@method fire
+	@method finish
 	@private
 	*/
-	fire () {
-		// Have we actually started?
-		if ( this.started ) {
-			// Check if we are complete, if so, exit
-			if ( this.completed ) {
-				// Finish up
-				this.finish()
-			}
+	finish () {
+		// Set and emmit the appropriate status for our error or non-error
+		const error = this.state.error
+		const status = error ? 'failed' : 'passed'
+		this.state.status = status
+		this.emit(status, error)
 
-			// Otherwise continue firing items if we are wanting to pause
-			else if ( !this.shouldPause ) {
-				this.fireNextItems()
-			}
+		// Notity our listners we have completed
+		this.emit('completed', this.state.error, this.state.results)
+
+		// Prevent the error from persisting
+		this.state.error = null
+
+		// Destroy if desired
+		if ( this.config.onExit === 'destroy' ) {
+			this.destroy()
 		}
-
-		// Chain
-		return this
-	}
-
-	/**
-	Remove and destroy the remaining items.
-	@chainable
-	@method clearRemaining
-	@public
-	*/
-	clearRemaining () {
-		const itemsRemaining = this.state.itemsRemaining
-		while ( itemsRemaining.length !== 0 ) {
-			itemsRemaining.pop().destroy()
-		}
-
-		// Chain
-		return this
-	}
-
-	/**
-	Remove and destroy the running items. Here for verboseness.
-	@chainable
-	@method clearRunning
-	@private
-	*/
-	clearRunning () {
-		const error = new Error('Clearing running items is not possible. Instead remaining items and wait for running items to complete.')
-		this.emit('error', error)
 	}
 
 	/**
@@ -1156,32 +1055,6 @@ class TaskGroup extends BaseInterface {
 	}
 
 	/**
-	Set our task to the completed state.
-	@NOTE This doesn't have to be a separate method, it could just go inside `fire` however, it is nice to have here to keep `fire` simple
-	@chainable
-	@method finish
-	@private
-	*/
-	finish () {
-		// Set and emmit the appropriate status for our error or non-error
-		const error = this.state.error
-		const status = error ? 'failed' : 'passed'
-		this.state.status = status
-		this.emit(status, error)
-
-		// Notity our listners we have completed
-		this.emit('completed', this.state.error, this.state.results)
-
-		// Prevent the error from persisting
-		this.state.error = null
-
-		// Destroy if desired
-		if ( this.config.onExit === 'destroy' ) {
-			this.destroy()
-		}
-	}
-
-	/**
 	@NOTE Perhaps at some point, we can add abort/exit functionality, but these things have to be considered:
 	What will happen to currently running items?
 	What will happen to remaining items?
@@ -1193,6 +1066,31 @@ class TaskGroup extends BaseInterface {
 	Perhaps we need to update the definition of pausing to be halted instead?
 	How can we apply this to Task and TaskGroup consistently?
 	*/
+
+	/**
+	Internal: Either execute the reamining items we are not paused, or complete execution by exiting.
+	@chainable
+	@method fire
+	@private
+	*/
+	fire () {
+		// Have we actually started?
+		if ( this.started ) {
+			// Check if we are complete, if so, exit
+			if ( this.completed ) {
+				// Finish up
+				this.finish()
+			}
+
+			// Otherwise continue firing items if we are wanting to pause
+			else if ( !this.shouldPause ) {
+				this.fireNextItems()
+			}
+		}
+
+		// Chain
+		return this
+	}
 
 	/**
 	Start/restart/resume the execution of the TaskGroup.
