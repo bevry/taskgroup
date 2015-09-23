@@ -4,7 +4,7 @@
 // Imports
 const BaseInterface = require('./interface')
 const Task = require('./task')
-const {ensureArray, errorToString} = require('./util')
+const {ensureArray} = require('./util')
 const extendr = require('extendr')
 const eachr = require('eachr')
 
@@ -15,7 +15,7 @@ Available configuration is documented in {{#crossLink "TaskGroup/setConfig"}}{{/
 
 Available events:
 
-- `started()` - emitted when we start execution
+- `pending()` - emitted when execution has been triggered
 - `running()` - emitted when the first item starts execution
 - `failed(error)` - emitted when execution exited with a failure
 - `passed()` - emitted when execution exited with a success
@@ -28,8 +28,8 @@ Available events:
 
 Available internal statuses:
 
-- `null` - execution has not yet started
-- `'started'` - execution has begun
+- `'created'` - execution has not yet started
+- `'pending'` - execution has been triggered
 - `'running'` - execution of items has begun
 - `'failed'` - execution has exited with failure status
 - `'passed'` - execution has exited with success status
@@ -97,7 +97,7 @@ class TaskGroup extends BaseInterface {
 	@protected
 	*/
 	get events () {
-		return ['error', 'started', 'running', 'passed', 'failed', 'completed', 'done', 'destroyed']
+		return ['error', 'pending', 'running', 'passed', 'failed', 'completed', 'done', 'destroyed']
 	}
 
 
@@ -141,9 +141,9 @@ class TaskGroup extends BaseInterface {
 	*/
 	get totalItems () {
 		const remaining = this.state.itemsRemaining.length
-		const running = this.state.itemsRunningCount
-		const completed = this.state.itemsCompletedCount
-		const total = running + remaining + completed
+		const executing = this.state.itemsExecutingCount
+		const done = this.state.itemsDoneCount
+		const total = executing + remaining + done
 		return total
 	}
 
@@ -153,8 +153,8 @@ class TaskGroup extends BaseInterface {
 	Returns an {Object} containg the hashes:
 
 	- remaining - A {Number} of the names of the remaining items.
-	- running - A {Number} of the names of the running items.
-	- completed - A {Number} of the names of the completed items.
+	- executing - A {Number} of the names of the executing items.
+	- done - A {Number} of the names of the done items.
 	- total - A {Number} of the total items we have.
 	- results - A {Number} of the total results we have.
 
@@ -164,14 +164,14 @@ class TaskGroup extends BaseInterface {
 	*/
 	get itemTotals () {
 		const remaining = this.state.itemsRemaining.length
-		const running = this.state.itemsRunningCount
-		const completed = this.state.itemsCompletedCount
+		const executing = this.state.itemsExecutingCount
+		const done = this.state.itemsDoneCount
 		const results = this.state.results.length
-		const total = running + remaining + completed
+		const total = executing + remaining + done
 		return {
 			remaining,
-			running,
-			completed,
+			executing,
+			done,
 			total,
 			results
 		}
@@ -194,7 +194,7 @@ class TaskGroup extends BaseInterface {
 	@private
 	*/
 	get hasRunning () {
-		return this.state.itemsRunningCount !== 0
+		return this.state.itemsExecutingCount !== 0
 	}
 
 	/**
@@ -235,7 +235,7 @@ class TaskGroup extends BaseInterface {
 	*/
 	get hasSlots () {
 		const concurrency = this.config.concurrency
-		return concurrency === 0 || this.state.itemsRunningCount < concurrency
+		return concurrency === 0 || this.state.itemsExecutingCount < concurrency
 	}
 
 	/**
@@ -256,9 +256,7 @@ class TaskGroup extends BaseInterface {
 	@private
 	*/
 	get shouldPause () {
-		return (
-			this.config.onError === 'exit' && this.hasError
-		)
+		return this.config.abortOnError && this.hasError
 	}
 
 	/**
@@ -268,10 +266,7 @@ class TaskGroup extends BaseInterface {
 	@private
 	*/
 	get paused () {
-		return (
-			this.shouldPause &&
-			!this.hasRunning
-		)
+		return this.shouldPause && !this.hasRunning
 	}
 
 	/**
@@ -292,7 +287,8 @@ class TaskGroup extends BaseInterface {
 	*/
 	get exited () {
 		switch ( this.state.status ) {
-			case 'completed':
+			case 'passed':
+			case 'failed':
 			case 'destroyed':
 				return true
 
@@ -308,7 +304,7 @@ class TaskGroup extends BaseInterface {
 	@private
 	*/
 	get started () {
-		return this.state.status != null
+		return this.state.status !== 'created'
 	}
 
 	/**
@@ -319,14 +315,9 @@ class TaskGroup extends BaseInterface {
 	@private
 	*/
 	get completed () {
-		return (
-			this.started &&
-			(
-				this.paused ||
-				this.empty
-			)
-		)
+		return this.started && (this.paused || this.empty)
 	}
+
 
 	// ---------------------------------
 	// State Changers
@@ -384,27 +375,38 @@ class TaskGroup extends BaseInterface {
 	constructor (...args) {
 		super()
 
+		// Prepare
+		if ( this.prepare ) {
+			this.prepare(...args)
+		}
+
 		// State defaults
 		extendr.defaults(this.state, {
 			id: `${this.type} ${Math.random()}`,
 			error: null,
-			status: null,
+			status: 'created',
 			results: [],
 			itemsRemaining: [],
-			itemsRunningCount: 0,
-			itemsCompletedCount: 0
+			itemsExecutingCount: 0,
+			itemsDoneCount: 0
 		})
 
 		// Configuration defaults
 		extendr.defaults(this.config, {
-			destroyCompleted: true,
-			onExit: 'destroy',
-			emitNestedEvents: false,
+			// Standard
+			destroyOnceDone: true,
+			sync: false,
+			parent: null,
+
+			// Unique to TaskGroup
+			method: null,
+			abortOnError: true,
+			destroyDoneItems: true,
 			nestedTaskConfig: {},
 			nestedGroupConfig: {},
+			emitNestedEvents: false,
 			concurrency: 1,
-			onError: 'exit',
-			sync: false
+			run: null
 		})
 
 		// Apply user configuration
@@ -467,17 +469,22 @@ class TaskGroup extends BaseInterface {
 	@param {Function} [config.whenDone] - Passed to {{#crossLink "TaskGroup/whenDone"}}{{/crossLink}}
 	@param {Object} [config.on] - An object of event names linking to listener functions that we would like bounded via {EventEmitter.on}.
 	@param {Object} [config.once] - An object of event names linking to listener functions that we would like bounded via {EventEmitter.once}.
-	@param {TaskGroup} [config.parent] - A parent {{#crossLink "TaskGroup"}}{{/crossLink}} that we may be attached to.
-	@param {String} [config.onError] - Either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.
+
+	@param {Boolean} [config.destroyOnceDone=true] - Whether or not we should automatically destroy the TaskGroup once done to free up resources
 	@param {Boolean} [config.sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`).
+	@param {TaskGroup} [config.parent] - A parent {{#crossLink "TaskGroup"}}{{/crossLink}} that we may be attached to.
 
 	@param {Function} [config.method] - The {Function} to execute for our {TaskGroup} when using inline execution style.
-	@param {Boolean} [config.run=true] - A {Boolean} for whether or not to the :method (if specified) automatically.
-	@param {Number} [config.concurrency=1] - The amount of items that we would like to execute at the same time. Use `0` for unlimited. `1` accomplishes serial execution, everything else accomplishes parallel execution.
+	@param {Boolean} [config.abortOnError=true] - Whether or not we should abort execution of the TaskGroup and exit when an error occurs
+	@param {Boolean} [config.destroyDoneItems=true] - Whether or not we should automatically destroy done items to free up resources
 	@param {Object} [config.nestedGroupConfig] - The nested configuration to be applied to all {TaskGroup} descendants of this group.
 	@param {Object} [config.nestedTaskConfig] - The nested configuration to be applied to all {Task} descendants of this group.
+	@param {Boolean} [config.emitNestedEvents=fakse] - Whether or not we should emit nested item events
+	@param {Number} [config.concurrency=1] - The amount of items that we would like to execute at the same time. Use `0` for unlimited. `1` accomplishes serial execution, everything else accomplishes parallel execution.
+	@param {Boolean} [config.run] - A {Boolean} for whether or not to run the TaskGroup automatically, by default will be enabled if config.method is defined
+
 	@param {Array} [config.tasks] - An {Array} of {Task} instances to be added to this group.
-	@param {Array} [config.groups] - An {Array} of {TaskGroup} instances to be added to this group.
+	@param {Array} [config.taskgroups] - An {Array} of {TaskGroup} instances to be added to this group.
 	@param {Array} [config.items] - An {Array} of {Task} and/or {TaskGroup} instances to be added to this group.
 
 	@chainable
@@ -540,6 +547,8 @@ class TaskGroup extends BaseInterface {
 
 				case 'group':
 				case 'groups':
+				case 'taskgroup':
+				case 'taskgroups':
 					this.addTaskGroups(value)
 					break
 
@@ -608,6 +617,7 @@ class TaskGroup extends BaseInterface {
 		method.isTaskGroupMethod = true
 		if ( !opts.name )  opts.name = 'taskgroup method for ' + this.name
 		if ( !opts.args )  opts.args = [this.addTaskGroup.bind(this), this.addTask.bind(this)]
+		// @TODO update this to be storeResult or something
 		if ( opts.includeInResults == null )  opts.includeInResults = false
 		this.addTask(method, opts)
 		return this
@@ -690,6 +700,9 @@ class TaskGroup extends BaseInterface {
 			item.config.name = `${item.type} ${this.totalItems + 1} for [${this.name}]`
 		}
 
+		// Add the item
+		this.state.itemsRemaining.push(item)
+
 		// Bubble the nested events if desired
 		if ( emitNestedEvents ) {
 			item.state.events.forEach(function (event) {
@@ -705,11 +718,8 @@ class TaskGroup extends BaseInterface {
 		// Handle item completion and errors once
 		// we can't just do item.done, or item.once('done'), because we need the item to be the argument, rather than `this`
 		item.done(function (...args) {
-			me.itemCompletionCallback(item, ...args)
+			me.itemDoneCallback(item, ...args)
 		})
-
-		// Add the item
-		this.state.itemsRemaining.push(item)
 
 		// We may be running and expecting items, if so, fire
 		this.fire()
@@ -862,7 +872,9 @@ class TaskGroup extends BaseInterface {
 	whenDone (handler) {
 		if ( this.completed ) {
 			// avoid zalgo
-			this.queue( () => handler.call(this, this.state.error, this.state.results) )
+			this.queue(() => {
+				handler.call(this, this.state.error, this.state.results)
+			})
 		}
 		else {
 			super.whenDone(handler)
@@ -883,7 +895,9 @@ class TaskGroup extends BaseInterface {
 	onceDone (handler) {
 		if ( this.completed ) {
 			// avoid zalgo
-			this.queue( () => handler.call(this, this.state.error, this.state.results) )
+			this.queue(() => {
+				handler.call(this, this.state.error, this.state.results)
+			})
 		}
 		else {
 			super.onceDone(handler)
@@ -934,15 +948,14 @@ class TaskGroup extends BaseInterface {
 			// Fire the next item
 
 			// Update our status and notify our listeners
-			let status = this.state.status
-			if ( status !== 'running' ) {
-				this.state.status = status = 'running'
-				this.emit(status)
+			if ( this.state.status !== 'running' ) {
+				this.state.status = 'running'
+				this.emit('running')
 			}
 
 			// Get the next item and bump the running count
 			const item = this.state.itemsRemaining.shift()
-			++this.state.itemsRunningCount
+			++this.state.itemsExecutingCount
 			item.run()
 
 			// Return the item
@@ -954,36 +967,36 @@ class TaskGroup extends BaseInterface {
 	}
 
 	/**
-	What to do when an item completes.
+	What to do when an item is done.
 	@chainable
 	@param {Task|TaskGroup} item - The item that has completed
 	@param {Arguments} ...args - The arguments that the item completed with.
-	@method itemCompletionCallback
+	@method itemDoneCallback
 	@private
 	*/
-	itemCompletionCallback (item, ...args) {
+	itemDoneCallback (item, ...args) {
 		// Prepare
-		let error = this.state.error
 		const results = this.state.results
 
 		// Update error if it exists
-		if ( this.config.onError === 'exit' && args[0] ) {
-			if ( !error ) {
-				this.state.error = error = args[0]
+		if ( this.config.abortOnError && args[0] ) {
+			if ( !this.state.error ) {
+				this.state.error = args[0]
 			}
 		}
 
 		// Add the result
-		if ( !item.config.includeInResults ) {
+		// falsey but not false should still add results
+		if ( item.config.includeInResults !== false ) {
 			results.push(args)
 		}
 
-		// Mark that one less item is running and one more item completed
-		--this.state.itemsRunningCount
-		++this.state.itemsCompletedCount
+		// Mark that one less item is running and one more item done
+		--this.state.itemsExecutingCount
+		++this.state.itemsDoneCount
 
 		// As we no longer have any use for this item, as it has completed, destroy it if desired
-		if ( this.config.destroyCompleted ) {
+		if ( this.config.destroyDoneItems ) {
 			item.destroy()
 		}
 
@@ -1015,9 +1028,26 @@ class TaskGroup extends BaseInterface {
 		this.state.error = null
 
 		// Destroy if desired
-		if ( this.config.onExit === 'destroy' ) {
+		if ( this.config.destroyOnceDone ) {
 			this.destroy()
 		}
+	}
+
+	/**
+	@NOTE Perhaps at some point, we can add abort/exit functionality, but these things have to be considered:
+	What will happen to currently running items?
+	What will happen to remaining items?
+	Should it be two methods? .halt() and .abort(error?)
+	Should it be a state?
+	Should it alter the state?
+	Should it clear or destroy?
+	What is the definition of pausing with this?
+	Perhaps we need to update the definition of pausing to be halted instead?
+	How can we apply this to Task and TaskGroup consistently?
+	@private
+	*/
+	abort () {
+		throw new Error('not yet implemented')
 	}
 
 	/**
@@ -1032,15 +1062,12 @@ class TaskGroup extends BaseInterface {
 
 		// Once running items have finished, then proceed to destruction
 		this.done(() => {
-			// Prepare
-			let status = this.state.status
-
 			// Are we already destroyed?
-			if ( status === 'destroyed' ) return
+			if ( this.state.status === 'destroyed' ) return
 
 			// Update our status and notify our listeners
-			this.state.status = status = 'destroyed'
-			this.emit(status)
+			this.state.status = 'destroyed'
+			this.emit('destroyed')
 
 			// Clear results
 			this.resetResults()
@@ -1055,27 +1082,14 @@ class TaskGroup extends BaseInterface {
 	}
 
 	/**
-	@NOTE Perhaps at some point, we can add abort/exit functionality, but these things have to be considered:
-	What will happen to currently running items?
-	What will happen to remaining items?
-	Should it be two methods? .halt() and .abort(error?)
-	Should it be a state?
-	Should it alter the state?
-	Should it clear or destroy?
-	What is the definition of pausing with this?
-	Perhaps we need to update the definition of pausing to be halted instead?
-	How can we apply this to Task and TaskGroup consistently?
-	*/
-
-	/**
 	Internal: Either execute the reamining items we are not paused, or complete execution by exiting.
 	@chainable
 	@method fire
 	@private
 	*/
 	fire () {
-		// Have we actually started?
-		if ( this.started ) {
+		// Have we started are not destroyed?
+		if ( this.started && this.state.status !== 'destroyed' ) {
 			// Check if we are complete, if so, exit
 			if ( this.completed ) {
 				// Finish up
@@ -1099,21 +1113,19 @@ class TaskGroup extends BaseInterface {
 	@public
 	*/
 	run () {
-		this.queue(() => {
-			// Already destroyed?
-			if ( this.state.status === 'destroyed' ) {
-				const error = new Error(`The taskgroup [${this.names}] was just about to start, but it was destroyed earlier, this is unexpected.`)
-				this.emit('error', error)
-			}
+		// Prevent running on destroy
+		if ( this.state.status === 'destroyed' ) {
+			const error = new Error(`Invalid run status for the TaskGroup [${this.names}], it was [${this.state.status}].`)
+			this.emit('error', error)
+			return this
+		}
 
-			// Apply our new status and notify our intention to run
-			const status = 'started'
-			this.state.status = status
-			this.emit(status)
+		// Put it into pending state
+		this.state.status = 'pending'
+		this.emit('pending')
 
-			// Give time for the listeners to complete before continuing
-			this.fire()
-		})
+		// Queue the actual running so we can give time for the listeners to complete before continuing
+		this.queue(() => this.fire())
 
 		// Chain
 		return this

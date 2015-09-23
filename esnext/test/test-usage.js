@@ -43,13 +43,13 @@ joe.suite('task', function (suite, test) {
 	test('Task.create(...).run().run().done(...) should fail as a task is not allowed to run twice', function (complete) {
 		Task.create(returnViaCallback(5))
 			.run().run()
-			.on('error', expectErrorViaCallback('started earlier', 'error was as expected', complete))
+			.on('error', expectErrorViaCallback('run status', 'error was as expected', complete))
 	})
 
 	// failure: done then run then run
 	test('Task.create(...).done(...).run().run() should fail as a task is not allowed to run twice', function (complete) {
 		Task.create(returnViaCallback(5))
-			.on('error', expectErrorViaCallback('started earlier', 'error was as expected', complete))
+			.on('error', expectErrorViaCallback('run status', 'error was as expected', complete))
 			.run().run()
 	})
 })

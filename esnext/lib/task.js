@@ -15,7 +15,7 @@ Available configuration is documented in {{#crossLink "Task/setConfig"}}{{/cross
 
 Available events:
 
-- `started()` - emitted when we start execution
+- `pending()` - emitted when execution has been triggered
 - `running()` - emitted when the method starts execution
 - `failed(error)` - emitted when execution exited with a failure
 - `passed()` - emitted when execution exited with a success
@@ -25,8 +25,8 @@ Available events:
 
 Available internal statuses:
 
-- `null` - execution has not yet started
-- `'started'` - execution has begun
+- `'created'` - execution has not yet started
+- `'pending'` - execution has been triggered
 - `'running'` - execution of our method has begun
 - `'failed'` - execution of our method has failed
 - `'passed'` - execution of our method has succeeded
@@ -101,11 +101,11 @@ export default class Task extends BaseInterface {
 	An {Array} of the events that we may emit.
 	@type Array
 	@property events
-	@default ['events', 'error', 'started', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed']
+	@default ['events', 'error', 'pending', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed']
 	@protected
 	*/
 	get events () {
-		return ['events', 'error', 'started', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed']
+		return ['events', 'error', 'pending', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed']
 	}
 
 
@@ -148,43 +148,16 @@ export default class Task extends BaseInterface {
 	@private
 	*/
 	get started () {
-		return this.state.status != null
+		return this.state.status !== 'created'
 	}
 
 	/**
-	Have we finished its execution yet?
+	Have we finished execution yet?
 	@type Boolean
 	@property exited
 	@private
 	*/
 	get exited () {
-		switch ( this.state.status ) {
-			case 'completed':
-			case 'destroyed':
-				return true
-
-			default:
-				return false
-		}
-	}
-
-	/**
-	Have we been destroyed?
-	@type Boolean
-	@property destroyed
-	@private
-	*/
-	get destroyed () {
-		return this.state.status === 'destroyed'
-	}
-
-	/**
-	Have we completed its execution yet?
-	@type Boolean
-	@property completed
-	@private
-	*/
-	get completed () {
 		switch ( this.state.status ) {
 			case 'failed':
 			case 'passed':
@@ -194,6 +167,54 @@ export default class Task extends BaseInterface {
 			default:
 				return false
 		}
+	}
+
+	/**
+	Have we completed execution yet?
+	@type Boolean
+	@property completed
+	@private
+	*/
+	get completed () {
+		switch ( this.state.status ) {
+			case 'failed':
+			case 'passed':
+				return true
+
+			default:
+				return false
+		}
+	}
+
+	// ---------------------------------
+	// State Changers
+
+	/**
+	Reset the results.
+	At this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.
+	@chainable
+	@method resetResults
+	@private
+	*/
+	resetResults () {
+		this.state.result = []
+		return this
+	}
+
+	/**
+	Clear the domain
+	@chainable
+	@method clearDomain
+	@private
+	*/
+	clearDomain () {
+		const taskDomain = this.state.taskDomain
+		if ( taskDomain ) {
+			taskDomain.exit()
+			taskDomain.removeAllListeners()
+			this.state.taskDomain = null
+		}
+		return this
 	}
 
 
@@ -213,17 +234,21 @@ export default class Task extends BaseInterface {
 		extendr.defaults(this.state, {
 			name: `${this.type} ${Math.random()}`,
 			error: null,
-			status: null
+			status: 'created'
 		})
 
 		// Configuration defaults
 		extendr.defaults(this.config, {
-			run: false,
-			onError: 'exit',
-			onExit: 'destroy',
+			// Standard
+			destroyOnceDone: true,
+			sync: false,
+			parent: null,
+
+			// Unique to Task
+			method: null,
+			errorOnExcessCompletions: true,
 			ambi: true,
 			domain: true,
-			sync: false,
 			args: null
 		})
 
@@ -241,15 +266,16 @@ export default class Task extends BaseInterface {
 	@param {Function} [config.whenDone] - Passed to {{#crossLink "Task/whenDone"}}{{/crossLink}}
 	@param {Object} [config.on] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}.
 	@param {Object} [config.once] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}.
-	@param {TaskGroup} [config.parent] - A parent {{#crossLink "TaskGroup"}}{{/crossLink}} that we may be attached to.
-	@param {String} [config.onError] - Either `'exit'` or `'ignore'`, when `'ignore'` duplicate run errors are not reported, useful when combined with the timeout option.
+
+	@param {Boolean} [config.destroyOnceDone=true] - Whether or not to automatically destroy the task once it's done to free up resources
 	@param {Boolean} [config.sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`).
+	@param {TaskGroup} [config.parent] - A parent {{#crossLink "TaskGroup"}}{{/crossLink}} that we may be attached to.
 
 	@param {Function} [config.method] - The {Function} to execute for our {Task}.
-	@param {Array} [config.args] - Arguments that we would like to forward onto our method when we execute it.
-	@param {Number} [config.timeout] - Millesconds that we would like to wait before timing out the method.
+	@param {Boolean} [config.errorOnExcessCompletions=true] - Whether or not to error if the task completes more than once
 	@param {Boolean} [config.ambi=true] - Whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately.
 	@param {Boolean} [config.domain=true] - Whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution).
+	@param {Array} [config.args] - Arguments that we would like to forward onto our method when we execute it.
 
 	@chainable
 	@method setConfig
@@ -382,7 +408,7 @@ export default class Task extends BaseInterface {
 		}
 
 		// Complete for the first (and hopefully only) time
-		if ( !this.completed ) {
+		if ( !this.exited ) {
 			// Apply the result if it exists
 			if ( args.length !== 0 ) this.state.result = args
 		}
@@ -395,6 +421,23 @@ export default class Task extends BaseInterface {
 	}
 
 	/**
+	@NOTE Perhaps at some point, we can add abort/exit functionality, but these things have to be considered:
+	What will happen to currently running items?
+	What will happen to remaining items?
+	Should it be two methods? .halt() and .abort(error?)
+	Should it be a state?
+	Should it alter the state?
+	Should it clear or destroy?
+	What is the definition of pausing with this?
+	Perhaps we need to update the definition of pausing to be halted instead?
+	How can we apply this to Task and TaskGroup consistently?
+	@private
+	*/
+	abort () {
+		throw new Error('not yet implemented')
+	}
+
+	/**
 	Set our task to the completed state.
 	@chainable
 	@method finish
@@ -404,7 +447,7 @@ export default class Task extends BaseInterface {
 		const error = this.state.error
 
 		// Complete for the first (and hopefully only) time
-		if ( !this.completed ) {
+		if ( !this.exited ) {
 			// Set the status and emit depending on success or failure status
 			const status = error ? 'failed' : 'passed'
 			this.state.status = status
@@ -418,13 +461,13 @@ export default class Task extends BaseInterface {
 			this.state.error = null
 
 			// Destroy if desired
-			if ( this.config.onExit === 'destroy' ) {
+			if ( this.config.destroyOnceDone ) {
 				this.destroy()
 			}
 		}
 
 		// Error as we have already completed before
-		else if ( this.config.onError !== 'ignore' ) {
+		else if ( this.config.errorOnExcessCompletions ) {
 			const completedError = new Error(`The task [${this.names}] just completed, but it had already completed earlier, this is unexpected.`)
 			this.emit('error', completedError)
 		}
@@ -440,16 +483,14 @@ export default class Task extends BaseInterface {
 	@public
 	*/
 	destroy () {
+		// Once finished running, destroy - we don't want to destroy earlier, because @TODO find out why
 		this.done(() => {
-			// Prepare
-			let status = this.state.status
-
 			// Are we already destroyed?
-			if ( status === 'destroyed' )  return
+			if ( this.state.status === 'destroyed' )  return
 
 			// Update our status and notify our listeners
-			this.state.status = status = 'destroyed'
-			this.emit(status)
+			this.state.status = 'destroyed'
+			this.emit('destroyed')
 
 			// Clear results
 			// this.resetResults()
@@ -531,21 +572,9 @@ export default class Task extends BaseInterface {
 		// Add the competion callback to the arguments our method will receive
 		args.push(completeMethod)
 
-		// Setup timeout if appropriate
-		const timeoutDuration = this.config.timeout
-		if ( timeoutDuration ) {
-			this.state.timeout = setTimeout(() => {
-				if ( !this.completed ) {
-					const error = new Error(`The task [${this.names}] has timed out.`)
-					exitMethod(error)
-				}
-			}, timeoutDuration)
-		}
-
 		// Notify that we are now running
-		const status = 'running'
-		this.state.status = status
-		this.emit(status)
+		this.state.status = 'running'
+		this.emit('running')
 
 		// Fire the method within the domain if desired, otherwise execute directly
 		if ( taskDomain ) {
@@ -572,24 +601,19 @@ export default class Task extends BaseInterface {
 	@public
 	*/
 	run () {
-		this.queue(() => {
-			// Already completed or even destroyed?
-			if ( this.started ) {
-				const error = new Error(`The task [${this.names}] was just about to start, but it already started earlier, this is unexpected.`)
-				this.emit('error', error)
-			}
+		// Already started?
+		if ( this.state.status !== 'created' ) {
+			const error = new Error(`Invalid run status for the Task [${this.names}], it was [${this.state.status}] instead of [created].`)
+			this.emit('error', error)
+			return this
+		}
 
-			// Not yet completed, so lets run!
-			else {
-				// Apply our new status and notify our listeners
-				const status = 'started'
-				this.state.status = status
-				this.emit(status)
+		// Put it into pending state
+		this.state.status = 'pending'
+		this.emit('pending')
 
-				// Fire the task
-				this.fire()
-			}
-		})
+		// Queue the actual running so we can give time for the listeners to complete before continuing
+		this.queue(() => this.fire())
 
 		// Chain
 		return this

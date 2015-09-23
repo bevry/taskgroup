@@ -45,6 +45,11 @@ export default class BaseInterface extends require('events').EventEmitter {
 	constructor () {
 		super()
 
+		// Allow extensions of this class to prepare the class instance before anything else fires
+		if ( this.prepare ) {
+			this.prepare()
+		}
+
 		// Set state and config
 		if ( this.state == null )  this.state = {}
 		if ( this.config == null )  this.config = {}
