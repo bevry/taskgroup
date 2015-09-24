@@ -69,8 +69,6 @@ export default class BaseInterface extends require('events').EventEmitter {
 			// has error, but no done listener and no event listener, throw error
 			else if ( error && this.listeners(event).length === 1 ) {
 				if ( event === 'error' ) {
-					/* eslint no-console:0 */
-					console.error(errorToString(error))
 					throw error
 				}
 				else {
@@ -80,9 +78,9 @@ export default class BaseInterface extends require('events').EventEmitter {
 		}
 
 		// Listen to the different events without listener
-		this.on('error', listener.bind(this, 'done'))
-		this.on('completed', listener.bind(this, 'done'))
-		// this.on('halted', listener.bind(this, 'done'))
+		this.on('error', listener.bind(this, 'error'))
+		this.on('completed', listener.bind(this, 'completed'))
+		// this.on('halted', listener.bind(this, 'halted')) <- not yet implemented, would be an alternative to pausing
 	}
 
 	/**
