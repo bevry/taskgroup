@@ -1,23 +1,35 @@
 {
   "title": "TaskGroup",
   "name": "taskgroup",
-  "version": "4.3.0",
+  "version": "4.3.1",
   "description": "Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.",
   "homepage": "https://github.com/bevry/taskgroup",
-  "license": {
-    "type": "MIT"
-  },
+  "license": "MIT",
   "badges": {
-    "travis": true,
-    "npm": true,
-    "npmdownloads": true,
-    "david": true,
-    "daviddev": true,
-    "gratipay": "bevry",
-    "flattr": "344188/balupton-on-Flattr",
-    "paypal": "QB8GQPZAH84N6",
-    "bitcoin": "https://coinbase.com/checkouts/9ef59f5479eec1d97d63382c9ebcb93a",
-    "wishlist": "http://amzn.com/w/2F8TXKSNAFG4V"
+    "list": [
+      "travisci",
+      "npmversion",
+      "npmdownloads",
+      "daviddm",
+      "daviddmdev",
+      "---",
+      "slackin",
+      "patreon",
+      "gratipay",
+      "flattr",
+      "paypal",
+      "bitcoin",
+      "wishlist"
+    ],
+    "config": {
+      "patreonUsername": "bevry",
+      "gratipayUsername": "bevry",
+      "flattrCode": "344188/balupton-on-Flattr",
+      "paypalButtonID": "QB8GQPZAH84N6",
+      "bitcoinURL": "https://bevry.me/bitcoin",
+      "wishlistURL": "https://bevry.me/wishlist",
+      "slackinURL": "https://slack.bevry.me"
+    }
   },
   "keywords": [
     "flow",
@@ -30,13 +42,13 @@
   ],
   "author": "2013+ Bevry Pty Ltd <us@bevry.me> (http://bevry.me), 2011+ Benjamin Lupton <b@lupton.cc> (http://balupton.com)",
   "maintainers": [
-    "Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)"
+    "Benjamin Lupton <b@lupton.cc> (http://balupton.com)"
   ],
   "contributors": [
-    "Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)",
-    "crito (https://github.com/crito)",
-    "pflannery (https://github.com/pflannery)",
-    "sfrdmn (https://github.com/sfrdmn)"
+    "Benjamin Lupton <b@lupton.cc> (http://balupton.com)",
+    "crito <crito@cryptodrunks.net> (https://github.com/crito)",
+    "Peter Flannery (https://github.com/pflannery)",
+    "Sean Fridman <mail@seanfridman.com> (http://seanfridman.com)"
   ],
   "bugs": {
     "url": "https://github.com/bevry/taskgroup/issues"
@@ -58,7 +70,7 @@
     "joe": "^1.6.0",
     "joe-reporter-console": "^1.2.1",
     "assert-helpers": "^1.0.0",
-    "projectz": "^0.5.0",
+    "projectz": "^1.0.0",
     "biscotto": "^2.3.1",
     "safeps": "^2.2.12"
   },
@@ -66,7 +78,6 @@
     "lib": "./out/lib"
   },
   "scripts": {
-    "preinstall": "node ./cyclic.js",
     "test": "node ./out/test/taskgroup-test.js"
   },
   "main": "./out/lib/taskgroup.js",
