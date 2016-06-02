@@ -1,7 +1,7 @@
 # History
 
 ## v5.0.0 Unreleased
-- Moved from CoffeeScript to ES6
+- Moved from CoffeeScript to ESNext
 - Improved performance from 10,000 tasks in 13 seconds to 2.5 seconds
 - Running and completed tasks are no longer stored, if you wish to store them, use the event listeners
 	- This improves memory footprint of 10,000 tasks from 130MB to 4MB (taken during completion event)

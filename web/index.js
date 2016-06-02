@@ -1,7 +1,6 @@
-'use strict'
-let TaskGroup = require('../esnext/lib/index.js')
-let $status = document.getElementById('status')
-let $performance = document.getElementById('performance')
+const TaskGroup = require('../esnext/lib/index.js')
+const $status = document.getElementById('status')
+const $performance = document.getElementById('performance')
 $performance.onclick = window.performanceTest = function () {
 	$status.innerHTML = 'Running!'
 
@@ -14,13 +13,13 @@ $performance.onclick = window.performanceTest = function () {
 	}
 
 	// Create the taskgroup
-	let tasks = TaskGroup.create()
+	const tasks = TaskGroup.create()
 
 	// Add the tasks
 	for ( let i = 0, n = 50000; i < n; ++i ) {
-		let name = 'Task ' + i
-		let value = 'Value ' + i
-		let task = createTask(name, value)
+		const name = 'Task ' + i
+		const value = 'Value ' + i
+		const task = createTask(name, value)
 		tasks.addTask(name, task)
 	}
 
