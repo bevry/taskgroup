@@ -2,7 +2,7 @@ const fsUtil = require('fs')
 const pathUtil = require('path')
 const profiler = require('v8-profiler')
 
-const writeFile = function (filepath, data, next) {
+function writeFile (filepath, data, next) {
 	try {
 		fsUtil.writeFileSync(filepath, data)
 	}
@@ -13,7 +13,7 @@ const writeFile = function (filepath, data, next) {
 	next()
 }
 
-const saveSnapshot = function (testname, next) {
+function saveSnapshot (testname, next) {
 	// https://github.com/node-inspector/v8-profiler/blob/851baf05bb8c98936751e0b3984a4e4195c3e3af/test/cpu_cprofiler.js#L200-L212
 	const filename = testname + '.heapsnapshot'
 	const filepath = pathUtil.join(process.cwd(), filename)
@@ -25,10 +25,10 @@ const saveSnapshot = function (testname, next) {
 		console.log('Snapshot taken successfully:', filepath)
 	}
 
-	const concatIterator = function (data) {
+	function concatIterator (data) {
 		result += data // not a buffer
 	}
-	const complete = function () {
+	function complete () {
 		snapshot.delete()
 		snapshot = null
 
@@ -38,11 +38,11 @@ const saveSnapshot = function (testname, next) {
 	snapshot.serialize(concatIterator, complete)
 }
 
-const startProfile = function (testname) {
+function startProfile (testname) {
 	profiler.startProfiling(testname, true)
 }
 
-const stopProfile = function (testname, next) {
+function stopProfile (testname, next) {
 	const filename = testname + '.cpuprofile'
 	const filepath = pathUtil.join(process.cwd(), filename)
 	let cpuProfile = profiler.stopProfiling(testname)

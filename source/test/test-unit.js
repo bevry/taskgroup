@@ -121,7 +121,7 @@ class TaskGroupDebug extends TaskGroup {
 const delay = 100
 
 // Task
-joe.suite('task', function (suite, test) {
+joe.suite('task', function (suite) {
 	// Basic
 	suite('basic', function (suite, test) {
 		// Async
@@ -361,7 +361,6 @@ joe.suite('task', function (suite, test) {
 		test('should detect sync throw error on synchronous task', function (done) {
 			// Specify how many special checks we are expecting
 			let checks = 0
-			const neverReached = false
 			const errMessage = 'deliberate sync throw error'
 			const err = new Error(errMessage)
 
@@ -378,6 +377,7 @@ joe.suite('task', function (suite, test) {
 				++checks
 				equal(task.status, 'failed', 'status to be failed as we are within the completion callback')
 				equal(_err, err, 'the callback error to be set as we errord')
+				equal(result, null, 'result to be null as there was no result')
 			})
 
 			// Check task hasn't run yet
@@ -408,7 +408,6 @@ joe.suite('task', function (suite, test) {
 
 			// Specify how many special checks we are expecting
 			let checks = 0
-			const neverReached = false
 			const errMessage = 'deliberate async throw error'
 			const err = new Error(errMessage)
 
@@ -427,6 +426,7 @@ joe.suite('task', function (suite, test) {
 				++checks
 				equal(task.status, 'failed', 'status to be failed as we are within the completion callback')
 				equal(_err, err, 'the callback error to be set as we errord')
+				equal(result, null, 'result to be null as there was no result')
 			})
 
 			// Check task hasn't run yet
@@ -444,7 +444,6 @@ joe.suite('task', function (suite, test) {
 			wait(delay * 2, function () {
 				++checks
 				equal(checks, 3, 'all our special checks have run')
-				equal(neverReached, false, 'never reached to be false')
 				done()
 			})
 		})
@@ -589,7 +588,7 @@ joe.suite('task', function (suite, test) {
 })
 
 // Task Group
-joe.suite('taskgroup', function (suite, test) {
+joe.suite('taskgroup', function (suite) {
 	// Basic
 	suite('basic', function (suite, test) {
 		// Serial
