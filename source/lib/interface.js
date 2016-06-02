@@ -11,8 +11,8 @@ Base class containing common functionality for {@link Task} and {@link TaskGroup
 */
 class BaseInterface extends require('events').EventEmitter {
 	/**
-	Creates and returns new instance of this class.
-	@param {Arguments} args - The arguments to be forwarded along to the constructor.
+	Creates and returns new instance of the current class.
+	@param {...*} args - The arguments to be forwarded along to the constructor.
 	@return {Object} The new instance.
 
 	@static
@@ -76,7 +76,8 @@ class BaseInterface extends require('events').EventEmitter {
 		// Listen to the different events without listener
 		this.on('error', listener.bind(this, 'error'))
 		this.on('completed', listener.bind(this, 'completed'))
-		// this.on('halted', listener.bind(this, 'halted')) <- not yet implemented, would be an alternative to pausing
+		// this.on('halted', listener.bind(this, 'halted'))
+		// ^ @TODO not yet implemented, would be an alternative to pausing
 	}
 
 	/**

@@ -600,7 +600,7 @@
       BaseInterface
     </h2>
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/f3c0f6ec0a98fdfe1989b88db105ef8d5e21084f/./source/lib/interface.js#L12-L183'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/1d8c59fa8c76e34674f236a456599a19007f8f4c/./source/lib/interface.js#L12-L184'>
       <span>./source/lib/interface.js</span>
       </a>
     
@@ -654,10 +654,10 @@
 
   
 
-  <p>Creates and returns new instance of this class.</p>
+  <p>Creates and returns new instance of the current class.</p>
 
 
-  <div class='pre p1 fill-light'>create(args: Arguments): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
+  <div class='pre p1 fill-light'>create(args: ...Any): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
 
   
 
@@ -673,7 +673,7 @@
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>args</span> <code class='quiet'>(Arguments)</code> The arguments to be forwarded along to the constructor.
+            <span class='code bold'>args</span> <code class='quiet'>(...Any)</code> The arguments to be forwarded along to the constructor.
 
           </div>
           
@@ -1208,7 +1208,7 @@ If the name was never configured, then return the name in the format of <code>&#
       TaskGroup
     </h2>
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/f3c0f6ec0a98fdfe1989b88db105ef8d5e21084f/./source/lib/taskgroup.js#L41-L1106'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/1d8c59fa8c76e34674f236a456599a19007f8f4c/./source/lib/taskgroup.js#L41-L1107'>
       <span>./source/lib/taskgroup.js</span>
       </a>
     
@@ -1408,7 +1408,7 @@ as instanceof will not work in those environments.</p>
 
   
 
-  <p>A reference to the {Task} class for use in {::createTask} if we want to override it.</p>
+  <p>A reference to the {Task} class for use in <a href="#TaskGroup#createTask">TaskGroup#createTask</a> if we want to override it.</p>
 
 
   <div class='pre p1 fill-light'>Task</div>
@@ -1454,7 +1454,7 @@ as instanceof will not work in those environments.</p>
 
   
 
-  <p>A reference to the {TaskGroup} class for use in {::createTaskGroup} if we want to override it.</p>
+  <p>A reference to the {TaskGroup} class for use in <a href="#TaskGroup#createTaskGroup">TaskGroup#createTaskGroup</a> if we want to override it.</p>
 
 
   <div class='pre p1 fill-light'>TaskGroup</div>
@@ -2663,7 +2663,8 @@ At this point this method is internal, as it&#x27;s functionality may change in 
   
 
   <p>Set the configuration for our instance.</p>
-<p>Despite accepting an {Object} of configuration, we can also accept an {Array} of configuration.&#x9;When using an array, a {String} becomes the :name, a {Function} becomes the :method, and an {Object} becomes the :config</p>
+<p>Despite accepting an {Object} of configuration, we can also accept an {Array} of configuration.
+When using an array, a {String} becomes the :name, a {Function} becomes the :method, and an {Object} becomes the :config</p>
 
 
   <div class='pre p1 fill-light'>setConfig(config: [<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>], args: ...): this</div>
@@ -2722,14 +2723,18 @@ At this point this method is internal, as it&#x27;s functionality may change in 
                 <tr>
                   <td class='break-word'><span class='code bold'>config.on</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>]</code>
                   </td>
-                  <td class='break-word'><span>An object of event names linking to listener functions that we would like bounded via {EventEmitter.on}.
+                  <td class='break-word'><span>An object of event names linking to listener functions that we would like bounded via 
+<a href="#EventEmitter#on">EventEmitter#on</a>
+.
 </span></td>
                 </tr>
               
                 <tr>
                   <td class='break-word'><span class='code bold'>config.once</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>]</code>
                   </td>
-                  <td class='break-word'><span>An object of event names linking to listener functions that we would like bounded via {EventEmitter.once}.
+                  <td class='break-word'><span>An object of event names linking to listener functions that we would like bounded via 
+<a href="#EventEmitter#once">EventEmitter#once</a>
+.
 </span></td>
                 </tr>
               
@@ -2738,7 +2743,7 @@ At this point this method is internal, as it&#x27;s functionality may change in 
                   
                     (default <code>true</code>)
                   </td>
-                  <td class='break-word'><span>Whether or not we should automatically destroy the TaskGroup once done to free up resources
+                  <td class='break-word'><span>Whether or not we should automatically destroy the {TaskGroup} once done to free up resources
 </span></td>
                 </tr>
               
@@ -2758,9 +2763,7 @@ At this point this method is internal, as it&#x27;s functionality may change in 
                 <tr>
                   <td class='break-word'><span class='code bold'>config.parent</span> <code class='quiet'>[<a href="#TaskGroup">TaskGroup</a>]</code>
                   </td>
-                  <td class='break-word'><span>A parent 
-<a href="#TaskGroup">TaskGroup</a>
- that we may be attached to.
+                  <td class='break-word'><span>A parent {TaskGroup} that we may be attached to.
 </span></td>
                 </tr>
               
@@ -2856,7 +2859,7 @@ At this point this method is internal, as it&#x27;s functionality may change in 
                   
                     (default <code>true</code>)
                   </td>
-                  <td class='break-word'><span>Whether or not we should abort execution of the TaskGroup and exit when an error occurs
+                  <td class='break-word'><span>Whether or not we should abort execution of the {TaskGroup} and exit when an error occurs
 </span></td>
                 </tr>
               
@@ -4272,7 +4275,7 @@ Fires the listener once, either on the next tick if we are already done, or if n
       Task
     </h2>
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/f3c0f6ec0a98fdfe1989b88db105ef8d5e21084f/./source/lib/task.js#L63-L611'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/1d8c59fa8c76e34674f236a456599a19007f8f4c/./source/lib/task.js#L63-L611'>
       <span>./source/lib/task.js</span>
       </a>
     
@@ -5320,7 +5323,7 @@ Fires the listener once, either on the next tick if we are already done, or if n
 Should only ever execute once, if it executes more than once, then we error.</p>
 
 
-  <div class='pre p1 fill-light'>itemCompletionCallback(args: Arguments): this</div>
+  <div class='pre p1 fill-light'>itemCompletionCallback(args: ...Any): this</div>
 
   
 
@@ -5336,7 +5339,9 @@ Should only ever execute once, if it executes more than once, then we error.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>args</span> <code class='quiet'>(Arguments)</code> The arguments that will be applied to the {::result} variable. First argument is the {Error} if it exists.
+            <span class='code bold'>args</span> <code class='quiet'>(...Any)</code> The arguments that will be applied to the 
+<a href="#Task#result">Task#result</a>
+ variable. First argument is the {Error} if it exists.
 
           </div>
           

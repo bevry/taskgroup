@@ -384,7 +384,7 @@ class Task extends BaseInterface {
 	/**
 	What to do when our task method completes.
 	Should only ever execute once, if it executes more than once, then we error.
-	@param {Arguments} args - The arguments that will be applied to the {::result} variable. First argument is the {Error} if it exists.
+	@param {...*} args - The arguments that will be applied to the {@link Task#result} variable. First argument is the {Error} if it exists.
 	@chainable
 	@returns {this}
 	@access private

@@ -65,7 +65,7 @@ class TaskGroup extends BaseInterface {
 	}
 
 	/**
-	A reference to the {Task} class for use in {::createTask} if we want to override it.
+	A reference to the {Task} class for use in {@link TaskGroup#createTask} if we want to override it.
 	@type {Task}
 	@default Task
 	@access public
@@ -73,7 +73,7 @@ class TaskGroup extends BaseInterface {
 	get Task () { return Task }
 
 	/**
-	A reference to the {TaskGroup} class for use in {::createTaskGroup} if we want to override it.
+	A reference to the {TaskGroup} class for use in {@link TaskGroup#createTaskGroup} if we want to override it.
 	@type {TaskGroup}
 	@default TaskGroup
 	@access public
@@ -434,22 +434,23 @@ class TaskGroup extends BaseInterface {
 	/**
 	Set the configuration for our instance.
 
-	Despite accepting an {Object} of configuration, we can also accept an {Array} of configuration.	When using an array, a {String} becomes the :name, a {Function} becomes the :method, and an {Object} becomes the :config
+	Despite accepting an {Object} of configuration, we can also accept an {Array} of configuration.
+	When using an array, a {String} becomes the :name, a {Function} becomes the :method, and an {Object} becomes the :config
 
 	@param {Object} [config]
 
 	@param {String} [config.name] - What we would like our name to be, useful for debugging.
 	@param {Function} [config.done] - Passed to {@link TaskGroup#onceDone} (aliases are `onceDone`, and `next`)
 	@param {Function} [config.whenDone] - Passed to {@link TaskGroup#whenDone}
-	@param {Object} [config.on] - An object of event names linking to listener functions that we would like bounded via {EventEmitter.on}.
-	@param {Object} [config.once] - An object of event names linking to listener functions that we would like bounded via {EventEmitter.once}.
+	@param {Object} [config.on] - An object of event names linking to listener functions that we would like bounded via {@link EventEmitter#on}.
+	@param {Object} [config.once] - An object of event names linking to listener functions that we would like bounded via {@link EventEmitter#once}.
 
-	@param {Boolean} [config.destroyOnceDone=true] - Whether or not we should automatically destroy the TaskGroup once done to free up resources
+	@param {Boolean} [config.destroyOnceDone=true] - Whether or not we should automatically destroy the {TaskGroup} once done to free up resources
 	@param {Boolean} [config.sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`).
-	@param {TaskGroup} [config.parent] - A parent {@link TaskGroup} that we may be attached to.
+	@param {TaskGroup} [config.parent] - A parent {TaskGroup} that we may be attached to.
 
 	@param {Function} [config.method] - The {Function} to execute for our {TaskGroup} when using inline execution style.
-	@param {Boolean} [config.abortOnError=true] - Whether or not we should abort execution of the TaskGroup and exit when an error occurs
+	@param {Boolean} [config.abortOnError=true] - Whether or not we should abort execution of the {TaskGroup} and exit when an error occurs
 	@param {Boolean} [config.destroyDoneItems=true] - Whether or not we should automatically destroy done items to free up resources
 	@param {Object} [config.nestedGroupConfig] - The nested configuration to be applied to all {TaskGroup} descendants of this group.
 	@param {Object} [config.nestedTaskConfig] - The nested configuration to be applied to all {Task} descendants of this group.
