@@ -219,7 +219,7 @@ joe.suite('taskgroup', function (suite, test) {
 	test('Taskgroup should be able to resume after an error', function (complete) {
 		const checks = {}
 		const err = new Error('fail after 5')
-		const tasks = TaskGroup.create()
+		const tasks = TaskGroup.create({destroyOnceDone: false})
 			.addTask(returnViaCallback(5))
 			.addTask(returnViaCallback(err))
 			.addTask(returnViaCallback(10))

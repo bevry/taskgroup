@@ -314,6 +314,11 @@ class Task extends BaseInterface {
 					this.onceDone(value)
 					break
 
+				case 'sync':
+				case 'includeInResults':
+				case 'timeout':
+					throw new Error(`Deprecated configuration property [${key}] given to Task::setConfig()`)
+
 				default:
 					this.config[key] = value
 					break
@@ -423,24 +428,18 @@ class Task extends BaseInterface {
 	@access public
 	*/
 	destroy () {
-		// Once finished running, destroy - we don't want to destroy earlier, because @TODO find out why
-		this.done(() => {
-			// Are we already destroyed?
-			if ( this.state.status === 'destroyed' )  return
+		// Update our status and notify our listeners
+		this.state.status = 'destroyed'
+		this.emit('destroyed')
 
-			// Update our status and notify our listeners
-			this.state.status = 'destroyed'
-			this.emit('destroyed')
+		// Clear the domain
+		this.clearDomain()
 
-			// Clear result, in case it keeps references to something
-			this.resetResult()
+		// Clear result, in case it keeps references to something
+		this.resetResult()
 
-			// Remove all listeners
-			this.removeAllListeners()
-
-			// Clear the domain
-			this.clearDomain()
-		})
+		// Remove all listeners
+		this.removeAllListeners()
 
 		// Chain
 		return this

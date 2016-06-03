@@ -704,11 +704,13 @@ class TaskGroup extends BaseInterface {
 
 		// Handle item completion and errors once
 		// we can't just do item.done, or item.once('done'), because we need the item to be the argument, rather than `this`
+		// @TODO this could probably come before this item.add emit
 		item.done(function (...args) {
 			me.itemDoneCallback(item, ...args)
 		})
 
 		// We may be running and expecting items, if so, fire
+		// @TODO determine if this should require a new run
 		this.fire()
 
 		// Chain
@@ -996,24 +998,18 @@ class TaskGroup extends BaseInterface {
 	@access public
 	*/
 	destroy () {
+		// Update our status and notify our listeners
+		this.state.status = 'destroyed'
+		this.emit('destroyed')
+
 		// Clear remaining items to prevent them from running
 		this.clearRemaining()
 
-		// Once running items have finished, then proceed to destruction
-		this.done(() => {
-			// Are we already destroyed?
-			if ( this.state.status === 'destroyed' ) return
+		// Clear result
+		this.resetResult()
 
-			// Update our status and notify our listeners
-			this.state.status = 'destroyed'
-			this.emit('destroyed')
-
-			// Clear result
-			this.resetResult()
-
-			// Remove listeners
-			this.removeAllListeners()
-		})
+		// Remove listeners
+		this.removeAllListeners()
 
 		// Chain
 		return this
