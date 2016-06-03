@@ -120,7 +120,8 @@ class Task extends BaseInterface {
 	/**
 	An {Array} representing the returned result or the passed {Arguments} of our method.
 	The first item in the array should be the {Error} if it exists.
-	@type {Array}
+	If no result has occured yet, it is null.
+	@type {?Array}
 	@access protected
 	*/
 	get result () { return this.state.result }
@@ -175,14 +176,14 @@ class Task extends BaseInterface {
 	// State Changers
 
 	/**
-	Reset the results.
+	Reset the result.
 	At this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.
 	@chainable
 	@returns {this}
 	@access private
 	*/
-	resetResults () {
-		this.state.result = []
+	resetResult () {
+		this.state.result = null
 		return this
 	}
 
@@ -248,18 +249,19 @@ class Task extends BaseInterface {
 	@param {String} [config.name] - What we would like our name to be, useful for debugging.
 	@param {Function} [config.done] - Passed to {@link Task#onceDone} (aliases are `onceDone`, and `next`)
 	@param {Function} [config.whenDone] - Passed to {@link Task#whenDone}
-	@param {Object} [config.on] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}.
-	@param {Object} [config.once] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}.
+	@param {Object} [config.on] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}
+	@param {Object} [config.once] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}
 
+	@param {Boolean} [config.storeResult] - Whether or not to store the result, unless `false`, will store
 	@param {Boolean} [config.destroyOnceDone=true] - Whether or not to automatically destroy the task once it's done to free up resources
-	@param {Boolean} [config.sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`).
-	@param {TaskGroup} [config.parent] - A parent {@link TaskGroup} that we may be attached to.
+	@param {Boolean} [config.sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`)
+	@param {TaskGroup} [config.parent] - A parent {@link TaskGroup} that we may be attached to
 
-	@param {Function} [config.method] - The {Function} to execute for our {Task}.
+	@param {Function} [config.method] - The {Function} to execute for our {Task}
 	@param {Boolean} [config.errorOnExcessCompletions=true] - Whether or not to error if the task completes more than once
-	@param {Boolean} [config.ambi=true] - Whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately.
-	@param {Boolean} [config.domain=true] - Whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution).
-	@param {Array} [config.args] - Arguments that we would like to forward onto our method when we execute it.
+	@param {Boolean} [config.ambi=true] - Whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately
+	@param {Boolean} [config.domain=true] - Whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution)
+	@param {Array} [config.args] - Arguments that we would like to forward onto our method when we execute it
 
 	@chainable
 	@returns {this}
@@ -394,8 +396,8 @@ class Task extends BaseInterface {
 
 		// Complete for the first (and hopefully only) time
 		if ( !this.exited ) {
-			// Apply the result if it exists
-			if ( args.length !== 0 ) this.state.result = args
+			// Apply the result if we want to and it exists
+			if ( this.config.storeResult !== false && args.length !== 0 ) this.state.result = args
 		}
 
 		// Finish up
@@ -478,9 +480,8 @@ class Task extends BaseInterface {
 			this.state.status = 'destroyed'
 			this.emit('destroyed')
 
-			// Clear results
-			// this.resetResults()
-			// ^ don't bother, nothing listens to this, not essential
+			// Clear result, in case it keeps references to something
+			this.resetResult()
 
 			// Remove all listeners
 			this.removeAllListeners()

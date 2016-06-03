@@ -69,9 +69,9 @@ class TaskGroupDebug extends TaskGroup {
 		const pending = this.getNamesOfItemsByStatus('pending')
 		const running = this.getNamesOfItemsByStatus('running')
 		const done = this.getNamesOfItemsByStatus('done')
-		const results = this.results
+		const result = this.result
 		const error = this.error
-		return {status, remaining, pending, running, done, results, error}
+		return {status, remaining, pending, running, done, result, error}
 	}
 
 	compare (_expectedDetails, testName) {
@@ -85,7 +85,7 @@ class TaskGroupDebug extends TaskGroup {
 			pending: _expectedDetails.pending || [],
 			running: _expectedDetails.running || [],
 			done: _expectedDetails.done || [],
-			results: _expectedDetails.results || [],
+			result: typeof _expectedDetails.result === 'undefined' ? [] : _expectedDetails.result,
 			error: _expectedDetails.error || null
 		}
 
@@ -96,7 +96,7 @@ class TaskGroupDebug extends TaskGroup {
 			executing: debugDetails.pending.length + debugDetails.running.length,
 			done: debugDetails.done.length,
 			total: debugDetails.remaining.length + debugDetails.pending.length + debugDetails.running.length + debugDetails.done.length,
-			results: debugDetails.results.length
+			result: debugDetails.result && debugDetails.result.length
 		}
 		debugDetails.totals = debugTotals
 		expectedDetails.totals = actualTotals
@@ -104,9 +104,9 @@ class TaskGroupDebug extends TaskGroup {
 		// Do the comparison
 		deepEqual(debugDetails, expectedDetails, testName)
 
-		// Compare results argument
-		if ( _expectedDetails.resultsArgument ) {
-			deepEqual(_expectedDetails.resultsArgument, this.results, testName + ': results argument was as expected')
+		// Compare result argument
+		if ( _expectedDetails.resultArgument ) {
+			deepEqual(_expectedDetails.resultArgument, this.result, testName + ': result argument was as expected')
 		}
 
 		// Compare error argument
@@ -255,7 +255,7 @@ joe.suite('task', function (suite) {
 			// Run the task
 			task.run()
 
-			// Check task hasn't run yet
+			// Check task has run
 			equal(task.status, 'running', 'status to be running as we just called run, and the sync flag is true')
 			equal(task.result, null, 'result to be null as we just called run, and the task is to execute asynchronously')
 
@@ -301,9 +301,9 @@ joe.suite('task', function (suite) {
 			// Run
 			task.run()
 
-			// Check task hasn't run yet
+			// Check task has run
 			equal(task.status, 'destroyed', 'status to be destroyed as we have already finished due to the sync flag')
-			deepEqual(task.result, [null, 10], 'result to be set as we have already finished due to the sync flag')
+			deepEqual(task.result, null, 'result to be cleared as we have already finished due to the sync flag')
 
 			// Check that all our special checks have run
 			wait(delay, function () {
@@ -595,15 +595,15 @@ joe.suite('taskgroup', function (suite) {
 		test('should work when running in serial', function (done) {
 
 			const tasks = new TaskGroupDebug({name: 'my parent group'})
-			tasks.done(function (err, results) {
+			tasks.done(function (err, result) {
 				errorEqual(err, null)
 				equal(tasks.config.concurrency, 1)
 
 				tasks.compare({
 					status: 'passed',
 					done: ['my task 1', 'my task 2'],
-					results: [[null, 10], [null, 20]],
-					resultsArgument: results,
+					result: [[null, 10], [null, 20]],
+					resultArgument: result,
 					errorArgument: err
 				}, 'inside tasks.done')
 
@@ -633,7 +633,7 @@ joe.suite('taskgroup', function (suite) {
 					status: 'running',
 					running: ['my task 2'],
 					done: ['my task 1'],
-					results: [[null, 10]]
+					result: [[null, 10]]
 				}, 'inside task 2')
 
 				return 20
@@ -641,8 +641,9 @@ joe.suite('taskgroup', function (suite) {
 
 			tasks.compare({
 				status: 'created',
-				remaining: ['my task 1', 'my task 2']
-			}, 'after tasks.run')
+				remaining: ['my task 1', 'my task 2'],
+				result: null
+			}, 'before tasks.run')
 
 			tasks.run()
 
@@ -656,15 +657,15 @@ joe.suite('taskgroup', function (suite) {
 		test('should work when running in parallel', function (done) {
 
 			const tasks = new TaskGroupDebug({concurrency: 0})
-			tasks.done(function (err, results) {
+			tasks.done(function (err, result) {
 				errorEqual(err, null)
 				equal(tasks.config.concurrency, 0)
 
 				tasks.compare({
 					status: 'passed',
 					done: ['task 2', 'task 1'],
-					results: [[null, 20], [null, 10]],
-					resultsArgument: results,
+					result: [[null, 20], [null, 10]],
+					resultArgument: result,
 					errorArgument: err
 				}, 'inside tasks.done')
 
@@ -683,7 +684,7 @@ joe.suite('taskgroup', function (suite) {
 						status: 'running',
 						running: ['task 1'],
 						done: ['task 2'],
-						results: [[null, 20]]
+						result: [[null, 20]]
 					}, 'inside task 1 after wait')
 
 					complete(null, 10)
@@ -701,8 +702,9 @@ joe.suite('taskgroup', function (suite) {
 
 			tasks.compare({
 				status: 'created',
-				remaining: ['task 1', 'task 2']
-			}, 'after tasks.run')
+				remaining: ['task 1', 'task 2'],
+				result: null
+			}, 'before tasks.run')
 
 			tasks.run()
 
@@ -718,15 +720,15 @@ joe.suite('taskgroup', function (suite) {
 			const tasks = TaskGroupDebug.create({
 				name: 'my tasks',
 				concurrency: 0,
-				next (err, results) {
+				next (err, result) {
 					errorEqual(err, null)
 					equal(tasks.config.concurrency, 0)
 
 					tasks.compare({
 						status: 'passed',
 						done: ['task 2 for [my tasks]', 'task 1 for [my tasks]'],
-						results: [[null, 20], [null, 10]],
-						resultsArgument: results,
+						result: [[null, 20], [null, 10]],
+						resultArgument: result,
 						errorArgument: err
 					}, 'inside tasks.done')
 
@@ -746,7 +748,7 @@ joe.suite('taskgroup', function (suite) {
 								status: 'running',
 								running: ['task 1 for [my tasks]'],
 								done: ['task 2 for [my tasks]'],
-								results: [[null, 20]]
+								result: [[null, 20]]
 							}, 'inside task 1 after wait')
 
 							complete(null, 10)
@@ -765,7 +767,8 @@ joe.suite('taskgroup', function (suite) {
 
 			tasks.compare({
 				status: 'created',
-				remaining: ['task 1 for [my tasks]', 'task 2 for [my tasks]']
+				remaining: ['task 1 for [my tasks]', 'task 2 for [my tasks]'],
+				result: null
 			}, 'before tasks.run')
 
 			tasks.run()
@@ -782,15 +785,15 @@ joe.suite('taskgroup', function (suite) {
 		// Serial
 		test('should work when running in serial with sync flag and async tasks', function (done) {
 
-			const tasks = new TaskGroupDebug({sync: true, concurrency: 1}).done(function (err, results) {
+			const tasks = new TaskGroupDebug({sync: true, concurrency: 1}).done(function (err, result) {
 				errorEqual(err, null)
 				equal(tasks.config.concurrency, 1)
 
 				tasks.compare({
 					status: 'passed',
 					done: ['task 1', 'task 2'],
-					results: [[null, 10], [null, 20]],
-					resultsArgument: results,
+					result: [[null, 10], [null, 20]],
+					resultArgument: result,
 					errorArgument: err
 				}, 'inside tasks.done')
 
@@ -820,7 +823,7 @@ joe.suite('taskgroup', function (suite) {
 					status: 'running',
 					running: ['task 2'],
 					done: ['task 1'],
-					results: [[null, 10]]
+					result: [[null, 10]]
 				}, 'inside task 2')
 
 				return 20
@@ -828,7 +831,8 @@ joe.suite('taskgroup', function (suite) {
 
 			tasks.compare({
 				status: 'created',
-				remaining: ['task 1', 'task 2']
+				remaining: ['task 1', 'task 2'],
+				result: null
 			}, 'before tasks.run')
 
 			tasks.run()
@@ -842,15 +846,15 @@ joe.suite('taskgroup', function (suite) {
 
 		// Serial
 		test('should work when running in serial with sync flag and sync tasks', function (done) {
-			const tasks = new TaskGroupDebug({sync: true, concurrency: 1}).done(function (err, results) {
+			const tasks = new TaskGroupDebug({sync: true, concurrency: 1}).done(function (err, result) {
 				errorEqual(err, null)
 				equal(tasks.config.concurrency, 1)
 
 				tasks.compare({
 					status: 'passed',
 					done: ['task 1', 'task 2'],
-					results: [[null, 10], [null, 20]],
-					resultsArgument: results,
+					result: [[null, 10], [null, 20]],
+					resultArgument: result,
 					errorArgument: err
 				}, 'inside tasks.done')
 			})
@@ -869,14 +873,15 @@ joe.suite('taskgroup', function (suite) {
 					status: 'running',
 					running: ['task 2'],
 					done: ['task 1'],
-					results: [[null, 10]]
+					result: [[null, 10]]
 				}, 'inside task 2')
 				return 20
 			})
 
 			tasks.compare({
 				status: 'created',
-				remaining: ['task 1', 'task 2']
+				remaining: ['task 1', 'task 2'],
+				result: null
 			}, 'before tasks.run')
 
 			tasks.run()
@@ -884,7 +889,7 @@ joe.suite('taskgroup', function (suite) {
 			tasks.compare({
 				status: 'destroyed',
 				done: ['task 1', 'task 2'],
-				results: []  // @TODO should we wipe this?
+				result: null
 			}, 'after tasks.run')
 
 			setTimeout(done, 1000)
@@ -899,16 +904,16 @@ joe.suite('taskgroup', function (suite) {
 		// Error Serial
 		test('should handle error correctly in serial', function (done) {
 
-			const tasks = new TaskGroupDebug({name: 'my tasks', concurrency: 1}).done(function (err, results) {
+			const tasks = new TaskGroupDebug({name: 'my tasks', concurrency: 1}).done(function (err, result) {
 				equal(tasks.config.concurrency, 1)
 
 				tasks.compare({
 					status: 'failed',
 					remaining: ['task 2'],
 					done: ['task 1'],
-					results: [[err1]],
+					result: [[err1]],
+					resultArgument: result,
 					error: err1,
-					resultsArgument: results,
 					errorArgument: err
 				}, 'inside tasks.done')
 
@@ -931,7 +936,8 @@ joe.suite('taskgroup', function (suite) {
 
 			tasks.compare({
 				status: 'created',
-				remaining: ['task 1', 'task 2']
+				remaining: ['task 1', 'task 2'],
+				result: null
 			}, 'before tasks.run')
 
 			tasks.run()
@@ -945,15 +951,15 @@ joe.suite('taskgroup', function (suite) {
 		// Parallel
 		test('should handle error correctly in parallel', function (done) {
 
-			const tasks = new TaskGroupDebug({name: 'my tasks', concurrency: 0}).done(function (err, results) {
+			const tasks = new TaskGroupDebug({name: 'my tasks', concurrency: 0}).done(function (err, result) {
 				equal(tasks.config.concurrency, 0)
 
 				tasks.compare({
 					status: 'failed',
 					done: ['task 2', 'task 1'],
-					results: [[err2], [err1]],
+					result: [[err2], [err1]],
+					resultArgument: result,
 					error: err2,
-					resultsArgument: results,
 					errorArgument: err
 				}, 'inside tasks.done')
 
@@ -967,7 +973,7 @@ joe.suite('taskgroup', function (suite) {
 					pending: ['task 2'],
 					running: ['task 1'],
 					total: 2,
-					results: []
+					result: []
 				}, 'inside task 1 before wait')
 
 				wait(delay, function () {
@@ -976,7 +982,7 @@ joe.suite('taskgroup', function (suite) {
 						running: ['task 1'],
 						done: ['task 2'],
 						error: err2,
-						results: [[err2]]
+						result: [[err2]]
 					}, 'inside task 1 after wait')
 
 					complete(err1)
@@ -997,7 +1003,8 @@ joe.suite('taskgroup', function (suite) {
 
 			tasks.compare({
 				status: 'created',
-				remaining: ['task 1', 'task 2']
+				remaining: ['task 1', 'task 2'],
+				result: null
 			}, 'before tasks.run')
 
 			tasks.run()
@@ -1054,7 +1061,7 @@ joe.suite('nested', function (suite, test) {
 				status: 'running',
 				running: ['my group b'],
 				done: ['my task a'],
-				results: [[null, 10]]
+				result: [[null, 10]]
 			}, 'inside my group b method, comparing parent')
 
 			// totals for sub group
@@ -1072,7 +1079,7 @@ joe.suite('nested', function (suite, test) {
 					status: 'running',
 					running: ['my group b'],
 					done: ['my task a'],
-					results: [[null, 10]]
+					result: [[null, 10]]
 				}, 'inside my group b task c, comparing parent')
 
 				// totals for sub group
@@ -1094,7 +1101,7 @@ joe.suite('nested', function (suite, test) {
 
 		})
 
-		tasks.done(function (err, results) {
+		tasks.done(function (err, result) {
 			deepEqual(checks, [
 				'my task a - part 1/2',
 				'my task a - part 2/2',
@@ -1106,13 +1113,13 @@ joe.suite('nested', function (suite, test) {
 			tasks.compare({
 				status: 'passed',
 				done: ['my task a', 'my group b'],
-				results: [
+				result: [
 					[null, 10],
 					[null, [
 						[null, 20]
 					]]
 				],
-				resultsArgument: results,
+				resultArgument: result,
 				errorArgument: err
 			}, 'inside tasks.done')
 
@@ -1162,7 +1169,7 @@ joe.suite('nested', function (suite, test) {
 					status: 'running',
 					running: ['my group b'],
 					done: ['taskgroup method for my parent group', 'my task a'],
-					results: [[null, 10]]
+					result: [[null, 10]]
 				}, 'inside my group b method, comparing parent group')
 
 				// totals for sub group
@@ -1180,7 +1187,7 @@ joe.suite('nested', function (suite, test) {
 						status: 'running',
 						running: ['my group b'],
 						done: ['taskgroup method for my parent group', 'my task a'],
-						results: [[null, 10]]
+						result: [[null, 10]]
 					}, 'inside my group b task c, comparing parent group')
 
 					// totals for sub group
@@ -1202,7 +1209,7 @@ joe.suite('nested', function (suite, test) {
 			})
 		})
 
-		tasks.done(function (err, results) {
+		tasks.done(function (err, result) {
 			deepEqual(checks, [
 				'my task a - part 1/2',
 				'my task a - part 2/2',
@@ -1214,13 +1221,13 @@ joe.suite('nested', function (suite, test) {
 			tasks.compare({
 				status: 'passed',
 				done: ['taskgroup method for my parent group', 'my task a', 'my group b'],
-				results: [
+				result: [
 					[null, 10],
 					[null, [
 						[null, 20]
 					]]
 				],
-				resultsArgument: results,
+				resultArgument: result,
 				errorArgument: err
 			}, 'inside tasks.done')
 
@@ -1258,7 +1265,7 @@ joe.suite('nested', function (suite, test) {
 				remaining: ['my task 3'],
 				running: ['my group 1'],
 				done: ['my task 1'],
-				results: [[null, 10]]
+				result: [[null, 10]]
 			}, 'inside my group 1 method, comparing parent')
 
 			// totals for sub group
@@ -1277,7 +1284,7 @@ joe.suite('nested', function (suite, test) {
 					remaining: ['my task 3'],
 					running: ['my group 1'],
 					done: ['my task 1'],
-					results: [[null, 10]]
+					result: [[null, 10]]
 				}, 'inside my group 1 my task 2, comparing parent')
 
 				// totals for sub group
@@ -1307,7 +1314,7 @@ joe.suite('nested', function (suite, test) {
 				status: 'running',
 				running: ['my task 3'],
 				done: ['my task 1', 'my group 1'],
-				results: [
+				result: [
 					[null, 10],
 					[null, [
 						[null, 20]
@@ -1318,7 +1325,7 @@ joe.suite('nested', function (suite, test) {
 			return 30
 		})
 
-		tasks.done(function (err, results) {
+		tasks.done(function (err, result) {
 			deepEqual(checks, [
 				'my task 1',
 				'my group 1',
@@ -1330,14 +1337,14 @@ joe.suite('nested', function (suite, test) {
 			tasks.compare({
 				status: 'passed',
 				done: ['my task 1', 'my group 1', 'my task 3'],
-				results: [
+				result: [
 					[null, 10],
 					[null, [
 						[null, 20]
 					]],
 					[null, 30]
 				],
-				resultsArgument: results,
+				resultArgument: result,
 				errorArgument: err
 			}, 'inside tasks.done')
 

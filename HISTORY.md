@@ -2,12 +2,14 @@
 
 ## v5.0.0 Unreleased
 - Moved from CoffeeScript to ESNext
-- Improved performance from 10,000 tasks in 13 seconds to 2.5 seconds
+- Improved performance of 10,000 tasks from 13 seconds to 2.5 seconds
+- Improved memory footprint of 10,000 tasks from 130MB to 4MB (taken during completion event)
 - Running and completed tasks are no longer stored, if you wish to store them, use the event listeners
-	- This improves memory footprint of 10,000 tasks from 130MB to 4MB (taken during completion event)
 - Nested events will no longer be emitted, unless `emitNestedEvents` is `true`
-- Removed `nestedConfig`, use either `nestedGroupConfig` or `nestedTaskConfig` or both
-- Removed `exit` as it's functionality was ambiguous and undocumented
+- Renamed `includeInResults` to `storeResult`, with improved functionality, defaults to `null`
+	- If `false`, Task and TaskGroup result will now be `null`, and as usual, will not be included in TaskGroup result
+- Removed `nestedConfig`, use either `nestedTaskConfig` or `nestedTaskGroupConfig` or both
+- Removed `exit` as its functionality was ambiguous and undocumented
 - `getTotalItems()`, `getItemTotals()` now changed to getters `totalItems`, `itemTotals`
 - A lot of previously `public` methods are now marked `private` or `protected`, this isn't really from a stability concern but from an isolation of responsibility concern
 

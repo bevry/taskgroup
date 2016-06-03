@@ -17,9 +17,9 @@ Available events:
 - `running()` - emitted when the first item starts execution
 - `failed(error)` - emitted when execution exited with a failure
 - `passed()` - emitted when execution exited with a success
-- `completed(error, results)` - emitted when execution exited, `results` is an {Array} of the result arguments for each item that executed
+- `completed(error, result)` - emitted when execution exited, `result` is an {?Array} of the result arguments for each item that executed
 - `error(error)` - emtited if an unexpected error occured within ourself
-- `done(error, results)` - emitted when either the execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)
+- `done(error, result)` - emitted when either the execution completes (the `completed` event) or when an unexpected error occurs (the `error` event)
 - `item.*(...)` - bubbled events from an added item
 - `task.*(...)` - bubbled events from an added {Task}
 - `group.*(...)` - bubbled events from an added {TaskGroup}
@@ -113,11 +113,12 @@ class TaskGroup extends BaseInterface {
 
 	/**
 	An {Array} that contains the result property for each completed {Task} and {TaskGroup}.
-	An item can disable having its result property added to this results array by setting its {includeInResults} configuration option to `false`.
-	@type {Array}
+	If the item has its config `storeResult` to `false`, we do not store its result.
+	If no result has occured yet, it is null.
+	@type {?Array}
 	@access protected
 	*/
-	get results () { return this.state.results }
+	get result () { return this.state.result }
 
 
 	// ---------------------------------
@@ -145,7 +146,7 @@ class TaskGroup extends BaseInterface {
 	- executing - A {Number} of the names of the executing items.
 	- done - A {Number} of the names of the done items.
 	- total - A {Number} of the total items we have.
-	- results - A {Number} of the total results we have.
+	- result - A {Number} of the total results we have.
 
 	@type {Object}
 	@access public
@@ -154,14 +155,14 @@ class TaskGroup extends BaseInterface {
 		const remaining = this.state.itemsRemaining.length
 		const executing = this.state.itemsExecutingCount
 		const done = this.state.itemsDoneCount
-		const results = this.state.results.length
+		const result = this.state.result && this.state.result.length
 		const total = executing + remaining + done
 		return {
 			remaining,
 			executing,
 			done,
 			total,
-			results
+			result
 		}
 	}
 
@@ -207,7 +208,7 @@ class TaskGroup extends BaseInterface {
 	@access private
 	*/
 	get hasResult () {
-		return this.hasError || this.state.results.length !== 0
+		return this.hasError || this.state.result.length !== 0
 	}
 
 	/**
@@ -298,14 +299,14 @@ class TaskGroup extends BaseInterface {
 	// State Changers
 
 	/**
-	Reset the results.
+	Reset the result.
 	At this point this method is internal, as it's functionality may change in the future, and it's outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.
 	@chainable
 	@returns {this}
 	@access private
 	*/
-	resetResults () {
-		this.state.results = []
+	resetResult () {
+		this.state.result = null
 
 		// Chain
 		return this
@@ -359,7 +360,7 @@ class TaskGroup extends BaseInterface {
 			id: `${this.type} ${Math.random()}`,
 			error: null,
 			status: 'created',
-			results: [],
+			result: null,
 			itemsRemaining: [],
 			itemsExecutingCount: 0,
 			itemsDoneCount: 0
@@ -377,7 +378,7 @@ class TaskGroup extends BaseInterface {
 			abortOnError: true,
 			destroyDoneItems: true,
 			nestedTaskConfig: {},
-			nestedGroupConfig: {},
+			nestedTaskGroupConfig: {},
 			emitNestedEvents: false,
 			concurrency: 1,
 			run: null
@@ -445,6 +446,7 @@ class TaskGroup extends BaseInterface {
 	@param {Object} [config.on] - An object of event names linking to listener functions that we would like bounded via {@link EventEmitter#on}.
 	@param {Object} [config.once] - An object of event names linking to listener functions that we would like bounded via {@link EventEmitter#once}.
 
+	@param {Boolean} [config.storeResult] - Whether or not to store the result, unless `false`, will store
 	@param {Boolean} [config.destroyOnceDone=true] - Whether or not we should automatically destroy the {TaskGroup} once done to free up resources
 	@param {Boolean} [config.sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`).
 	@param {TaskGroup} [config.parent] - A parent {TaskGroup} that we may be attached to.
@@ -452,7 +454,7 @@ class TaskGroup extends BaseInterface {
 	@param {Function} [config.method] - The {Function} to execute for our {TaskGroup} when using inline execution style.
 	@param {Boolean} [config.abortOnError=true] - Whether or not we should abort execution of the {TaskGroup} and exit when an error occurs
 	@param {Boolean} [config.destroyDoneItems=true] - Whether or not we should automatically destroy done items to free up resources
-	@param {Object} [config.nestedGroupConfig] - The nested configuration to be applied to all {TaskGroup} descendants of this group.
+	@param {Object} [config.nestedTaskGroupConfig] - The nested configuration to be applied to all {TaskGroup} descendants of this group.
 	@param {Object} [config.nestedTaskConfig] - The nested configuration to be applied to all {Task} descendants of this group.
 	@param {Boolean} [config.emitNestedEvents=fakse] - Whether or not we should emit nested item events
 	@param {Number} [config.concurrency=1] - The amount of items that we would like to execute at the same time. Use `0` for unlimited. `1` accomplishes serial execution, everything else accomplishes parallel execution.
@@ -481,7 +483,7 @@ class TaskGroup extends BaseInterface {
 					opts.method = arg
 					break
 				case 'object':
-					extendr.deep(opts, arg)
+					extendr.deep(opts, arg)  // @TODO why deep?
 					break
 				default: {
 					const error = new Error(`Unknown argument type of [${type}] given to TaskGroup::setConfig()`)
@@ -544,7 +546,7 @@ class TaskGroup extends BaseInterface {
 	}
 
 	/**
-	Merged passed configuration into {config.nestedTaskConfig}.
+	Merge passed configuration into {config.nestedTaskConfig}.
 	@param {Object} opts - The configuration to merge.
 	@chainable
 	@returns {this}
@@ -559,15 +561,15 @@ class TaskGroup extends BaseInterface {
 	}
 
 	/**
-	Merged passed configuration into {config.nestedGroupConfig}.
+	Merge passed configuration into {config.nestedTaskGroupConfig}.
 	@param {Object} opts - The configuration to merge.
 	@chainable
 	@returns {this}
 	@access public
 	*/
-	setNestedGroupConfig (opts) {
+	setNestedTaskGroupConfig (opts) {
 		// Fetch and copy options to the state's nested configuration
-		extendr.deep(this.state.nestedGroupConfig, opts)
+		extendr.deep(this.state.nestedTaskGroupConfig, opts)
 
 		// Chain
 		return this
@@ -593,8 +595,7 @@ class TaskGroup extends BaseInterface {
 		method.isTaskGroupMethod = true
 		if ( !opts.name )  opts.name = 'taskgroup method for ' + this.name
 		if ( !opts.args )  opts.args = [this.addTaskGroup.bind(this), this.addTask.bind(this)]
-		// @TODO update this to be storeResult or something
-		if ( opts.includeInResults == null )  opts.includeInResults = false
+		if ( opts.storeResult == null )  opts.storeResult = false  // by default, hide result for methods
 		this.addTask(method, opts)
 		return this
 	}
@@ -625,7 +626,7 @@ class TaskGroup extends BaseInterface {
 		}
 
 		// Extract
-		const nestedGroupConfig = this.config.nestedGroupConfig
+		const nestedTaskGroupConfig = this.config.nestedTaskGroupConfig
 		const nestedTaskConfig = this.config.nestedTaskConfig
 		const emitNestedEvents = this.config.emitNestedEvents
 
@@ -650,7 +651,7 @@ class TaskGroup extends BaseInterface {
 		// Bubble group events
 		else if ( TaskGroup.isTaskGroup(item) ) {
 			// Nested configuration
-			item.setConfig(itemConfig, {nestedTaskConfig, nestedGroupConfig}, nestedGroupConfig, ...args)
+			item.setConfig(itemConfig, {nestedTaskConfig, nestedTaskGroupConfig}, nestedTaskGroupConfig, ...args)
 
 			// Bubble the nested events if desired
 			if ( emitNestedEvents ) {
@@ -675,6 +676,12 @@ class TaskGroup extends BaseInterface {
 		// Name default
 		if ( !item.config.name ) {
 			item.config.name = `${item.type} ${this.totalItems + 1} for [${this.name}]`
+		}
+
+		// Store Result Default
+		// if the item is undecided, then inherit from our decision
+		if ( item.config.storeResult == null ) {
+			item.config.storeResult = this.config.storeResult
 		}
 
 		// Add the item
@@ -848,7 +855,7 @@ class TaskGroup extends BaseInterface {
 		if ( this.completed ) {
 			// avoid zalgo
 			this.queue(() => {
-				handler.call(this, this.state.error, this.state.results)
+				handler.call(this, this.state.error, this.state.result)
 			})
 		}
 		else {
@@ -871,7 +878,7 @@ class TaskGroup extends BaseInterface {
 		if ( this.completed ) {
 			// avoid zalgo
 			this.queue(() => {
-				handler.call(this, this.state.error, this.state.results)
+				handler.call(this, this.state.error, this.state.result)
 			})
 		}
 		else {
@@ -949,7 +956,7 @@ class TaskGroup extends BaseInterface {
 	*/
 	itemDoneCallback (item, ...args) {
 		// Prepare
-		const results = this.state.results
+		const result = this.state.result
 
 		// Update error if it exists
 		if ( this.config.abortOnError && args[0] ) {
@@ -958,10 +965,9 @@ class TaskGroup extends BaseInterface {
 			}
 		}
 
-		// Add the result
-		// falsey but not false should still add results
-		if ( item.config.includeInResults !== false ) {
-			results.push(args)
+		// Add the result if desired
+		if ( this.config.storeResult !== false && item.config.storeResult !== false ) {
+			result.push(args)
 		}
 
 		// Mark that one less item is running and one more item done
@@ -995,7 +1001,7 @@ class TaskGroup extends BaseInterface {
 		this.emit(status, error)
 
 		// Notity our listners we have completed
-		this.emit('completed', this.state.error, this.state.results)
+		this.emit('completed', this.state.error, this.state.result)
 
 		// Prevent the error from persisting
 		this.state.error = null
@@ -1043,9 +1049,8 @@ class TaskGroup extends BaseInterface {
 			this.state.status = 'destroyed'
 			this.emit('destroyed')
 
-			// Clear results
-			this.resetResults()
-			// item arrays should already be wiped due to done completion
+			// Clear result
+			this.resetResult()
 
 			// Remove listeners
 			this.removeAllListeners()
@@ -1097,6 +1102,11 @@ class TaskGroup extends BaseInterface {
 		// Put it into pending state
 		this.state.status = 'pending'
 		this.emit('pending')
+
+		// Prepare result, if it doesn't exist
+		if ( this.config.storeResult !== false && this.state.result == null ) {
+			this.state.result = []
+		}
 
 		// Queue the actual running so we can give time for the listeners to complete before continuing
 		this.queue(() => this.fire())

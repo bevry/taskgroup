@@ -165,9 +165,9 @@
                       </a></li>
                       
                       <li><a
-                        href='#TaskGroup#results'
+                        href='#TaskGroup#result'
                         class='regular pre-open'>
-                        #results
+                        #result
                       </a></li>
                       
                       <li><a
@@ -261,9 +261,9 @@
                       </a></li>
                       
                       <li><a
-                        href='#TaskGroup#resetResults'
+                        href='#TaskGroup#resetResult'
                         class='regular pre-open'>
-                        #resetResults
+                        #resetResult
                       </a></li>
                       
                       <li><a
@@ -303,9 +303,9 @@
                       </a></li>
                       
                       <li><a
-                        href='#TaskGroup#setNestedGroupConfig'
+                        href='#TaskGroup#setNestedTaskGroupConfig'
                         class='regular pre-open'>
-                        #setNestedGroupConfig
+                        #setNestedTaskGroupConfig
                       </a></li>
                       
                       <li><a
@@ -503,9 +503,9 @@
                       </a></li>
                       
                       <li><a
-                        href='#Task#resetResults'
+                        href='#Task#resetResult'
                         class='regular pre-open'>
-                        #resetResults
+                        #resetResult
                       </a></li>
                       
                       <li><a
@@ -600,7 +600,7 @@
       BaseInterface
     </h2>
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/fcf863eec6e4820ec4bd7ec83a93b868e4b1da5e/./source/lib/interface.js#L12-L184'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/a6a63edee43b700b2b12467da1bde51e8182607d/./source/lib/interface.js#L12-L184'>
       <span>./source/lib/interface.js</span>
       </a>
     
@@ -1208,7 +1208,7 @@ If the name was never configured, then return the name in the format of <code>&#
       TaskGroup
     </h2>
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/fcf863eec6e4820ec4bd7ec83a93b868e4b1da5e/./source/lib/taskgroup.js#L41-L1107'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/a6a63edee43b700b2b12467da1bde51e8182607d/./source/lib/taskgroup.js#L41-L1117'>
       <span>./source/lib/taskgroup.js</span>
       </a>
     
@@ -1223,9 +1223,9 @@ If the name was never configured, then return the name in the format of <code>&#
 <li><code>running()</code> - emitted when the first item starts execution</li>
 <li><code>failed(error)</code> - emitted when execution exited with a failure</li>
 <li><code>passed()</code> - emitted when execution exited with a success</li>
-<li><code>completed(error, results)</code> - emitted when execution exited, <code>results</code> is an {Array} of the result arguments for each item that executed</li>
+<li><code>completed(error, result)</code> - emitted when execution exited, <code>result</code> is an {?Array} of the result arguments for each item that executed</li>
 <li><code>error(error)</code> - emtited if an unexpected error occured within ourself</li>
-<li><code>done(error, results)</code> - emitted when either the execution completes (the <code>completed</code> event) or when an unexpected error occurs (the <code>error</code> event)</li>
+<li><code>done(error, result)</code> - emitted when either the execution completes (the <code>completed</code> event) or when an unexpected error occurs (the <code>error</code> event)</li>
 <li><code>item.*(...)</code> - bubbled events from an added item</li>
 <li><code>task.*(...)</code> - bubbled events from an added {Task}</li>
 <li><code>group.*(...)</code> - bubbled events from an added {TaskGroup}</li>
@@ -1625,11 +1625,11 @@ as instanceof will not work in those environments.</p>
       </div>
     </div>
   
-    <div class='keyline-bottom' id='TaskGroup#results'>
+    <div class='keyline-bottom' id='TaskGroup#result'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="pad1y contain">
             <a class='icon pin-right pad1y dark-link caret-right'></a>
-            <span class='code strong strong truncate'>results</span>
+            <span class='code strong strong truncate'>result</span>
             <span class='quiet code space-right2'></span>
         </div>
       </div>
@@ -1639,10 +1639,11 @@ as instanceof will not work in those environments.</p>
   
 
   <p>An {Array} that contains the result property for each completed {Task} and {TaskGroup}.
-An item can disable having its result property added to this results array by setting its {includeInResults} configuration option to <code>false</code>.</p>
+If the item has its config <code>storeResult</code> to <code>false</code>, we do not store its result.
+If no result has occured yet, it is null.</p>
 
 
-  <div class='pre p1 fill-light'>results</div>
+  <div class='pre p1 fill-light'>result</div>
 
   
 
@@ -1738,7 +1739,7 @@ An item can disable having its result property added to this results array by se
 <li>executing - A {Number} of the names of the executing items.</li>
 <li>done - A {Number} of the names of the done items.</li>
 <li>total - A {Number} of the total items we have.</li>
-<li>results - A {Number} of the total results we have.</li>
+<li>result - A {Number} of the total results we have.</li>
 </ul>
 
 
@@ -2372,11 +2373,11 @@ Completion of executed is determined of whether or not we have started, and whet
       </div>
     </div>
   
-    <div class='keyline-bottom' id='TaskGroup#resetResults'>
+    <div class='keyline-bottom' id='TaskGroup#resetResult'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="pad1y contain">
             <a class='icon pin-right pad1y dark-link caret-right'></a>
-            <span class='code strong strong truncate'>resetResults</span>
+            <span class='code strong strong truncate'>resetResult</span>
             <span class='quiet code space-right2'>()</span>
         </div>
       </div>
@@ -2385,11 +2386,11 @@ Completion of executed is determined of whether or not we have started, and whet
 
   
 
-  <p>Reset the results.
+  <p>Reset the result.
 At this point this method is internal, as it&#x27;s functionality may change in the future, and it&#x27;s outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.</p>
 
 
-  <div class='pre p1 fill-light'>resetResults(): this</div>
+  <div class='pre p1 fill-light'>resetResult(): this</div>
 
   
 
@@ -2739,6 +2740,15 @@ When using an array, a {String} becomes the :name, a {Function} becomes the :met
                 </tr>
               
                 <tr>
+                  <td class='break-word'><span class='code bold'>config.storeResult</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>]</code>
+                  </td>
+                  <td class='break-word'><span>Whether or not to store the result, unless 
+<code>false</code>
+, will store
+</span></td>
+                </tr>
+              
+                <tr>
                   <td class='break-word'><span class='code bold'>config.destroyOnceDone</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>]</code>
                   
                     (default <code>true</code>)
@@ -2791,7 +2801,7 @@ When using an array, a {String} becomes the :name, a {Function} becomes the :met
                 </tr>
               
                 <tr>
-                  <td class='break-word'><span class='code bold'>config.nestedGroupConfig</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>]</code>
+                  <td class='break-word'><span class='code bold'>config.nestedTaskGroupConfig</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>]</code>
                   </td>
                   <td class='break-word'><span>The nested configuration to be applied to all {TaskGroup} descendants of this group.
 </span></td>
@@ -2916,7 +2926,7 @@ When using an array, a {String} becomes the :name, a {Function} becomes the :met
 
   
 
-  <p>Merged passed configuration into {config.nestedTaskConfig}.</p>
+  <p>Merge passed configuration into {config.nestedTaskConfig}.</p>
 
 
   <div class='pre p1 fill-light'>setNestedTaskConfig(opts: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): this</div>
@@ -2969,11 +2979,11 @@ When using an array, a {String} becomes the :name, a {Function} becomes the :met
       </div>
     </div>
   
-    <div class='keyline-bottom' id='TaskGroup#setNestedGroupConfig'>
+    <div class='keyline-bottom' id='TaskGroup#setNestedTaskGroupConfig'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="pad1y contain">
             <a class='icon pin-right pad1y dark-link caret-right'></a>
-            <span class='code strong strong truncate'>setNestedGroupConfig</span>
+            <span class='code strong strong truncate'>setNestedTaskGroupConfig</span>
             <span class='quiet code space-right2'>(opts)</span>
         </div>
       </div>
@@ -2982,10 +2992,10 @@ When using an array, a {String} becomes the :name, a {Function} becomes the :met
 
   
 
-  <p>Merged passed configuration into {config.nestedGroupConfig}.</p>
+  <p>Merge passed configuration into {config.nestedTaskGroupConfig}.</p>
 
 
-  <div class='pre p1 fill-light'>setNestedGroupConfig(opts: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): this</div>
+  <div class='pre p1 fill-light'>setNestedTaskGroupConfig(opts: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): this</div>
 
   
 
@@ -4275,7 +4285,7 @@ Fires the listener once, either on the next tick if we are already done, or if n
       Task
     </h2>
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/fcf863eec6e4820ec4bd7ec83a93b868e4b1da5e/./source/lib/task.js#L59-L607'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/a6a63edee43b700b2b12467da1bde51e8182607d/./source/lib/task.js#L59-L608'>
       <span>./source/lib/task.js</span>
       </a>
     
@@ -4636,7 +4646,8 @@ as instanceof will not work in those environments.</p>
   
 
   <p>An {Array} representing the returned result or the passed {Arguments} of our method.
-The first item in the array should be the {Error} if it exists.</p>
+The first item in the array should be the {Error} if it exists.
+If no result has occured yet, it is null.</p>
 
 
   <div class='pre p1 fill-light'>result</div>
@@ -4807,11 +4818,11 @@ The first item in the array should be the {Error} if it exists.</p>
       </div>
     </div>
   
-    <div class='keyline-bottom' id='Task#resetResults'>
+    <div class='keyline-bottom' id='Task#resetResult'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="pad1y contain">
             <a class='icon pin-right pad1y dark-link caret-right'></a>
-            <span class='code strong strong truncate'>resetResults</span>
+            <span class='code strong strong truncate'>resetResult</span>
             <span class='quiet code space-right2'>()</span>
         </div>
       </div>
@@ -4820,11 +4831,11 @@ The first item in the array should be the {Error} if it exists.</p>
 
   
 
-  <p>Reset the results.
+  <p>Reset the result.
 At this point this method is internal, as it&#x27;s functionality may change in the future, and it&#x27;s outside use is not yet confirmed. If you need such an ability, let us know via the issue tracker.</p>
 
 
-  <div class='pre p1 fill-light'>resetResults(): this</div>
+  <div class='pre p1 fill-light'>resetResult(): this</div>
 
   
 
@@ -5044,14 +5055,23 @@ At this point this method is internal, as it&#x27;s functionality may change in 
                 <tr>
                   <td class='break-word'><span class='code bold'>config.on</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>]</code>
                   </td>
-                  <td class='break-word'><span>A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}.
+                  <td class='break-word'><span>A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}
 </span></td>
                 </tr>
               
                 <tr>
                   <td class='break-word'><span class='code bold'>config.once</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>]</code>
                   </td>
-                  <td class='break-word'><span>A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}.
+                  <td class='break-word'><span>A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}
+</span></td>
+                </tr>
+              
+                <tr>
+                  <td class='break-word'><span class='code bold'>config.storeResult</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>]</code>
+                  </td>
+                  <td class='break-word'><span>Whether or not to store the result, unless 
+<code>false</code>
+, will store
 </span></td>
                 </tr>
               
@@ -5076,14 +5096,14 @@ At this point this method is internal, as it&#x27;s functionality may change in 
                   </td>
                   <td class='break-word'><span>A parent 
 <a href="#TaskGroup">TaskGroup</a>
- that we may be attached to.
+ that we may be attached to
 </span></td>
                 </tr>
               
                 <tr>
                   <td class='break-word'><span class='code bold'>config.method</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function">Function</a>]</code>
                   </td>
-                  <td class='break-word'><span>The {Function} to execute for our {Task}.
+                  <td class='break-word'><span>The {Function} to execute for our {Task}
 </span></td>
                 </tr>
               
@@ -5101,7 +5121,7 @@ At this point this method is internal, as it&#x27;s functionality may change in 
                   
                     (default <code>true</code>)
                   </td>
-                  <td class='break-word'><span>Whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately.
+                  <td class='break-word'><span>Whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately
 </span></td>
                 </tr>
               
@@ -5110,14 +5130,14 @@ At this point this method is internal, as it&#x27;s functionality may change in 
                   
                     (default <code>true</code>)
                   </td>
-                  <td class='break-word'><span>Whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution).
+                  <td class='break-word'><span>Whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution)
 </span></td>
                 </tr>
               
                 <tr>
                   <td class='break-word'><span class='code bold'>config.args</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>]</code>
                   </td>
-                  <td class='break-word'><span>Arguments that we would like to forward onto our method when we execute it.
+                  <td class='break-word'><span>Arguments that we would like to forward onto our method when we execute it
 </span></td>
                 </tr>
               
@@ -5130,7 +5150,7 @@ At this point this method is internal, as it&#x27;s functionality may change in 
 <code>false</code>
 ) or synchronously (set to 
 <code>true</code>
-).
+)
 </span></td>
                 </tr>
               
