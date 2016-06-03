@@ -1,6 +1,6 @@
 // Import
 const joe = require('joe')
-const {equal, expectErrorViaFunction, throwErrorViaCallback, returnViaCallback, completeViaCallback, expectViaCallback, expectErrorViaCallback} = require('assert-helpers')
+const {equal, errorEqual, expectErrorViaFunction, throwErrorViaCallback, returnViaCallback, completeViaCallback, expectViaCallback, expectErrorViaCallback} = require('assert-helpers')
 const {wait} = require('./test-util')
 const {Task, TaskGroup} = require('../')
 
@@ -8,18 +8,28 @@ const {Task, TaskGroup} = require('../')
 // Prepare
 const delay = 100
 
-function bump (checks) {
+function bump (checks, thrower) {
 	if ( checks.i == null )  checks.i = 0
 	if ( checks.n == null )  checks.n = 0
 	++checks.n
-	return () => ++checks.i
+	return (err) => {
+		++checks.i
+		if ( err && thrower) {
+			checks.error = err
+			if ( thrower === 'function' ) {
+				thrower(err)
+			}
+			throw err
+		}
+	}
 }
 
-function bumped (checks, next, testName) {
+function bumped (checks, next) {
 	if ( checks.i == null )  checks.i = 0
 	if ( checks.n == null )  checks.n = 0
 	wait(delay * 2, () => {
-		equal(checks.i, checks.n, testName || 'all expected checks ran')
+		errorEqual(checks.error || null, null, 'checks ran without error')
+		equal(checks.i, checks.n, 'all expected checks ran')
 		if ( next )  next()
 	})
 }
@@ -40,7 +50,7 @@ joe.suite('task', function (suite, test) {
 		const checks = {}
 		Task.create()
 			.run()
-			.done(expectErrorViaCallback('no method', 'error was as expected', bump(checks)))
+			.done(expectErrorViaCallback('no method', 'error was as expected', bump(checks, complete)))
 			.done(bump(checks))
 		bumped(checks, complete)
 	})
@@ -69,7 +79,7 @@ joe.suite('task', function (suite, test) {
 	test('Task.create(...).done(...).run().run() should fail as a task is not allowed to run twice', function (complete) {
 		const checks = {}
 		Task.create(returnViaCallback(5))
-			.on('error', expectErrorViaCallback('run status', 'error was emitted and caught by the listener expected', bump(checks)))
+			.on('error', expectErrorViaCallback('run status', 'error was emitted and caught by the listener expected', bump(checks, complete)))
 			.run().run()
 		bumped(checks, complete)
 	})
@@ -81,23 +91,13 @@ joe.suite('task', function (suite, test) {
 			Task.create(returnViaCallback(5))
 				.run().run()
 				.on('error', throwErrorViaCallback('unexpected error'))
-		}, 'error was uncaught by the error listener as expected, because the error listener was bound after the error was emitted', bump(checks))
+		}, 'error was uncaught by the error listener as expected', bump(checks, complete))
 		bumped(checks, complete)
 	})
 })
 
 // Taskgroup
 joe.suite('taskgroup', function (suite, test) {
-	// failure: done with no run
-	test('TaskGroup.create().addTask(...).done(...) should time out when run was not called', function (complete) {
-		const checks = {}
-		TaskGroup.create()
-			.addTask(returnViaCallback(5))
-			.done(throwErrorViaCallback('unexpected error'))
-			.done(bump(checks))
-		bumped(checks, complete)
-	})
-
 	// success: done with no tasks then run
 	test('TaskGroup.create().run().done(...) should complete with no result', function (complete) {
 		const checks = {}
@@ -141,8 +141,8 @@ joe.suite('taskgroup', function (suite, test) {
 				.addTask(returnViaCallback(10))
 				.done(expectViaCallback(null, [[null, 5], [null, 10]]))
 				.done(bump(checks))
+			bumped(checks, complete)
 		})
-		bumped(checks, complete)
 	})
 
 	// success: run then done then add
@@ -199,32 +199,11 @@ joe.suite('taskgroup', function (suite, test) {
 		bumped(checks, complete)
 	})
 
-	// success: resume after error
-	test('Taskgroup should be able to resume after an error', function (complete) {
-		const checks = {}
-		const err = new Error('fail after 5')
-		const tasks = TaskGroup.create()
-			.addTask(returnViaCallback(5))
-			.addTask(returnViaCallback(err))
-			.addTask(returnViaCallback(10))
-			.run()
-			.done(expectViaCallback(err, [[null, 5], [err]]))
-			.done(bump(checks))
-		// @TODO a new run should be required here... that clears the previously completed results
-		wait(delay, function () {
-			tasks
-				.addTask(returnViaCallback(15))
-				.done(expectViaCallback(null, [[null, 5], [err], [null, 10], [null, 15]]))
-				.done(bump(checks))
-		})
-		bumped(checks, complete)
-	})
-
 	// success: ignore after error
 	test('Taskgroup should ignore when encountering an error with different config', function (complete) {
 		const checks = {}
 		const err = new Error('fail after 5')
-		TaskGroup.create({onError: 'ignore'})
+		TaskGroup.create({abortOnError: false})
 			.addTask(returnViaCallback(5))
 			.addTask(returnViaCallback(err))
 			.addTask(returnViaCallback(10))
@@ -236,24 +215,29 @@ joe.suite('taskgroup', function (suite, test) {
 		bumped(checks, complete)
 	})
 
-	// failure: nested timeouts
-	test('Taskgroup should apply nested configuration to tasks', function (complete) {
+	// success: resume after error
+	test('Taskgroup should be able to resume after an error', function (complete) {
 		const checks = {}
-		TaskGroup.create()
-			.setConfig({
-				nestedTaskConfig: {
-					timeout: delay,
-					onError: 'ignore'
-				}
-			})
+		const err = new Error('fail after 5')
+		const tasks = TaskGroup.create()
 			.addTask(returnViaCallback(5))
-			.addTask(completeViaCallback(10, delay * 2))
-			.addTask(returnViaCallback(15))
+			.addTask(returnViaCallback(err))
+			.addTask(returnViaCallback(10))
 			.run()
-			.done(expectErrorViaCallback('timed out', 'error was as expected', bump(checks)))
+			.done(expectViaCallback(err, [[null, 5], [err]]))
 			.done(bump(checks))
-		bumped(checks, complete)
+
+		// @TODO a new run should be required here... that clears the previously completed results
+
+		wait(delay, function () {
+			tasks
+				.addTask(returnViaCallback(15))
+				.done(expectViaCallback(null, [[null, 5], [err], [null, 10], [null, 15]]))
+				.done(bump(checks))
+			bumped(checks, complete)
+		})
 	})
+
 })
 
 // @TODO for each test here, give a real world example of where it is actually used

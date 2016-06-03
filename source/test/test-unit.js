@@ -352,54 +352,6 @@ joe.suite('task', function (suite) {
 			})
 		})
 
-		/*
-		test('should error when a timeout has exceeded', function (done) {
-			// Specify how many special checks we are expecting
-			const checks = []
-
-			// Create our asynchronous task
-			const task = Task.create({timeout: delay}, function (complete) {
-				wait(delay * 2, function () {
-					complete()
-				})
-			})
-
-			// Check the task completed as expected
-			task.whenDone(function (err, result) {
-				if ( checks.length === 0 ) {
-					checks.push('timeout')
-					errorEqual(err, 'timed out')
-				}
-				else if ( checks.length === 1 ) {
-					checks.push('completed twice')
-					errorEqual(err, 'already completed')
-					done()
-				}
-			})
-
-			// Run
-			task.run()
-		})
-
-		test('should not error when a timeout has not exceeded', function (done) {
-			// Specify how many special checks we are expecting
-			const checks = []
-
-			// Create our asynchronous task
-			const task = Task.create({timeout: delay * 2}, function (complete) {
-				wait(delay, function () {
-					complete()
-				})
-			})
-
-			// Check the task completed as expected
-			task.whenDone(done)
-
-			// Run
-			task.run()
-		})
-		*/
-
 		// https://github.com/bevry/taskgroup/issues/17
 		test('it should not catch errors within the completion callback: issue 17, with domains', function (done) {
 			// Run our test file
