@@ -30,30 +30,26 @@ Available internal statuses:
 - `'passed'` - execution of our method has succeeded
 - `'destroyed'` - we've been destroyed and can no longer execute
 
-Example:
+@example
+const Task = require('taskgroup').Task
 
-``` javascript
-var Task = require('taskgroup').Task
-var task
-
-task = new Task('my synchronous task', function(){
+Task.create('my synchronous task', function () {
 	return 5
 }).done(console.info).run()  // [null, 5]
 
-task = new Task('my asynchronous task', function(complete){
+Task.create('my asynchronous task', function (complete) {
 	complete(null, 5)
 }).done(console.info).run()  // [null, 5]
 
-task = new Task('my task that returns an error', function(){
+Task.create('my task that returns an error', function () {
 	var error = new Error('deliberate error')
 	return error
 }).done(console.info).run()  // [Error('deliberator error')]
 
-task = new Task('my task that passes an error', function(complete){
+Task.create('my task that passes an error', function (complete) {
 	var error = new Error('deliberate error')
 	complete(error)
 }).done(console.info).run()  // [Error('deliberator error')]
-```
 
 @class Task
 @extends BaseInterface

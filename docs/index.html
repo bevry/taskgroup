@@ -600,7 +600,7 @@
       BaseInterface
     </h2>
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/1d8c59fa8c76e34674f236a456599a19007f8f4c/./source/lib/interface.js#L12-L184'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/fcf863eec6e4820ec4bd7ec83a93b868e4b1da5e/./source/lib/interface.js#L12-L184'>
       <span>./source/lib/interface.js</span>
       </a>
     
@@ -1208,7 +1208,7 @@ If the name was never configured, then return the name in the format of <code>&#
       TaskGroup
     </h2>
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/1d8c59fa8c76e34674f236a456599a19007f8f4c/./source/lib/taskgroup.js#L41-L1107'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/fcf863eec6e4820ec4bd7ec83a93b868e4b1da5e/./source/lib/taskgroup.js#L41-L1107'>
       <span>./source/lib/taskgroup.js</span>
       </a>
     
@@ -4275,7 +4275,7 @@ Fires the listener once, either on the next tick if we are already done, or if n
       Task
     </h2>
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/1d8c59fa8c76e34674f236a456599a19007f8f4c/./source/lib/task.js#L63-L611'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/fcf863eec6e4820ec4bd7ec83a93b868e4b1da5e/./source/lib/task.js#L59-L607'>
       <span>./source/lib/task.js</span>
       </a>
     
@@ -4303,28 +4303,6 @@ Fires the listener once, either on the next tick if we are already done, or if n
 <li><code>&#x27;passed&#x27;</code> - execution of our method has succeeded</li>
 <li><code>&#x27;destroyed&#x27;</code> - we&#x27;ve been destroyed and can no longer execute</li>
 </ul>
-<p>Example:</p>
-<pre><code>var Task = require(&#x27;taskgroup&#x27;).Task
-var task
-
-task = new Task(&#x27;my synchronous task&#x27;, function(){
-return 5
-}).done(console.info).run()  // [null, 5]
-
-task = new Task(&#x27;my asynchronous task&#x27;, function(complete){
-complete(null, 5)
-}).done(console.info).run()  // [null, 5]
-
-task = new Task(&#x27;my task that returns an error&#x27;, function(){
-var error = new Error(&#x27;deliberate error&#x27;)
-return error
-}).done(console.info).run()  // [Error(&#x27;deliberator error&#x27;)]
-
-task = new Task(&#x27;my task that passes an error&#x27;, function(complete){
-var error = new Error(&#x27;deliberate error&#x27;)
-complete(error)
-}).done(console.info).run()  // [Error(&#x27;deliberator error&#x27;)]
-</code></pre>
 
 
   <div class='pre p1 fill-light'>Task()</div>
@@ -4352,6 +4330,30 @@ complete(error)
 
   
 
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">const</span> Task = <span class="hljs-built_in">require</span>(<span class="hljs-string">'taskgroup'</span>).Task
+
+Task.create(<span class="hljs-string">'my synchronous task'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+<span class="hljs-keyword">return</span> <span class="hljs-number">5</span>
+}).done(<span class="hljs-built_in">console</span>.info).run()  <span class="hljs-comment">// [null, 5]</span>
+
+Task.create(<span class="hljs-string">'my asynchronous task'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">complete</span>) </span>{
+complete(<span class="hljs-literal">null</span>, <span class="hljs-number">5</span>)
+}).done(<span class="hljs-built_in">console</span>.info).run()  <span class="hljs-comment">// [null, 5]</span>
+
+Task.create(<span class="hljs-string">'my task that returns an error'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+<span class="hljs-keyword">var</span> error = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'deliberate error'</span>)
+<span class="hljs-keyword">return</span> error
+}).done(<span class="hljs-built_in">console</span>.info).run()  <span class="hljs-comment">// [Error('deliberator error')]</span>
+
+Task.create(<span class="hljs-string">'my task that passes an error'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">complete</span>) </span>{
+<span class="hljs-keyword">var</span> error = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'deliberate error'</span>)
+complete(error)
+}).done(<span class="hljs-built_in">console</span>.info).run()  <span class="hljs-comment">// [Error('deliberator error')]</span></pre>
+    
   
 
   
