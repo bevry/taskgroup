@@ -16,6 +16,7 @@
 - Removed `nestedConfig`, use either `nestedTaskConfig` or `nestedTaskGroupConfig` or both
 - Removed `sync` as there was only one use case of it, that was better accomplished other ways, it was far too complex
 - Removed `exit` as its functionality was ambiguous and undocumented
+- `onError="ignore"` is now `abortOnError="true"`
 - `getTotalItems()`, `getItemTotals()` now changed to getters `totalItems`, `itemTotals`
 - A lot of previously `public` methods are now marked `private` or `protected`, this isn't really from a stability concern but from an isolation of responsibility concern
 
