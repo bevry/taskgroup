@@ -440,29 +440,29 @@ class TaskGroup extends BaseInterface {
 
 	@param {Object} [config]
 
-	@param {String} [config.name] - What we would like our name to be, useful for debugging.
+	@param {String} [config.name] - What we would like our name to be, useful for debugging
 	@param {Function} [config.done] - Passed to {@link TaskGroup#onceDone} (aliases are `onceDone`, and `next`)
 	@param {Function} [config.whenDone] - Passed to {@link TaskGroup#whenDone}
-	@param {Object} [config.on] - An object of event names linking to listener functions that we would like bounded via {@link EventEmitter#on}.
-	@param {Object} [config.once] - An object of event names linking to listener functions that we would like bounded via {@link EventEmitter#once}.
+	@param {Object} [config.on] - An object of event names linking to listener functions that we would like bounded via {@link EventEmitter#on}
+	@param {Object} [config.once] - An object of event names linking to listener functions that we would like bounded via {@link EventEmitter#once}
 
 	@param {Boolean} [config.storeResult] - Whether or not to store the result, unless `false`, will store
 	@param {Boolean} [config.destroyOnceDone=true] - Whether or not we should automatically destroy the {TaskGroup} once done to free up resources
-	@param {Boolean} [config.sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`).
-	@param {TaskGroup} [config.parent] - A parent {TaskGroup} that we may be attached to.
+	@param {Boolean} [config.sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`), used by safeps
+	@param {TaskGroup} [config.parent] - A parent {TaskGroup} that we may be attached to
 
-	@param {Function} [config.method] - The {Function} to execute for our {TaskGroup} when using inline execution style.
+	@param {Function} [config.method] - The {Function} to execute for our {TaskGroup} when using inline execution style
 	@param {Boolean} [config.abortOnError=true] - Whether or not we should abort execution of the {TaskGroup} and exit when an error occurs
 	@param {Boolean} [config.destroyDoneItems=true] - Whether or not we should automatically destroy done items to free up resources
-	@param {Object} [config.nestedTaskGroupConfig] - The nested configuration to be applied to all {TaskGroup} descendants of this group.
-	@param {Object} [config.nestedTaskConfig] - The nested configuration to be applied to all {Task} descendants of this group.
+	@param {Object} [config.nestedTaskGroupConfig] - The nested configuration to be applied to all {TaskGroup} descendants of this group
+	@param {Object} [config.nestedTaskConfig] - The nested configuration to be applied to all {Task} descendants of this group
 	@param {Boolean} [config.emitNestedEvents=fakse] - Whether or not we should emit nested item events
-	@param {Number} [config.concurrency=1] - The amount of items that we would like to execute at the same time. Use `0` for unlimited. `1` accomplishes serial execution, everything else accomplishes parallel execution.
+	@param {Number} [config.concurrency=1] - The amount of items that we would like to execute at the same time. Use `0` for unlimited. `1` accomplishes serial execution, everything else accomplishes parallel execution
 	@param {Boolean} [config.run] - A {Boolean} for whether or not to run the TaskGroup automatically, by default will be enabled if config.method is defined
 
-	@param {Array} [config.tasks] - An {Array} of {Task} instances to be added to this group.
-	@param {Array} [config.taskgroups] - An {Array} of {TaskGroup} instances to be added to this group.
-	@param {Array} [config.items] - An {Array} of {Task} and/or {TaskGroup} instances to be added to this group.
+	@param {Array} [config.tasks] - An {Array} of {Task} instances to be added to this group
+	@param {Array} [config.taskgroups] - An {Array} of {TaskGroup} instances to be added to this group
+	@param {Array} [config.items] - An {Array} of {Task} and/or {TaskGroup} instances to be added to this group
 
 	@chainable
 	@returns {this}
@@ -974,7 +974,7 @@ class TaskGroup extends BaseInterface {
 		--this.state.itemsExecutingCount
 		++this.state.itemsDoneCount
 
-		// As we no longer have any use for this item, as it has completed, destroy it if desired
+		// As we no longer have any use for this item, as it has completed, destroy the item if desired
 		if ( this.config.destroyDoneItems ) {
 			item.destroy()
 		}

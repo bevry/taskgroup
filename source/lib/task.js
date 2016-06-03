@@ -254,7 +254,7 @@ class Task extends BaseInterface {
 
 	@param {Boolean} [config.storeResult] - Whether or not to store the result, unless `false`, will store
 	@param {Boolean} [config.destroyOnceDone=true] - Whether or not to automatically destroy the task once it's done to free up resources
-	@param {Boolean} [config.sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`)
+	@param {Boolean} [config.sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`), used by safeps
 	@param {TaskGroup} [config.parent] - A parent {@link TaskGroup} that we may be attached to
 
 	@param {Function} [config.method] - The {Function} to execute for our {Task}

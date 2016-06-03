@@ -600,7 +600,7 @@
       BaseInterface
     </h2>
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/a6a63edee43b700b2b12467da1bde51e8182607d/./source/lib/interface.js#L12-L184'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/3d8205e9f3b4e0edc7523723db2a5448dcb95e11/./source/lib/interface.js#L12-L184'>
       <span>./source/lib/interface.js</span>
       </a>
     
@@ -1208,7 +1208,7 @@ If the name was never configured, then return the name in the format of <code>&#
       TaskGroup
     </h2>
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/a6a63edee43b700b2b12467da1bde51e8182607d/./source/lib/taskgroup.js#L41-L1117'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/3d8205e9f3b4e0edc7523723db2a5448dcb95e11/./source/lib/taskgroup.js#L41-L1117'>
       <span>./source/lib/taskgroup.js</span>
       </a>
     
@@ -2726,7 +2726,6 @@ When using an array, a {String} becomes the :name, a {Function} becomes the :met
                   </td>
                   <td class='break-word'><span>An object of event names linking to listener functions that we would like bounded via 
 <a href="#EventEmitter#on">EventEmitter#on</a>
-.
 </span></td>
                 </tr>
               
@@ -2735,7 +2734,6 @@ When using an array, a {String} becomes the :name, a {Function} becomes the :met
                   </td>
                   <td class='break-word'><span>An object of event names linking to listener functions that we would like bounded via 
 <a href="#EventEmitter#once">EventEmitter#once</a>
-.
 </span></td>
                 </tr>
               
@@ -2766,28 +2764,28 @@ When using an array, a {String} becomes the :name, a {Function} becomes the :met
 <code>false</code>
 ) or synchronously (set to 
 <code>true</code>
-).
+), used by safeps
 </span></td>
                 </tr>
               
                 <tr>
                   <td class='break-word'><span class='code bold'>config.parent</span> <code class='quiet'>[<a href="#TaskGroup">TaskGroup</a>]</code>
                   </td>
-                  <td class='break-word'><span>A parent {TaskGroup} that we may be attached to.
+                  <td class='break-word'><span>A parent {TaskGroup} that we may be attached to
 </span></td>
                 </tr>
               
                 <tr>
                   <td class='break-word'><span class='code bold'>config.method</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function">Function</a>]</code>
                   </td>
-                  <td class='break-word'><span>The {Function} to execute for our {TaskGroup} when using inline execution style.
+                  <td class='break-word'><span>The {Function} to execute for our {TaskGroup} when using inline execution style
 </span></td>
                 </tr>
               
                 <tr>
                   <td class='break-word'><span class='code bold'>config.name</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>]</code>
                   </td>
-                  <td class='break-word'><span>What we would like our name to be, useful for debugging.
+                  <td class='break-word'><span>What we would like our name to be, useful for debugging
 </span></td>
                 </tr>
               
@@ -2803,14 +2801,14 @@ When using an array, a {String} becomes the :name, a {Function} becomes the :met
                 <tr>
                   <td class='break-word'><span class='code bold'>config.nestedTaskGroupConfig</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>]</code>
                   </td>
-                  <td class='break-word'><span>The nested configuration to be applied to all {TaskGroup} descendants of this group.
+                  <td class='break-word'><span>The nested configuration to be applied to all {TaskGroup} descendants of this group
 </span></td>
                 </tr>
               
                 <tr>
                   <td class='break-word'><span class='code bold'>config.nestedTaskConfig</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>]</code>
                   </td>
-                  <td class='break-word'><span>The nested configuration to be applied to all {Task} descendants of this group.
+                  <td class='break-word'><span>The nested configuration to be applied to all {Task} descendants of this group
 </span></td>
                 </tr>
               
@@ -2832,7 +2830,7 @@ When using an array, a {String} becomes the :name, a {Function} becomes the :met
 <code>0</code>
  for unlimited. 
 <code>1</code>
- accomplishes serial execution, everything else accomplishes parallel execution.
+ accomplishes serial execution, everything else accomplishes parallel execution
 </span></td>
                 </tr>
               
@@ -2846,21 +2844,21 @@ When using an array, a {String} becomes the :name, a {Function} becomes the :met
                 <tr>
                   <td class='break-word'><span class='code bold'>config.tasks</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>]</code>
                   </td>
-                  <td class='break-word'><span>An {Array} of {Task} instances to be added to this group.
+                  <td class='break-word'><span>An {Array} of {Task} instances to be added to this group
 </span></td>
                 </tr>
               
                 <tr>
                   <td class='break-word'><span class='code bold'>config.taskgroups</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>]</code>
                   </td>
-                  <td class='break-word'><span>An {Array} of {TaskGroup} instances to be added to this group.
+                  <td class='break-word'><span>An {Array} of {TaskGroup} instances to be added to this group
 </span></td>
                 </tr>
               
                 <tr>
                   <td class='break-word'><span class='code bold'>config.items</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>]</code>
                   </td>
-                  <td class='break-word'><span>An {Array} of {Task} and/or {TaskGroup} instances to be added to this group.
+                  <td class='break-word'><span>An {Array} of {Task} and/or {TaskGroup} instances to be added to this group
 </span></td>
                 </tr>
               
@@ -4285,7 +4283,7 @@ Fires the listener once, either on the next tick if we are already done, or if n
       Task
     </h2>
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/a6a63edee43b700b2b12467da1bde51e8182607d/./source/lib/task.js#L59-L608'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/3d8205e9f3b4e0edc7523723db2a5448dcb95e11/./source/lib/task.js#L59-L608'>
       <span>./source/lib/task.js</span>
       </a>
     
@@ -5150,7 +5148,7 @@ At this point this method is internal, as it&#x27;s functionality may change in 
 <code>false</code>
 ) or synchronously (set to 
 <code>true</code>
-)
+), used by safeps
 </span></td>
                 </tr>
               
