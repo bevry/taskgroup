@@ -456,7 +456,7 @@ class TaskGroup extends BaseInterface {
 	@param {Boolean} [config.destroyDoneItems=true] - Whether or not we should automatically destroy done items to free up resources
 	@param {Object} [config.nestedTaskGroupConfig] - The nested configuration to be applied to all {TaskGroup} descendants of this group
 	@param {Object} [config.nestedTaskConfig] - The nested configuration to be applied to all {Task} descendants of this group
-	@param {Boolean} [config.emitNestedEvents=fakse] - Whether or not we should emit nested item events
+	@param {Boolean} [config.emitNestedEvents=false] - Whether or not we should emit nested item events @TODO remove this, there are not tests for it, can be accomplished via item.add listener like TaskGroupDebug
 	@param {Number} [config.concurrency=1] - The amount of items that we would like to execute at the same time. Use `0` for unlimited. `1` accomplishes serial execution, everything else accomplishes parallel execution
 	@param {Boolean} [config.run] - A {Boolean} for whether or not to run the TaskGroup automatically, by default will be enabled if config.method is defined
 
@@ -637,7 +637,7 @@ class TaskGroup extends BaseInterface {
 
 			// Bubble the nested events if desired
 			if ( emitNestedEvents ) {
-				item.state.events.forEach(function (event) {
+				item.events.forEach(function (event) {
 					item.on(event, function (...args) {
 						me.emit(`task.${event}`, item, ...args)
 					})
@@ -655,7 +655,7 @@ class TaskGroup extends BaseInterface {
 
 			// Bubble the nested events if desired
 			if ( emitNestedEvents ) {
-				item.state.events.forEach(function (event) {
+				item.events.forEach(function (event) {
 					item.on(event, function (...args) {
 						me.emit(`group.${event}`, item, ...args)
 					})
@@ -689,7 +689,7 @@ class TaskGroup extends BaseInterface {
 
 		// Bubble the nested events if desired
 		if ( emitNestedEvents ) {
-			item.state.events.forEach(function (event) {
+			item.events.forEach(function (event) {
 				item.on(event, function (...args) {
 					me.emit(`item.${event}`, item, ...args)
 				})
