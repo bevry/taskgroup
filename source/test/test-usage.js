@@ -1,6 +1,6 @@
 // Import
 const joe = require('joe')
-const {throwUnexpected, returnViaCallback, completeViaCallback, expectViaCallback, expectErrorViaCallback} = require('assert-helpers')
+const {expectErrorViaFunction, throwErrorViaCallback, returnViaCallback, completeViaCallback, expectViaCallback, expectErrorViaCallback} = require('assert-helpers')
 const {wait} = require('./test-util')
 const {Task, TaskGroup} = require('../../')
 
@@ -12,7 +12,7 @@ joe.suite('task', function (suite, test) {
 	// failure: done with no run
 	test('Task.create(...).done(...) should time out when run was not called', function (complete) {
 		Task.create(returnViaCallback(5))
-			.done(throwUnexpected)
+			.done(throwErrorViaCallback('unexpected error'))
 		wait(delay, complete)
 	})
 
@@ -39,18 +39,20 @@ joe.suite('task', function (suite, test) {
 			.done(complete)
 	})
 
-	// failure: run then run then done
-	test('Task.create(...).run().run().done(...) should fail as a task is not allowed to run twice', function (complete) {
-		Task.create(returnViaCallback(5))
-			.run().run()
-			.on('error', expectErrorViaCallback('run status', 'error was as expected', complete))
-	})
-
 	// failure: done then run then run
 	test('Task.create(...).done(...).run().run() should fail as a task is not allowed to run twice', function (complete) {
 		Task.create(returnViaCallback(5))
-			.on('error', expectErrorViaCallback('run status', 'error was as expected', complete))
+			.on('error', expectErrorViaCallback('run status', 'error was emitted and caught by the listener expected', complete))
 			.run().run()
+	})
+
+	// failure: run then run then done
+	test('Task.create(...).run().run().done(...) should fail as a task is not allowed to run twice', function (complete) {
+		expectErrorViaFunction('run status', function () {
+			Task.create(returnViaCallback(5))
+				.run().run()
+				.on('error', throwErrorViaCallback('unexpected error'))
+		}, 'error was uncaught by the error listener as expected, because the error listener was bound after the error was emitted', complete)
 	})
 })
 
@@ -60,20 +62,55 @@ joe.suite('taskgroup', function (suite, test) {
 	test('TaskGroup.create().addTask(...).done(...) should time out when run was not called', function (complete) {
 		TaskGroup.create()
 			.addTask(returnViaCallback(5))
-			.done(throwUnexpected)
+			.done(throwErrorViaCallback('unexpected error'))
 		wait(delay, complete)
 	})
 
 	// success: done with no tasks then run
-	test('TaskGroup.create().run().done(...) should complete with no results', function (complete) {
+	test('TaskGroup.create().run().done(...) should complete with no result', function (complete) {
 		TaskGroup.create()
 			.run()
 			.done(expectViaCallback(null, []))
 			.done(complete)
 	})
 
+	/*
+	// failure: multiple runs
+	test('Taskgroup should not be able to complete multiple times by default', function (complete) {
+		const tasks = TaskGroup.create()
+			.addTask(returnViaCallback(5))
+			.run()
+			.done(expectViaCallback(null, [[null, 5]]))
+		wait(delay, function () {
+			tasks
+				// @TODO failure detection should go here, however it is harder to do
+				// as this is not a documented failure condition...
+				// as addTask actually calls fire... which detecting destruction is difficult...
+				// perhaps addTask should not call fire... perhaps another call to .run() should be required
+				// which makes sense, will leave until other tests are passing
+				.addTask(returnViaCallback(10))
+				.done(expectViaCallback(null, [[null, 5], [null, 10]]))
+				.done(complete)
+		})
+	})
+	*/
+
+	// success: multiple runs
+	test('Taskgroup should be able to complete multiple times with destroyOnceDone: false', function (complete) {
+		const tasks = TaskGroup.create({destroyOnceDone: false})
+			.addTask(returnViaCallback(5))
+			.run()
+			.done(expectViaCallback(null, [[null, 5]]))
+		wait(delay, function () {
+			tasks
+				.addTask(returnViaCallback(10))
+				.done(expectViaCallback(null, [[null, 5], [null, 10]]))
+				.done(complete)
+		})
+	})
+
 	// success: run then done then add
-	test('TaskGroup.create().run().done(...).addTask(...) should complete with the tasks results', function (complete) {
+	test('TaskGroup.create().run().done(...).addTask(...) should complete with the tasks result', function (complete) {
 		TaskGroup.create()
 			.run()
 			.done(expectViaCallback(null, [[null, 5]]))
@@ -99,20 +136,6 @@ joe.suite('taskgroup', function (suite, test) {
 			.run().run()
 			.addTask(returnViaCallback(10))
 			.done(complete)
-	})
-
-	// success: multiple runs
-	test('Taskgroup should be able to complete multiple times', function (complete) {
-		const tasks = TaskGroup.create()
-			.addTask(returnViaCallback(5))
-			.run()
-			.done(expectViaCallback(null, [[null, 5]]))
-		wait(delay, function () {
-			tasks
-				.addTask(returnViaCallback(10))
-				.done(expectViaCallback(null, [[null, 5], [null, 10]]))
-				.done(complete)
-		})
 	})
 
 	// success: pause after error
