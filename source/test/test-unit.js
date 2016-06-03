@@ -7,7 +7,7 @@
 const joe = require('joe')
 const {equal, deepEqual, errorEqual} = require('assert-helpers')
 const {wait} = require('./test-util')
-const {Task, TaskGroup} = require('../../')
+const {Task, TaskGroup} = require('../')
 
 /* eslint no-extend-native:0, no-cond-assign:0 */
 Array.prototype.remove = function (...a) {

@@ -2,7 +2,7 @@
 const joe = require('joe')
 const {expectErrorViaFunction, throwErrorViaCallback, returnViaCallback, completeViaCallback, expectViaCallback, expectErrorViaCallback} = require('assert-helpers')
 const {wait} = require('./test-util')
-const {Task, TaskGroup} = require('../../')
+const {Task, TaskGroup} = require('../')
 
 // Prepare
 const delay = 100
