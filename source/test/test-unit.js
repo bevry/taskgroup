@@ -9,12 +9,14 @@ const {equal, deepEqual, errorEqual} = require('assert-helpers')
 const {wait} = require('./test-util')
 const {Task, TaskGroup} = require('../')
 
-/* eslint no-extend-native:0, no-cond-assign:0 */
-Array.prototype.remove = function (...a) {
+/* eslint no-extend-native:0, no-cond-assign:0, prefer-rest-params:0 */
+// do not use ...args instead of arguments, will crash node v5 and below
+// https://travis-ci.org/bevry/taskgroup/jobs/134675452
+Array.prototype.remove = function () {
 	// http://stackoverflow.com/a/3955096/130638
-	let what, L = a.length, ax
+	let what, L = arguments.length, ax
 	while ( L && this.length ) {
-		what = a[--L]
+		what = arguments[--L]
 		while ((ax = this.indexOf(what)) !== -1) {
 			this.splice(ax, 1)
 		}
