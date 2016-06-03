@@ -357,7 +357,6 @@ class TaskGroup extends BaseInterface {
 
 		// State defaults
 		extendr.defaults(this.state, {
-			id: `${this.type} ${Math.random()}`,
 			error: null,
 			status: 'created',
 			result: null,

@@ -48,8 +48,9 @@ class BaseInterface extends require('events').EventEmitter {
 
 		// Set state and config
 		if ( this.state == null )  this.state = {}
+		if ( this.state.name == null )  this.state.name = `${this.type} ${Math.random()}`
 		if ( this.config == null )  this.config = {}
-		if ( !this.config.nameSeparator )  this.config.nameSeparator = ' ➞  '
+		if ( this.config.nameSeparator == null )  this.config.nameSeparator = ' ➞  '
 
 		// Generate our listener method that we will beind to different events
 		// to add support for the `done` event and better error/event handling
@@ -132,10 +133,10 @@ class BaseInterface extends require('events').EventEmitter {
 	*/
 	get names () {
 		// Fetch
-		const names = [], parent = this.config.parent
+		const names = [], {name, parent, nameSeparator} = this.config
 		if ( parent )  names.push(...parent.names)
-		if ( this.config.name !== false )  names.push(this.name)
-		names.toString = () => names.join(this.config.nameSeparator)
+		if ( name !== false )  names.push(this.name)
+		names.toString = () => names.join(nameSeparator)
 
 		// Return
 		return names
@@ -149,19 +150,6 @@ class BaseInterface extends require('events').EventEmitter {
 	*/
 	get name () {
 		return this.config.name || this.state.name
-	}
-
-	/**
-	Get extra state information for debugging.
-	@returns {String}
-	@access private
-	*/
-	prepareStateInformation () {
-		return require('util').inspect({
-			error: errorToString(this.state.error),
-			state: this.state,
-			config: this.cofnig
-		})
 	}
 
 	/**

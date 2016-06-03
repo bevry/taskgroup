@@ -217,7 +217,6 @@ class Task extends BaseInterface {
 
 		// State defaults
 		extendr.defaults(this.state, {
-			name: `${this.type} ${Math.random()}`,
 			error: null,
 			status: 'created'
 		})

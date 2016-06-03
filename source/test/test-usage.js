@@ -7,6 +7,18 @@ const {Task, TaskGroup} = require('../../')
 // Prepare
 const delay = 100
 
+// Helpers
+class TaskGroupDebug extends TaskGroup {
+	get TaskGroup () { return TaskGroupDebug }
+	constructor (...args) {
+		super(...args)
+		this.events.forEach((event) => {
+			console.log(`${this.names}: ${event}: listening`)
+			this.on(event, console.log.bind(console.log, `${this.names}: ${event}:`))
+		})
+	}
+}
+
 // Task
 joe.suite('task', function (suite, test) {
 	// failure: done with no run
@@ -111,7 +123,7 @@ joe.suite('taskgroup', function (suite, test) {
 
 	// success: run then done then add
 	test('TaskGroup.create().run().done(...).addTask(...) should complete with the tasks result', function (complete) {
-		TaskGroup.create()
+		TaskGroupDebug.create()
 			.run()
 			.done(expectViaCallback(null, [[null, 5]]))
 			.done(complete)
@@ -201,3 +213,6 @@ joe.suite('taskgroup', function (suite, test) {
 			.done(expectErrorViaCallback('timed out', 'error was as expected', complete))
 	})
 })
+
+// @TODO for each test here, give a real world example of where it is actually used
+// so we know if it is actually real usage, or imagined usage, if imagined usage, then we can break/remove/change
