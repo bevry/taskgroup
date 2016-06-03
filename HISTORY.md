@@ -5,10 +5,16 @@
 - Improved performance of 10,000 tasks from 13 seconds to 2.5 seconds
 - Improved memory footprint of 10,000 tasks from 130MB to 4MB (taken during completion event)
 - Running and completed tasks are no longer stored, if you wish to store them, use the event listeners
+- Task done listener's error argument will now always be set if an error was detected in the task
+	- Previously, if the error was detected via say a throw, it was possible the error wouldn't have been provided as the error argument to the done listener
+- If `domain` is `true` and domains are not available, and error will result
 - Nested events will no longer be emitted, unless `emitNestedEvents` is `true`
+- `done`, `onceDone`, and `whenDone` will no longer fire the listener if already completed, it will wait for the next event
+	- There was no way to guarantee the expected results were returned to these listeners under such circumstances
 - Renamed `includeInResults` to `storeResult`, with improved functionality, defaults to `null`
 	- If `false`, Task and TaskGroup result will now be `null`, and as usual, will not be included in TaskGroup result
 - Removed `nestedConfig`, use either `nestedTaskConfig` or `nestedTaskGroupConfig` or both
+- Removed `sync` as there was only one use case of it, that was better accomplished other ways, it was far too complex
 - Removed `exit` as its functionality was ambiguous and undocumented
 - `getTotalItems()`, `getItemTotals()` now changed to getters `totalItems`, `itemTotals`
 - A lot of previously `public` methods are now marked `private` or `protected`, this isn't really from a stability concern but from an isolation of responsibility concern

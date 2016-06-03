@@ -118,9 +118,8 @@ class Task extends BaseInterface {
 	get status () { return this.state.status }
 
 	/**
-	An {Array} representing the returned result or the passed {Arguments} of our method.
-	The first item in the array should be the {Error} if it exists.
-	If no result has occured yet, it is null.
+	An {Array} representing the returned result or the passed {Arguments} of our method (minus the first error argument).
+	If no result has occured yet, or we don't care, it is null.
 	@type {?Array}
 	@access protected
 	*/
@@ -217,6 +216,7 @@ class Task extends BaseInterface {
 
 		// State defaults
 		extendr.defaults(this.state, {
+			result: null,
 			error: null,
 			status: 'created'
 		})
@@ -224,15 +224,15 @@ class Task extends BaseInterface {
 		// Configuration defaults
 		extendr.defaults(this.config, {
 			// Standard
+			storeResult: null,
 			destroyOnceDone: true,
-			sync: false,
 			parent: null,
 
 			// Unique to Task
 			method: null,
 			errorOnExcessCompletions: true,
 			ambi: true,
-			domain: true,
+			domain: null,
 			args: null
 		})
 
@@ -251,15 +251,14 @@ class Task extends BaseInterface {
 	@param {Object} [config.on] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.on}
 	@param {Object} [config.once] - A map of event names linking to listener functions that we would like bounded via {EventEmitter.once}
 
-	@param {Boolean} [config.storeResult] - Whether or not to store the result, unless `false`, will store
+	@param {Boolean} [config.storeResult] - Whether or not to store the result, if `false` will not store
 	@param {Boolean} [config.destroyOnceDone=true] - Whether or not to automatically destroy the task once it's done to free up resources
-	@param {Boolean} [config.sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`), used by safeps
 	@param {TaskGroup} [config.parent] - A parent {@link TaskGroup} that we may be attached to
 
 	@param {Function} [config.method] - The {Function} to execute for our {Task}
 	@param {Boolean} [config.errorOnExcessCompletions=true] - Whether or not to error if the task completes more than once
 	@param {Boolean} [config.ambi=true] - Whether or not to use bevry/ambi to determine if the method is asynchronous or synchronous and execute it appropriately
-	@param {Boolean} [config.domain=true] - Whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution)
+	@param {Boolean} [config.domain] - If not `false` will wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution), if `true` will fail if domains aren't available
 	@param {Array} [config.args] - Arguments that we would like to forward onto our method when we execute it
 
 	@chainable
@@ -284,8 +283,7 @@ class Task extends BaseInterface {
 					extendr.deep(opts, arg)
 					break
 				default: {
-					const error = new Error(`Unknown argument type of [${type}] given to Task::setConfig()`)
-					throw error
+					throw new Error(`Unknown argument type of [${type}] given to Task::setConfig()`)
 				}
 			}
 		})
@@ -331,54 +329,6 @@ class Task extends BaseInterface {
 	// Workflow
 
 	/**
-	When Done Promise.
-	Fires the listener, either on the next tick if we are already done, or if not, each time the `done` event fires.
-	@param {Function} listener - The {Function} to attach or execute.
-	@chainable
-	@returns {this}
-	@access public
-	*/
-	whenDone (listener) {
-		if ( this.completed ) {
-			// avoid zalgo
-			this.queue(() => {
-				const result = this.state.result || []
-				listener.apply(this, result)
-			})
-		}
-		else {
-			super.whenDone(listener)
-		}
-
-		// Chain
-		return this
-	}
-
-	/**
-	Once Done Promise.
-	Fires the listener once, either on the next tick if we are already done, or if not, each time the `done` event fires.
-	@param {Function} listener - The {Function} to attach or execute.
-	@chainable
-	@returns {this}
-	@access public
-	*/
-	onceDone (listener) {
-		if ( this.completed ) {
-			// avoid zalgo
-			this.queue(() => {
-				const result = this.state.result || []
-				listener.apply(this, result)
-			})
-		}
-		else {
-			super.onceDone(listener)
-		}
-
-		// Chain
-		return this
-	}
-
-	/**
 	What to do when our task method completes.
 	Should only ever execute once, if it executes more than once, then we error.
 	@param {...*} args - The arguments that will be applied to the {@link Task#result} variable. First argument is the {Error} if it exists.
@@ -396,7 +346,9 @@ class Task extends BaseInterface {
 		// Complete for the first (and hopefully only) time
 		if ( !this.exited ) {
 			// Apply the result if we want to and it exists
-			if ( this.config.storeResult !== false && args.length !== 0 ) this.state.result = args
+			if ( this.config.storeResult !== false ) {
+				this.state.result = args.slice(1)
+			}
 		}
 
 		// Finish up
@@ -441,7 +393,8 @@ class Task extends BaseInterface {
 			this.emit(status, error)
 
 			// Notify our listeners we have completed
-			const args = this.state.result || []
+			const args = [error]
+			if ( this.state.result )  args.push(...this.state.result)
 			this.emit('completed', ...args)
 
 			// Prevent the error from persisting
@@ -517,17 +470,24 @@ class Task extends BaseInterface {
 		// Bind method
 		method = method.bind(this)
 
-		// Prepare the task domain if it doesn't already exist
-		if ( useDomains && domain && !taskDomain ) {
-			// Setup the domain
-			this.state.taskDomain = taskDomain = domain.create()
-			taskDomain.on('error', exitMethod)
+		// Handle domains
+		if ( domain ) {
+			// Prepare the task domain if we want to and if it doesn't already exist
+			if ( !taskDomain && this.config.domain !== false ) {
+				this.state.taskDomain = taskDomain = domain.create()
+				taskDomain.on('error', exitMethod)
+			}
+		}
+		else if ( this.config.domain === true ) {
+			const error = new Error(`The task [${this.names}] failed to run as it requested to use domains but domains are not available.`)
+			this.emit('error', error)
+			return this
 		}
 
 		// Domains, as well as process.nextTick, make it so we can't just use exitMethod directly
 		// Instead we cover it up like so, to ensure the domain exits, as well to ensure the arguments are passed
 		const completeMethod = (...args) => {
-			if ( this.config.sync || taskDomain ) {
+			if ( taskDomain ) {
 				this.clearDomain()
 				taskDomain = null
 				exitMethod(...args)
@@ -599,7 +559,7 @@ class Task extends BaseInterface {
 		this.emit('pending')
 
 		// Queue the actual running so we can give time for the listeners to complete before continuing
-		this.queue(() => this.fire())
+		queue(() => this.fire())
 
 		// Chain
 		return this

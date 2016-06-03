@@ -7,18 +7,6 @@ const {Task, TaskGroup} = require('../')
 // Prepare
 const delay = 100
 
-// Helpers
-class TaskGroupDebug extends TaskGroup {
-	get TaskGroup () { return TaskGroupDebug }
-	constructor (...args) {
-		super(...args)
-		this.events.forEach((event) => {
-			console.log(`${this.names}: ${event}: listening`)
-			this.on(event, console.log.bind(console.log, `${this.names}: ${event}:`))
-		})
-	}
-}
-
 // Task
 joe.suite('task', function (suite, test) {
 	// failure: done with no run
@@ -123,7 +111,7 @@ joe.suite('taskgroup', function (suite, test) {
 
 	// success: run then done then add
 	test('TaskGroup.create().run().done(...).addTask(...) should complete with the tasks result', function (complete) {
-		TaskGroupDebug.create()
+		TaskGroup.create()
 			.run()
 			.done(expectViaCallback(null, [[null, 5]]))
 			.done(complete)
@@ -136,6 +124,7 @@ joe.suite('taskgroup', function (suite, test) {
 			.done(expectViaCallback(null, [[null, 5], [null, 10]]))
 			.addTask('task 1 that will return 5', returnViaCallback(5))
 			.run()
+			.done(expectViaCallback(null, [[null, 5], [null, 10]]))
 			.addTask('task 2 that will return 10', returnViaCallback(10))
 			.done(complete)
 	})
@@ -173,6 +162,7 @@ joe.suite('taskgroup', function (suite, test) {
 			.addTask(returnViaCallback(10))
 			.run()
 			.done(expectViaCallback(err, [[null, 5], [err]]))
+		// @TODO a new run should be required here... that clears the previously completed results
 		wait(delay, function () {
 			tasks
 				.addTask(returnViaCallback(15))

@@ -148,7 +148,7 @@ joe.suite('task', function (suite) {
 				checks.push('completion callback')
 				errorEqual(err, null, 'the callback error to be null as we did not error')
 				equal(result, 10, 'the callback result to be as expected')
-				deepEqual(task.result, [err, result], 'the set result to be as expected as the task has completed')
+				deepEqual(task.result, [result], 'the set result to be as expected as the task has completed')
 				equal(task.status, 'passed', 'status to be passed as we are within the completion callback')
 			})
 
@@ -194,7 +194,7 @@ joe.suite('task', function (suite) {
 				++checks
 				errorEqual(err, null, 'the callback error to be null as we did not error')
 				equal(result, 10, 'the callback result to be as expected')
-				deepEqual(task.result, [err, result], 'the set result to be as expected as the task has completed')
+				deepEqual(task.result, [result], 'the set result to be as expected as the task has completed')
 				equal(task.status, 'passed', 'status to be passed as we are within the completion callback')
 			})
 
@@ -208,102 +208,6 @@ joe.suite('task', function (suite) {
 			// Check task hasn't run yet
 			equal(task.status, 'pending', 'status to be pending as we just called run, and execute tasks asynchronously')
 			equal(task.result, null, 'result to be null as we just called run, and execute tasks asynchronously')
-
-			// Check that all our special checks have run
-			wait(delay, function () {
-				++checks
-				equal(checks, 3, 'all our special checks have run')
-				done()
-			})
-		})
-	})
-
-	// Sync Flag
-	suite('sync flag', function (suite, test) {
-		// Async
-		// Test that the task executes correctly asynchronously
-		test('should work with async', function (done) {
-			// Specify how many special checks we are expecting
-			const checks = []
-
-			// Create our asynchronous task
-			const task = Task.create({sync: true}, function (complete) {
-				checks.push('task 1 - before wait')
-				// Wait a while as this is an async test
-				wait(delay, function () {
-					checks.push('task 1 - after wait')
-					equal(task.status, 'running', 'status to be running as we are within the task')
-					equal(task.result, null, 'result to be null as we haven\'t set it yet')
-					// Return no error, and the result to the completion callback completing the task
-					complete(null, 10)
-				})
-			})
-
-			// Check the task completed as expected
-			task.done(function (err, result) {
-				checks.push('completion callback')
-				errorEqual(err, null, 'the callback error to be null as we did not error')
-				equal(result, 10, 'the callback result to be as expected')
-				deepEqual(task.result, [err, result], 'the set result to be as expected as the task has completed')
-				equal(task.status, 'passed', 'status to be passed as we are within the completion callback')
-			})
-
-			// Check task hasn't run yet
-			equal(task.status, 'created', 'status to be created as we haven\'t called run yet')
-			equal(task.result, null, 'result to be null as we haven\'t called run yet')
-
-			// Run the task
-			task.run()
-
-			// Check task has run
-			equal(task.status, 'running', 'status to be running as we just called run, and the sync flag is true')
-			equal(task.result, null, 'result to be null as we just called run, and the task is to execute asynchronously')
-
-			// Check that all our special checks have run
-			wait(delay * 2, function () {
-				deepEqual(checks, [
-					'task 1 - before wait',
-					'task 1 - after wait',
-					'completion callback'
-				], 'all testing checks fired correctly')
-				done()
-			})
-		})
-
-		// Sync
-		// Test that the task
-		test('should work with sync', function (done) {
-			// Specify how many special checks we are expecting
-			let checks = 0
-
-			// Create our synchronous task
-			const task = new Task({sync: true}, function () {
-				++checks
-				equal(task.status, 'running', 'status to be running as we are within the task')
-				equal(task.result, null, 'result to be null as we haven\'t set it yet')
-				// Return our result completing the task
-				return 10
-			})
-
-			// Check the task completed as expected
-			task.done(function (err, result) {
-				++checks
-				errorEqual(err, null, 'the callback error to be null as we did not error')
-				equal(result, 10, 'the callback result to be as expected')
-				deepEqual(task.result, [err, result], 'the set result to be as expected as the task has completed')
-				equal(task.status, 'passed', 'status to be passed as we are within the completion callback')
-			})
-
-			// Check task hasn't run yet
-			equal(task.status, 'created', 'status to be created as we haven\'t called run yet')
-			equal(task.result, null, 'result to be null as we haven\'t called run yet')
-
-			// Run
-			task.run()
-
-			// Check task has run
-			equal(task.status, 'destroyed', 'status to be destroyed as we have already finished due to the sync flag')
-			deepEqual(task.result, null, 'result to be cleared as we have already finished due to the sync flag')
 
 			// Check that all our special checks have run
 			wait(delay, function () {
@@ -334,7 +238,7 @@ joe.suite('task', function (suite) {
 			task.done(function (_err, result) {
 				++checks
 				equal(task.status, 'failed', 'status to be failed as we are within the completion callback')
-				deepEqual(task.result, [err], 'the set result to be as expected as the task has completed')
+				deepEqual(task.result, [], 'the set result to be as expected as the task has completed')
 				equal(_err, err, 'the callback error to be set as we errord')
 				equal(result, null, 'the callback result to be null we errord')
 			})
@@ -497,10 +401,26 @@ joe.suite('task', function (suite) {
 		*/
 
 		// https://github.com/bevry/taskgroup/issues/17
-		test('it should not catch errors within the completion callback: issue 17', function (done) {
+		test('it should not catch errors within the completion callback: issue 17, with domains', function (done) {
 			// Run our test file
 			/* eslint handle-callback-err:0 */
-			require('safeps').exec(`node ${__dirname}/test-issue17.js`, {cwd: __dirname}, function (err, stdout, stderr) {
+			require('safeps').exec(`node ${__dirname}/test-issue17-a.js`, {cwd: __dirname}, function (err, stdout, stderr) {
+				// Check if we got the error we expected
+				if ( stderr.indexOf('Error: goodbye world') !== -1 ) {
+					done()
+				}
+				else {
+					const err = new Error('Issue 17 check did not execute correctly')
+					console.log('stdout:\n', stdout, '\nstderr:\n', stderr, '\n')
+					done(err)
+				}
+			})
+		})
+
+		test('it should not catch errors within the completion callback: issue 17, without domains', function (done) {
+			// Run our test file
+			/* eslint handle-callback-err:0 */
+			require('safeps').exec(`node ${__dirname}/test-issue17-b.js`, {cwd: __dirname}, function (err, stdout, stderr) {
 				// Check if we got the error we expected
 				if ( stderr.indexOf('Error: goodbye world\n    at Task.') !== -1 ) {
 					done()
@@ -534,7 +454,7 @@ joe.suite('task', function (suite) {
 			// Check
 			task.done(function (err, result) {
 				checks.push('completion callback')
-				deepEqual(task.result, [err, result])
+				deepEqual(task.result, [result])
 				errorEqual(err, null)
 				equal(result, 10)
 			})
@@ -570,7 +490,7 @@ joe.suite('task', function (suite) {
 			// Check
 			task.done(function (err, result) {
 				checks.push('completion callback')
-				deepEqual(task.result, [err, result])
+				deepEqual(task.result, [result])
 				errorEqual(err, null)
 				equal(result, 10)
 			})
@@ -777,122 +697,6 @@ joe.suite('taskgroup', function (suite) {
 				status: 'pending',
 				remaining: ['task 1 for [my tasks]', 'task 2 for [my tasks]']
 			}, 'after tasks.run')
-		})
-	})
-
-	// Sync flag
-	suite('sync flag', function (suite, test) {
-		// Serial
-		test('should work when running in serial with sync flag and async tasks', function (done) {
-
-			const tasks = new TaskGroupDebug({sync: true, concurrency: 1}).done(function (err, result) {
-				errorEqual(err, null)
-				equal(tasks.config.concurrency, 1)
-
-				tasks.compare({
-					status: 'passed',
-					done: ['task 1', 'task 2'],
-					result: [[null, 10], [null, 20]],
-					resultArgument: result,
-					errorArgument: err
-				}, 'inside tasks.done')
-
-				done()
-			})
-
-			tasks.addTask('task 1', function (complete) {
-				tasks.compare({
-					status: 'running',
-					remaining: ['task 2'],
-					running: ['task 1']
-				}, 'inside task 1 before wait')
-
-				wait(delay, function () {
-					tasks.compare({
-						status: 'running',
-						remaining: ['task 2'],
-						running: ['task 1']
-					}, 'inside task 1 after wait')
-
-					complete(null, 10)
-				})
-			})
-
-			tasks.addTask('task 2', function () {
-				tasks.compare({
-					status: 'running',
-					running: ['task 2'],
-					done: ['task 1'],
-					result: [[null, 10]]
-				}, 'inside task 2')
-
-				return 20
-			})
-
-			tasks.compare({
-				status: 'created',
-				remaining: ['task 1', 'task 2'],
-				result: null
-			}, 'before tasks.run')
-
-			tasks.run()
-
-			tasks.compare({
-				status: 'running',
-				remaining: ['task 2'],
-				running: ['task 1']
-			}, 'after tasks.run')
-		})
-
-		// Serial
-		test('should work when running in serial with sync flag and sync tasks', function (done) {
-			const tasks = new TaskGroupDebug({sync: true, concurrency: 1}).done(function (err, result) {
-				errorEqual(err, null)
-				equal(tasks.config.concurrency, 1)
-
-				tasks.compare({
-					status: 'passed',
-					done: ['task 1', 'task 2'],
-					result: [[null, 10], [null, 20]],
-					resultArgument: result,
-					errorArgument: err
-				}, 'inside tasks.done')
-			})
-
-			tasks.addTask('task 1', function (complete) {
-				tasks.compare({
-					status: 'running',
-					remaining: ['task 2'],
-					running: ['task 1']
-				}, 'inside task 1')
-				complete(null, 10)
-			})
-
-			tasks.addTask('task 2', function () {
-				tasks.compare({
-					status: 'running',
-					running: ['task 2'],
-					done: ['task 1'],
-					result: [[null, 10]]
-				}, 'inside task 2')
-				return 20
-			})
-
-			tasks.compare({
-				status: 'created',
-				remaining: ['task 1', 'task 2'],
-				result: null
-			}, 'before tasks.run')
-
-			tasks.run()
-
-			tasks.compare({
-				status: 'destroyed',
-				done: ['task 1', 'task 2'],
-				result: null
-			}, 'after tasks.run')
-
-			setTimeout(done, 1000)
 		})
 	})
 
@@ -1384,3 +1188,8 @@ joe.suite('nested', function (suite, test) {
 		tasks.run()
 	*/
 })
+
+// @TODO add tests for nested events, to see if they actually work, and are actually useful
+// otherwise could remove them
+
+// @TODO add tests for storeResult for task, taskgroup, and nested tasks

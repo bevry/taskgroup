@@ -84,12 +84,6 @@
                         #name
                       </a></li>
                       
-                      <li><a
-                        href='#BaseInterface#queue'
-                        class='regular pre-open'>
-                        #queue
-                      </a></li>
-                      
                     </ul>
                   
                   
@@ -357,18 +351,6 @@
                       </a></li>
                       
                       <li><a
-                        href='#TaskGroup#whenDone'
-                        class='regular pre-open'>
-                        #whenDone
-                      </a></li>
-                      
-                      <li><a
-                        href='#TaskGroup#onceDone'
-                        class='regular pre-open'>
-                        #onceDone
-                      </a></li>
-                      
-                      <li><a
                         href='#TaskGroup#fireNextItems'
                         class='regular pre-open'>
                         #fireNextItems
@@ -521,18 +503,6 @@
                       </a></li>
                       
                       <li><a
-                        href='#Task#whenDone'
-                        class='regular pre-open'>
-                        #whenDone
-                      </a></li>
-                      
-                      <li><a
-                        href='#Task#onceDone'
-                        class='regular pre-open'>
-                        #onceDone
-                      </a></li>
-                      
-                      <li><a
                         href='#Task#itemCompletionCallback'
                         class='regular pre-open'>
                         #itemCompletionCallback
@@ -594,7 +564,7 @@
       BaseInterface
     </h2>
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/4858a0574e12125b9a64618b33d34939169a14c7/./source/lib/interface.js#L12-L172'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/2ddc168cb7beb27cc9d751bb2d2c2f06e9430ac7/./source/lib/interface.js#L9-L148'>
       <span>./source/lib/interface.js</span>
       </a>
     
@@ -1065,72 +1035,6 @@ If the name was never configured, then return the name in the format of <code>&#
       </div>
     </div>
   
-    <div class='keyline-bottom' id='BaseInterface#queue'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="pad1y contain">
-            <a class='icon pin-right pad1y dark-link caret-right'></a>
-            <span class='code strong strong truncate'>queue</span>
-            <span class='quiet code space-right2'>(fn)</span>
-        </div>
-      </div>
-      <div class="clearfix hidden toggle-target">
-        <section class='py2 clearfix'>
-
-  
-
-  <p>Executes the passed function either synchronously if <code>config.sync</code> is <code>true</code> or delays it for the next tick.</p>
-
-
-  <div class='pre p1 fill-light'>queue(fn: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function">Function</a>): this</div>
-
-  
-
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>fn</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function">Function</a>)</code> The function to execute
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code>this</code>:
-        
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
 </div>
 
   
@@ -1149,7 +1053,7 @@ If the name was never configured, then return the name in the format of <code>&#
       TaskGroup
     </h2>
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/4858a0574e12125b9a64618b33d34939169a14c7/./source/lib/taskgroup.js#L41-L1116'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/2ddc168cb7beb27cc9d751bb2d2c2f06e9430ac7/./source/lib/taskgroup.js#L41-L1068'>
       <span>./source/lib/taskgroup.js</span>
       </a>
     
@@ -1580,8 +1484,7 @@ as instanceof will not work in those environments.</p>
   
 
   <p>An {Array} that contains the result property for each completed {Task} and {TaskGroup}.
-If the item has its config <code>storeResult</code> to <code>false</code>, we do not store its result.
-If no result has occured yet, it is null.</p>
+If no result has occured yet, or we don&#x27;t care, it is null.</p>
 
 
   <div class='pre p1 fill-light'>result</div>
@@ -2681,9 +2584,9 @@ When using an array, a {String} becomes the :name, a {Function} becomes the :met
                 <tr>
                   <td class='break-word'><span class='code bold'>config.storeResult</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>]</code>
                   </td>
-                  <td class='break-word'><span>Whether or not to store the result, unless 
+                  <td class='break-word'><span>Whether or not to store the result, if 
 <code>false</code>
-, will store
+ will not store
 </span></td>
                 </tr>
               
@@ -2693,19 +2596,6 @@ When using an array, a {String} becomes the :name, a {Function} becomes the :met
                     (default <code>true</code>)
                   </td>
                   <td class='break-word'><span>Whether or not we should automatically destroy the {TaskGroup} once done to free up resources
-</span></td>
-                </tr>
-              
-                <tr>
-                  <td class='break-word'><span class='code bold'>config.sync</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>]</code>
-                  
-                    (default <code>false</code>)
-                  </td>
-                  <td class='break-word'><span>Whether or not we should execute certain calls asynchronously (set to 
-<code>false</code>
-) or synchronously (set to 
-<code>true</code>
-), used by safeps
 </span></td>
                 </tr>
               
@@ -3622,140 +3512,6 @@ If a {TaskGroup} instance is not supplied, a {TaskGroup} instance is created fro
       </div>
     </div>
   
-    <div class='keyline-bottom' id='TaskGroup#whenDone'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="pad1y contain">
-            <a class='icon pin-right pad1y dark-link caret-right'></a>
-            <span class='code strong strong truncate'>whenDone</span>
-            <span class='quiet code space-right2'>(handler)</span>
-        </div>
-      </div>
-      <div class="clearfix hidden toggle-target">
-        <section class='py2 clearfix'>
-
-  
-
-  <p>When Done Promise.
-Fires the listener, either on the next tick if we are already done, or if not, each time the <code>done</code> event fires.</p>
-
-
-  <div class='pre p1 fill-light'>whenDone(handler: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function">Function</a>): this</div>
-
-  
-
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>handler</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function">Function</a>)</code> The {Function} to attach or execute.
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code>this</code>:
-        
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='keyline-bottom' id='TaskGroup#onceDone'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="pad1y contain">
-            <a class='icon pin-right pad1y dark-link caret-right'></a>
-            <span class='code strong strong truncate'>onceDone</span>
-            <span class='quiet code space-right2'>(handler)</span>
-        </div>
-      </div>
-      <div class="clearfix hidden toggle-target">
-        <section class='py2 clearfix'>
-
-  
-
-  <p>Once Done Promise.
-Fires the listener once, either on the next tick if we are already done, or if not, each time the <code>done</code> event fires.</p>
-
-
-  <div class='pre p1 fill-light'>onceDone(handler: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function">Function</a>): this</div>
-
-  
-
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>handler</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function">Function</a>)</code> The {Function} to attach or execute.
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code>this</code>:
-        
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
     <div class='keyline-bottom' id='TaskGroup#fireNextItems'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="pad1y contain">
@@ -4224,7 +3980,7 @@ Fires the listener once, either on the next tick if we are already done, or if n
       Task
     </h2>
     
-      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/4858a0574e12125b9a64618b33d34939169a14c7/./source/lib/task.js#L59-L607'>
+      <a class='fr fill-darken0 round round pad1x quiet h5' href='https://github.com/bevry/taskgroup/blob/2ddc168cb7beb27cc9d751bb2d2c2f06e9430ac7/./source/lib/task.js#L59-L567'>
       <span>./source/lib/task.js</span>
       </a>
     
@@ -4584,9 +4340,8 @@ as instanceof will not work in those environments.</p>
 
   
 
-  <p>An {Array} representing the returned result or the passed {Arguments} of our method.
-The first item in the array should be the {Error} if it exists.
-If no result has occured yet, it is null.</p>
+  <p>An {Array} representing the returned result or the passed {Arguments} of our method (minus the first error argument).
+If no result has occured yet, or we don&#x27;t care, it is null.</p>
 
 
   <div class='pre p1 fill-light'>result</div>
@@ -5008,18 +4763,9 @@ At this point this method is internal, as it&#x27;s functionality may change in 
                 <tr>
                   <td class='break-word'><span class='code bold'>config.storeResult</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>]</code>
                   </td>
-                  <td class='break-word'><span>Whether or not to store the result, unless 
+                  <td class='break-word'><span>Whether or not to store the result, if 
 <code>false</code>
-, will store
-</span></td>
-                </tr>
-              
-                <tr>
-                  <td class='break-word'><span class='code bold'>config.destroyOnceDone</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>]</code>
-                  
-                    (default <code>true</code>)
-                  </td>
-                  <td class='break-word'><span>Whether or not to automatically destroy the task once it&#x27;s done to free up resources
+ will not store
 </span></td>
                 </tr>
               
@@ -5066,10 +4812,12 @@ At this point this method is internal, as it&#x27;s functionality may change in 
               
                 <tr>
                   <td class='break-word'><span class='code bold'>config.domain</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>]</code>
-                  
-                    (default <code>true</code>)
                   </td>
-                  <td class='break-word'><span>Whether or not to wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution)
+                  <td class='break-word'><span>If not 
+<code>false</code>
+ will wrap the task execution in a domain to attempt to catch background errors (aka errors that are occuring in other ticks than the initial execution), if 
+<code>true</code>
+ will fail if domains aren&#x27;t available
 </span></td>
                 </tr>
               
@@ -5081,15 +4829,11 @@ At this point this method is internal, as it&#x27;s functionality may change in 
                 </tr>
               
                 <tr>
-                  <td class='break-word'><span class='code bold'>config.sync</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>]</code>
+                  <td class='break-word'><span class='code bold'>config.destroyOnceDone</span> <code class='quiet'>[<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>]</code>
                   
-                    (default <code>false</code>)
+                    (default <code>true</code>)
                   </td>
-                  <td class='break-word'><span>Whether or not we should execute certain calls asynchronously (set to 
-<code>false</code>
-) or synchronously (set to 
-<code>true</code>
-), used by safeps
+                  <td class='break-word'><span>Whether or not to automatically destroy the task once it&#x27;s done to free up resources
 </span></td>
                 </tr>
               
@@ -5101,140 +4845,6 @@ At this point this method is internal, as it&#x27;s functionality may change in 
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>args</span> <code class='quiet'>(...)</code> 
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code>this</code>:
-        
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='keyline-bottom' id='Task#whenDone'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="pad1y contain">
-            <a class='icon pin-right pad1y dark-link caret-right'></a>
-            <span class='code strong strong truncate'>whenDone</span>
-            <span class='quiet code space-right2'>(listener)</span>
-        </div>
-      </div>
-      <div class="clearfix hidden toggle-target">
-        <section class='py2 clearfix'>
-
-  
-
-  <p>When Done Promise.
-Fires the listener, either on the next tick if we are already done, or if not, each time the <code>done</code> event fires.</p>
-
-
-  <div class='pre p1 fill-light'>whenDone(listener: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function">Function</a>): this</div>
-
-  
-
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>listener</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function">Function</a>)</code> The {Function} to attach or execute.
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code>this</code>:
-        
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='keyline-bottom' id='Task#onceDone'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="pad1y contain">
-            <a class='icon pin-right pad1y dark-link caret-right'></a>
-            <span class='code strong strong truncate'>onceDone</span>
-            <span class='quiet code space-right2'>(listener)</span>
-        </div>
-      </div>
-      <div class="clearfix hidden toggle-target">
-        <section class='py2 clearfix'>
-
-  
-
-  <p>Once Done Promise.
-Fires the listener once, either on the next tick if we are already done, or if not, each time the <code>done</code> event fires.</p>
-
-
-  <div class='pre p1 fill-light'>onceDone(listener: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function">Function</a>): this</div>
-
-  
-
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>listener</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function">Function</a>)</code> The {Function} to attach or execute.
-
           </div>
           
         </div>

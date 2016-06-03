@@ -1,6 +1,3 @@
-// Imports
-const {queue, errorToString} = require('./util')
-
 /**
 Base class containing common functionality for {@link Task} and {@link TaskGroup}.
 
@@ -89,10 +86,8 @@ class BaseInterface extends require('events').EventEmitter {
 	@access public
 	*/
 	whenDone (listener) {
-		// check if we have a listener
-		if ( typeof listener === 'function' ) {
-			this.on('done', listener.bind(this))
-		}
+		// Attach the listener
+		this.on('done', listener.bind(this))
 
 		// Chain
 		return this
@@ -106,10 +101,8 @@ class BaseInterface extends require('events').EventEmitter {
 	@access public
 	*/
 	onceDone (listener) {
-		// Check if we have a listener
-		if ( typeof listener === 'function' ) {
-			this.once('done', listener)
-		}
+		// Attach the listener
+		this.once('done', listener.bind(this))
 
 		// Chain
 		return this
@@ -150,23 +143,6 @@ class BaseInterface extends require('events').EventEmitter {
 	*/
 	get name () {
 		return this.config.name || this.state.name
-	}
-
-	/**
-	Executes the passed function either synchronously if `config.sync` is `true` or delays it for the next tick.
-	@param {Function} fn - The function to execute
-	@chainable
-	@returns {this}
-	@access private
-	*/
-	queue (fn) {
-		// If synchronous, execute immediately
-		if ( this.config.sync ) fn()
-		// Otherwise, execute at the next tick
-		else queue(fn)
-
-		// Chain
-		return this
 	}
 
 }

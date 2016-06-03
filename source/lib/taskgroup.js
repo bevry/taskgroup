@@ -2,7 +2,7 @@
 // Imports
 const {BaseInterface} = require('./interface')
 const {Task} = require('./task')
-const {ensureArray} = require('./util')
+const {queue, ensureArray} = require('./util')
 const extendr = require('extendr')
 const eachr = require('eachr')
 
@@ -113,8 +113,7 @@ class TaskGroup extends BaseInterface {
 
 	/**
 	An {Array} that contains the result property for each completed {Task} and {TaskGroup}.
-	If the item has its config `storeResult` to `false`, we do not store its result.
-	If no result has occured yet, it is null.
+	If no result has occured yet, or we don't care, it is null.
 	@type {?Array}
 	@access protected
 	*/
@@ -357,9 +356,9 @@ class TaskGroup extends BaseInterface {
 
 		// State defaults
 		extendr.defaults(this.state, {
+			result: null,
 			error: null,
 			status: 'created',
-			result: null,
 			itemsRemaining: [],
 			itemsExecutingCount: 0,
 			itemsDoneCount: 0
@@ -368,8 +367,8 @@ class TaskGroup extends BaseInterface {
 		// Configuration defaults
 		extendr.defaults(this.config, {
 			// Standard
+			storeResult: null,
 			destroyOnceDone: true,
-			sync: false,
 			parent: null,
 
 			// Unique to TaskGroup
@@ -389,7 +388,7 @@ class TaskGroup extends BaseInterface {
 		// Give setConfig enough chance to fire
 		// Changing this to setImmediate breaks a lot of things
 		// As tasks inside nested taskgroups will fire in any order
-		this.queue(this.autoRun.bind(this))
+		queue(this.autoRun.bind(this))
 	}
 
 	/**
@@ -445,9 +444,8 @@ class TaskGroup extends BaseInterface {
 	@param {Object} [config.on] - An object of event names linking to listener functions that we would like bounded via {@link EventEmitter#on}
 	@param {Object} [config.once] - An object of event names linking to listener functions that we would like bounded via {@link EventEmitter#once}
 
-	@param {Boolean} [config.storeResult] - Whether or not to store the result, unless `false`, will store
+	@param {Boolean} [config.storeResult] - Whether or not to store the result, if `false` will not store
 	@param {Boolean} [config.destroyOnceDone=true] - Whether or not we should automatically destroy the {TaskGroup} once done to free up resources
-	@param {Boolean} [config.sync=false] - Whether or not we should execute certain calls asynchronously (set to `false`) or synchronously (set to `true`), used by safeps
 	@param {TaskGroup} [config.parent] - A parent {TaskGroup} that we may be attached to
 
 	@param {Function} [config.method] - The {Function} to execute for our {TaskGroup} when using inline execution style
@@ -485,8 +483,7 @@ class TaskGroup extends BaseInterface {
 					extendr.deep(opts, arg)  // @TODO why deep?
 					break
 				default: {
-					const error = new Error(`Unknown argument type of [${type}] given to TaskGroup::setConfig()`)
-					throw error
+					throw new Error(`Unknown argument type of [${type}] given to TaskGroup::setConfig()`)
 				}
 			}
 		})
@@ -620,8 +617,7 @@ class TaskGroup extends BaseInterface {
 
 		// Link our item to ourself
 		const itemConfig = {
-			parent: this,
-			sync: this.config.sync
+			parent: this
 		}
 
 		// Extract
@@ -843,52 +839,6 @@ class TaskGroup extends BaseInterface {
 	// Workflow
 
 	/**
-	When Done Promise.
-	Fires the listener, either on the next tick if we are already done, or if not, each time the `done` event fires.
-	@param {Function} handler - The {Function} to attach or execute.
-	@chainable
-	@returns {this}
-	@access public
-	*/
-	whenDone (handler) {
-		if ( this.completed ) {
-			// avoid zalgo
-			this.queue(() => {
-				handler.call(this, this.state.error, this.state.result)
-			})
-		}
-		else {
-			super.whenDone(handler)
-		}
-
-		// Chain
-		return this
-	}
-
-	/**
-	Once Done Promise.
-	Fires the listener once, either on the next tick if we are already done, or if not, each time the `done` event fires.
-	@param {Function} handler - The {Function} to attach or execute.
-	@chainable
-	@returns {this}
-	@access public
-	*/
-	onceDone (handler) {
-		if ( this.completed ) {
-			// avoid zalgo
-			this.queue(() => {
-				handler.call(this, this.state.error, this.state.result)
-			})
-		}
-		else {
-			super.onceDone(handler)
-		}
-
-		// Chain
-		return this
-	}
-
-	/**
 	Fire the next items.
 	@return {Array|false} Either an {Array} of items that were fired or `false` if no items were fired.
 	@access private
@@ -1000,7 +950,9 @@ class TaskGroup extends BaseInterface {
 		this.emit(status, error)
 
 		// Notity our listners we have completed
-		this.emit('completed', this.state.error, this.state.result)
+		const args = [error]
+		if ( this.state.result )  args.push(this.state.result)
+		this.emit('completed', ...args)
 
 		// Prevent the error from persisting
 		this.state.error = null
@@ -1108,7 +1060,7 @@ class TaskGroup extends BaseInterface {
 		}
 
 		// Queue the actual running so we can give time for the listeners to complete before continuing
-		this.queue(() => this.fire())
+		queue(() => this.fire())
 
 		// Chain
 		return this
