@@ -13,23 +13,23 @@
 - `getTotalItems()`, `getItemTotals()` now changed to getters `totalItems`, `itemTotals`
 - A lot of previously `public` methods are now marked `private` or `protected`, this isn't really from a stability concern but from an isolation of responsibility concern
 
-## v4.3.0 March 15, 2015
+## v4.3.0 2015 March 15
 - Now exports the TaskGroup class, of which `Task` and `TaskGroup` are now children
 - Added `Task` attribute on the TaskGroup class to allow over-riding of what should be the sub-task class
 - Added `TaskGroup` attribute on the TaskGroup class to allow over-riding of what should be the sub-taskgroup class
 - Added the `sync` configuration option, which when set to `true` will allow the execution of a Task or TaskGroup to execute synchronously
 - Updated dependencies
 
-## v4.2.1 February 20, 2015
+## v4.2.1 2015 February 20
 - Output more information about errors when a task completes twice
 
-## v4.2.0 February 2, 2015
+## v4.2.0 2015 February 2
 - Reintroduced `try...catch` for Node v0.8 and browser environments with a workaround to prevent error suppression
 	- Thanks to [kksharma1618](https://github.com/kksharma1618) for [issue #17](https://github.com/bevry/taskgroup/issues/17)
 	- Closes [issue #18](https://github.com/bevry/taskgroup/issues/17)
 - You can now ignore all the warnings from the v4.1.0 changelog as the behaviour is more or less the same as v4.0.5 but with added improvements
 
-## v4.1.0 February 2, 2015
+## v4.1.0 2015 February 2
 - This release fixes the errors in completion callbacks being swallowed/lost
 	- Thanks to [kksharma1618](https://github.com/kksharma1618) for [issue #17](https://github.com/bevry/taskgroup/issues/17)
 - The following changes have been made
@@ -47,24 +47,24 @@
 	- If you are running TaskGroup in a web browser, you will need to catch errors manually or utilise a domain shim (browserify has one by default) - [why?](https://github.com/bevry/taskgroup/issues/18)
 - In other words, this release is the most stable yet, but do run your tests (you should always do this)
 
-## v4.0.5 August 3, 2014
+## v4.0.5 2014 August 3
 - Changed an error output to be of error type
 
-## v4.0.4 August 3, 2014
+## v4.0.4 2014 August 3
 - Added the ability to turn off using domains by setting the new task option `domain` to `false` (defaults to `true`)
 - Added the ability to turn off using [ambi](https://github.com/bevry/ambi) by setting the new task option `ambi` to `false` (defaults to `true`)
 
-## v4.0.3 July 11, 2014
+## v4.0.3 2014 July 11
 - Use `setImmediate` instead of `nextTick` to avoid `(node) warning: Recursive process.nextTick detected. This will break in the next version of node. Please use setImmediate for recursive deferral.` errors
 - Updated dependencies
 
-## v4.0.2 June 18, 2014
+## v4.0.2 2014 June 18
 - Added support for `done`, `whenDone`, `onceDone`, `once`, and `on` configuration options
 
-## v4.0.1 June 16, 2014
+## v4.0.1 2014 June 16
 - Fixed `Recursive process.nextTick detected` error (regression since v4.0.0)
 
-## v4.0.0 June 16, 2014
+## v4.0.0 2014 June 16
 - Significant rewrite with b/c breaks
 	- Completion listeners should now be accomplished via `.done(listener)` (listens once) or `.whenDone(listener)` (listener persists)
 		- These methods are promises in that they will execute the listener if the item is already complete
@@ -89,85 +89,85 @@
 		- new `onError` option that defaults to `'exit'` but can also accept `'ignore'` which will ignore all task errors
 		- new `setNestedConfig(config)` and `setNestedTaskConfig(config)` options to set configuration for all children
 
-## v3.4.0 May 8, 2014
+## v3.4.0 2014 May 8
 - Added `context` option for Task, to perform a late bind on the method
 - Asynchronous task methods can now accept optional arguments thanks to new [ambi](https://github.com/bevry/ambi) version
 - Updated dependencies
 
-## v3.3.9 May 4, 2014
+## v3.3.9 2014 May 4
 - Added [extendonclass](https://github.com/bevry/extendonclass) support
 - Added `Task.create` and `TaskGroup.create` helpers
 - Will no longer fail if an invalid argument is passed as configuration
 - Updated dependencies
 
-## v3.3.8 February 5, 2014
+## v3.3.8 2014 February 5
 - More descriptive error when a task is fired without a method to fire
 
-## v3.3.7 January 30, 2014
+## v3.3.7 2014 January 30
 - Improvements around adding tasks to task groups and passing arguments to Task and TaskGroup constructors
 
-## v3.3.6 November 29, 2013
+## v3.3.6 2013 November 29
 - Properly fixed v3.3.3 issue while maintaining node.js v0.8 and browserify support
 	- Thanks to [pflannery](https://github.com/pflannery) for [pull request #11](https://github.com/bevry/taskgroup/pull/11)
 
-## v3.3.5 November 28, 2013
+## v3.3.5 2013 November 28
 - Re-added Node.js v0.8 support (regression since v3.3.3)
 
-## v3.3.4 November 27, 2013
+## v3.3.4 2013 November 27
 - Fixed the v3.3.3 fix
 
-## v3.3.3 November 27, 2013
+## v3.3.3 2013 November 27
 - Fixed possible "(node) warning: Recursive process.nextTick detected. This will break in the next version of node. Please use setImmediate for recursive deferral." error under certain circumstances
 
-## v3.3.2 November 19, 2013
+## v3.3.2 2013 November 19
 - Don't add or create empty tasks and groups
 
-## v3.3.1 November 6, 2013
+## v3.3.1 2013 November 6
 - Fixed child event bubbling by using duck typing (regression since v3.3.0)
 - Better error handling on uncaught task exceptions
 - Tasks will now get a default name set to ease debugging
 
-## v3.3.0 November 1, 2013
+## v3.3.0 2013 November 1
 - Bindings are now more explicit
 - Improved configuration parsing
 - Configuration is now accessed via `getConfig()`
 - Dropped component.io and bower support, just use ender or browserify
 
-## v3.2.4 October 27, 2013
+## v3.2.4 2013 October 27
 - Re-packaged
 
-## v3.2.3 September 18, 2013
+## v3.2.3 2013 September 18
 - Fixed cyclic dependency problem on windows (since v2.1.3)
 - Added bower support
 
-## v3.2.2 September 18, 2013
+## v3.2.2 2013 September 18
 - Component.io compatibility
 
-## v3.2.1 August 19, 2013
+## v3.2.1 2013 August 19
 - Republish with older version of joe dev dependency to try and stop cyclic errors
 - Better node 0.8 support when catching thrown errors
 
-## v3.2.0 August 19, 2013
+## v3.2.0 2013 August 19
 - Wrapped Task execution in a domain to catch uncaught errors within the task execution, as well as added checks to ensure the completion callback does not fire multiple times
 	- These will be reported via the `error` event that the Task will emit
 		- If the Task is part of a TaskGroup, the TaskGroup will listen for this, kill the TaskGroup and emit an `error` event on the TaskGroup
 - Moved from EventEmitter2 to node's own EventEmitter to ensure domain compatibility
 
-## v3.1.2 April 6, 2013
+## v3.1.2 2013 April 6
 - Added `getTotals()` to `TaskGroup`
 - Added `complete()` to `Task`
 
-## v3.1.1 April 5, 2013
+## v3.1.1 2013 April 5
 - Fixed task run issue under certain circumstances
 - Added `exit(err)` function
 
-## v3.1.0 April 5, 2013
+## v3.1.0 2013 April 5
 - Tasks can now have the arguments that are sent to them customized by the `args` configuration option
 - Group inline functions now support an optional completion callback
 - Group events for items now have their first argument as the item the event was for
 
-## v3.0.0 April 5, 2013
+## v3.0.0 2013 April 5
 - Significant rewrite and b/c break
 
-## v2.0.0 March 27, 2013
+## v2.0.0 2013 March 27
 - Split from [bal-util](https://github.com/balupton/bal-util) / [bal-util history](https://github.com/balupton/bal-util/blob/master/HISTORY.md#files)
