@@ -531,6 +531,14 @@ class TaskGroup extends BaseInterface {
 					this.addItems(value)
 					break
 
+				case 'onError':
+				case 'sync':
+				case 'exit':
+				case 'nestedConfig':
+				case 'includeInResults':
+				case 'timeout':
+					throw new Error(`Deprecated configuration property [${key}] given to TaskGroup::setConfig()`)
+
 				default:
 					this.config[key] = value
 					break
