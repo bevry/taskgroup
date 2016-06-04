@@ -10,17 +10,26 @@
 	- Module is published with [Editions](https://github.com/bevry/editions)
 
 - Changes to be cautious about:
+	- Packaging:
+		- `require('taskgroup')` is no longer the TaskGroup class, you must again do `require('taskgroup').TaskGroup`
+			- It was too difficult to handle this across multiple environments without polluting scopes
 	- Task and TaskGroup:
+		- Once done, the item is now destroyed by default via the `destroyOnceDone` configuration option
+			- This means to add tasks to an already completed TaskGroup, you will need to set `destroyOnceDone` to `false`
+			- This will be a silent problem, unless coupled with a `pauseOnError`, `onError` or `onExit` deprecation error
+		- Running and completed tasks are no longer stored
+			- Completed items are now destroyed by default via TaskGroup's `destroyDoneItems` configuration option
+			- If you wish to store them, use the event listeners and disable `destroyDoneItems`
 		- `destroy()` now operates instantly, including removing all event listeners
 			- So if you did `.done().destroy().done().run()` the first done listener would be discarded
-		- Running and completed tasks are no longer stored
-			- If you wish to store them, use the event listeners
 		- Removed `exit()` method and `exit` configuration option
 			- They were complex, ambiguous, and undocumented
 			- `errorOnExcessCompletions` and `destroyOnceDone` configuration options are now provided
+		- Replaced `onError` and `pauseOnError` configuration options with `abortOnError` for better clarity
+			- Having two or more configuration options for this ability was overly complex
 		- Removed `sync` configuration option
 			- It was complex and only had one use case, which turned out was [better accomplished without it](https://github.com/bevry/safeps/releases/tag/v6.2.0)
-		- Renamed `includeInResults` to `storeResult` with improved functionality
+		- Renamed `includeInResults` configuration option to `storeResult` with improved functionality
 			- If `destroyOnceDone` is `true`, `storeResult` will default to `false`
 		- `done()`, `onceDone()`, and `whenDone()` now only listen for upcoming completions, rather than past
 			- Listening for past completions was too complex and could never guarantee consistent results
@@ -28,8 +37,8 @@
 			- It is actually best and easily accomplished by your own task methods
 		- Removed configuration options will throw deprecation errors to ease migration
 	- TaskGroup:
+		- `results` state property renamed to `results`
 		- `addGroup()` method is now `addTaskGroup()`, alias provided
-		- `onError="ignore"` configuration option is now `abortOnError=true`
 		- Split `nestedConfig` configuration option into `nestedTaskConfig` and `nestedTaskGroupConfig`
 
 - Changes to be aware of:

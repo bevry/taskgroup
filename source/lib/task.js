@@ -323,9 +323,12 @@ class Task extends BaseInterface {
 					this.onceDone(value)
 					break
 
-				case 'sync':
+				case 'onError':
+				case 'pauseOnError':
 				case 'includeInResults':
+				case 'sync':
 				case 'timeout':
+				case 'exit':
 					throw new Error(`Deprecated configuration property [${key}] given to Task::setConfig()`)
 
 				default:

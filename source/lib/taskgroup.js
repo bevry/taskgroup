@@ -542,11 +542,12 @@ class TaskGroup extends BaseInterface {
 					break
 
 				case 'onError':
+				case 'pauseOnError':
+				case 'includeInResults':
 				case 'sync':
+				case 'timeout':
 				case 'exit':
 				case 'nestedConfig':
-				case 'includeInResults':
-				case 'timeout':
 					throw new Error(`Deprecated configuration property [${key}] given to TaskGroup::setConfig()`)
 
 				default:
