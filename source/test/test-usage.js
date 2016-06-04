@@ -136,7 +136,9 @@ joe.suite('taskgroup', function (suite, test) {
 			.addTask(returnViaCallback(5))
 			.run()
 			.done(expectViaCallback(null, [[null, 5]]))
+
 		// @TODO should probably require a new .run() and a clear of results
+
 		wait(delay, function () {
 			tasks
 				.addTask(returnViaCallback(10))
@@ -228,7 +230,7 @@ joe.suite('taskgroup', function (suite, test) {
 			.done(expectViaCallback(err, [[null, 5], [err]]))
 			.done(bump(checks))
 
-		// @TODO a new run should be required here... that clears the previously completed results
+		// @TODO should probably require a new .run() and a clear of results
 
 		wait(delay, function () {
 			tasks

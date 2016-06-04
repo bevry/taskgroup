@@ -1,8 +1,5 @@
 /* eslint consistent-this:0 */
 
-// @TODO
-// - Add tests for nested configuration
-
 // Imports
 const joe = require('joe')
 const {equal, deepEqual, errorEqual} = require('assert-helpers')
@@ -1147,3 +1144,5 @@ joe.suite('nested', function (suite, test) {
 // otherwise could remove them
 
 // @TODO add tests for storeResult for task, taskgroup, and nested tasks
+
+// @TODO add tests for nested configuration

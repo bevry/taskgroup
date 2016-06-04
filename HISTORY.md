@@ -16,6 +16,7 @@
 - Removed `nestedConfig`, use either `nestedTaskConfig` or `nestedTaskGroupConfig` or both
 - Removed `sync` as there was only one use case of it, that was better accomplished other ways, it was far too complex
 - Removed `exit` as its functionality was ambiguous and undocumented
+- `started` event is now `pending` and `running`
 - `destroy` now operates instantly, including removing all event listeners
 - `onError="ignore"` is now `abortOnError="true"`
 - `getTotalItems()`, `getItemTotals()` now changed to getters `totalItems`, `itemTotals`

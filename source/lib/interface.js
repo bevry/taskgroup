@@ -144,6 +144,37 @@ class BaseInterface extends require('events').EventEmitter {
 		return this.config.name || this.state.name || (this.state.name = `${this.type} ${Math.random()}`)
 	}
 
+	// ---------------------------------
+	// Backwards compatability helpers
+
+	getNames (opts) {
+		return opts && opts.separator ? this.names.join(opts.separator) : this.names
+	}
+
+	getConfig () {
+		return this.config
+	}
+
+	getTotalItems () {
+		return this.totalItems
+	}
+
+	getItemTotals () {
+		return this.itemTotals
+	}
+
+	isCompleted () {
+		return this.completed
+	}
+
+	hasStarted () {
+		return this.started
+	}
+
+	addGroup (...args) {
+		return this.addTaskGroup(...args)
+	}
+
 }
 
 // Exports
