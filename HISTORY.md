@@ -1,26 +1,53 @@
 # History
 
 ## v5.0.0 Unreleased
-- Moved from CoffeeScript to ESNext
-- Improved performance of 10,000 tasks from 13 seconds to 2.5 seconds
-- Improved memory footprint of 10,000 tasks from 130MB to 4MB (taken during completion event)
-- Running and completed tasks are no longer stored, if you wish to store them, use the event listeners
-- Task done listener's error argument will now always be set if an error was detected in the task
-	- Previously, if the error was detected via say a throw, it was possible the error wouldn't have been provided as the error argument to the done listener
-- If `domain` is `true` and domains are not available, and error will result
-- Nested events will no longer be emitted, unless `emitNestedEvents` is `true`
-- `done`, `onceDone`, and `whenDone` will no longer fire the listener if already completed, it will wait for the next event
-	- There was no way to guarantee the expected results were returned to these listeners under such circumstances
-- Renamed `includeInResults` to `storeResult`, with improved functionality, defaults to `null`
-	- If `false`, Task and TaskGroup result will now be `null`, and as usual, will not be included in TaskGroup result
-- Removed `nestedConfig`, use either `nestedTaskConfig` or `nestedTaskGroupConfig` or both
-- Removed `sync` as there was only one use case of it, that was better accomplished other ways, it was far too complex
-- Removed `exit` as its functionality was ambiguous and undocumented
-- `started` event is now `pending` and `running`
-- `destroy` now operates instantly, including removing all event listeners
-- `onError="ignore"` is now `abortOnError="true"`
-- `getTotalItems()`, `getItemTotals()` now changed to getters `totalItems`, `itemTotals`
-- A lot of previously `public` methods are now marked `private` or `protected`, this isn't really from a stability concern but from an isolation of responsibility concern
+- Changes to be impressed by:
+	- Dramatic performance improvements
+		- Improved performance of 10,000 tasks from 13 seconds to 1 seconds
+		- Improved memory footprint of 10,000 tasks from 130MB to 4MB (taken during completion event)
+	- Code has moved from CoffeeScript to ESNext
+	- Documentation is now powered by JSDoc
+	- Module is published with [Editions](https://github.com/bevry/editions)
+
+- Changes to be cautious about:
+	- Task and TaskGroup:
+		- `destroy()` now operates instantly, including removing all event listeners
+			- So if you did `.done().destroy().done().run()` the first done listener would be discarded
+		- Running and completed tasks are no longer stored
+			- If you wish to store them, use the event listeners
+		- Removed `exit()` method and `exit` configuration option
+			- They were complex, ambiguous, and undocumented
+			- `errorOnExcessCompletions` and `destroyOnceDone` configuration options are now provided
+		- Removed `sync` configuration option
+			- It was complex and only had one use case, which turned out was [better accomplished without it](https://github.com/bevry/safeps/releases/tag/v6.2.0)
+		- Renamed `includeInResults` to `storeResult` with improved functionality
+			- If `destroyOnceDone` is `true`, `storeResult` will default to `false`
+		- `done()`, `onceDone()`, and `whenDone()` now only listen for upcoming completions, rather than past
+			- Listening for past completions was too complex and could never guarantee consistent results
+		- `timeout` configuration option has been removed
+			- It is actually best and easily accomplished by your own task methods
+	- TaskGroup:
+		- `addGroup()` method is now `addTaskGroup()`, alias provided
+		- `onError="ignore"` configuration option is now `abortOnError=true`
+		- Split `nestedConfig` configuration option into `nestedTaskConfig` and `nestedTaskGroupConfig`
+
+- Changes to be aware of:
+	- Task and TaskGroup:
+		- `started` event has been split into `pending` and `running` events for more accurate semantics
+		- Less used public APIs have now been marked as `private` or `public` depending on their use cases
+		- `getNames` method has been replaced by just `names` getter, which has its own `toString()` method that makes use of the `nameSeparator` configuration option, alias provided
+		- `getConfig()` method now `config` getter, alias provided
+		- `isCompleted() method now `completed` getter, alias provided
+		- `hasStarted()` method now `started` getter, alias provided
+	- TaskGroup:
+		- `getTotalItems()` method now `totalItems` getter, alias provided
+		- `getItemTotals()` method now `itemTotals getter, alias provided
+	- Task:
+		- If `domain` configuration option is `true` and domains are not available, an error will result
+		- More accurate error reporting for `completion` event
+			- It a state error occurred, but a argument error did not, it is possible this would not be reported to our done listener, this has been resolved
+			- done listener's error argument will now always be the stored error
+			- internal `result` storage now is stored without the error/first argument, as that is stored elsewhere
 
 ## v4.3.0 2015 March 15
 - Now exports the TaskGroup class, of which `Task` and `TaskGroup` are now children
