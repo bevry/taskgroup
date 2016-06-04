@@ -1,6 +1,6 @@
 # History
 
-## v5.0.0 Unreleased
+## v5.0.0 2016 June 4
 - Changes to be impressed by:
 	- Dramatic performance improvements
 		- Improved performance of 10,000 tasks from 13 seconds to 1 seconds
@@ -66,7 +66,7 @@
 	- [An unusually large amount of memory usage - issue #19](https://github.com/bevry/taskgroup/issues/19)
 	- [Disabled optimisation issue: "bad value context for arguments value - issue #12](https://github.com/bevry/taskgroup/issues/12)
 
-s
+
 ## v4.3.1 2015 December 10
 - Removed `cyclic.js` as the problem it solved was solved by npm v2 and above
 
