@@ -45,7 +45,6 @@ class BaseInterface extends require('events').EventEmitter {
 
 		// Set state and config
 		if ( this.state == null )  this.state = {}
-		if ( this.state.name == null )  this.state.name = `${this.type} ${Math.random()}`
 		if ( this.config == null )  this.config = {}
 		if ( this.config.nameSeparator == null )  this.config.nameSeparator = ' ➞  '
 
@@ -142,7 +141,7 @@ class BaseInterface extends require('events').EventEmitter {
 	@access public
 	*/
 	get name () {
-		return this.config.name || this.state.name
+		return this.config.name || this.state.name || (this.state.name = `${this.type} ${Math.random()}`)
 	}
 
 }
