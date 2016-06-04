@@ -26,6 +26,7 @@
 			- Listening for past completions was too complex and could never guarantee consistent results
 		- `timeout` configuration option has been removed
 			- It is actually best and easily accomplished by your own task methods
+		- Removed configuration options will throw deprecation errors to ease migration
 	- TaskGroup:
 		- `addGroup()` method is now `addTaskGroup()`, alias provided
 		- `onError="ignore"` configuration option is now `abortOnError=true`
@@ -48,6 +49,14 @@
 			- It a state error occurred, but a argument error did not, it is possible this would not be reported to our done listener, this has been resolved
 			- done listener's error argument will now always be the stored error
 			- internal `result` storage now is stored without the error/first argument, as that is stored elsewhere
+
+- People to thank:
+	- [Peter Flannery](https://github.com/pflannery) for kicking off the initial performance research that made most of this possible
+
+- Issues closed:
+	- [An unusually large amount of memory usage - issue #19](https://github.com/bevry/taskgroup/issues/19)
+	- [Disabled optimisation issue: "bad value context for arguments value - issue #12](https://github.com/bevry/taskgroup/issues/12)
+
 
 ## v4.3.0 2015 March 15
 - Now exports the TaskGroup class, of which `Task` and `TaskGroup` are now children
