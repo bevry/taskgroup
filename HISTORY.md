@@ -70,7 +70,7 @@
 ## v4.3.1 2015 December 10
 - Removed `cyclic.js` as the problem it solved was solved by npm v2 and above
 
-## v4.3.0 March 15, 2015
+## v4.3.0 2015 March 15
 - Now exports the TaskGroup class, of which `Task` and `TaskGroup` are now children
 - Added `Task` attribute on the TaskGroup class to allow over-riding of what should be the sub-task class
 - Added `TaskGroup` attribute on the TaskGroup class to allow over-riding of what should be the sub-taskgroup class
