@@ -1,4 +1,4 @@
-const TaskGroup = require('../esnext/lib/index.js')
+const TaskGroup = require('../es2015/index.js').TaskGroup
 const $status = document.getElementById('status')
 const $performance = document.getElementById('performance')
 $performance.onclick = window.performanceTest = function () {

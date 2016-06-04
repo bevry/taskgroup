@@ -94,14 +94,12 @@
   ],
   "main": "index.js",
   "browser": "es2015/index.js",
-  "jspm": {
-    "main": "source/index.js"
-  },
   "scripts": {
     "setup": "npm install",
     "clean": "rm -Rf ./docs ./es2015",
     "compile": "npm run compile:es2015",
     "compile:es2015": "babel ./source --out-dir ./es2015 --presets es2015",
+    "compile:web": "browserify ./web/index.js -t babelify --outfile ./web/out.js",
     "meta": "npm run meta:docs && npm run meta:projectz",
     "meta:docs": "documentation build -f html -o ./docs -g -p --shallow ./source/lib/*.js",
     "meta:projectz": "projectz compile",
@@ -112,8 +110,7 @@
     "release:push": "git push origin master && git push origin --tags",
     "pretest": "npm run test:eslint",
     "test:eslint": "eslint ./source",
-    "test": "node --harmony -e \"require('editions').requirePackage(process.cwd(), require, 'test.js')\"",
-    "browserify": "./node_modules/.bin/browserify ./web/index.js -t babelify --outfile ./web/out.js"
+    "test": "node --harmony -e \"require('editions').requirePackage(process.cwd(), require, 'test.js')\""
   },
   "dependencies": {
     "ambi": "^2.5.0",
