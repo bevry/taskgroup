@@ -21,7 +21,7 @@
 			- Completed items are now destroyed by default via TaskGroup's `destroyDoneItems` configuration option
 			- If you wish to store them, use the event listeners and disable `destroyDoneItems`
 		- `destroy()` now operates instantly, including removing all event listeners
-			- So if you did `.done().destroy().done().run()` the first done listener would be discarded
+			- So if you did `.done().destroy().done()` the first done listener would be discarded
 		- Removed `exit()` method and `exit` configuration option
 			- They were complex, ambiguous, and undocumented
 			- `errorOnExcessCompletions` and `destroyOnceDone` configuration options are now provided
@@ -37,7 +37,7 @@
 			- It is actually best and easily accomplished by your own task methods
 		- Removed configuration options will throw deprecation errors to ease migration
 	- TaskGroup:
-		- `results` state property renamed to `results`
+		- `results` state property renamed to `result`
 		- `addGroup()` method is now `addTaskGroup()`, alias provided
 		- Split `nestedConfig` configuration option into `nestedTaskConfig` and `nestedTaskGroupConfig`
 
