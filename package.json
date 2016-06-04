@@ -40,7 +40,7 @@
     "batch",
     "concurrency"
   ],
-  "author": "2013+ Bevry Pty Ltd <us@bevry.me> (http://bevry.me), 2011-2012 Benjamin Lupton <b@lupton.cc> (https://balupton.com)",
+  "author": "2013+ Bevry Pty Ltd <us@bevry.me> (https://bevry.me), 2011-2012 Benjamin Lupton <b@lupton.cc> (https://balupton.com)",
   "maintainers": [
     "Benjamin Lupton <b@lupton.cc> (https://balupton.com)"
   ],
@@ -48,7 +48,6 @@
     "Benjamin Lupton <b@lupton.cc> (https://balupton.com)",
     "crito <crito@cryptodrunks.net> (https://github.com/crito)",
     "Peter Flannery (https://github.com/pflannery)",
-    "Sean Fridman <fridman@mail.sfsu.edu> (www.seanfridman.com)",
     "Sean Fridman <mail@seanfridman.com> (http://seanfridman.com)"
   ],
   "bugs": {
