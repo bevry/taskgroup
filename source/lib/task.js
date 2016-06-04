@@ -503,7 +503,6 @@ class Task extends BaseInterface {
 			else {
 				// Use the next tick workaround to escape the try...catch scope
 				// Which would otherwise catch errors inside our code when it shouldn't therefore suppressing errors
-				// @TODO add test for this, originally used process.nextTick, changed to queue, hopefully it still does the same
 				queue(function () {
 					exitMethod(...args)
 				})
