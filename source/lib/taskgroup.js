@@ -93,6 +93,16 @@ class TaskGroup extends BaseInterface {
 		return ['error', 'pending', 'running', 'passed', 'failed', 'completed', 'done', 'destroyed']
 	}
 
+	/**
+	Fetches the interpreted value of storeResult
+	@type {boolean}
+	@access private
+	*/
+	get storeResult () {
+		const {storeResult, destroyOnceDone} = this.config
+		return storeResult == null ? destroyOnceDone : (storeResult !== false)
+	}
+
 
 	// -----------------------------------
 	// State Accessors
@@ -444,7 +454,7 @@ class TaskGroup extends BaseInterface {
 	@param {Object} [config.on] - An object of event names linking to listener functions that we would like bounded via {@link EventEmitter#on}
 	@param {Object} [config.once] - An object of event names linking to listener functions that we would like bounded via {@link EventEmitter#once}
 
-	@param {Boolean} [config.storeResult] - Whether or not to store the result, if `false` will not store
+	@param {Boolean} [config.storeResult] - Whether or not to store the result, if `false` will not store, defaults to `false` if `destroyOnceDone` is `true`
 	@param {Boolean} [config.destroyOnceDone=true] - Whether or not we should automatically destroy the {TaskGroup} once done to free up resources
 	@param {TaskGroup} [config.parent] - A parent {TaskGroup} that we may be attached to
 
@@ -925,7 +935,7 @@ class TaskGroup extends BaseInterface {
 		}
 
 		// Add the result if desired
-		if ( this.config.storeResult !== false && item.config.storeResult !== false ) {
+		if ( this.storeResult && item.storeResult ) {
 			result.push(args)
 		}
 
@@ -1059,7 +1069,7 @@ class TaskGroup extends BaseInterface {
 		this.emit('pending')
 
 		// Prepare result, if it doesn't exist
-		if ( this.config.storeResult !== false && this.state.result == null ) {
+		if ( this.storeResult && this.state.result == null ) {
 			this.state.result = []
 		}
 

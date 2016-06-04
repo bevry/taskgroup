@@ -99,6 +99,15 @@ class Task extends BaseInterface {
 		return ['events', 'error', 'pending', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed']
 	}
 
+	/**
+	Fetches the interpreted value of storeResult
+	@type {boolean}
+	@access private
+	*/
+	get storeResult () {
+		return this.config.storeResult !== false
+	}
+
 
 	// -----------------------------------
 	// State Accessors
@@ -351,7 +360,7 @@ class Task extends BaseInterface {
 		// Complete for the first (and hopefully only) time
 		if ( !this.exited ) {
 			// Apply the result if we want to and it exists
-			if ( this.config.storeResult !== false ) {
+			if ( this.storeResult ) {
 				this.state.result = args.slice(1)
 			}
 		}

@@ -132,10 +132,11 @@ joe.suite('taskgroup', function (suite, test) {
 	// success: multiple runs
 	test('Taskgroup should be able to complete multiple times with destroyOnceDone: false', function (complete) {
 		const checks = {}
-		const tasks = TaskGroup.create({destroyOnceDone: false})
+		const tasks = TaskGroup.create({destroyOnceDone: false, storeResult: true})
 			.addTask(returnViaCallback(5))
 			.run()
 			.done(expectViaCallback(null, [[null, 5]]))
+		// @TODO should probably require a new .run() and a clear of results
 		wait(delay, function () {
 			tasks
 				.addTask(returnViaCallback(10))
@@ -219,7 +220,7 @@ joe.suite('taskgroup', function (suite, test) {
 	test('Taskgroup should be able to resume after an error', function (complete) {
 		const checks = {}
 		const err = new Error('fail after 5')
-		const tasks = TaskGroup.create({destroyOnceDone: false})
+		const tasks = TaskGroup.create({destroyOnceDone: false, storeResult: true})
 			.addTask(returnViaCallback(5))
 			.addTask(returnViaCallback(err))
 			.addTask(returnViaCallback(10))
