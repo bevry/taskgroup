@@ -51,7 +51,7 @@
 			- internal `result` storage now is stored without the error/first argument, as that is stored elsewhere
 
 - People to thank:
-	- [Peter Flannery](https://github.com/pflannery) for kicking off the initial performance research that made most of this possible
+	- [Peter Flannery](https://github.com/pflannery) for kickstarting the performance research and making it a priority
 
 - Issues closed:
 	- [An unusually large amount of memory usage - issue #19](https://github.com/bevry/taskgroup/issues/19)
