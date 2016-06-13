@@ -1,7 +1,7 @@
 {
   "title": "TaskGroup",
   "name": "taskgroup",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.",
   "homepage": "https://github.com/bevry/taskgroup",
   "license": "MIT",
@@ -48,7 +48,7 @@
     "Benjamin Lupton <b@lupton.cc> (https://balupton.com)",
     "crito <crito@cryptodrunks.net> (https://github.com/crito)",
     "Peter Flannery (https://github.com/pflannery)",
-    "Sean Fridman <mail@seanfridman.com> (http://seanfridman.com)"
+    "Sean Fridman <mail@seanfridman.com> (https://github.com/sfrdmn)"
   ],
   "bugs": {
     "url": "https://github.com/bevry/taskgroup/issues"
@@ -120,16 +120,16 @@
   },
   "devDependencies": {
     "assert-helpers": "^4.4.0",
-    "babel-cli": "^6.9.0",
+    "babel-cli": "^6.10.1",
     "babel-preset-es2015": "^6.9.0",
     "documentation": "^4.0.0-beta5",
-    "eslint": "^2.11.1",
+    "eslint": "^2.12.0",
     "eslint-plugin-babel": "^3.2.0",
-    "joe": "^1.6.0",
+    "joe": "^1.8.0",
     "joe-reporter-console": "^1.2.1",
-    "projectz": "^1.1.5",
+    "projectz": "^1.1.6",
     "browserify": "^13.0.1",
     "babelify": "^7.3.0",
-    "safeps": "^6.2.0"
+    "safeps": "^6.3.0"
   }
 }

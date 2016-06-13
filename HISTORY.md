@@ -1,5 +1,8 @@
 # History
 
+## v5.0.1 2016 June 13
+- Added `clear` to `clearRemaining` alias for backwards compatibility between v4 and v5
+
 ## v5.0.0 2016 June 4
 - Changes to be impressed by:
 	- Dramatic performance improvements

@@ -175,6 +175,10 @@ class BaseInterface extends require('events').EventEmitter {
 		return this.addTaskGroup(...args)
 	}
 
+	clear (...args) {
+		return this.clearRemaining(...args)
+	}
+
 }
 
 // Exports

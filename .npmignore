@@ -1,4 +1,4 @@
-# 2016 June 4
+# 2016 June 6
 # https://github.com/bevry/base
 
 # Temp Files
@@ -26,6 +26,7 @@ HISTORY.md
 
 # Development Files
 web/
+**/example*
 **/test*
 .editorconfig
 .eslintrc*

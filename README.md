@@ -42,7 +42,7 @@ Group together synchronous and asynchronous tasks and execute them with support 
 <a href="http://browserify.org" title="Browserify lets you require('modules') in the browser by bundling up all of your dependencies"><h3>Browserify</h3></a><ul>
 <li>Install: <code>npm install --save taskgroup</code></li>
 <li>Module: <code>require('taskgroup')</code></li>
-<li>CDN URL: <code>//wzrd.in/bundle/taskgroup@5.0.0</code></li></ul>
+<li>CDN URL: <code>//wzrd.in/bundle/taskgroup@5.0.1</code></li></ul>
 
 <a href="http://enderjs.com" title="Ender is a full featured package manager for your browser"><h3>Ender</h3></a><ul>
 <li>Install: <code>ender add taskgroup</code></li>
@@ -115,7 +115,7 @@ These amazing people have contributed code to this project:
 <ul><li><a href="https://balupton.com">Benjamin Lupton</a> — <a href="https://github.com/bevry/taskgroup/commits?author=balupton" title="View the GitHub contributions of Benjamin Lupton on repository bevry/taskgroup">view contributions</a></li>
 <li><a href="https://github.com/crito">crito</a> — <a href="https://github.com/bevry/taskgroup/commits?author=crito" title="View the GitHub contributions of crito on repository bevry/taskgroup">view contributions</a></li>
 <li><a href="https://github.com/pflannery">Peter Flannery</a> — <a href="https://github.com/bevry/taskgroup/commits?author=pflannery" title="View the GitHub contributions of Peter Flannery on repository bevry/taskgroup">view contributions</a></li>
-<li><a href="http://seanfridman.com">Sean Fridman</a> — <a href="https://github.com/bevry/taskgroup/commits?author=sfrdmn" title="View the GitHub contributions of Sean Fridman on repository bevry/taskgroup">view contributions</a></li></ul>
+<li><a href="https://github.com/sfrdmn">Sean Fridman</a> — <a href="https://github.com/bevry/taskgroup/commits?author=sfrdmn" title="View the GitHub contributions of Sean Fridman on repository bevry/taskgroup">view contributions</a></li></ul>
 
 <a href="https://github.com/bevry/taskgroup/blob/master/CONTRIBUTING.md#files">Discover how you can contribute by heading on over to the <code>CONTRIBUTING.md</code> file.</a>
 
