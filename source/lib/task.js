@@ -465,7 +465,7 @@ class Task extends BaseInterface {
 	*/
 	fire () {
 		// Prepare
-		const args = (this.config.args || []).slice()
+		const taskArgs = (this.config.args || []).slice()
 		let taskDomain = this.state.taskDomain
 		const useDomains = this.config.domain !== false
 		const exitMethod = this.itemCompletionCallback.bind(this)
@@ -516,17 +516,17 @@ class Task extends BaseInterface {
 		const fireMethod = () => {
 			// Execute with ambi if appropriate
 			if ( this.config.ambi !== false ) {
-				ambi(method, ...args)
+				ambi(method, ...taskArgs)
 			}
 
 			// Otherwise execute directly if appropriate
 			else {
-				method(...args)
+				method(...taskArgs)
 			}
 		}
 
 		// Add the competion callback to the arguments our method will receive
-		args.push(completeMethod)
+		taskArgs.push(completeMethod)
 
 		// Notify that we are now running
 		this.state.status = 'running'
