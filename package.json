@@ -13,16 +13,19 @@
       "daviddm",
       "daviddmdev",
       "---",
-      "slackin",
       "patreon",
+      "opencollective",
       "gratipay",
       "flattr",
       "paypal",
       "bitcoin",
-      "wishlist"
+      "wishlist",
+      "---",
+      "slackin"
     ],
     "config": {
       "patreonUsername": "bevry",
+      "opencollectiveUsername": "bevry",
       "gratipayUsername": "bevry",
       "flattrUsername": "balupton",
       "paypalURL": "https://bevry.me/paypal",
@@ -40,15 +43,15 @@
     "batch",
     "concurrency"
   ],
-  "author": "2013+ Bevry Pty Ltd <us@bevry.me> (https://bevry.me), 2011-2012 Benjamin Lupton <b@lupton.cc> (https://balupton.com)",
+  "author": "2013+ Bevry Pty Ltd <us@bevry.me> (http://bevry.me), 2011-2012 Benjamin Lupton <b@lupton.cc> (http://balupton.com)",
   "maintainers": [
-    "Benjamin Lupton <b@lupton.cc> (https://balupton.com)"
+    "Benjamin Lupton <b@lupton.cc> (http://balupton.com)"
   ],
   "contributors": [
-    "Benjamin Lupton <b@lupton.cc> (https://balupton.com)",
+    "Benjamin Lupton <b@lupton.cc> (http://balupton.com)",
     "crito <crito@cryptodrunks.net> (https://github.com/crito)",
     "Peter Flannery (https://github.com/pflannery)",
-    "Sean Fridman <mail@seanfridman.com> (https://github.com/sfrdmn)"
+    "Sean Fridman <mail@seanfridman.com> (http://seanfridman.com)"
   ],
   "bugs": {
     "url": "https://github.com/bevry/taskgroup/issues"
@@ -63,7 +66,7 @@
   "editions": [
     {
       "description": "Source + ESNext + Require",
-      "entry": "source/index.js",
+      "entry": "index.js",
       "directory": "source",
       "syntaxes": [
         "javascript",
@@ -83,7 +86,7 @@
     },
     {
       "description": "Babel Compiled + ES2015 + Require",
-      "entry": "es2015/index.js",
+      "entry": "index.js",
       "directory": "es2015",
       "syntaxes": [
         "javascript",
@@ -95,40 +98,41 @@
   "main": "index.js",
   "browser": "es2015/index.js",
   "scripts": {
-    "setup": "npm install",
-    "clean": "rm -Rf ./docs ./es2015",
-    "compile": "npm run compile:es2015",
-    "compile:es2015": "babel ./source --out-dir ./es2015 --presets es2015",
-    "compile:web": "browserify ./web/index.js -t babelify --outfile ./web/out.js",
-    "meta": "npm run meta:docs && npm run meta:projectz",
-    "meta:docs": "documentation build -f html -o ./docs -g -p --shallow ./source/lib/*.js",
-    "meta:projectz": "projectz compile",
-    "prepare": "npm run compile && npm run test && npm run meta",
-    "release": "npm run prepare && npm run release:publish && npm run release:tag && npm run release:push",
-    "release:publish": "npm publish",
-    "release:tag": "git tag v$npm_package_version -a",
-    "release:push": "git push origin master && git push origin --tags",
-    "pretest": "npm run test:eslint",
-    "test:eslint": "eslint ./source",
-    "test": "node --harmony -e \"require('editions').requirePackage(process.cwd(), require, 'test.js')\""
+    "our:setup": "npm install",
+    "our:clean": "rm -Rf ./docs ./es2015 ./out",
+    "our:compile": "npm run our:compile:es2015",
+    "our:compile:es2015": "babel ./source --out-dir ./es2015 --presets es2015",
+    "our:meta": "npm run our:meta:docs && npm run our:meta:projectz",
+    "our:meta:docs": "documentation build -f html -o ./docs -g --shallow ./source/**.js",
+    "our:meta:projectz": "projectz compile",
+    "our:verify": "npm run our:verify:eslint",
+    "our:verify:eslint": "eslint --fix ./source",
+    "our:test": "npm run our:verify && npm test",
+    "our:release": "npm run our:release:prepare && npm run our:release:check && npm run our:release:tag && npm run our:release:push",
+    "our:release:prepare": "npm run our:clean && npm run our:compile && npm run our:test && npm run our:meta",
+    "our:release:check": "npm run our:release:check:changelog && npm run our:release:check:dirty",
+    "our:release:check:changelog": "cat ./HISTORY.md | grep v$npm_package_version || (echo add a changelog entry for v$npm_package_version && exit -1)",
+    "our:release:check:dirty": "git diff --exit-code",
+    "our:release:tag": "export MESSAGE=$(cat ./HISTORY.md | sed -n \"/## v$npm_package_version/,/##/p\" | sed 's/## //' | awk 'NR>1{print buf}{buf = $0}') && test \"$MESSAGE\" || (echo 'proper changelog entry not found' && exit -1) && git tag v$npm_package_version -am \"$MESSAGE\"",
+    "our:release:push": "git push origin master && git push origin --tags",
+    "test": "node --harmony ./test.js --joe-reporter=console"
   },
   "dependencies": {
     "ambi": "^2.5.0",
     "eachr": "^3.2.0",
-    "editions": "^1.1.1",
-    "extendr": "^3.2.0"
+    "editions": "^1.3.3",
+    "extendr": "^3.2.2"
   },
   "devDependencies": {
-    "assert-helpers": "^4.4.0",
-    "babel-cli": "^6.10.1",
-    "babel-preset-es2015": "^6.9.0",
-    "documentation": "^4.0.0-beta5",
-    "eslint": "^2.12.0",
-    "eslint-plugin-babel": "^3.2.0",
-    "joe": "^1.8.0",
-    "joe-reporter-console": "^1.2.1",
-    "projectz": "^1.1.6",
-    "browserify": "^13.0.1",
+    "assert-helpers": "^4.5.0",
+    "babel-cli": "^6.24.0",
+    "babel-preset-es2015": "^6.24.0",
+    "documentation": "^4.0.0-beta.18",
+    "eslint": "^3.18.0",
+    "joe": "^2.0.2",
+    "joe-reporter-console": "^2.0.1",
+    "projectz": "^1.3.2",
+    "browserify": "^14.1.0",
     "babelify": "^7.3.0",
     "safeps": "^6.3.0"
   }
