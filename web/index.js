@@ -1,3 +1,6 @@
+/* eslinte-env browser */
+'use strict'
+
 const TaskGroup = require('../es2015/index.js').TaskGroup
 const $status = document.getElementById('status')
 const $performance = document.getElementById('performance')

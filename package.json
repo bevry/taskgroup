@@ -100,8 +100,9 @@
   "scripts": {
     "our:setup": "npm install",
     "our:clean": "rm -Rf ./docs ./es2015 ./out",
-    "our:compile": "npm run our:compile:es2015",
+    "our:compile": "npm run our:compile:es2015 && npm run our:compile:web",
     "our:compile:es2015": "babel ./source --out-dir ./es2015 --presets es2015",
+    "our:compile:web": "browserify ./web/index.js -t babelify --outfile ./web/out.js",
     "our:meta": "npm run our:meta:docs && npm run our:meta:projectz",
     "our:meta:docs": "documentation build -f html -o ./docs -g --shallow ./source/**.js",
     "our:meta:projectz": "projectz compile",
