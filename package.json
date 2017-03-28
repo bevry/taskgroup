@@ -104,7 +104,7 @@
     "our:compile:es2015": "babel ./source --out-dir ./es2015 --presets es2015",
     "our:compile:web": "browserify ./web/index.js -t babelify --outfile ./web/out.js",
     "our:meta": "npm run our:meta:docs && npm run our:meta:projectz",
-    "our:meta:docs": "documentation build -f html -o ./docs -g --shallow ./source/**.js",
+    "our:meta:docs": "documentation build -f html -o ./docs -g --shallow ./source/lib/**.js",
     "our:meta:projectz": "projectz compile",
     "our:verify": "npm run our:verify:eslint",
     "our:verify:eslint": "eslint --fix ./source",
