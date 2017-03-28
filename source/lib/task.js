@@ -1,4 +1,6 @@
 /* eslint no-extra-parens:0 func-style:0 */
+'use strict'
+
 // Imports
 const {BaseInterface} = require('./interface')
 const {queue, domain} = require('./util')
@@ -467,7 +469,6 @@ class Task extends BaseInterface {
 		// Prepare
 		const taskArgs = (this.config.args || []).slice()
 		let taskDomain = this.state.taskDomain
-		const useDomains = this.config.domain !== false
 		const exitMethod = this.itemCompletionCallback.bind(this)
 		let method = this.config.method
 

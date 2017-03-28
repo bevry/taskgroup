@@ -1,6 +1,8 @@
+'use strict'
+
 // Import
 const joe = require('joe')
-const {equal, errorEqual, expectErrorViaFunction, throwErrorViaCallback, returnViaCallback, completeViaCallback, expectViaCallback, expectErrorViaCallback} = require('assert-helpers')
+const {equal, errorEqual, expectErrorViaFunction, throwErrorViaCallback, returnViaCallback, expectViaCallback, expectErrorViaCallback} = require('assert-helpers')
 const {wait} = require('./test-util')
 const {Task, TaskGroup} = require('../')
 

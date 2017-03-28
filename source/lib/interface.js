@@ -1,3 +1,5 @@
+'use strict'
+
 /**
 Base class containing common functionality for {@link Task} and {@link TaskGroup}.
 

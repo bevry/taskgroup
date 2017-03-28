@@ -1,4 +1,5 @@
 /* eslint consistent-this:0 */
+'use strict'
 
 // Imports
 const joe = require('joe')
@@ -315,6 +316,7 @@ joe.suite('task', function (suite) {
 			const err = new Error(errMessage)
 
 			// Create our asynchronous task
+			/* eslint no-unused-vars:0 */
 			const task = new Task(function (done) {
 				wait(delay, function () {
 					++checks

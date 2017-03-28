@@ -1,4 +1,6 @@
 /* eslint no-extra-parens:0 */
+'use strict'
+
 // Imports
 const {BaseInterface} = require('./interface')
 const {Task} = require('./task')
@@ -61,7 +63,7 @@ class TaskGroup extends BaseInterface {
 	@access public
 	*/
 	static isTaskGroup (group) {
-		return group && group.type === 'taskgroup' || group instanceof this
+		return (group && group.type === 'taskgroup') || group instanceof this
 	}
 
 	/**
@@ -869,6 +871,7 @@ class TaskGroup extends BaseInterface {
 		const items = []
 
 		// Fire the next items
+		/* eslint no-constant-condition:0 */
 		while ( true ) {
 			const item = this.fireNextItem()
 			if ( item ) {

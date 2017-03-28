@@ -1,4 +1,6 @@
 /* eslint no-extra-parens:0 */
+'use strict'
+
 // Domains are crippled in the browser and on node 0.8, so don't use domains in those environments
 const domain = (process.browser || process.versions.node.substr(0, 3) === '0.8') ? null : require('domain')
 

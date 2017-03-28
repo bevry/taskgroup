@@ -1,3 +1,5 @@
+'use strict'
+
 const {TaskGroup} = require('../../')
 
 const testname = 'taskgroup-profile-test'

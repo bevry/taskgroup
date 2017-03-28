@@ -1,3 +1,5 @@
+'use strict'
+
 const fsUtil = require('fs')
 const pathUtil = require('path')
 const profiler = require('v8-profiler')
