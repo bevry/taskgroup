@@ -147,6 +147,27 @@ class BaseInterface extends require('events').EventEmitter {
 	}
 
 	// ---------------------------------
+	// Promise helpers
+
+	then (resolve) {
+		return new Promise((resolve, reject) => {
+			this.done((err, ...args) => {
+				if (err) return reject(err)
+				resolve(args.length === 1 ? args[0] : args)
+			})
+		}).then(resolve)
+	}
+
+	catch (reject) {
+		return new Promise((resolve, reject) => {
+			this.done((err, ...args) => {
+				if (err) return reject(err)
+				resolve(args.length === 1 ? args[0] : args)
+			})
+		}).catch(reject)
+	}
+
+	// ---------------------------------
 	// Backwards compatability helpers
 
 	getNames (opts) {
