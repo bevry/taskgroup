@@ -64,6 +64,8 @@ Group together synchronous and asynchronous tasks and execute them with support 
 
 
 ## Usage
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fbevry%2Ftaskgroup.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fbevry%2Ftaskgroup?ref=badge_shield)
+
 
 1. [Introduction Guide & Usage Examples](http://learn.bevry.me/taskgroup/guide)
 2. [Technical API](http://learn.bevry.me/taskgroup/api)
@@ -139,3 +141,7 @@ and licensed under:
 <ul><li><a href="http://spdx.org/licenses/MIT.html">MIT License</a></li></ul>
 
 <!-- /LICENSE -->
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fbevry%2Ftaskgroup.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fbevry%2Ftaskgroup?ref=badge_large)
