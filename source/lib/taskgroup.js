@@ -7,6 +7,7 @@ const { Task } = require('./task')
 const { queue, ensureArray } = require('./util')
 const extendr = require('extendr')
 const eachr = require('eachr')
+const unbounded = require('unbounded')
 
 /**
 Our TaskGroup class.
@@ -400,7 +401,7 @@ class TaskGroup extends BaseInterface {
 		// Give setConfig enough chance to fire
 		// Changing this to setImmediate breaks a lot of things
 		// As tasks inside nested taskgroups will fire in any order
-		queue(this.autoRun.bind(this))
+		queue(unbounded.binder.call(this.autoRun, this))
 	}
 
 	/**
@@ -608,7 +609,7 @@ class TaskGroup extends BaseInterface {
 	@access private
 	*/
 	addMethod (method, opts = {}) {
-		method = method.bind(this) // run the taskgroup method on the group, rather than itself
+		method = unbounded.binder.call(method, this) // run the taskgroup method on the group, rather than itself
 		method.isTaskGroupMethod = true
 		if (!opts.name) opts.name = 'taskgroup method for ' + this.name
 		if (!opts.args) opts.args = [this.addTaskGroup.bind(this), this.addTask.bind(this)]

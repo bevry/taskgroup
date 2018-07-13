@@ -1,5 +1,9 @@
 # History
 
+## v5.1.0 2018 July 13
+- Add support for [unbounded](https://github.com/bevry/unbounded)
+- If a task completed, but had already completed earlier, we will now try to output the task's source for easier debugging
+
 ## v5.0.2 2018 July 13
 - Updated base files using [boundation](https://github.com/bevry/boundation)
 - Updated dependencies

@@ -7,6 +7,7 @@ const { queue, domain } = require('./util')
 const ambi = require('ambi')
 const extendr = require('extendr')
 const eachr = require('eachr')
+const unbounded = require('unbounded')
 
 /**
 Our Task Class
@@ -427,7 +428,8 @@ class Task extends BaseInterface {
 
 		// Error as we have already completed before
 		else if (this.config.errorOnExcessCompletions) {
-			const completedError = new Error(`The task [${this.names}] just completed, but it had already completed earlier, this is unexpected.`)
+			const source = (this.config.method.unbounded || this.config.method || 'no longer present').toString()
+			const completedError = new Error(`The task [${this.names}] just completed, but it had already completed earlier, this is unexpected.\nTask Source: ${source}`)
 			this.emit('error', completedError)
 		}
 
@@ -469,7 +471,7 @@ class Task extends BaseInterface {
 		// Prepare
 		const taskArgs = (this.config.args || []).slice()
 		let taskDomain = this.state.taskDomain
-		const exitMethod = this.itemCompletionCallback.bind(this)
+		const exitMethod = unbounded.binder.call(this.itemCompletionCallback, this)
 		let method = this.config.method
 
 		// Check that we have a method to fire
@@ -480,7 +482,7 @@ class Task extends BaseInterface {
 		}
 
 		// Bind method
-		method = method.bind(this)
+		method = unbounded.binder.call(method, this)
 
 		// Handle domains
 		if (domain) {
