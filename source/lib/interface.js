@@ -41,14 +41,14 @@ class BaseInterface extends require('events').EventEmitter {
 		super()
 
 		// Allow extensions of this class to prepare the class instance before anything else fires
-		if ( this.prepare ) {
+		if (this.prepare) {
 			this.prepare()
 		}
 
 		// Set state and config
-		if ( this.state == null )  this.state = {}
-		if ( this.config == null )  this.config = {}
-		if ( this.config.nameSeparator == null )  this.config.nameSeparator = ' ➞  '
+		if (this.state == null) this.state = {}
+		if (this.config == null) this.config = {}
+		if (this.config.nameSeparator == null) this.config.nameSeparator = ' ➞  '
 
 		// Generate our listener method that we will beind to different events
 		// to add support for the `done` event and better error/event handling
@@ -57,13 +57,13 @@ class BaseInterface extends require('events').EventEmitter {
 			const error = args[0]
 
 			// has done listener, forward to that
-			if ( this.listeners('done').length !== 0 ) {
+			if (this.listeners('done').length !== 0) {
 				this.emit('done', ...args)
 			}
 
 			// has error, but no done listener and no event listener, throw error
-			else if ( error && this.listeners(event).length === 1 ) {
-				if ( event === 'error' ) {
+			else if (error && this.listeners(event).length === 1) {
+				if (event === 'error') {
 					throw error
 				}
 				else {
@@ -127,9 +127,9 @@ class BaseInterface extends require('events').EventEmitter {
 	*/
 	get names () {
 		// Fetch
-		const names = [], {name, parent, nameSeparator} = this.config
-		if ( parent )  names.push(...parent.names)
-		if ( name !== false )  names.push(this.name)
+		const names = [], { name, parent, nameSeparator } = this.config
+		if (parent) names.push(...parent.names)
+		if (name !== false) names.push(this.name)
 		names.toString = () => names.join(nameSeparator)
 
 		// Return
@@ -184,4 +184,4 @@ class BaseInterface extends require('events').EventEmitter {
 }
 
 // Exports
-module.exports = {BaseInterface}
+module.exports = { BaseInterface }

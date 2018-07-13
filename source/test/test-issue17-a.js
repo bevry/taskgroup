@@ -1,9 +1,9 @@
 'use strict'
 
-const {Task} = require('../')
+const { Task } = require('../')
 
 Task
-	.create({domain: true}, function (complete) {
+	.create({ domain: true }, function (complete) {
 		complete()
 	})
 	.done(function () {

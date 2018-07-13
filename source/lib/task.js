@@ -2,8 +2,8 @@
 'use strict'
 
 // Imports
-const {BaseInterface} = require('./interface')
-const {queue, domain} = require('./util')
+const { BaseInterface } = require('./interface')
+const { queue, domain } = require('./util')
 const ambi = require('ambi')
 const extendr = require('extendr')
 const eachr = require('eachr')
@@ -155,7 +155,7 @@ class Task extends BaseInterface {
 	@access private
 	*/
 	get exited () {
-		switch ( this.state.status ) {
+		switch (this.state.status) {
 			case 'failed':
 			case 'passed':
 			case 'destroyed':
@@ -172,7 +172,7 @@ class Task extends BaseInterface {
 	@access private
 	*/
 	get completed () {
-		switch ( this.state.status ) {
+		switch (this.state.status) {
 			case 'failed':
 			case 'passed':
 				return true
@@ -205,7 +205,7 @@ class Task extends BaseInterface {
 	*/
 	clearDomain () {
 		const taskDomain = this.state.taskDomain
-		if ( taskDomain ) {
+		if (taskDomain) {
 			taskDomain.exit()
 			taskDomain.removeAllListeners()
 			this.state.taskDomain = null
@@ -281,9 +281,9 @@ class Task extends BaseInterface {
 
 		// Extract the configuration from the arguments
 		args.forEach(function (arg) {
-			if ( arg == null )  return
+			if (arg == null) return
 			const type = typeof arg
-			switch ( type ) {
+			switch (type) {
 				case 'string':
 					opts.name = arg
 					break
@@ -301,17 +301,17 @@ class Task extends BaseInterface {
 
 		// Apply the configuration directly to our instance
 		eachr(opts, (value, key) => {
-			if ( value == null )  return
-			switch ( key ) {
+			if (value == null) return
+			switch (key) {
 				case 'on':
 					eachr(value, (value, key) => {
-						if ( value ) this.on(key, value)
+						if (value) this.on(key, value)
 					})
 					break
 
 				case 'once':
 					eachr(value, (value, key) => {
-						if ( value ) this.once(key, value)
+						if (value) this.once(key, value)
 					})
 					break
 
@@ -358,14 +358,14 @@ class Task extends BaseInterface {
 	itemCompletionCallback (...args) {
 		// Store the first error
 		let error = this.state.error
-		if ( args[0] && !error ) {
+		if (args[0] && !error) {
 			this.state.error = error = args[0]
 		}
 
 		// Complete for the first (and hopefully only) time
-		if ( !this.exited ) {
+		if (!this.exited) {
 			// Apply the result if we want to and it exists
-			if ( this.storeResult ) {
+			if (this.storeResult) {
 				this.state.result = args.slice(1)
 			}
 		}
@@ -405,7 +405,7 @@ class Task extends BaseInterface {
 		const error = this.state.error
 
 		// Complete for the first (and hopefully only) time
-		if ( !this.exited ) {
+		if (!this.exited) {
 			// Set the status and emit depending on success or failure status
 			const status = error ? 'failed' : 'passed'
 			this.state.status = status
@@ -413,20 +413,20 @@ class Task extends BaseInterface {
 
 			// Notify our listeners we have completed
 			const args = [error]
-			if ( this.state.result )  args.push(...this.state.result)
+			if (this.state.result) args.push(...this.state.result)
 			this.emit('completed', ...args)
 
 			// Prevent the error from persisting
 			this.state.error = null
 
 			// Destroy if desired
-			if ( this.config.destroyOnceDone ) {
+			if (this.config.destroyOnceDone) {
 				this.destroy()
 			}
 		}
 
 		// Error as we have already completed before
-		else if ( this.config.errorOnExcessCompletions ) {
+		else if (this.config.errorOnExcessCompletions) {
 			const completedError = new Error(`The task [${this.names}] just completed, but it had already completed earlier, this is unexpected.`)
 			this.emit('error', completedError)
 		}
@@ -473,7 +473,7 @@ class Task extends BaseInterface {
 		let method = this.config.method
 
 		// Check that we have a method to fire
-		if ( !method ) {
+		if (!method) {
 			const error = new Error(`The task [${this.names}] failed to run as no method was defined for it.`)
 			this.emit('error', error)
 			return this
@@ -483,14 +483,14 @@ class Task extends BaseInterface {
 		method = method.bind(this)
 
 		// Handle domains
-		if ( domain ) {
+		if (domain) {
 			// Prepare the task domain if we want to and if it doesn't already exist
-			if ( !taskDomain && this.config.domain !== false ) {
+			if (!taskDomain && this.config.domain !== false) {
 				this.state.taskDomain = taskDomain = domain.create()
 				taskDomain.on('error', exitMethod)
 			}
 		}
-		else if ( this.config.domain === true ) {
+		else if (this.config.domain === true) {
 			const error = new Error(`The task [${this.names}] failed to run as it requested to use domains but domains are not available.`)
 			this.emit('error', error)
 			return this
@@ -499,7 +499,7 @@ class Task extends BaseInterface {
 		// Domains, as well as process.nextTick, make it so we can't just use exitMethod directly
 		// Instead we cover it up like so, to ensure the domain exits, as well to ensure the arguments are passed
 		const completeMethod = (...args) => {
-			if ( taskDomain ) {
+			if (taskDomain) {
 				this.clearDomain()
 				taskDomain = null
 				exitMethod(...args)
@@ -516,7 +516,7 @@ class Task extends BaseInterface {
 		// Our fire function that will be wrapped in a domain or executed directly
 		const fireMethod = () => {
 			// Execute with ambi if appropriate
-			if ( this.config.ambi !== false ) {
+			if (this.config.ambi !== false) {
 				ambi(method, ...taskArgs)
 			}
 
@@ -534,7 +534,7 @@ class Task extends BaseInterface {
 		this.emit('running')
 
 		// Fire the method within the domain if desired, otherwise execute directly
-		if ( taskDomain ) {
+		if (taskDomain) {
 			taskDomain.run(fireMethod)
 		}
 		else {
@@ -559,7 +559,7 @@ class Task extends BaseInterface {
 	*/
 	run () {
 		// Already started?
-		if ( this.state.status !== 'created' ) {
+		if (this.state.status !== 'created') {
 			const error = new Error(`Invalid run status for the Task [${this.names}], it was [${this.state.status}] instead of [created].`)
 			this.emit('error', error)
 			return this
@@ -578,4 +578,4 @@ class Task extends BaseInterface {
 }
 
 // Exports
-module.exports = {Task}
+module.exports = { Task }

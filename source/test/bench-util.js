@@ -23,7 +23,7 @@ function saveSnapshot (testname, next) {
 	let snapshot = profiler.takeSnapshot(testname)
 
 	next = next || function (error) {
-		if ( error )  return console.error(error)
+		if (error) return console.error(error)
 		console.log('Snapshot taken successfully:', filepath)
 	}
 
@@ -54,7 +54,7 @@ function stopProfile (testname, next) {
 	cpuProfile = null
 
 	next = next || function (error) {
-		if ( error )  return console.error(error)
+		if (error) return console.error(error)
 		console.log('Profile taken successfully:', filepath)
 	}
 
@@ -66,4 +66,4 @@ function stopProfile (testname, next) {
 }
 
 // Exports
-module.exports = {saveSnapshot, startProfile, stopProfile}
+module.exports = { saveSnapshot, startProfile, stopProfile }

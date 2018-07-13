@@ -6,4 +6,4 @@ function wait (delay, fn) {
 }
 
 // Exports
-module.exports = {wait}
+module.exports = { wait }

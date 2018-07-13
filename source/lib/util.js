@@ -11,13 +11,13 @@ const queue = (global || window).setImmediate || (process && process.nextTick) |
 
 // Convert an error to a string
 function errorToString (error) {
-	if ( !error ) {
+	if (!error) {
 		return null
 	}
-	else if ( error.stack ) {
+	else if (error.stack) {
 		return error.stack.toString()
 	}
-	else if ( error.message ) {
+	else if (error.message) {
 		return error.message.toString()
 	}
 	else {
@@ -27,9 +27,9 @@ function errorToString (error) {
 
 // Ensure that the passed array is actually an array
 function ensureArray (arr) {
-	if ( !Array.isArray(arr) ) arr = [arr]
+	if (!Array.isArray(arr)) arr = [arr]
 	return arr
 }
 
 // Exports
-module.exports = {domain, queue, errorToString, ensureArray}
+module.exports = { domain, queue, errorToString, ensureArray }

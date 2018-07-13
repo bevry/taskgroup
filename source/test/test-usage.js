@@ -2,23 +2,23 @@
 
 // Import
 const joe = require('joe')
-const {equal, errorEqual, expectErrorViaFunction, throwErrorViaCallback, returnViaCallback, expectViaCallback, expectErrorViaCallback} = require('assert-helpers')
-const {wait} = require('./test-util')
-const {Task, TaskGroup} = require('../')
+const { equal, errorEqual, expectErrorViaFunction, throwErrorViaCallback, returnViaCallback, expectViaCallback, expectErrorViaCallback } = require('assert-helpers')
+const { wait } = require('./test-util')
+const { Task, TaskGroup } = require('../')
 
 
 // Prepare
 const delay = 100
 
 function bump (checks, thrower) {
-	if ( checks.i == null )  checks.i = 0
-	if ( checks.n == null )  checks.n = 0
+	if (checks.i == null) checks.i = 0
+	if (checks.n == null) checks.n = 0
 	++checks.n
 	return (err) => {
 		++checks.i
-		if ( err && thrower) {
+		if (err && thrower) {
 			checks.error = err
-			if ( thrower === 'function' ) {
+			if (thrower === 'function') {
 				thrower(err)
 			}
 			throw err
@@ -27,12 +27,12 @@ function bump (checks, thrower) {
 }
 
 function bumped (checks, next) {
-	if ( checks.i == null )  checks.i = 0
-	if ( checks.n == null )  checks.n = 0
+	if (checks.i == null) checks.i = 0
+	if (checks.n == null) checks.n = 0
 	wait(delay * 2, () => {
 		errorEqual(checks.error || null, null, 'checks ran without error')
 		equal(checks.i, checks.n, 'all expected checks ran')
-		if ( next )  next()
+		if (next) next()
 	})
 }
 
@@ -134,7 +134,7 @@ joe.suite('taskgroup', function (suite, test) {
 	// success: multiple runs
 	test('Taskgroup should be able to complete multiple times with destroyOnceDone: false', function (complete) {
 		const checks = {}
-		const tasks = TaskGroup.create({destroyOnceDone: false, storeResult: true})
+		const tasks = TaskGroup.create({ destroyOnceDone: false, storeResult: true })
 			.addTask(returnViaCallback(5))
 			.run()
 			.done(expectViaCallback(null, [[null, 5]]))
@@ -208,7 +208,7 @@ joe.suite('taskgroup', function (suite, test) {
 	test('Taskgroup should ignore when encountering an error with different config', function (complete) {
 		const checks = {}
 		const err = new Error('fail after 5')
-		TaskGroup.create({abortOnError: false})
+		TaskGroup.create({ abortOnError: false })
 			.addTask(returnViaCallback(5))
 			.addTask(returnViaCallback(err))
 			.addTask(returnViaCallback(10))
@@ -224,7 +224,7 @@ joe.suite('taskgroup', function (suite, test) {
 	test('Taskgroup should be able to resume after an error', function (complete) {
 		const checks = {}
 		const err = new Error('fail after 5')
-		const tasks = TaskGroup.create({destroyOnceDone: false, storeResult: true})
+		const tasks = TaskGroup.create({ destroyOnceDone: false, storeResult: true })
 			.addTask(returnViaCallback(5))
 			.addTask(returnViaCallback(err))
 			.addTask(returnViaCallback(10))

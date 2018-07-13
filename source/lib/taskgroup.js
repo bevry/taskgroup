@@ -2,9 +2,9 @@
 'use strict'
 
 // Imports
-const {BaseInterface} = require('./interface')
-const {Task} = require('./task')
-const {queue, ensureArray} = require('./util')
+const { BaseInterface } = require('./interface')
+const { Task } = require('./task')
+const { queue, ensureArray } = require('./util')
 const extendr = require('extendr')
 const eachr = require('eachr')
 
@@ -101,7 +101,7 @@ class TaskGroup extends BaseInterface {
 	@access private
 	*/
 	get storeResult () {
-		const {storeResult, destroyOnceDone} = this.config
+		const { storeResult, destroyOnceDone } = this.config
 		return storeResult == null ? destroyOnceDone : (storeResult !== false)
 	}
 
@@ -275,7 +275,7 @@ class TaskGroup extends BaseInterface {
 	@access private
 	*/
 	get exited () {
-		switch ( this.state.status ) {
+		switch (this.state.status) {
 			case 'passed':
 			case 'failed':
 			case 'destroyed':
@@ -331,7 +331,7 @@ class TaskGroup extends BaseInterface {
 	*/
 	clearRemaining () {
 		const itemsRemaining = this.state.itemsRemaining
-		while ( itemsRemaining.length !== 0 ) {
+		while (itemsRemaining.length !== 0) {
 			itemsRemaining.pop().destroy()
 		}
 
@@ -362,7 +362,7 @@ class TaskGroup extends BaseInterface {
 		super()
 
 		// Prepare
-		if ( this.prepare ) {
+		if (this.prepare) {
 			this.prepare(...args)
 		}
 
@@ -423,18 +423,18 @@ class TaskGroup extends BaseInterface {
 		let run = this.config.run
 
 		// Auto run if we are going the inline style and have no parent
-		if ( method ) {
+		if (method) {
 			// Add the function as our first unamed task with the extra arguments
 			this.addMethod(method)
 
 			// If we are the topmost group default run to true
-			if ( !this.config.parent && run == null ) {
+			if (!this.config.parent && run == null) {
 				this.state.run = run = true
 			}
 		}
 
 		// Auto run if we are configured to
-		if ( run ) {
+		if (run) {
 			this.run()
 		}
 
@@ -482,9 +482,9 @@ class TaskGroup extends BaseInterface {
 
 		// Extract the configuration from the arguments
 		args.forEach(function (arg) {
-			if ( arg == null )  return
+			if (arg == null) return
 			const type = typeof arg
-			switch ( type ) {
+			switch (type) {
 				case 'string':
 					opts.name = arg
 					break
@@ -502,17 +502,17 @@ class TaskGroup extends BaseInterface {
 
 		// Apply the configuration directly to our instance
 		eachr(opts, (value, key) => {
-			if ( value == null )  return
-			switch ( key ) {
+			if (value == null) return
+			switch (key) {
 				case 'on':
 					eachr(value, (value, key) => {
-						if ( value )  this.on(key, value)
+						if (value) this.on(key, value)
 					})
 					break
 
 				case 'once':
 					eachr(value, (value, key) => {
-						if ( value )  this.once(key, value)
+						if (value) this.once(key, value)
 					})
 					break
 
@@ -610,9 +610,9 @@ class TaskGroup extends BaseInterface {
 	addMethod (method, opts = {}) {
 		method = method.bind(this) // run the taskgroup method on the group, rather than itself
 		method.isTaskGroupMethod = true
-		if ( !opts.name )  opts.name = 'taskgroup method for ' + this.name
-		if ( !opts.args )  opts.args = [this.addTaskGroup.bind(this), this.addTask.bind(this)]
-		if ( opts.storeResult == null )  opts.storeResult = false  // by default, hide result for methods
+		if (!opts.name) opts.name = 'taskgroup method for ' + this.name
+		if (!opts.args) opts.args = [this.addTaskGroup.bind(this), this.addTask.bind(this)]
+		if (opts.storeResult == null) opts.storeResult = false  // by default, hide result for methods
 		this.addTask(method, opts)
 		return this
 	}
@@ -634,7 +634,7 @@ class TaskGroup extends BaseInterface {
 		const me = this
 
 		// Only add the item if it exists
-		if ( !item ) return null
+		if (!item) return null
 
 		// Link our item to ourself
 		const itemConfig = {
@@ -647,12 +647,12 @@ class TaskGroup extends BaseInterface {
 		const emitNestedEvents = this.config.emitNestedEvents
 
 		// Bubble task events
-		if ( Task.isTask(item) ) {
+		if (Task.isTask(item)) {
 			// Nested configuration
 			item.setConfig(itemConfig, nestedTaskConfig, ...args)
 
 			// Bubble the nested events if desired
-			if ( emitNestedEvents ) {
+			if (emitNestedEvents) {
 				item.events.forEach(function (event) {
 					item.on(event, function (...args) {
 						me.emit(`task.${event}`, item, ...args)
@@ -665,12 +665,12 @@ class TaskGroup extends BaseInterface {
 		}
 
 		// Bubble group events
-		else if ( TaskGroup.isTaskGroup(item) ) {
+		else if (TaskGroup.isTaskGroup(item)) {
 			// Nested configuration
-			item.setConfig(itemConfig, {nestedTaskConfig, nestedTaskGroupConfig}, nestedTaskGroupConfig, ...args)
+			item.setConfig(itemConfig, { nestedTaskConfig, nestedTaskGroupConfig }, nestedTaskGroupConfig, ...args)
 
 			// Bubble the nested events if desired
-			if ( emitNestedEvents ) {
+			if (emitNestedEvents) {
 				item.events.forEach(function (event) {
 					item.on(event, function (...args) {
 						me.emit(`group.${event}`, item, ...args)
@@ -690,13 +690,13 @@ class TaskGroup extends BaseInterface {
 		}
 
 		// Name default
-		if ( !item.config.name ) {
+		if (!item.config.name) {
 			item.config.name = `${item.type} ${this.totalItems + 1} for [${this.name}]`
 		}
 
 		// Store Result Default
 		// if the item is undecided, then inherit from our decision
-		if ( item.config.storeResult == null ) {
+		if (item.config.storeResult == null) {
 			item.config.storeResult = this.config.storeResult
 		}
 
@@ -704,7 +704,7 @@ class TaskGroup extends BaseInterface {
 		this.state.itemsRemaining.push(item)
 
 		// Bubble the nested events if desired
-		if ( emitNestedEvents ) {
+		if (emitNestedEvents) {
 			item.events.forEach(function (event) {
 				item.on(event, function (...args) {
 					me.emit(`item.${event}`, item, ...args)
@@ -759,7 +759,7 @@ class TaskGroup extends BaseInterface {
 		let task
 
 		// Support receiving an existing task instance
-		if ( Task.isTask(args[0]) ) {
+		if (Task.isTask(args[0])) {
 			task = args[0]
 			task.setConfig(...args.slice(1))
 		}
@@ -816,7 +816,7 @@ class TaskGroup extends BaseInterface {
 		let group
 
 		// Support receiving an existing group instance
-		if ( TaskGroup.isTaskGroup(args[0]) ) {
+		if (TaskGroup.isTaskGroup(args[0])) {
 			group = args[0]
 			group.setConfig(...args.slice(1))
 		}
@@ -872,9 +872,9 @@ class TaskGroup extends BaseInterface {
 
 		// Fire the next items
 		/* eslint no-constant-condition:0 */
-		while ( true ) {
+		while (true) {
 			const item = this.fireNextItem()
-			if ( item ) {
+			if (item) {
 				items.push(item)
 			}
 			else {
@@ -897,11 +897,11 @@ class TaskGroup extends BaseInterface {
 		let result = false
 
 		// Can we run the next item?
-		if ( this.shouldFire ) {
+		if (this.shouldFire) {
 			// Fire the next item
 
 			// Update our status and notify our listeners
-			if ( this.state.status !== 'running' ) {
+			if (this.state.status !== 'running') {
 				this.state.status = 'running'
 				this.emit('running')
 			}
@@ -932,14 +932,14 @@ class TaskGroup extends BaseInterface {
 		const result = this.state.result
 
 		// Update error if it exists
-		if ( this.config.abortOnError && args[0] ) {
-			if ( !this.state.error ) {
+		if (this.config.abortOnError && args[0]) {
+			if (!this.state.error) {
 				this.state.error = args[0]
 			}
 		}
 
 		// Add the result if desired
-		if ( this.storeResult && item.storeResult ) {
+		if (this.storeResult && item.storeResult) {
 			result.push(args)
 		}
 
@@ -948,7 +948,7 @@ class TaskGroup extends BaseInterface {
 		++this.state.itemsDoneCount
 
 		// As we no longer have any use for this item, as it has completed, destroy the item if desired
-		if ( this.config.destroyDoneItems ) {
+		if (this.config.destroyDoneItems) {
 			item.destroy()
 		}
 
@@ -975,14 +975,14 @@ class TaskGroup extends BaseInterface {
 
 		// Notity our listners we have completed
 		const args = [error]
-		if ( this.state.result )  args.push(this.state.result)
+		if (this.state.result) args.push(this.state.result)
 		this.emit('completed', ...args)
 
 		// Prevent the error from persisting
 		this.state.error = null
 
 		// Destroy if desired
-		if ( this.config.destroyOnceDone ) {
+		if (this.config.destroyOnceDone) {
 			this.destroy()
 		}
 	}
@@ -1037,15 +1037,15 @@ class TaskGroup extends BaseInterface {
 	*/
 	fire () {
 		// Have we started are not destroyed?
-		if ( this.started && this.state.status !== 'destroyed' ) {
+		if (this.started && this.state.status !== 'destroyed') {
 			// Check if we are complete, if so, exit
-			if ( this.completed ) {
+			if (this.completed) {
 				// Finish up
 				this.finish()
 			}
 
 			// Otherwise continue firing items if we are wanting to pause
-			else if ( !this.shouldPause ) {
+			else if (!this.shouldPause) {
 				this.fireNextItems()
 			}
 		}
@@ -1062,7 +1062,7 @@ class TaskGroup extends BaseInterface {
 	*/
 	run () {
 		// Prevent running on destroy
-		if ( this.state.status === 'destroyed' ) {
+		if (this.state.status === 'destroyed') {
 			const error = new Error(`Invalid run status for the TaskGroup [${this.names}], it was [${this.state.status}].`)
 			this.emit('error', error)
 			return this
@@ -1073,7 +1073,7 @@ class TaskGroup extends BaseInterface {
 		this.emit('pending')
 
 		// Prepare result, if it doesn't exist
-		if ( this.storeResult && this.state.result == null ) {
+		if (this.storeResult && this.state.result == null) {
 			this.state.result = []
 		}
 
@@ -1086,4 +1086,4 @@ class TaskGroup extends BaseInterface {
 }
 
 // Export
-module.exports = {TaskGroup}
+module.exports = { TaskGroup }

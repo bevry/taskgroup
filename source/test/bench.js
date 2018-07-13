@@ -1,6 +1,6 @@
 'use strict'
 
-const {TaskGroup} = require('../../')
+const { TaskGroup } = require('../../')
 
 const testname = 'taskgroup-profile-test'
 const mode = 'bench' // 'profile'
@@ -8,7 +8,7 @@ const total = 100000  // 100,000
 
 // Start profiling
 const profileUtils = mode !== 'bench' ? require('./profile-utils') : null
-if ( mode === 'profile' )  profileUtils.startProfile(testname)
+if (mode === 'profile') profileUtils.startProfile(testname)
 
 // Prepare
 function createTask (name, value) {
@@ -27,7 +27,7 @@ const tasks = TaskGroup.create()
 
 // Add the tasks
 console.log(`Adding ${total} tasks`)
-for ( let i = 0, n = total; i < n; ++i ) {
+for (let i = 0, n = total; i < n; ++i) {
 	const name = 'Task ' + i
 	const value = 'Value ' + i
 	const task = createTask(name, value)
@@ -40,13 +40,13 @@ tasks.done(function () {
 	const totalSeconds = ((end - start) / 1000).toFixed(2)
 	console.log(`Completed ${total} tasks. Total seconds: ${totalSeconds}`)
 
-	if ( mode === 'heap' ) {
+	if (mode === 'heap') {
 		profileUtils.saveSnapshot(testname + '-before')  // 121mb heap (due to itemsCompleted in GC)
 		setTimeout(function () {
 			profileUtils.saveSnapshot(testname + '-after')  // 3mb heap
 		}, 1000)
 	}
-	else if ( mode === 'profile' ) {
+	else if (mode === 'profile') {
 		setTimeout(function () {
 			profileUtils.stopProfile(testname)
 		}, 2000)

@@ -3,9 +3,9 @@
 
 // Imports
 const joe = require('joe')
-const {equal, deepEqual, errorEqual} = require('assert-helpers')
-const {wait} = require('./test-util')
-const {Task, TaskGroup} = require('../')
+const { equal, deepEqual, errorEqual } = require('assert-helpers')
+const { wait } = require('./test-util')
+const { Task, TaskGroup } = require('../')
 
 /* eslint no-extend-native:0, no-cond-assign:0, prefer-rest-params:0 */
 // do not use ...args instead of arguments, will crash node v5 and below
@@ -13,7 +13,7 @@ const {Task, TaskGroup} = require('../')
 Array.prototype.remove = function () {
 	// http://stackoverflow.com/a/3955096/130638
 	let what, L = arguments.length, ax
-	while ( L && this.length ) {
+	while (L && this.length) {
 		what = arguments[--L]
 		while ((ax = this.indexOf(what)) !== -1) {
 			this.splice(ax, 1)
@@ -28,7 +28,7 @@ class TaskGroupDebug extends TaskGroup {
 	get TaskGroup () { return TaskGroupDebug }
 
 	prepare () {
-		if ( !this.itemsStatusMap ) {
+		if (!this.itemsStatusMap) {
 			const me = this
 			this.itemsStatusMap = {
 				remaining: [],
@@ -71,7 +71,7 @@ class TaskGroupDebug extends TaskGroup {
 		const done = this.getNamesOfItemsByStatus('done')
 		const result = this.result
 		const error = this.error
-		return {status, remaining, pending, running, done, result, error}
+		return { status, remaining, pending, running, done, result, error }
 	}
 
 	compare (_expectedDetails, testName) {
@@ -105,12 +105,12 @@ class TaskGroupDebug extends TaskGroup {
 		deepEqual(debugDetails, expectedDetails, testName)
 
 		// Compare result argument
-		if ( _expectedDetails.resultArgument ) {
+		if (_expectedDetails.resultArgument) {
 			deepEqual(_expectedDetails.resultArgument, this.result, testName + ': result argument was as expected')
 		}
 
 		// Compare error argument
-		if ( _expectedDetails.errorArgument ) {
+		if (_expectedDetails.errorArgument) {
 			errorEqual(_expectedDetails.errorArgument, this.error, testName + ': error argument was as expected')
 		}
 	}
@@ -305,7 +305,7 @@ joe.suite('task', function (suite) {
 
 		test('should detect async throw error on asynchronous task', function (done) {
 			// Check node version
-			if ( process.versions.node.substr(0, 3) === '0.8' ) {
+			if (process.versions.node.substr(0, 3) === '0.8') {
 				console.log('skip this test on node 0.8 because domains behave differently')
 				return done()
 			}
@@ -357,9 +357,9 @@ joe.suite('task', function (suite) {
 		test('it should not catch errors within the completion callback: issue 17, with domains', function (done) {
 			// Run our test file
 			/* eslint handle-callback-err:0 */
-			require('safeps').exec(`node ${__dirname}/test-issue17-a.js`, {cwd: __dirname}, function (err, stdout, stderr) {
+			require('safeps').exec(`node ${__dirname}/test-issue17-a.js`, { cwd: __dirname }, function (err, stdout, stderr) {
 				// Check if we got the error we expected
-				if ( stderr.indexOf('Error: goodbye world') !== -1 ) {
+				if (stderr.indexOf('Error: goodbye world') !== -1) {
 					done()
 				}
 				else {
@@ -373,9 +373,9 @@ joe.suite('task', function (suite) {
 		test('it should not catch errors within the completion callback: issue 17, without domains', function (done) {
 			// Run our test file
 			/* eslint handle-callback-err:0 */
-			require('safeps').exec(`node ${__dirname}/test-issue17-b.js`, {cwd: __dirname}, function (err, stdout, stderr) {
+			require('safeps').exec(`node ${__dirname}/test-issue17-b.js`, { cwd: __dirname }, function (err, stdout, stderr) {
 				// Check if we got the error we expected
-				if ( stderr.indexOf('Error: goodbye world\n    at Task.') !== -1 ) {
+				if (stderr.indexOf('Error: goodbye world\n    at Task.') !== -1) {
 					done()
 				}
 				else {
@@ -402,7 +402,7 @@ joe.suite('task', function (suite) {
 			})
 
 			// Apply the arguments
-			task.setConfig({args: [2, 5]})
+			task.setConfig({ args: [2, 5] })
 
 			// Check
 			task.done(function (err, result) {
@@ -438,7 +438,7 @@ joe.suite('task', function (suite) {
 			})
 
 			// Apply the arguments
-			task.setConfig({args: [2, 5]})
+			task.setConfig({ args: [2, 5] })
 
 			// Check
 			task.done(function (err, result) {
@@ -467,7 +467,7 @@ joe.suite('taskgroup', function (suite) {
 		// Serial
 		test('should work when running in serial', function (done) {
 
-			const tasks = new TaskGroupDebug({name: 'my parent group'})
+			const tasks = new TaskGroupDebug({ name: 'my parent group' })
 			tasks.done(function (err, result) {
 				errorEqual(err, null)
 				equal(tasks.config.concurrency, 1)
@@ -529,7 +529,7 @@ joe.suite('taskgroup', function (suite) {
 		// Parallel with new API
 		test('should work when running in parallel', function (done) {
 
-			const tasks = new TaskGroupDebug({concurrency: 0})
+			const tasks = new TaskGroupDebug({ concurrency: 0 })
 			tasks.done(function (err, result) {
 				errorEqual(err, null)
 				equal(tasks.config.concurrency, 0)
@@ -661,7 +661,7 @@ joe.suite('taskgroup', function (suite) {
 		// Error Serial
 		test('should handle error correctly in serial', function (done) {
 
-			const tasks = new TaskGroupDebug({name: 'my tasks', concurrency: 1}).done(function (err, result) {
+			const tasks = new TaskGroupDebug({ name: 'my tasks', concurrency: 1 }).done(function (err, result) {
 				equal(tasks.config.concurrency, 1)
 
 				tasks.compare({
@@ -708,7 +708,7 @@ joe.suite('taskgroup', function (suite) {
 		// Parallel
 		test('should handle error correctly in parallel', function (done) {
 
-			const tasks = new TaskGroupDebug({name: 'my tasks', concurrency: 0}).done(function (err, result) {
+			const tasks = new TaskGroupDebug({ name: 'my tasks', concurrency: 0 }).done(function (err, result) {
 				equal(tasks.config.concurrency, 0)
 
 				tasks.compare({
@@ -781,7 +781,7 @@ joe.suite('nested', function (suite, test) {
 	test('traditional format', function (done) {
 		const checks = []
 
-		const tasks = new TaskGroupDebug({name: 'my parent group'}).run()
+		const tasks = new TaskGroupDebug({ name: 'my parent group' }).run()
 
 		tasks.addTask('my task a', function (complete) {
 			checks.push('my task a - part 1/2')
@@ -996,7 +996,7 @@ joe.suite('nested', function (suite, test) {
 	test('mixed format', function (done) {
 		const checks = []
 
-		const tasks = new TaskGroupDebug({name: 'my parent group'})
+		const tasks = new TaskGroupDebug({ name: 'my parent group' })
 
 		tasks.addTask('my task 1', function () {
 			checks.push('my task 1')
