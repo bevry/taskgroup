@@ -1,4 +1,4 @@
-/* eslint no-extra-parens:0 */
+/* eslint no-extra-parens:0 no-warning-comments:0 */
 'use strict'
 
 // Imports
@@ -362,7 +362,7 @@ class TaskGroup extends BaseInterface {
 	constructor (...args) {
 		super()
 
-		// Prepare
+		// Prepare (used for class extensions)
 		if (this.prepare) {
 			this.prepare(...args)
 		}
@@ -646,57 +646,31 @@ class TaskGroup extends BaseInterface {
 		const nestedTaskGroupConfig = this.config.nestedTaskGroupConfig
 		const nestedTaskConfig = this.config.nestedTaskConfig
 		const emitNestedEvents = this.config.emitNestedEvents
+		const isTask = Task.isTask(item)
+		const isTaskGroup = TaskGroup.isTaskGroup(item)
 
-		// Bubble task events
-		if (Task.isTask(item)) {
-			// Nested configuration
-			item.setConfig(itemConfig, nestedTaskConfig, ...args)
-
-			// Bubble the nested events if desired
-			if (emitNestedEvents) {
-				item.events.forEach(function (event) {
-					item.on(event, function (...args) {
-						me.emit(`task.${event}`, item, ...args)
-					})
-				})
-			}
-
-			// Notify our intention
-			this.emit('task.add', item)
-		}
-
-		// Bubble group events
-		else if (TaskGroup.isTaskGroup(item)) {
-			// Nested configuration
-			item.setConfig(itemConfig, { nestedTaskConfig, nestedTaskGroupConfig }, nestedTaskGroupConfig, ...args)
-
-			// Bubble the nested events if desired
-			if (emitNestedEvents) {
-				item.events.forEach(function (event) {
-					item.on(event, function (...args) {
-						me.emit(`group.${event}`, item, ...args)
-					})
-				})
-			}
-
-			// Notify our intention
-			this.emit('group.add', item)
-		}
-
-		// Unknown type
-		else {
+		// Check
+		if (!isTask && !isTaskGroup) {
 			const error = new Error('Unknown item type')
 			this.emit('error', error)
 			return this
 		}
 
+		// Nested configuration
+		if (isTask) item.setConfig(itemConfig, nestedTaskConfig, ...args)
+		else if (isTaskGroup) item.setConfig(itemConfig, { nestedTaskConfig, nestedTaskGroupConfig }, nestedTaskGroupConfig, ...args)
+
 		// Name default
+		// @todo perhaps this can come after item.add emissions, in case the user wants to set the item name there,
+		// however that is signficant complexity to test, so for now won't bother
 		if (!item.config.name) {
 			item.config.name = `${item.type} ${this.totalItems + 1} for [${this.name}]`
 		}
 
 		// Store Result Default
 		// if the item is undecided, then inherit from our decision
+		// @todo perhaps this can come after item.add emissions, in case the user wants to set the item name there,
+		// however that is signficant complexity to test, so for now won't bother
 		if (item.config.storeResult == null) {
 			item.config.storeResult = this.config.storeResult
 		}
@@ -704,24 +678,27 @@ class TaskGroup extends BaseInterface {
 		// Add the item
 		this.state.itemsRemaining.push(item)
 
+		// When the item completes, update our state
+		item.done(this.itemDoneCallbackUpdateState.bind(this, item))
+
 		// Bubble the nested events if desired
 		if (emitNestedEvents) {
 			item.events.forEach(function (event) {
 				item.on(event, function (...args) {
+					if (isTask) me.emit(`task.${event}`, item, ...args)
+					else if (isTaskGroup) me.emit(`task.${event}`, item, ...args)
 					me.emit(`item.${event}`, item, ...args)
 				})
 			})
 		}
 
 		// Emit
+		if (isTask) this.emit('task.add', item)
+		else if (isTaskGroup) this.emit('group.add', item)
 		this.emit('item.add', item)
 
-		// Handle item completion and errors once
-		// we can't just do item.done, or item.once('done'), because we need the item to be the argument, rather than `this`
-		// @TODO this could probably come before this item.add emit
-		item.done(function (...args) {
-			me.itemDoneCallback(item, ...args)
-		})
+		// When the item completes, after user events have fired, continue with the next state
+		item.done(this.itemDoneCallbackNextState.bind(this, item))
 
 		// We may be running and expecting items, if so, fire
 		// @TODO determine if this should require a new run
@@ -921,14 +898,14 @@ class TaskGroup extends BaseInterface {
 	}
 
 	/**
-	What to do when an item is done.
+	What to do when an item is done. Run before user events.
 	@chainable
 	@returns {this}
 	@param {Task|TaskGroup} item - The item that has completed
 	@param {...*} args - The arguments that the item completed with.
 	@access private
 	*/
-	itemDoneCallback (item, ...args) {
+	itemDoneCallbackUpdateState (item, ...args) {
 		// Prepare
 		const result = this.state.result
 
@@ -948,6 +925,18 @@ class TaskGroup extends BaseInterface {
 		--this.state.itemsExecutingCount
 		++this.state.itemsDoneCount
 
+		// Chain
+		return this
+	}
+
+	/**
+	What to do when an item is done. Run after user events.
+	@chainable
+	@returns {this}
+	@param {Task|TaskGroup} item - The item that has completed
+	@access private
+	*/
+	itemDoneCallbackNextState (item) {
 		// As we no longer have any use for this item, as it has completed, destroy the item if desired
 		if (this.config.destroyDoneItems) {
 			item.destroy()

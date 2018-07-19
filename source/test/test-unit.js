@@ -57,6 +57,7 @@ class TaskGroupDebug extends TaskGroup {
 		this.itemsStatusMap.running.remove(item)
 		this.itemsStatusMap.done.remove(item)
 		this.itemsStatusMap[status].push(item)
+		deepEqual(this.itemDetails.totals, this.itemTotals, 'totals were in sync')
 	}
 
 	getNamesOfItemsByStatus (status) {
@@ -71,7 +72,16 @@ class TaskGroupDebug extends TaskGroup {
 		const done = this.getNamesOfItemsByStatus('done')
 		const result = this.result
 		const error = this.error
-		return { status, remaining, pending, running, done, result, error }
+		const itemDetails = { status, remaining, pending, running, done, result, error }
+		const totals = {
+			remaining: itemDetails.remaining.length,
+			executing: itemDetails.pending.length + itemDetails.running.length,
+			done: itemDetails.done.length,
+			total: itemDetails.remaining.length + itemDetails.pending.length + itemDetails.running.length + itemDetails.done.length,
+			result: itemDetails.result && itemDetails.result.length
+		}
+		itemDetails.totals = totals
+		return itemDetails
 	}
 
 	compare (_expectedDetails, testName) {
@@ -86,20 +96,9 @@ class TaskGroupDebug extends TaskGroup {
 			running: _expectedDetails.running || [],
 			done: _expectedDetails.done || [],
 			result: typeof _expectedDetails.result === 'undefined' ? [] : _expectedDetails.result,
-			error: _expectedDetails.error || null
+			error: _expectedDetails.error || null,
+			totals: this.itemTotals
 		}
-
-		// Add totals comparison too
-		const actualTotals = this.itemTotals
-		const debugTotals = {
-			remaining: debugDetails.remaining.length,
-			executing: debugDetails.pending.length + debugDetails.running.length,
-			done: debugDetails.done.length,
-			total: debugDetails.remaining.length + debugDetails.pending.length + debugDetails.running.length + debugDetails.done.length,
-			result: debugDetails.result && debugDetails.result.length
-		}
-		debugDetails.totals = debugTotals
-		expectedDetails.totals = actualTotals
 
 		// Do the comparison
 		deepEqual(debugDetails, expectedDetails, testName)
@@ -121,7 +120,7 @@ class TaskGroupDebug extends TaskGroup {
 const delay = 100
 
 // Task
-joe.suite('task', function (suite) {
+joe.suite('test-unit: task', function (suite) {
 	// Basic
 	suite('basic', function (suite, test) {
 		// Async
@@ -461,7 +460,7 @@ joe.suite('task', function (suite) {
 })
 
 // Task Group
-joe.suite('taskgroup', function (suite) {
+joe.suite('test-unit: taskgroup', function (suite) {
 	// Basic
 	suite('basic', function (suite, test) {
 		// Serial
@@ -775,7 +774,7 @@ joe.suite('taskgroup', function (suite) {
 })
 
 // Test Runner
-joe.suite('nested', function (suite, test) {
+joe.suite('test-unit: nested', function (suite, test) {
 
 	// Traditional
 	test('traditional format', function (done) {

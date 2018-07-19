@@ -1,7 +1,7 @@
 {
   "title": "TaskGroup",
   "name": "taskgroup",
-  "version": "5.1.0",
+  "version": "5.2.0",
   "description": "Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.",
   "homepage": "ssh://git@github.com/bevry/taskgroup",
   "license": "MIT",

@@ -1,5 +1,11 @@
 # History
 
+## v5.2.0 2018 July 20
+- state of taskgroup is now updated before user events are emitted, to accurately represent current state
+    - this splits `itemDoneCallback` into `itemDoneCallbackUpdateState` and `itemDoneCallbackNextState`
+- nested events are now all bound at the same time
+- `task.add`, `group.add`, and `item.add` are now all emitted at the same time
+
 ## v5.1.0 2018 July 13
 - Add support for [unbounded](https://github.com/bevry/unbounded)
 - If a task completed, but had already completed earlier, we will now try to output the task's source for easier debugging

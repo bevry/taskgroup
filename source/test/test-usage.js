@@ -38,7 +38,7 @@ function bumped (checks, next) {
 
 
 // Task
-joe.suite('task', function (suite, test) {
+joe.suite('test-usage: task', function (suite, test) {
 	// failure: done with no run
 	test('Task.create(...).done(...) should time out when run was not called', function (complete) {
 		const checks = {}
@@ -99,7 +99,7 @@ joe.suite('task', function (suite, test) {
 })
 
 // Taskgroup
-joe.suite('taskgroup', function (suite, test) {
+joe.suite('test-usage: taskgroup', function (suite, test) {
 	// success: done with no tasks then run
 	test('TaskGroup.create().run().done(...) should complete with no result', function (complete) {
 		const checks = {}
