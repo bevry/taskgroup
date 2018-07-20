@@ -1,5 +1,8 @@
 # History
 
+## v5.3.0 2018 July 20
+- `clearRemaining` now returns the number of dropped items, `clear` continues to be chainable
+
 ## v5.2.0 2018 July 20
 - state of taskgroup is now updated before user events are emitted, to accurately represent current state
     - this splits `itemDoneCallback` into `itemDoneCallbackUpdateState` and `itemDoneCallbackNextState`

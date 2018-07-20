@@ -327,17 +327,19 @@ class TaskGroup extends BaseInterface {
 	/**
 	Remove and destroy the remaining items.
 	@chainable
-	@returns {this}
+	@returns {number} the amount of items that were dropped
 	@access public
 	*/
 	clearRemaining () {
+		let dropped = 0
 		const itemsRemaining = this.state.itemsRemaining
 		while (itemsRemaining.length !== 0) {
 			itemsRemaining.pop().destroy()
+			++dropped
 		}
 
-		// Chain
-		return this
+		// Return
+		return dropped
 	}
 
 	/**
@@ -349,6 +351,7 @@ class TaskGroup extends BaseInterface {
 	clearRunning () {
 		const error = new Error('Clearing running items is not possible. Instead remaining items and wait for running items to complete.')
 		this.emit('error', error)
+		return this
 	}
 
 

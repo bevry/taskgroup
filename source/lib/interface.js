@@ -178,7 +178,8 @@ class BaseInterface extends require('events').EventEmitter {
 	}
 
 	clear (...args) {
-		return this.clearRemaining(...args)
+		this.clearRemaining(...args)
+		return this
 	}
 
 }
