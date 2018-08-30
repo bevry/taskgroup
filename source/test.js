@@ -1,4 +1,4 @@
 'use strict'
 
-require('./test/test-usage')
-require('./test/test-unit')
+require('./test/test-usage.js')
+require('./test/test-unit.js')

@@ -1,11 +1,25 @@
-/* eslinte-env browser */
+/* eslint-env browser */
 'use strict'
 
 const TaskGroup = require('../es2015/index.js').TaskGroup
-const $status = document.getElementById('status')
-const $performance = document.getElementById('performance')
+
+const $status = document.createElement('h2')
+$status.innerText = 'loaded'
+document.body.appendChild($status)
+
+const $performance = document.createElement('button')
+$performance.innerText = 'run'
+document.body.appendChild($performance)
+
+const $amount = document.createElement('input')
+$amount.setAttribute('type', 'number')
+$amount.setAttribute('title', 'how many tasks to run')
+$amount.value = '50000'
+document.body.appendChild($amount)
+
 $performance.onclick = window.performanceTest = function () {
-	$status.innerHTML = 'Running!'
+	const amount = Number($amount.value)
+	$status.innerText = `running ${amount} tasks!`
 
 	// Prepare
 	function createTask (name, value) {
@@ -19,7 +33,7 @@ $performance.onclick = window.performanceTest = function () {
 	const tasks = TaskGroup.create()
 
 	// Add the tasks
-	for ( let i = 0, n = 50000; i < n; ++i ) {
+	for (let i = 0, n = amount; i < n; ++i) {
 		const name = 'Task ' + i
 		const value = 'Value ' + i
 		const task = createTask(name, value)
@@ -28,10 +42,9 @@ $performance.onclick = window.performanceTest = function () {
 
 	// Listen for completion
 	tasks.done(function () {
-		$status.innerHTML = 'Done!'
+		$status.innerText = `ran ${amount} tasks`
 	})
 
 	// Start the taskgroup
 	tasks.run()
 }
-$status.innerHTML = 'Loaded!'

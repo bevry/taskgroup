@@ -2,8 +2,8 @@
 'use strict'
 
 // Imports
-const { BaseInterface } = require('./interface')
-const { queue, domain } = require('./util')
+const { BaseInterface } = require('./interface.js')
+const { queue, domain } = require('./util.js')
 const ambi = require('ambi')
 const extendr = require('extendr')
 const eachr = require('eachr')
@@ -60,6 +60,35 @@ Task.create('my task that passes an error', function (complete) {
 @access public
 */
 class Task extends BaseInterface {
+	constructor (...args) {
+		// Initialise BaseInterface
+		super()
+
+		// State defaults
+		extendr.defaults(this.state, {
+			result: null,
+			error: null,
+			status: 'created'
+		})
+
+		// Configuration defaults
+		extendr.defaults(this.config, {
+			// Standard
+			storeResult: null,
+			destroyOnceDone: true,
+			parent: null,
+
+			// Unique to Task
+			method: null,
+			errorOnExcessCompletions: true,
+			ambi: true,
+			domain: null,
+			args: null
+		})
+
+		// Apply user configuration
+		this.setConfig(...args)
+	}
 
 	// ===================================
 	// Typing Helpers
@@ -217,40 +246,6 @@ class Task extends BaseInterface {
 
 	// ===================================
 	// Initialization
-
-	/**
-	Initialize our new {Task} instance. Forwards arguments onto {@link Task#setConfig}.
-	@access public
-	*/
-	constructor (...args) {
-		// Initialise BaseInterface
-		super()
-
-		// State defaults
-		extendr.defaults(this.state, {
-			result: null,
-			error: null,
-			status: 'created'
-		})
-
-		// Configuration defaults
-		extendr.defaults(this.config, {
-			// Standard
-			storeResult: null,
-			destroyOnceDone: true,
-			parent: null,
-
-			// Unique to Task
-			method: null,
-			errorOnExcessCompletions: true,
-			ambi: true,
-			domain: null,
-			args: null
-		})
-
-		// Apply user configuration
-		this.setConfig(...args)
-	}
 
 	/**
 	Set the configuration for our instance.

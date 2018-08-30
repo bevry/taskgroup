@@ -3,40 +3,24 @@
 /**
 Base class containing common functionality for {@link Task} and {@link TaskGroup}.
 
+Adds support for the done event while
+ensuring that errors are always handled correctly.
+It does this by listening to the `error` and `completed` events,
+and when the emit, we check if there is a `done` listener:
+
+- if there is, then emit the done event with the original event arguments
+- if there isn't, then output the error to stderr and throw it.
+
+Sets the following configuration:
+
+- `nameSeparator` defaults to `' ➞  '`, used to stringify the result of `.names`
+
 @class BaseInterface
 @extends EventEmitter
 @constructor
 @access private
 */
 class BaseInterface extends require('events').EventEmitter {
-	/**
-	Creates and returns new instance of the current class.
-	@param {...*} args - The arguments to be forwarded along to the constructor.
-	@return {Object} The new instance.
-
-	@static
-	@access public
-	*/
-	static create (...args) {
-		return new this(...args)
-	}
-
-	/**
-	BaseInterface Constructor
-
-	Adds support for the done event while
-	ensuring that errors are always handled correctly.
-	It does this by listening to the `error` and `completed` events,
-	and when the emit, we check if there is a `done` listener:
-
-	- if there is, then emit the done event with the original event arguments
-	- if there isn't, then output the error to stderr and throw it.
-
-	Sets the following configuration:
-
-	- `nameSeparator` defaults to `' ➞  '`, used to stringify the result of `.names`
-
-	*/
 	constructor () {
 		super()
 
@@ -80,10 +64,22 @@ class BaseInterface extends require('events').EventEmitter {
 	}
 
 	/**
+	Creates and returns new instance of the current class.
+	@param {...*} args - The arguments to be forwarded along to the constructor.
+	@return {BaseInterface} The new instance.
+
+	@static
+	@access public
+	*/
+	static create (...args) {
+		return new this(...args)
+	}
+
+	/**
 	Attaches the listener to the `done` event to be emitted each time.
 	@param {Function} listener - Attaches to the `done` event.
 	@chainable
-	@returns {this}
+	@returns {BaseInterface} this
 	@access public
 	*/
 	whenDone (listener) {
@@ -98,7 +94,7 @@ class BaseInterface extends require('events').EventEmitter {
 	Attaches the listener to the `done` event to be emitted only once, then removed to not fire again.
 	@param {Function} listener - Attaches to the `done` event.
 	@chainable
-	@returns {this}
+	@returns {BaseInterface} this
 	@access public
 	*/
 	onceDone (listener) {
@@ -113,7 +109,7 @@ class BaseInterface extends require('events').EventEmitter {
 	Alias for {@link BaseInterface#onceDone}
 	@param {Function} listener - Attaches to the `done` event.
 	@chainable
-	@returns {this}
+	@returns {BaseInterface} this
 	@access public
 	*/
 	done (listener) {

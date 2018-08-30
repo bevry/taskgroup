@@ -2,9 +2,9 @@
 'use strict'
 
 // Imports
-const { BaseInterface } = require('./interface')
-const { Task } = require('./task')
-const { queue, ensureArray } = require('./util')
+const { BaseInterface } = require('./interface.js')
+const { Task } = require('./task.js')
+const { queue, ensureArray } = require('./util.js')
 const extendr = require('extendr')
 const eachr = require('eachr')
 const unbounded = require('unbounded')
@@ -42,6 +42,50 @@ Available internal statuses:
 @access public
 */
 class TaskGroup extends BaseInterface {
+	constructor (...args) {
+		super()
+
+		// Prepare (used for class extensions)
+		if (this.prepare) {
+			this.prepare(...args)
+		}
+
+		// State defaults
+		extendr.defaults(this.state, {
+			result: null,
+			error: null,
+			status: 'created',
+			itemsRemaining: [],
+			itemsExecutingCount: 0,
+			itemsDoneCount: 0
+		})
+
+		// Configuration defaults
+		extendr.defaults(this.config, {
+			// Standard
+			storeResult: null,
+			destroyOnceDone: true,
+			parent: null,
+
+			// Unique to TaskGroup
+			method: null,
+			abortOnError: true,
+			destroyDoneItems: true,
+			nestedTaskConfig: {},
+			nestedTaskGroupConfig: {},
+			emitNestedEvents: false,
+			concurrency: 1,
+			run: null
+		})
+
+		// Apply user configuration
+		this.setConfig(...args)
+
+		// Give setConfig enough chance to fire
+		// Changing this to setImmediate breaks a lot of things
+		// As tasks inside nested taskgroups will fire in any order
+		queue(unbounded.binder.call(this.autoRun, this))
+	}
 
 	// ===================================
 	// Typing Helpers
@@ -357,55 +401,6 @@ class TaskGroup extends BaseInterface {
 
 	// ===================================
 	// Initialization
-
-	/**
-	Initialize our new {TaskGroup} instance. Forwards arguments onto {@link TaskGroup#setConfig}.
-	@access public
-	*/
-	constructor (...args) {
-		super()
-
-		// Prepare (used for class extensions)
-		if (this.prepare) {
-			this.prepare(...args)
-		}
-
-		// State defaults
-		extendr.defaults(this.state, {
-			result: null,
-			error: null,
-			status: 'created',
-			itemsRemaining: [],
-			itemsExecutingCount: 0,
-			itemsDoneCount: 0
-		})
-
-		// Configuration defaults
-		extendr.defaults(this.config, {
-			// Standard
-			storeResult: null,
-			destroyOnceDone: true,
-			parent: null,
-
-			// Unique to TaskGroup
-			method: null,
-			abortOnError: true,
-			destroyDoneItems: true,
-			nestedTaskConfig: {},
-			nestedTaskGroupConfig: {},
-			emitNestedEvents: false,
-			concurrency: 1,
-			run: null
-		})
-
-		// Apply user configuration
-		this.setConfig(...args)
-
-		// Give setConfig enough chance to fire
-		// Changing this to setImmediate breaks a lot of things
-		// As tasks inside nested taskgroups will fire in any order
-		queue(unbounded.binder.call(this.autoRun, this))
-	}
 
 	/**
 	Autorun ourself under certain conditions.
