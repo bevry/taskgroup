@@ -64,10 +64,10 @@ Group together synchronous and asynchronous tasks and execute them with support 
 
 ## Usage
 
-1. [Introduction Guide & Usage Examples](http://learn.bevry.me/taskgroup/guide)
-2. [Technical API](http://learn.bevry.me/taskgroup/api)
-3. [Comparisons against other flow libraries](http://learn.bevry.me/taskgroup/comparisons)
-4. [Projects & Libraries built on top of TaskGroup](http://learn.bevry.me/taskgroup/showcase)
+1. [Introduction Guide & Usage Examples](https://github.com/bevry/taskgroup/wiki/Introduction-&-Usage)
+2. [Technical API]( http://master.taskgroup.bevry.surge.sh/docs/)
+3. [Comparisons against other flow libraries](https://github.com/bevry/taskgroup/wiki/Compare)
+4. [Projects & Libraries built on top of TaskGroup](https://github.com/bevry/taskgroup/wiki/Showcase)
 
 
 <!-- HISTORY/ -->
