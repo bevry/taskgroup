@@ -45,7 +45,7 @@ Group together synchronous and asynchronous tasks and execute them with support 
 <a href="http://browserify.org" title="Browserify lets you require('modules') in the browser by bundling up all of your dependencies"><h3>Browserify</h3></a><ul>
 <li>Install: <code>npm install --save taskgroup</code></li>
 <li>Module: <code>require('taskgroup')</code></li>
-<li>CDN URL: <code>//wzrd.in/bundle/taskgroup@5.3.0</code></li></ul>
+<li>CDN URL: <code>//wzrd.in/bundle/taskgroup@5.4.0</code></li></ul>
 
 <a href="http://enderjs.com" title="Ender is a full featured package manager for your browser"><h3>Ender</h3></a><ul>
 <li>Install: <code>ender add taskgroup</code></li>
@@ -65,11 +65,11 @@ Group together synchronous and asynchronous tasks and execute them with support 
 
 ## Usage
 
-1. [Introduction Guide & Usage Examples](https://github.com/bevry/taskgroup/wiki/Introduction-&-Usage)
-1. [Technical API]( http://master.taskgroup.bevry.surge.sh/docs/)
-1. [Comparisons against other flow libraries](https://github.com/bevry/taskgroup/wiki/Compare)
-1. [Projects & Libraries built on top of TaskGroup](https://github.com/bevry/taskgroup/wiki/Showcase)
-1. [Web Demonstration]( http://master.taskgroup.bevry.surge.sh/web/)
+[Documentation.](https://gitbook.bevry.me/taskgroup/)
+
+[Technical API Documentation.](http://master.taskgroup.bevry.surge.sh/docs/)
+
+[Web Demonstration.](http://master.taskgroup.bevry.surge.sh/web/)
 
 
 <!-- HISTORY/ -->

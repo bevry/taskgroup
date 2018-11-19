@@ -1,5 +1,9 @@
 # History
 
+## v5.4.0 2018 November 20
+- Updated [base files](https://github.com/bevry/base) and [editions](https://github.com/bevry/editions) using [boundation](https://github.com/bevry/boundation)
+- Updated dependencies
+
 ## v5.3.0 2018 July 20
 - `clearRemaining` now returns the number of dropped items, `clear` continues to be chainable
 
@@ -14,7 +18,7 @@
 - If a task completed, but had already completed earlier, we will now try to output the task's source for easier debugging
 
 ## v5.0.2 2018 July 13
-- Updated base files using [boundation](https://github.com/bevry/boundation)
+- Updated [base files](https://github.com/bevry/base) and [editions](https://github.com/bevry/editions) using [boundation](https://github.com/bevry/boundation)
 - Updated dependencies
 
 ## v5.0.1 2016 June 13
