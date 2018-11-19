@@ -1,7 +1,7 @@
 /* eslint-env browser */
 'use strict'
 
-const TaskGroup = require('../es2015/index.js').TaskGroup
+const TaskGroup = require('../source/index.js').TaskGroup
 
 const $status = document.createElement('h2')
 $status.innerText = 'loaded'
