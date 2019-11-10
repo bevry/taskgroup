@@ -1,7 +1,7 @@
 {
   "title": "TaskGroup",
   "name": "taskgroup",
-  "version": "5.5.0",
+  "version": "6.0.0",
   "description": "Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.",
   "homepage": "https://github.com/bevry/taskgroup",
   "license": "MIT",
@@ -66,7 +66,7 @@
     "url": "https://github.com/bevry/taskgroup.git"
   },
   "engines": {
-    "node": ">=0.8"
+    "node": ">=8"
   },
   "editions": [
     {
@@ -79,7 +79,7 @@
         "require"
       ],
       "engines": {
-        "node": "6 || 8 || 10 || 12 || 13",
+        "node": "8 || 10 || 12",
         "browsers": false
       }
     },
@@ -95,29 +95,15 @@
         "node": false,
         "browsers": "defaults"
       }
-    },
-    {
-      "description": "esnext compiled for node.js 0.8 with require for modules",
-      "directory": "edition-node-0.8",
-      "entry": "index.js",
-      "tags": [
-        "javascript",
-        "require"
-      ],
-      "engines": {
-        "node": "0.8 || 0.10 || 0.12 || 4 || 6 || 8 || 10 || 12 || 13",
-        "browsers": false
-      }
     }
   ],
-  "main": "index.js",
+  "main": "source/index.js",
   "browser": "edition-browsers/index.js",
   "dependencies": {
     "ambi": "3.2.0",
     "eachr": "^3.2.0",
-    "editions": "^2.2.0",
     "extendr": "^3.5.0",
-    "safeps": "7.0.1",
+    "safeps": "8.0.0",
     "unbounded": "^1.2.0"
   },
   "devDependencies": {
@@ -125,7 +111,7 @@
     "@babel/core": "^7.7.2",
     "@babel/plugin-proposal-object-rest-spread": "^7.6.2",
     "@babel/preset-env": "^7.7.1",
-    "assert-helpers": "4.10.0",
+    "assert-helpers": "^5.0.0",
     "babelify": "^10.0.0",
     "browserify": "^16.5.0",
     "eslint": "^6.6.0",
@@ -143,9 +129,8 @@
   "scripts": {
     "my:meta:web": "browserify ./web/index.js -t babelify --outfile ./web/index.out.js",
     "our:clean": "rm -Rf ./docs ./edition* ./es2015 ./es5 ./out ./.next",
-    "our:compile": "npm run our:compile:edition-browsers && npm run our:compile:edition-node-0.8",
+    "our:compile": "npm run our:compile:edition-browsers",
     "our:compile:edition-browsers": "env BABEL_ENV=edition-browsers babel --out-dir ./edition-browsers ./source",
-    "our:compile:edition-node-0.8": "env BABEL_ENV=edition-node-0.8 babel --out-dir ./edition-node-0.8 ./source",
     "our:deploy": "echo no need for this project",
     "our:meta": "npm run our:meta:docs && npm run our:meta:projectz && npm run our:meta:web",
     "our:meta:docs": "npm run our:meta:docs:jsdoc",
@@ -165,7 +150,7 @@
     "our:verify:directory": "npx valid-directory",
     "our:verify:eslint": "eslint --fix --ignore-pattern '**/*.d.ts' --ignore-pattern '**/vendor/' --ignore-pattern '**/node_modules/' --ext .mjs,.js,.jsx,.ts,.tsx ./source",
     "our:verify:prettier": "prettier --write ./source/**",
-    "test": "node ./test.js"
+    "test": "node ./source/test.js"
   },
   "eslintConfig": {
     "extends": [
@@ -185,23 +170,6 @@
             "@babel/preset-env",
             {
               "targets": "defaults",
-              "modules": "commonjs"
-            }
-          ]
-        ],
-        "plugins": [
-          "@babel/proposal-object-rest-spread"
-        ]
-      },
-      "edition-node-0.8": {
-        "sourceType": "script",
-        "presets": [
-          [
-            "@babel/preset-env",
-            {
-              "targets": {
-                "node": "0.8"
-              },
               "modules": "commonjs"
             }
           ]

@@ -5,7 +5,7 @@ const kava = require('kava')
 const {
 	equal,
 	errorEqual,
-	expectErrorViaFunction,
+	expectThrowViaFunction,
 	throwErrorViaCallback,
 	returnViaCallback,
 	expectViaCallback,
@@ -110,7 +110,7 @@ kava.suite('test-usage: task', function(suite, test) {
 	// failure: run then run then done
 	test('Task.create(...).run().run().done(...) should fail as a task is not allowed to run twice', function(complete) {
 		const checks = {}
-		expectErrorViaFunction(
+		expectThrowViaFunction(
 			'run status',
 			function() {
 				Task.create(returnViaCallback(5))

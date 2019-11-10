@@ -336,7 +336,11 @@ kava.suite('test-unit: task', function(suite) {
 					'the set result to be as expected as the task has completed'
 				)
 				equal(_err, err, 'the callback error to be set as we errord')
-				equal(result, null, 'the callback result to be null we errord')
+				equal(
+					typeof result,
+					'undefined',
+					'the callback result to be undefined as we errord'
+				)
 			})
 
 			// Check task hasn't run yet
@@ -397,7 +401,11 @@ kava.suite('test-unit: task', function(suite) {
 					'status to be failed as we are within the completion callback'
 				)
 				equal(_err, err, 'the callback error to be set as we errord')
-				equal(result, null, 'result to be null as there was no result')
+				equal(
+					typeof result,
+					'undefined',
+					'result to be undefined as there was no result'
+				)
 			})
 
 			// Check task hasn't run yet
@@ -469,7 +477,11 @@ kava.suite('test-unit: task', function(suite) {
 					'status to be failed as we are within the completion callback'
 				)
 				equal(_err, err, 'the callback error to be set as we errord')
-				equal(result, null, 'result to be null as there was no result')
+				equal(
+					typeof result,
+					'undefined',
+					'result to be undefined as there was no result'
+				)
 			})
 
 			// Check task hasn't run yet
