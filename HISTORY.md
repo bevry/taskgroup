@@ -3,7 +3,7 @@
 ## v6.0.0 2019 November 11
 
 -   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
--   Minimum required node version changed from `node: >=0.8` to `node: >=8` due to keep up with mandatory ecosystem changes
+-   Minimum required node version changed from `node: >=0.8` to `node: >=8` to keep up with mandatory ecosystem changes
 
 ## v5.5.0 2019 November 11
 
