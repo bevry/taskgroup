@@ -4,15 +4,15 @@ const { TaskGroup } = require('../../')
 
 const testname = 'taskgroup-profile-test'
 const mode = 'bench' // 'profile'
-const total = 100000  // 100,000
+const total = 100000 // 100,000
 
 // Start profiling
 const profileUtils = mode !== 'bench' ? require('./profile-utils') : null
 if (mode === 'profile') profileUtils.startProfile(testname)
 
 // Prepare
-function createTask (name, value) {
-	return function () {
+function createTask(name, value) {
+	return function() {
 		// $status.innerHTML += value
 		return value
 	}
@@ -22,7 +22,7 @@ function createTask (name, value) {
 console.log('Running benchmarks on:', process.versions)
 
 // Create the taskgroup
-const start = (new Date()).getTime()
+const start = new Date().getTime()
 const tasks = TaskGroup.create()
 
 // Add the tasks
@@ -35,19 +35,18 @@ for (let i = 0, n = total; i < n; ++i) {
 }
 
 // Listen for complete
-tasks.done(function () {
-	const end = (new Date()).getTime()
+tasks.done(function() {
+	const end = new Date().getTime()
 	const totalSeconds = ((end - start) / 1000).toFixed(2)
 	console.log(`Completed ${total} tasks. Total seconds: ${totalSeconds}`)
 
 	if (mode === 'heap') {
-		profileUtils.saveSnapshot(testname + '-before')  // 121mb heap (due to itemsCompleted in GC)
-		setTimeout(function () {
-			profileUtils.saveSnapshot(testname + '-after')  // 3mb heap
+		profileUtils.saveSnapshot(testname + '-before') // 121mb heap (due to itemsCompleted in GC)
+		setTimeout(function() {
+			profileUtils.saveSnapshot(testname + '-after') // 3mb heap
 		}, 1000)
-	}
-	else if (mode === 'profile') {
-		setTimeout(function () {
+	} else if (mode === 'profile') {
+		setTimeout(function() {
 			profileUtils.stopProfile(testname)
 		}, 2000)
 	}

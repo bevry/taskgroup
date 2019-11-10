@@ -21,7 +21,7 @@ Sets the following configuration:
 @access private
 */
 class BaseInterface extends require('events').EventEmitter {
-	constructor () {
+	constructor() {
 		super()
 
 		// Allow extensions of this class to prepare the class instance before anything else fires
@@ -36,7 +36,7 @@ class BaseInterface extends require('events').EventEmitter {
 
 		// Generate our listener method that we will beind to different events
 		// to add support for the `done` event and better error/event handling
-		function listener (event, ...args) {
+		function listener(event, ...args) {
 			// Prepare
 			const error = args[0]
 
@@ -49,8 +49,7 @@ class BaseInterface extends require('events').EventEmitter {
 			else if (error && this.listeners(event).length === 1) {
 				if (event === 'error') {
 					throw error
-				}
-				else {
+				} else {
 					this.emit('error', error)
 				}
 			}
@@ -71,7 +70,7 @@ class BaseInterface extends require('events').EventEmitter {
 	@static
 	@access public
 	*/
-	static create (...args) {
+	static create(...args) {
 		return new this(...args)
 	}
 
@@ -82,7 +81,7 @@ class BaseInterface extends require('events').EventEmitter {
 	@returns {BaseInterface} this
 	@access public
 	*/
-	whenDone (listener) {
+	whenDone(listener) {
 		// Attach the listener
 		this.on('done', listener.bind(this))
 
@@ -97,7 +96,7 @@ class BaseInterface extends require('events').EventEmitter {
 	@returns {BaseInterface} this
 	@access public
 	*/
-	onceDone (listener) {
+	onceDone(listener) {
 		// Attach the listener
 		this.once('done', listener.bind(this))
 
@@ -112,7 +111,7 @@ class BaseInterface extends require('events').EventEmitter {
 	@returns {BaseInterface} this
 	@access public
 	*/
-	done (listener) {
+	done(listener) {
 		return this.onceDone(listener)
 	}
 
@@ -121,9 +120,10 @@ class BaseInterface extends require('events').EventEmitter {
 	@type {Array}
 	@access public
 	*/
-	get names () {
+	get names() {
 		// Fetch
-		const names = [], { name, parent, nameSeparator } = this.config
+		const names = [],
+			{ name, parent, nameSeparator } = this.config
 		if (parent) names.push(...parent.names)
 		if (name !== false) names.push(this.name)
 		names.toString = () => names.join(nameSeparator)
@@ -138,46 +138,49 @@ class BaseInterface extends require('events').EventEmitter {
 	@type {String}
 	@access public
 	*/
-	get name () {
-		return this.config.name || this.state.name || (this.state.name = `${this.type} ${Math.random()}`)
+	get name() {
+		return (
+			this.config.name ||
+			this.state.name ||
+			(this.state.name = `${this.type} ${Math.random()}`)
+		)
 	}
 
 	// ---------------------------------
 	// Backwards compatability helpers
 
-	getNames (opts) {
+	getNames(opts) {
 		return opts && opts.separator ? this.names.join(opts.separator) : this.names
 	}
 
-	getConfig () {
+	getConfig() {
 		return this.config
 	}
 
-	getTotalItems () {
+	getTotalItems() {
 		return this.totalItems
 	}
 
-	getItemTotals () {
+	getItemTotals() {
 		return this.itemTotals
 	}
 
-	isCompleted () {
+	isCompleted() {
 		return this.completed
 	}
 
-	hasStarted () {
+	hasStarted() {
 		return this.started
 	}
 
-	addGroup (...args) {
+	addGroup(...args) {
 		return this.addTaskGroup(...args)
 	}
 
-	clear (...args) {
+	clear(...args) {
 		this.clearRemaining(...args)
 		return this
 	}
-
 }
 
 // Exports

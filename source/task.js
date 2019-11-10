@@ -60,7 +60,7 @@ Task.create('my task that passes an error', function (complete) {
 @access public
 */
 class Task extends BaseInterface {
-	constructor (...args) {
+	constructor(...args) {
 		// Initialise BaseInterface
 		super()
 
@@ -104,7 +104,9 @@ class Task extends BaseInterface {
 	@default 'task'
 	@access private
 	*/
-	get type () { return 'task' }
+	get type() {
+		return 'task'
+	}
 
 	/**
 	A helper method to check if the passed argument is a {Task} via instanceof and duck typing.
@@ -113,10 +115,9 @@ class Task extends BaseInterface {
 	@static
 	@access public
 	*/
-	static isTask (item) {
-		return (item && item.type === 'task') || (item instanceof this)
+	static isTask(item) {
+		return (item && item.type === 'task') || item instanceof this
 	}
-
 
 	// ===================================
 	// Accessors
@@ -127,8 +128,18 @@ class Task extends BaseInterface {
 	@default ['events', 'error', 'pending', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed']
 	@access protected
 	*/
-	get events () {
-		return ['events', 'error', 'pending', 'running', 'failed', 'passed', 'completed', 'done', 'destroyed']
+	get events() {
+		return [
+			'events',
+			'error',
+			'pending',
+			'running',
+			'failed',
+			'passed',
+			'completed',
+			'done',
+			'destroyed'
+		]
 	}
 
 	/**
@@ -136,10 +147,9 @@ class Task extends BaseInterface {
 	@type {boolean}
 	@access private
 	*/
-	get storeResult () {
+	get storeResult() {
 		return this.config.storeResult !== false
 	}
-
 
 	// -----------------------------------
 	// State Accessors
@@ -149,14 +159,18 @@ class Task extends BaseInterface {
 	@type {Error}
 	@access protected
 	*/
-	get error () { return this.state.error }
+	get error() {
+		return this.state.error
+	}
 
 	/**
 	A {String} containing our current status. See our {Task} description for available values.
 	@type {String}
 	@access protected
 	*/
-	get status () { return this.state.status }
+	get status() {
+		return this.state.status
+	}
 
 	/**
 	An {Array} representing the returned result or the passed {Arguments} of our method (minus the first error argument).
@@ -164,8 +178,9 @@ class Task extends BaseInterface {
 	@type {?Array}
 	@access protected
 	*/
-	get result () { return this.state.result }
-
+	get result() {
+		return this.state.result
+	}
 
 	// ---------------------------------
 	// Status Accessors
@@ -175,7 +190,7 @@ class Task extends BaseInterface {
 	@type {Boolean}
 	@access private
 	*/
-	get started () {
+	get started() {
 		return this.state.status !== 'created'
 	}
 
@@ -184,7 +199,7 @@ class Task extends BaseInterface {
 	@type {Boolean}
 	@access private
 	*/
-	get exited () {
+	get exited() {
 		switch (this.state.status) {
 			case 'failed':
 			case 'passed':
@@ -201,7 +216,7 @@ class Task extends BaseInterface {
 	@type {Boolean}
 	@access private
 	*/
-	get completed () {
+	get completed() {
 		switch (this.state.status) {
 			case 'failed':
 			case 'passed':
@@ -222,7 +237,7 @@ class Task extends BaseInterface {
 	@returns {this}
 	@access private
 	*/
-	resetResult () {
+	resetResult() {
 		this.state.result = null
 		return this
 	}
@@ -233,7 +248,7 @@ class Task extends BaseInterface {
 	@returns {this}
 	@access private
 	*/
-	clearDomain () {
+	clearDomain() {
 		const taskDomain = this.state.taskDomain
 		if (taskDomain) {
 			taskDomain.exit()
@@ -242,7 +257,6 @@ class Task extends BaseInterface {
 		}
 		return this
 	}
-
 
 	// ===================================
 	// Initialization
@@ -272,11 +286,11 @@ class Task extends BaseInterface {
 	@returns {this}
 	@access public
 	*/
-	setConfig (...args) {
+	setConfig(...args) {
 		const opts = {}
 
 		// Extract the configuration from the arguments
-		args.forEach(function (arg) {
+		args.forEach(function(arg) {
 			if (arg == null) return
 			const type = typeof arg
 			switch (type) {
@@ -290,7 +304,9 @@ class Task extends BaseInterface {
 					extendr.deep(opts, arg)
 					break
 				default: {
-					throw new Error(`Unknown argument type of [${type}] given to Task::setConfig()`)
+					throw new Error(
+						`Unknown argument type of [${type}] given to Task::setConfig()`
+					)
 				}
 			}
 		})
@@ -327,7 +343,9 @@ class Task extends BaseInterface {
 				case 'sync':
 				case 'timeout':
 				case 'exit':
-					throw new Error(`Deprecated configuration property [${key}] given to Task::setConfig()`)
+					throw new Error(
+						`Deprecated configuration property [${key}] given to Task::setConfig()`
+					)
 
 				default:
 					this.config[key] = value
@@ -338,7 +356,6 @@ class Task extends BaseInterface {
 		// Chain
 		return this
 	}
-
 
 	// ===================================
 	// Workflow
@@ -351,7 +368,7 @@ class Task extends BaseInterface {
 	@returns {this}
 	@access private
 	*/
-	itemCompletionCallback (...args) {
+	itemCompletionCallback(...args) {
 		// Store the first error
 		let error = this.state.error
 		if (args[0] && !error) {
@@ -387,7 +404,7 @@ class Task extends BaseInterface {
 	@access private
 	@returns {void}
 	*/
-	abort () {
+	abort() {
 		throw new Error('not yet implemented')
 	}
 
@@ -397,7 +414,7 @@ class Task extends BaseInterface {
 	@returns {this}
 	@access private
 	*/
-	finish () {
+	finish() {
 		const error = this.state.error
 
 		// Complete for the first (and hopefully only) time
@@ -423,8 +440,14 @@ class Task extends BaseInterface {
 
 		// Error as we have already completed before
 		else if (this.config.errorOnExcessCompletions) {
-			const source = (this.config.method.unbounded || this.config.method || 'no longer present').toString()
-			const completedError = new Error(`The task [${this.names}] just completed, but it had already completed earlier, this is unexpected.\nTask Source: ${source}`)
+			const source = (
+				this.config.method.unbounded ||
+				this.config.method ||
+				'no longer present'
+			).toString()
+			const completedError = new Error(
+				`The task [${this.names}] just completed, but it had already completed earlier, this is unexpected.\nTask Source: ${source}`
+			)
 			this.emit('error', completedError)
 		}
 
@@ -438,7 +461,7 @@ class Task extends BaseInterface {
 	@returns {this}
 	@access public
 	*/
-	destroy () {
+	destroy() {
 		// Update our status and notify our listeners
 		this.state.status = 'destroyed'
 		this.emit('destroyed')
@@ -462,7 +485,7 @@ class Task extends BaseInterface {
 	@returns {this}
 	@access private
 	*/
-	fire () {
+	fire() {
 		// Prepare
 		const taskArgs = (this.config.args || []).slice()
 		let taskDomain = this.state.taskDomain
@@ -471,7 +494,9 @@ class Task extends BaseInterface {
 
 		// Check that we have a method to fire
 		if (!method) {
-			const error = new Error(`The task [${this.names}] failed to run as no method was defined for it.`)
+			const error = new Error(
+				`The task [${this.names}] failed to run as no method was defined for it.`
+			)
 			this.emit('error', error)
 			return this
 		}
@@ -486,9 +511,10 @@ class Task extends BaseInterface {
 				this.state.taskDomain = taskDomain = domain.create()
 				taskDomain.on('error', exitMethod)
 			}
-		}
-		else if (this.config.domain === true) {
-			const error = new Error(`The task [${this.names}] failed to run as it requested to use domains but domains are not available.`)
+		} else if (this.config.domain === true) {
+			const error = new Error(
+				`The task [${this.names}] failed to run as it requested to use domains but domains are not available.`
+			)
 			this.emit('error', error)
 			return this
 		}
@@ -500,11 +526,10 @@ class Task extends BaseInterface {
 				this.clearDomain()
 				taskDomain = null
 				exitMethod(...args)
-			}
-			else {
+			} else {
 				// Use the next tick workaround to escape the try...catch scope
 				// Which would otherwise catch errors inside our code when it shouldn't therefore suppressing errors
-				queue(function () {
+				queue(function() {
 					exitMethod(...args)
 				})
 			}
@@ -533,12 +558,10 @@ class Task extends BaseInterface {
 		// Fire the method within the domain if desired, otherwise execute directly
 		if (taskDomain) {
 			taskDomain.run(fireMethod)
-		}
-		else {
+		} else {
 			try {
 				fireMethod()
-			}
-			catch (error) {
+			} catch (error) {
 				exitMethod(error)
 			}
 		}
@@ -554,10 +577,12 @@ class Task extends BaseInterface {
 	@returns {this}
 	@access public
 	*/
-	run () {
+	run() {
 		// Already started?
 		if (this.state.status !== 'created') {
-			const error = new Error(`Invalid run status for the Task [${this.names}], it was [${this.state.status}] instead of [created].`)
+			const error = new Error(
+				`Invalid run status for the Task [${this.names}], it was [${this.state.status}] instead of [created].`
+			)
 			this.emit('error', error)
 			return this
 		}

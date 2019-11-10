@@ -42,7 +42,7 @@ Available internal statuses:
 @access public
 */
 class TaskGroup extends BaseInterface {
-	constructor (...args) {
+	constructor(...args) {
 		super()
 
 		// Prepare (used for class extensions)
@@ -98,7 +98,9 @@ class TaskGroup extends BaseInterface {
 	@default 'taskgroup'
 	@access private
 	*/
-	get type () { return 'taskgroup' }
+	get type() {
+		return 'taskgroup'
+	}
 
 	/**
 	A helper method to check if the passed argument is a {TaskGroup} via instanceof and duck typing.
@@ -107,7 +109,7 @@ class TaskGroup extends BaseInterface {
 	@static
 	@access public
 	*/
-	static isTaskGroup (group) {
+	static isTaskGroup(group) {
 		return (group && group.type === 'taskgroup') || group instanceof this
 	}
 
@@ -117,7 +119,9 @@ class TaskGroup extends BaseInterface {
 	@default Task
 	@access public
 	*/
-	get Task () { return Task }
+	get Task() {
+		return Task
+	}
 
 	/**
 	A reference to the {TaskGroup} class for use in {@link TaskGroup#createTaskGroup} if we want to override it.
@@ -125,8 +129,9 @@ class TaskGroup extends BaseInterface {
 	@default TaskGroup
 	@access public
 	*/
-	get TaskGroup () { return TaskGroup }
-
+	get TaskGroup() {
+		return TaskGroup
+	}
 
 	// ===================================
 	// Accessors
@@ -136,8 +141,17 @@ class TaskGroup extends BaseInterface {
 	@type {Array}
 	@access protected
 	*/
-	get events () {
-		return ['error', 'pending', 'running', 'passed', 'failed', 'completed', 'done', 'destroyed']
+	get events() {
+		return [
+			'error',
+			'pending',
+			'running',
+			'passed',
+			'failed',
+			'completed',
+			'done',
+			'destroyed'
+		]
 	}
 
 	/**
@@ -145,11 +159,10 @@ class TaskGroup extends BaseInterface {
 	@type {boolean}
 	@access private
 	*/
-	get storeResult () {
+	get storeResult() {
 		const { storeResult, destroyOnceDone } = this.config
-		return storeResult == null ? destroyOnceDone : (storeResult !== false)
+		return storeResult == null ? destroyOnceDone : storeResult !== false
 	}
-
 
 	// -----------------------------------
 	// State Accessors
@@ -159,14 +172,18 @@ class TaskGroup extends BaseInterface {
 	@type {Error}
 	@access protected
 	*/
-	get error () { return this.state.error }
+	get error() {
+		return this.state.error
+	}
 
 	/**
 	A {String} containing our current status. See our {TaskGroup} description for available values.
 	@type {String}
 	@access protected
 	*/
-	get status () { return this.state.status }
+	get status() {
+		return this.state.status
+	}
 
 	/**
 	An {Array} that contains the result property for each completed {Task} and {TaskGroup}.
@@ -174,8 +191,9 @@ class TaskGroup extends BaseInterface {
 	@type {?Array}
 	@access protected
 	*/
-	get result () { return this.state.result }
-
+	get result() {
+		return this.state.result
+	}
 
 	// ---------------------------------
 	// Status Accessors
@@ -185,7 +203,7 @@ class TaskGroup extends BaseInterface {
 	@type {Number}
 	@access public
 	*/
-	get totalItems () {
+	get totalItems() {
 		const remaining = this.state.itemsRemaining.length
 		const executing = this.state.itemsExecutingCount
 		const done = this.state.itemsDoneCount
@@ -207,7 +225,7 @@ class TaskGroup extends BaseInterface {
 	@type {Object}
 	@access public
 	*/
-	get itemTotals () {
+	get itemTotals() {
 		const remaining = this.state.itemsRemaining.length
 		const executing = this.state.itemsExecutingCount
 		const done = this.state.itemsDoneCount
@@ -227,7 +245,7 @@ class TaskGroup extends BaseInterface {
 	@type {Boolean}
 	@access private
 	*/
-	get hasRemaining () {
+	get hasRemaining() {
 		return this.state.itemsRemaining.length !== 0
 	}
 
@@ -236,7 +254,7 @@ class TaskGroup extends BaseInterface {
 	@type {Boolean}
 	@access private
 	*/
-	get hasRunning () {
+	get hasRunning() {
 		return this.state.itemsExecutingCount !== 0
 	}
 
@@ -245,7 +263,7 @@ class TaskGroup extends BaseInterface {
 	@type {Boolean}
 	@access private
 	*/
-	get hasItems () {
+	get hasItems() {
 		return this.hasRunning || this.hasRemaining
 	}
 
@@ -254,7 +272,7 @@ class TaskGroup extends BaseInterface {
 	@type {Boolean}
 	@access private
 	*/
-	get hasError () {
+	get hasError() {
 		return this.state.error != null
 	}
 
@@ -263,7 +281,7 @@ class TaskGroup extends BaseInterface {
 	@type {Boolean}
 	@access private
 	*/
-	get hasResult () {
+	get hasResult() {
 		return this.hasError || this.state.result.length !== 0
 	}
 
@@ -272,7 +290,7 @@ class TaskGroup extends BaseInterface {
 	@type {Boolean}
 	@access private
 	*/
-	get hasSlots () {
+	get hasSlots() {
 		const concurrency = this.config.concurrency
 		return concurrency === 0 || this.state.itemsExecutingCount < concurrency
 	}
@@ -283,7 +301,7 @@ class TaskGroup extends BaseInterface {
 	@type {Boolean}
 	@access private
 	*/
-	get shouldFire () {
+	get shouldFire() {
 		return !this.shouldPause && this.hasRemaining && this.hasSlots
 	}
 
@@ -292,7 +310,7 @@ class TaskGroup extends BaseInterface {
 	@type {Boolean}
 	@access private
 	*/
-	get shouldPause () {
+	get shouldPause() {
 		return this.config.abortOnError && this.hasError
 	}
 
@@ -301,7 +319,7 @@ class TaskGroup extends BaseInterface {
 	@type {Boolean}
 	@access private
 	*/
-	get paused () {
+	get paused() {
 		return this.shouldPause && !this.hasRunning
 	}
 
@@ -310,7 +328,7 @@ class TaskGroup extends BaseInterface {
 	@type {Boolean}
 	@access private
 	*/
-	get empty () {
+	get empty() {
 		return !this.hasItems
 	}
 
@@ -319,7 +337,7 @@ class TaskGroup extends BaseInterface {
 	@type {Boolean}
 	@access private
 	*/
-	get exited () {
+	get exited() {
 		switch (this.state.status) {
 			case 'passed':
 			case 'failed':
@@ -336,7 +354,7 @@ class TaskGroup extends BaseInterface {
 	@type {Boolean}
 	@access private
 	*/
-	get started () {
+	get started() {
 		return this.state.status !== 'created'
 	}
 
@@ -346,10 +364,9 @@ class TaskGroup extends BaseInterface {
 	@type {Boolean}
 	@access private
 	*/
-	get completed () {
+	get completed() {
 		return this.started && (this.paused || this.empty)
 	}
-
 
 	// ---------------------------------
 	// State Changers
@@ -361,7 +378,7 @@ class TaskGroup extends BaseInterface {
 	@returns {this}
 	@access private
 	*/
-	resetResult () {
+	resetResult() {
 		this.state.result = null
 
 		// Chain
@@ -374,7 +391,7 @@ class TaskGroup extends BaseInterface {
 	@returns {number} the amount of items that were dropped
 	@access public
 	*/
-	clearRemaining () {
+	clearRemaining() {
 		let dropped = 0
 		const itemsRemaining = this.state.itemsRemaining
 		while (itemsRemaining.length !== 0) {
@@ -392,12 +409,13 @@ class TaskGroup extends BaseInterface {
 	@returns {this}
 	@access private
 	*/
-	clearRunning () {
-		const error = new Error('Clearing running items is not possible. Instead remaining items and wait for running items to complete.')
+	clearRunning() {
+		const error = new Error(
+			'Clearing running items is not possible. Instead remaining items and wait for running items to complete.'
+		)
 		this.emit('error', error)
 		return this
 	}
-
 
 	// ===================================
 	// Initialization
@@ -416,7 +434,7 @@ class TaskGroup extends BaseInterface {
 	@returns {this}
 	@access private
 	*/
-	autoRun () {
+	autoRun() {
 		// Prepare
 		const method = this.config.method
 		let run = this.config.run
@@ -476,11 +494,11 @@ class TaskGroup extends BaseInterface {
 	@returns {this}
 	@access public
 	*/
-	setConfig (...args) {
+	setConfig(...args) {
 		const opts = {}
 
 		// Extract the configuration from the arguments
-		args.forEach(function (arg) {
+		args.forEach(function(arg) {
 			if (arg == null) return
 			const type = typeof arg
 			switch (type) {
@@ -491,10 +509,12 @@ class TaskGroup extends BaseInterface {
 					opts.method = arg
 					break
 				case 'object':
-					extendr.deep(opts, arg)  // @TODO why deep?
+					extendr.deep(opts, arg) // @TODO why deep?
 					break
 				default: {
-					throw new Error(`Unknown argument type of [${type}] given to TaskGroup::setConfig()`)
+					throw new Error(
+						`Unknown argument type of [${type}] given to TaskGroup::setConfig()`
+					)
 				}
 			}
 		})
@@ -549,7 +569,9 @@ class TaskGroup extends BaseInterface {
 				case 'timeout':
 				case 'exit':
 				case 'nestedConfig':
-					throw new Error(`Deprecated configuration property [${key}] given to TaskGroup::setConfig()`)
+					throw new Error(
+						`Deprecated configuration property [${key}] given to TaskGroup::setConfig()`
+					)
 
 				default:
 					this.config[key] = value
@@ -568,7 +590,7 @@ class TaskGroup extends BaseInterface {
 	@returns {this}
 	@access public
 	*/
-	setNestedTaskConfig (opts) {
+	setNestedTaskConfig(opts) {
 		// Fetch and copy options to the state's nested task configuration
 		extendr.deep(this.state.nestedTaskConfig, opts)
 
@@ -583,14 +605,13 @@ class TaskGroup extends BaseInterface {
 	@returns {this}
 	@access public
 	*/
-	setNestedTaskGroupConfig (opts) {
+	setNestedTaskGroupConfig(opts) {
 		// Fetch and copy options to the state's nested configuration
 		extendr.deep(this.state.nestedTaskGroupConfig, opts)
 
 		// Chain
 		return this
 	}
-
 
 	// ===================================
 	// Items
@@ -606,16 +627,16 @@ class TaskGroup extends BaseInterface {
 	@returns {this}
 	@access private
 	*/
-	addMethod (method, opts = {}) {
+	addMethod(method, opts = {}) {
 		method = unbounded.binder.call(method, this) // run the taskgroup method on the group, rather than itself
 		method.isTaskGroupMethod = true
 		if (!opts.name) opts.name = 'taskgroup method for ' + this.name
-		if (!opts.args) opts.args = [this.addTaskGroup.bind(this), this.addTask.bind(this)]
-		if (opts.storeResult == null) opts.storeResult = false  // by default, hide result for methods
+		if (!opts.args)
+			opts.args = [this.addTaskGroup.bind(this), this.addTask.bind(this)]
+		if (opts.storeResult == null) opts.storeResult = false // by default, hide result for methods
 		this.addTask(method, opts)
 		return this
 	}
-
 
 	// ---------------------------------
 	// Add Item
@@ -628,7 +649,7 @@ class TaskGroup extends BaseInterface {
 	@returns {this}
 	@access public
 	*/
-	addItem (item, ...args) {
+	addItem(item, ...args) {
 		// Prepare
 		const me = this
 
@@ -656,13 +677,21 @@ class TaskGroup extends BaseInterface {
 
 		// Nested configuration
 		if (isTask) item.setConfig(itemConfig, nestedTaskConfig, ...args)
-		else if (isTaskGroup) item.setConfig(itemConfig, { nestedTaskConfig, nestedTaskGroupConfig }, nestedTaskGroupConfig, ...args)
+		else if (isTaskGroup)
+			item.setConfig(
+				itemConfig,
+				{ nestedTaskConfig, nestedTaskGroupConfig },
+				nestedTaskGroupConfig,
+				...args
+			)
 
 		// Name default
 		// @todo perhaps this can come after item.add emissions, in case the user wants to set the item name there,
 		// however that is signficant complexity to test, so for now won't bother
 		if (!item.config.name) {
-			item.config.name = `${item.type} ${this.totalItems + 1} for [${this.name}]`
+			item.config.name = `${item.type} ${this.totalItems + 1} for [${
+				this.name
+			}]`
 		}
 
 		// Store Result Default
@@ -681,8 +710,8 @@ class TaskGroup extends BaseInterface {
 
 		// Bubble the nested events if desired
 		if (emitNestedEvents) {
-			item.events.forEach(function (event) {
-				item.on(event, function (...args) {
+			item.events.forEach(function(event) {
+				item.on(event, function(...args) {
 					if (isTask) me.emit(`task.${event}`, item, ...args)
 					else if (isTaskGroup) me.emit(`task.${event}`, item, ...args)
 					me.emit(`item.${event}`, item, ...args)
@@ -714,11 +743,10 @@ class TaskGroup extends BaseInterface {
 	@returns {this}
 	@access public
 	*/
-	addItems (items, ...args) {
-		ensureArray(items).forEach((item) => this.addItem(item, ...args))
+	addItems(items, ...args) {
+		ensureArray(items).forEach(item => this.addItem(item, ...args))
 		return this
 	}
-
 
 	// ---------------------------------
 	// Add Task
@@ -730,7 +758,7 @@ class TaskGroup extends BaseInterface {
 	@return {Task}
 	@access public
 	*/
-	createTask (...args) {
+	createTask(...args) {
 		// Prepare
 		let task
 
@@ -757,7 +785,7 @@ class TaskGroup extends BaseInterface {
 	@returns {this}
 	@access public
 	*/
-	addTask (...args) {
+	addTask(...args) {
 		const task = this.createTask(...args)
 		this.addItem(task)
 		return this
@@ -771,11 +799,10 @@ class TaskGroup extends BaseInterface {
 	@returns {this}
 	@access public
 	*/
-	addTasks (items, ...args) {
-		ensureArray(items).forEach((item) => this.addTask(item, ...args))
+	addTasks(items, ...args) {
+		ensureArray(items).forEach(item => this.addTask(item, ...args))
 		return this
 	}
-
 
 	// ---------------------------------
 	// Add Group
@@ -787,7 +814,7 @@ class TaskGroup extends BaseInterface {
 	@return {TaskGroup}
 	@access public
 	*/
-	createTaskGroup (...args) {
+	createTaskGroup(...args) {
 		// Prepare
 		let group
 
@@ -814,7 +841,7 @@ class TaskGroup extends BaseInterface {
 	@returns {this}
 	@access public
 	*/
-	addTaskGroup (...args) {
+	addTaskGroup(...args) {
 		const group = this.createTaskGroup(...args)
 		this.addItem(group)
 		return this
@@ -828,11 +855,10 @@ class TaskGroup extends BaseInterface {
 	@returns {this}
 	@access public
 	*/
-	addTaskGroups (items, ...args) {
-		ensureArray(items).forEach((item) => this.addTaskGroup(item, ...args))
+	addTaskGroups(items, ...args) {
+		ensureArray(items).forEach(item => this.addTaskGroup(item, ...args))
 		return this
 	}
-
 
 	// ===================================
 	// Workflow
@@ -842,7 +868,7 @@ class TaskGroup extends BaseInterface {
 	@return {Array|false} Either an {Array} of items that were fired or `false` if no items were fired.
 	@access private
 	*/
-	fireNextItems () {
+	fireNextItems() {
 		// Prepare
 		const items = []
 
@@ -852,8 +878,7 @@ class TaskGroup extends BaseInterface {
 			const item = this.fireNextItem()
 			if (item) {
 				items.push(item)
-			}
-			else {
+			} else {
 				break
 			}
 		}
@@ -868,7 +893,7 @@ class TaskGroup extends BaseInterface {
 	@return {Task|TaskGroup|false} Either the {Task|TaskGroup} item that was fired or `false` if no item was fired.
 	@access private
 	*/
-	fireNextItem () {
+	fireNextItem() {
 		// Prepare
 		let result = false
 
@@ -903,7 +928,7 @@ class TaskGroup extends BaseInterface {
 	@param {...*} args - The arguments that the item completed with.
 	@access private
 	*/
-	itemDoneCallbackUpdateState (item, ...args) {
+	itemDoneCallbackUpdateState(item, ...args) {
 		// Prepare
 		const result = this.state.result
 
@@ -934,7 +959,7 @@ class TaskGroup extends BaseInterface {
 	@param {Task|TaskGroup} item - The item that has completed
 	@access private
 	*/
-	itemDoneCallbackNextState (item) {
+	itemDoneCallbackNextState(item) {
 		// As we no longer have any use for this item, as it has completed, destroy the item if desired
 		if (this.config.destroyDoneItems) {
 			item.destroy()
@@ -954,7 +979,7 @@ class TaskGroup extends BaseInterface {
 	@returns {this}
 	@access private
 	*/
-	finish () {
+	finish() {
 		// Set and emmit the appropriate status for our error or non-error
 		const error = this.state.error
 		const status = error ? 'failed' : 'passed'
@@ -989,7 +1014,7 @@ class TaskGroup extends BaseInterface {
 	@access private
 	@returns {void}
 	*/
-	abort () {
+	abort() {
 		throw new Error('not yet implemented')
 	}
 
@@ -999,7 +1024,7 @@ class TaskGroup extends BaseInterface {
 	@returns {this}
 	@access public
 	*/
-	destroy () {
+	destroy() {
 		// Update our status and notify our listeners
 		this.state.status = 'destroyed'
 		this.emit('destroyed')
@@ -1023,7 +1048,7 @@ class TaskGroup extends BaseInterface {
 	@returns {this}
 	@access private
 	*/
-	fire () {
+	fire() {
 		// Have we started are not destroyed?
 		if (this.started && this.state.status !== 'destroyed') {
 			// Check if we are complete, if so, exit
@@ -1048,10 +1073,12 @@ class TaskGroup extends BaseInterface {
 	@returns {this}
 	@access public
 	*/
-	run () {
+	run() {
 		// Prevent running on destroy
 		if (this.state.status === 'destroyed') {
-			const error = new Error(`Invalid run status for the TaskGroup [${this.names}], it was [${this.state.status}].`)
+			const error = new Error(
+				`Invalid run status for the TaskGroup [${this.names}], it was [${this.state.status}].`
+			)
 			this.emit('error', error)
 			return this
 		}
