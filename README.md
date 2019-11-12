@@ -131,7 +131,8 @@ These amazing people have contributed code to this project:
 <li><a href="https://github.com/crito">crito</a> — <a href="https://github.com/bevry/taskgroup/commits?author=crito" title="View the GitHub contributions of crito on repository bevry/taskgroup">view contributions</a></li>
 <li><a href="https://github.com/pflannery">Peter Flannery</a> — <a href="https://github.com/bevry/taskgroup/commits?author=pflannery" title="View the GitHub contributions of Peter Flannery on repository bevry/taskgroup">view contributions</a></li>
 <li><a href="http://seanfridman.com">Sean Fridman</a> — <a href="https://github.com/bevry/taskgroup/commits?author=sfrdmn" title="View the GitHub contributions of Sean Fridman on repository bevry/taskgroup">view contributions</a></li>
-<li><a href="http://github.com/apps/dependabot">dependabot[bot]</a> — <a href="https://github.com/bevry/taskgroup/commits?author=dependabot[bot]" title="View the GitHub contributions of dependabot[bot] on repository bevry/taskgroup">view contributions</a></li></ul>
+<li><a href="http://github.com/apps/dependabot">dependabot[bot]</a> — <a href="https://github.com/bevry/taskgroup/commits?author=dependabot[bot]" title="View the GitHub contributions of dependabot[bot] on repository bevry/taskgroup">view contributions</a></li>
+<li><a href="http://github.com/apps/dependabot-preview">dependabot-preview[bot]</a> — <a href="https://github.com/bevry/taskgroup/commits?author=dependabot-preview[bot]" title="View the GitHub contributions of dependabot-preview[bot] on repository bevry/taskgroup">view contributions</a></li></ul>
 
 <a href="https://github.com/bevry/taskgroup/blob/master/CONTRIBUTING.md#files">Discover how you can contribute by heading on over to the <code>CONTRIBUTING.md</code> file.</a>
 
