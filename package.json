@@ -101,7 +101,7 @@
     "ambi": "3.2.0",
     "eachr": "^3.2.0",
     "extendr": "^3.5.0",
-    "safeps": "8.0.0",
+    "safeps": "8.1.0",
     "unbounded": "^1.2.0"
   },
   "devDependencies": {
