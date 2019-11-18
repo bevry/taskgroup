@@ -98,7 +98,7 @@
   "main": "source/index.js",
   "browser": "edition-browsers/index.js",
   "dependencies": {
-    "ambi": "3.2.0",
+    "ambi": "6.0.0",
     "eachr": "^4.1.0",
     "extendr": "^4.0.0",
     "safeps": "9.0.0",
