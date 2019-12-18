@@ -6,13 +6,16 @@
   "homepage": "https://github.com/bevry/taskgroup",
   "license": "MIT",
   "keywords": [
-    "flow",
-    "control",
     "async",
+    "batch",
+    "browser",
+    "concurrency",
+    "control",
+    "flow",
     "sync",
     "tasks",
-    "batch",
-    "concurrency"
+    "typed",
+    "types"
   ],
   "badges": {
     "list": [
@@ -54,9 +57,7 @@
     "Benjamin Lupton <b@lupton.cc> (http://balupton.com)",
     "crito <crito@cryptodrunks.net> (https://github.com/crito)",
     "Peter Flannery (https://github.com/pflannery)",
-    "Sean Fridman <mail@seanfridman.com> (http://seanfridman.com)",
-    "dependabot[bot] (http://github.com/apps/dependabot)",
-    "dependabot-preview[bot] (http://github.com/apps/dependabot-preview)"
+    "Sean Fridman <mail@seanfridman.com> (http://seanfridman.com)"
   ],
   "bugs": {
     "url": "https://github.com/bevry/taskgroup/issues"
@@ -70,7 +71,7 @@
   },
   "editions": [
     {
-      "description": "esnext source code with require for modules",
+      "description": "ESNext source code for Node.js with Require for modules",
       "directory": "source",
       "entry": "index.js",
       "tags": [
@@ -79,12 +80,12 @@
         "require"
       ],
       "engines": {
-        "node": "8 || 10 || 12",
+        "node": "8 || 10 || 12 || 13",
         "browsers": false
       }
     },
     {
-      "description": "esnext compiled for browsers with require for modules",
+      "description": "ESNext compiled for web browsers with Require for modules",
       "directory": "edition-browsers",
       "entry": "index.js",
       "tags": [
@@ -105,7 +106,7 @@
     "eachr": "^4.5.0",
     "extendr": "^4.3.0",
     "safeps": "^9.3.0",
-    "unbounded": "^2.2.0"
+    "unbounded": "^2.3.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.5",
@@ -116,14 +117,14 @@
     "eslint": "^6.7.2",
     "eslint-config-bevry": "^2.3.0",
     "eslint-config-prettier": "^6.7.0",
-    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-prettier": "^3.1.2",
     "jsdoc": "^3.6.3",
     "kava": "^4.4.0",
     "minami": "^1.2.3",
     "prettier": "^1.19.1",
-    "projectz": "^1.16.0",
+    "projectz": "^1.19.0",
     "surge": "^0.21.3",
-    "valid-directory": "^1.5.0"
+    "valid-directory": "^1.6.0"
   },
   "scripts": {
     "our:clean": "rm -Rf ./docs ./edition* ./es2015 ./es5 ./out ./.next",
@@ -144,9 +145,9 @@
     "our:setup:install": "npm install",
     "our:test": "npm run our:verify && npm test",
     "our:verify": "npm run our:verify:directory && npm run our:verify:eslint && npm run our:verify:prettier",
-    "our:verify:directory": "npx valid-directory",
+    "our:verify:directory": "valid-directory",
     "our:verify:eslint": "eslint --fix --ignore-pattern '**/*.d.ts' --ignore-pattern '**/vendor/' --ignore-pattern '**/node_modules/' --ext .mjs,.js,.jsx,.ts,.tsx ./source",
-    "our:verify:prettier": "prettier --write ./source/**",
+    "our:verify:prettier": "prettier --write ./source/** *.md",
     "test": "node ./source/test.js"
   },
   "eslintConfig": {
@@ -166,7 +167,10 @@
           [
             "@babel/preset-env",
             {
-              "targets": "defaults",
+              "targets": {
+                "esmodules": false,
+                "browsers": "defaults"
+              },
               "modules": false
             }
           ]
