@@ -37,7 +37,7 @@ Group together synchronous and asynchronous tasks and execute them with support 
 
 [Complete API Documentation.](http://master.taskgroup.bevry.surge.sh/docs/)
 
-[Tutorials & Guides](https://gitbook.bevry.me/taskgroup/)
+[Tutorials & Guides.](https://taskgroup.bevry.me)
 
 [Web Browser Demonstration.](http://master.taskgroup.bevry.surge.sh/web/)
 
