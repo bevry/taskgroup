@@ -9,7 +9,7 @@ const {
 	throwErrorViaCallback,
 	returnViaCallback,
 	expectViaCallback,
-	expectErrorViaCallback
+	expectErrorViaCallback,
 } = require('assert-helpers')
 const { wait } = require('./test-util')
 const { Task, TaskGroup } = require('../')
@@ -21,7 +21,7 @@ function bump(checks, thrower) {
 	if (checks.i == null) checks.i = 0
 	if (checks.n == null) checks.n = 0
 	++checks.n
-	return err => {
+	return (err) => {
 		++checks.i
 		if (err && thrower) {
 			checks.error = err
@@ -44,9 +44,9 @@ function bumped(checks, next) {
 }
 
 // Task
-kava.suite('test-usage: task', function(suite, test) {
+kava.suite('test-usage: task', function (suite, test) {
 	// failure: done with no run
-	test('Task.create(...).done(...) should time out when run was not called', function(complete) {
+	test('Task.create(...).done(...) should time out when run was not called', function (complete) {
 		const checks = {}
 		Task.create(returnViaCallback(5)).done(
 			throwErrorViaCallback('unexpected error')
@@ -55,7 +55,7 @@ kava.suite('test-usage: task', function(suite, test) {
 	})
 
 	// failure: done with no task method
-	test('Task.create().run().done(...) should fail as there was no task method defined', function(complete) {
+	test('Task.create().run().done(...) should fail as there was no task method defined', function (complete) {
 		const checks = {}
 		Task.create()
 			.run()
@@ -71,7 +71,7 @@ kava.suite('test-usage: task', function(suite, test) {
 	})
 
 	// success: run then done
-	test('Task.create(...).run().done(...) should fire the completion callback with the expected result', function(complete) {
+	test('Task.create(...).run().done(...) should fire the completion callback with the expected result', function (complete) {
 		const checks = {}
 		Task.create(returnViaCallback(5))
 			.run()
@@ -81,7 +81,7 @@ kava.suite('test-usage: task', function(suite, test) {
 	})
 
 	// success: done then run
-	test('Task.create(...).done(...).run() should fire the completion callback with the expected result', function(complete) {
+	test('Task.create(...).done(...).run() should fire the completion callback with the expected result', function (complete) {
 		const checks = {}
 		Task.create(returnViaCallback(5))
 			.run()
@@ -91,7 +91,7 @@ kava.suite('test-usage: task', function(suite, test) {
 	})
 
 	// failure: done then run then run
-	test('Task.create(...).done(...).run().run() should fail as a task is not allowed to run twice', function(complete) {
+	test('Task.create(...).done(...).run().run() should fail as a task is not allowed to run twice', function (complete) {
 		const checks = {}
 		Task.create(returnViaCallback(5))
 			.on(
@@ -108,11 +108,11 @@ kava.suite('test-usage: task', function(suite, test) {
 	})
 
 	// failure: run then run then done
-	test('Task.create(...).run().run().done(...) should fail as a task is not allowed to run twice', function(complete) {
+	test('Task.create(...).run().run().done(...) should fail as a task is not allowed to run twice', function (complete) {
 		const checks = {}
 		expectThrowViaFunction(
 			'run status',
-			function() {
+			function () {
 				Task.create(returnViaCallback(5))
 					.run()
 					.run()
@@ -126,9 +126,9 @@ kava.suite('test-usage: task', function(suite, test) {
 })
 
 // Taskgroup
-kava.suite('test-usage: taskgroup', function(suite, test) {
+kava.suite('test-usage: taskgroup', function (suite, test) {
 	// success: done with no tasks then run
-	test('TaskGroup.create().run().done(...) should complete with no result', function(complete) {
+	test('TaskGroup.create().run().done(...) should complete with no result', function (complete) {
 		const checks = {}
 		TaskGroup.create()
 			.run()
@@ -159,11 +159,11 @@ kava.suite('test-usage: taskgroup', function(suite, test) {
 	*/
 
 	// success: multiple runs
-	test('Taskgroup should be able to complete multiple times with destroyOnceDone: false', function(complete) {
+	test('Taskgroup should be able to complete multiple times with destroyOnceDone: false', function (complete) {
 		const checks = {}
 		const tasks = TaskGroup.create({
 			destroyOnceDone: false,
-			storeResult: true
+			storeResult: true,
 		})
 			.addTask(returnViaCallback(5))
 			.run()
@@ -171,13 +171,13 @@ kava.suite('test-usage: taskgroup', function(suite, test) {
 
 		// @TODO should probably require a new .run() and a clear of results
 
-		wait(delay, function() {
+		wait(delay, function () {
 			tasks
 				.addTask(returnViaCallback(10))
 				.done(
 					expectViaCallback(null, [
 						[null, 5],
-						[null, 10]
+						[null, 10],
 					])
 				)
 				.done(bump(checks))
@@ -186,7 +186,7 @@ kava.suite('test-usage: taskgroup', function(suite, test) {
 	})
 
 	// success: run then done then add
-	test('TaskGroup.create().run().done(...).addTask(...) should complete with the tasks result', function(complete) {
+	test('TaskGroup.create().run().done(...).addTask(...) should complete with the tasks result', function (complete) {
 		const checks = {}
 		TaskGroup.create()
 			.run()
@@ -198,13 +198,13 @@ kava.suite('test-usage: taskgroup', function(suite, test) {
 	})
 
 	// success: done then task then run then done
-	test('TaskGroup.create().done().addTask(...).run().addTask(...).done(...) should complete correctly', function(complete) {
+	test('TaskGroup.create().done().addTask(...).run().addTask(...).done(...) should complete correctly', function (complete) {
 		const checks = {}
 		TaskGroup.create()
 			.done(
 				expectViaCallback(null, [
 					[null, 5],
-					[null, 10]
+					[null, 10],
 				])
 			)
 			.done(bump(checks))
@@ -213,7 +213,7 @@ kava.suite('test-usage: taskgroup', function(suite, test) {
 			.done(
 				expectViaCallback(null, [
 					[null, 5],
-					[null, 10]
+					[null, 10],
 				])
 			)
 			.done(bump(checks))
@@ -223,13 +223,13 @@ kava.suite('test-usage: taskgroup', function(suite, test) {
 	})
 
 	// success: done then task then run then done
-	test('TaskGroup.create().run().run().done(...) should complete only once', function(complete) {
+	test('TaskGroup.create().run().run().done(...) should complete only once', function (complete) {
 		const checks = {}
 		TaskGroup.create()
 			.done(
 				expectViaCallback(null, [
 					[null, 5],
-					[null, 10]
+					[null, 10],
 				])
 			)
 			.done(bump(checks))
@@ -242,7 +242,7 @@ kava.suite('test-usage: taskgroup', function(suite, test) {
 	})
 
 	// success: pause after error
-	test('Taskgroup should pause when encountering an error', function(complete) {
+	test('Taskgroup should pause when encountering an error', function (complete) {
 		const checks = {}
 		const err = new Error('fail after 5')
 		TaskGroup.create()
@@ -256,7 +256,7 @@ kava.suite('test-usage: taskgroup', function(suite, test) {
 	})
 
 	// success: ignore after error
-	test('Taskgroup should ignore when encountering an error with different config', function(complete) {
+	test('Taskgroup should ignore when encountering an error with different config', function (complete) {
 		const checks = {}
 		const err = new Error('fail after 5')
 		TaskGroup.create({ abortOnError: false })
@@ -270,12 +270,12 @@ kava.suite('test-usage: taskgroup', function(suite, test) {
 	})
 
 	// success: resume after error
-	test('Taskgroup should be able to resume after an error', function(complete) {
+	test('Taskgroup should be able to resume after an error', function (complete) {
 		const checks = {}
 		const err = new Error('fail after 5')
 		const tasks = TaskGroup.create({
 			destroyOnceDone: false,
-			storeResult: true
+			storeResult: true,
 		})
 			.addTask(returnViaCallback(5))
 			.addTask(returnViaCallback(err))
@@ -286,7 +286,7 @@ kava.suite('test-usage: taskgroup', function(suite, test) {
 
 		// @TODO should probably require a new .run() and a clear of results
 
-		wait(delay, function() {
+		wait(delay, function () {
 			tasks
 				.addTask(returnViaCallback(15))
 				.done(

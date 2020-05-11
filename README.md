@@ -35,7 +35,7 @@ Group together synchronous and asynchronous tasks and execute them with support 
 
 ## Usage
 
-[Complete API Documentation.](http://master.taskgroup.bevry.surge.sh/docs/)
+[Complete API Documentation.](http://master.taskgroup.bevry.surge.sh/docs/index.html)
 
 [Tutorials & Guides.](https://taskgroup.bevry.me)
 
@@ -56,7 +56,7 @@ Group together synchronous and asynchronous tasks and execute them with support 
 
 ``` html
 <script type="module">
-    import * as pkg from '//dev.jspm.io/taskgroup@6.5.0'
+    import * as pkg from '//dev.jspm.io/taskgroup@7.0.0'
 </script>
 ```
 
@@ -64,7 +64,7 @@ Group together synchronous and asynchronous tasks and execute them with support 
 
 <p>This package is published with the following editions:</p>
 
-<ul><li><code>taskgroup</code> aliases <code>taskgroup/source/index.js</code></li>
+<ul><li><code>taskgroup</code> aliases <code>taskgroup/index.js</code> which uses the <a href="https://github.com/bevry/editions" title="You can use the Editions Autoloader to autoload the appropriate edition for your consumers environment">Editions Autoloader</a> to automatically select the correct edition for the consumer's environment</li>
 <li><code>taskgroup/source/index.js</code> is <a href="https://en.wikipedia.org/wiki/ECMAScript#ES.Next" title="ECMAScript Next">ESNext</a> source code for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> with <a href="https://nodejs.org/dist/latest-v5.x/docs/api/modules.html" title="Node/CJS Modules">Require</a> for modules</li>
 <li><code>taskgroup/edition-browsers/index.js</code> is <a href="https://en.wikipedia.org/wiki/ECMAScript#ES.Next" title="ECMAScript Next">ESNext</a> compiled for web browsers with <a href="https://nodejs.org/dist/latest-v5.x/docs/api/modules.html" title="Node/CJS Modules">Require</a> for modules</li></ul>
 
@@ -109,7 +109,7 @@ This project provides its type information via inline <a href="http://usejsdoc.o
 
 These amazing people are maintaining this project:
 
-<ul><li><a href="http://balupton.com">Benjamin Lupton</a> — <a href="https://github.com/bevry/taskgroup/commits?author=balupton" title="View the GitHub contributions of Benjamin Lupton on repository bevry/taskgroup">view contributions</a></li></ul>
+<ul><li><a href="https://balupton.com">Benjamin Lupton</a> — <a href="https://github.com/bevry/taskgroup/commits?author=balupton" title="View the GitHub contributions of Benjamin Lupton on repository bevry/taskgroup">view contributions</a></li></ul>
 
 <h3>Sponsors</h3>
 
@@ -129,12 +129,10 @@ No sponsors yet! Will you be the first?
 
 These amazing people have contributed code to this project:
 
-<ul><li><a href="http://balupton.com">Benjamin Lupton</a> — <a href="https://github.com/bevry/taskgroup/commits?author=balupton" title="View the GitHub contributions of Benjamin Lupton on repository bevry/taskgroup">view contributions</a></li>
-<li><a href="https://github.com/crito">crito</a> — <a href="https://github.com/bevry/taskgroup/commits?author=crito" title="View the GitHub contributions of crito on repository bevry/taskgroup">view contributions</a></li>
+<ul><li><a href="https://balupton.com">Benjamin Lupton</a> — <a href="https://github.com/bevry/taskgroup/commits?author=balupton" title="View the GitHub contributions of Benjamin Lupton on repository bevry/taskgroup">view contributions</a></li>
 <li><a href="https://github.com/pflannery">Peter Flannery</a> — <a href="https://github.com/bevry/taskgroup/commits?author=pflannery" title="View the GitHub contributions of Peter Flannery on repository bevry/taskgroup">view contributions</a></li>
-<li><a href="http://seanfridman.com">Sean Fridman</a> — <a href="https://github.com/bevry/taskgroup/commits?author=sfrdmn" title="View the GitHub contributions of Sean Fridman on repository bevry/taskgroup">view contributions</a></li>
-<li><a href="http://github.com/apps/dependabot">dependabot[bot]</a> — <a href="https://github.com/bevry/taskgroup/commits?author=dependabot[bot]" title="View the GitHub contributions of dependabot[bot] on repository bevry/taskgroup">view contributions</a></li>
-<li><a href="http://github.com/apps/dependabot-preview">dependabot-preview[bot]</a> — <a href="https://github.com/bevry/taskgroup/commits?author=dependabot-preview[bot]" title="View the GitHub contributions of dependabot-preview[bot] on repository bevry/taskgroup">view contributions</a></li></ul>
+<li><a href="https://github.com/sfrdmn">Sean Fridman</a> — <a href="https://github.com/bevry/taskgroup/commits?author=sfrdmn" title="View the GitHub contributions of Sean Fridman on repository bevry/taskgroup">view contributions</a></li>
+<li><a href="https://github.com/crito">crito</a> — <a href="https://github.com/bevry/taskgroup/commits?author=crito" title="View the GitHub contributions of crito on repository bevry/taskgroup">view contributions</a></li></ul>
 
 <a href="https://github.com/bevry/taskgroup/blob/master/CONTRIBUTING.md#files">Discover how you can contribute by heading on over to the <code>CONTRIBUTING.md</code> file.</a>
 
@@ -148,7 +146,7 @@ These amazing people have contributed code to this project:
 Unless stated otherwise all works are:
 
 <ul><li>Copyright &copy; 2013+ <a href="http://bevry.me">Bevry Pty Ltd</a></li>
-<li>Copyright &copy; 2011-2012 <a href="http://balupton.com">Benjamin Lupton</a></li></ul>
+<li>Copyright &copy; 2011-2012 <a href="https://balupton.com">Benjamin Lupton</a></li></ul>
 
 and licensed under:
 

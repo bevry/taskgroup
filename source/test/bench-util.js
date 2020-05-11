@@ -23,7 +23,7 @@ function saveSnapshot(testname, next) {
 
 	next =
 		next ||
-		function(error) {
+		function (error) {
 			if (error) return console.error(error)
 			console.log('Snapshot taken successfully:', filepath)
 		}
@@ -56,7 +56,7 @@ function stopProfile(testname, next) {
 
 	next =
 		next ||
-		function(error) {
+		function (error) {
 			if (error) return console.error(error)
 			console.log('Profile taken successfully:', filepath)
 		}

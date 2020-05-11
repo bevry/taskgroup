@@ -57,7 +57,7 @@ class TaskGroup extends BaseInterface {
 			status: 'created',
 			itemsRemaining: [],
 			itemsExecutingCount: 0,
-			itemsDoneCount: 0
+			itemsDoneCount: 0,
 		})
 
 		// Configuration defaults
@@ -75,7 +75,7 @@ class TaskGroup extends BaseInterface {
 			nestedTaskGroupConfig: {},
 			emitNestedEvents: false,
 			concurrency: 1,
-			run: null
+			run: null,
 		})
 
 		// Apply user configuration
@@ -150,7 +150,7 @@ class TaskGroup extends BaseInterface {
 			'failed',
 			'completed',
 			'done',
-			'destroyed'
+			'destroyed',
 		]
 	}
 
@@ -236,7 +236,7 @@ class TaskGroup extends BaseInterface {
 			executing,
 			done,
 			total,
-			result
+			result,
 		}
 	}
 
@@ -498,7 +498,7 @@ class TaskGroup extends BaseInterface {
 		const opts = {}
 
 		// Extract the configuration from the arguments
-		args.forEach(function(arg) {
+		args.forEach(function (arg) {
 			if (arg == null) return
 			const type = typeof arg
 			switch (type) {
@@ -658,7 +658,7 @@ class TaskGroup extends BaseInterface {
 
 		// Link our item to ourself
 		const itemConfig = {
-			parent: this
+			parent: this,
 		}
 
 		// Extract
@@ -710,8 +710,8 @@ class TaskGroup extends BaseInterface {
 
 		// Bubble the nested events if desired
 		if (emitNestedEvents) {
-			item.events.forEach(function(event) {
-				item.on(event, function(...args) {
+			item.events.forEach(function (event) {
+				item.on(event, function (...args) {
 					if (isTask) me.emit(`task.${event}`, item, ...args)
 					else if (isTaskGroup) me.emit(`task.${event}`, item, ...args)
 					me.emit(`item.${event}`, item, ...args)
@@ -744,7 +744,7 @@ class TaskGroup extends BaseInterface {
 	@access public
 	*/
 	addItems(items, ...args) {
-		ensureArray(items).forEach(item => this.addItem(item, ...args))
+		ensureArray(items).forEach((item) => this.addItem(item, ...args))
 		return this
 	}
 
@@ -800,7 +800,7 @@ class TaskGroup extends BaseInterface {
 	@access public
 	*/
 	addTasks(items, ...args) {
-		ensureArray(items).forEach(item => this.addTask(item, ...args))
+		ensureArray(items).forEach((item) => this.addTask(item, ...args))
 		return this
 	}
 
@@ -856,7 +856,7 @@ class TaskGroup extends BaseInterface {
 	@access public
 	*/
 	addTaskGroups(items, ...args) {
-		ensureArray(items).forEach(item => this.addTaskGroup(item, ...args))
+		ensureArray(items).forEach((item) => this.addTaskGroup(item, ...args))
 		return this
 	}
 

@@ -12,7 +12,7 @@ if (mode === 'profile') profileUtils.startProfile(testname)
 
 // Prepare
 function createTask(name, value) {
-	return function() {
+	return function () {
 		// $status.innerHTML += value
 		return value
 	}
@@ -35,18 +35,18 @@ for (let i = 0, n = total; i < n; ++i) {
 }
 
 // Listen for complete
-tasks.done(function() {
+tasks.done(function () {
 	const end = new Date().getTime()
 	const totalSeconds = ((end - start) / 1000).toFixed(2)
 	console.log(`Completed ${total} tasks. Total seconds: ${totalSeconds}`)
 
 	if (mode === 'heap') {
 		profileUtils.saveSnapshot(testname + '-before') // 121mb heap (due to itemsCompleted in GC)
-		setTimeout(function() {
+		setTimeout(function () {
 			profileUtils.saveSnapshot(testname + '-after') // 3mb heap
 		}, 1000)
 	} else if (mode === 'profile') {
-		setTimeout(function() {
+		setTimeout(function () {
 			profileUtils.stopProfile(testname)
 		}, 2000)
 	}

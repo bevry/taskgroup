@@ -22,13 +22,13 @@
 			$amount.value = '50000'
 			document.body.appendChild($amount)
 
-			$performance.onclick = function() {
+			$performance.onclick = function () {
 				const amount = Number($amount.value)
 				$status.innerText = `running ${amount} tasks!`
 
 				// Prepare
 				function createTask(name, value) {
-					return function() {
+					return function () {
 						// $status.innerHTML += value
 						return value
 					}
@@ -46,7 +46,7 @@
 				}
 
 				// Listen for completion
-				tasks.done(function() {
+				tasks.done(function () {
 					$status.innerText = `ran ${amount} tasks`
 				})
 

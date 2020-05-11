@@ -10,7 +10,7 @@ const { Task, TaskGroup } = require('../')
 /* eslint no-extend-native:0, no-cond-assign:0, prefer-rest-params:0 */
 // do not use ...args instead of arguments, will crash node v5 and below
 // https://travis-ci.org/bevry/taskgroup/jobs/134675452
-Array.prototype.remove = function() {
+Array.prototype.remove = function () {
 	// http://stackoverflow.com/a/3955096/130638
 	let what,
 		L = arguments.length,
@@ -37,17 +37,17 @@ class TaskGroupDebug extends TaskGroup {
 				remaining: [],
 				pending: [],
 				running: [],
-				done: []
+				done: [],
 			}
-			this.on('item.add', function(item) {
+			this.on('item.add', function (item) {
 				me.updateItemStatus(item, 'remaining')
-				item.once('pending', function() {
+				item.once('pending', function () {
 					me.updateItemStatus(item, 'pending')
 				})
-				item.once('running', function() {
+				item.once('running', function () {
 					me.updateItemStatus(item, 'running')
 				})
-				item.done(function() {
+				item.done(function () {
 					me.updateItemStatus(item, 'done')
 				})
 			})
@@ -64,7 +64,7 @@ class TaskGroupDebug extends TaskGroup {
 	}
 
 	getNamesOfItemsByStatus(status) {
-		return this.itemsStatusMap[status].map(item => item.name)
+		return this.itemsStatusMap[status].map((item) => item.name)
 	}
 
 	get itemDetails() {
@@ -82,7 +82,7 @@ class TaskGroupDebug extends TaskGroup {
 			running,
 			done,
 			result,
-			error
+			error,
 		}
 		const totals = {
 			remaining: itemDetails.remaining.length,
@@ -93,7 +93,7 @@ class TaskGroupDebug extends TaskGroup {
 				itemDetails.pending.length +
 				itemDetails.running.length +
 				itemDetails.done.length,
-			result: itemDetails.result && itemDetails.result.length
+			result: itemDetails.result && itemDetails.result.length,
 		}
 		itemDetails.totals = totals
 		return itemDetails
@@ -115,7 +115,7 @@ class TaskGroupDebug extends TaskGroup {
 					? []
 					: _expectedDetails.result,
 			error: _expectedDetails.error || null,
-			totals: this.itemTotals
+			totals: this.itemTotals,
 		}
 
 		// Do the comparison
@@ -145,20 +145,20 @@ class TaskGroupDebug extends TaskGroup {
 const delay = 100
 
 // Task
-kava.suite('test-unit: task', function(suite) {
+kava.suite('test-unit: task', function (suite) {
 	// Basic
-	suite('basic', function(suite, test) {
+	suite('basic', function (suite, test) {
 		// Async
 		// Test that the task executes correctly asynchronously
-		test('should work with async', function(done) {
+		test('should work with async', function (done) {
 			// Specify how many special checks we are expecting
 			const checks = []
 
 			// Create our asynchronous task
-			const task = Task.create(function(complete) {
+			const task = Task.create(function (complete) {
 				checks.push('task 1 - before wait')
 				// Wait a while as this is an async test
-				wait(delay, function() {
+				wait(delay, function () {
 					checks.push('task 1 - after wait')
 					equal(
 						task.status,
@@ -172,7 +172,7 @@ kava.suite('test-unit: task', function(suite) {
 			})
 
 			// Check the task completed as expected
-			task.done(function(err, result) {
+			task.done(function (err, result) {
 				checks.push('completion callback')
 				errorEqual(
 					err,
@@ -216,13 +216,13 @@ kava.suite('test-unit: task', function(suite) {
 			)
 
 			// Check that all our special checks have run
-			wait(delay * 2, function() {
+			wait(delay * 2, function () {
 				deepEqual(
 					checks,
 					[
 						'task 1 - before wait',
 						'task 1 - after wait',
-						'completion callback'
+						'completion callback',
 					],
 					'all testing checks fired correctly'
 				)
@@ -232,12 +232,12 @@ kava.suite('test-unit: task', function(suite) {
 
 		// Sync
 		// Test that the task
-		test('should work with sync', function(done) {
+		test('should work with sync', function (done) {
 			// Specify how many special checks we are expecting
 			let checks = 0
 
 			// Create our synchronous task
-			const task = new Task(function() {
+			const task = new Task(function () {
 				++checks
 				equal(
 					task.status,
@@ -250,7 +250,7 @@ kava.suite('test-unit: task', function(suite) {
 			})
 
 			// Check the task completed as expected
-			task.done(function(err, result) {
+			task.done(function (err, result) {
 				++checks
 				errorEqual(
 					err,
@@ -294,7 +294,7 @@ kava.suite('test-unit: task', function(suite) {
 			)
 
 			// Check that all our special checks have run
-			wait(delay, function() {
+			wait(delay, function () {
 				++checks
 				equal(checks, 3, 'all our special checks have run')
 				done()
@@ -303,15 +303,15 @@ kava.suite('test-unit: task', function(suite) {
 	})
 
 	// Error Handling
-	suite('errors', function(suite, test) {
-		test('should detect return error on synchronous task', function(done) {
+	suite('errors', function (suite, test) {
+		test('should detect return error on synchronous task', function (done) {
 			// Specify how many special checks we are expecting
 			let checks = 0
 			const errMessage = 'deliberate return error'
 			const err = new Error(errMessage)
 
 			// Create our synchronous task
-			const task = new Task(function() {
+			const task = new Task(function () {
 				++checks
 				equal(
 					task.status,
@@ -323,7 +323,7 @@ kava.suite('test-unit: task', function(suite) {
 			})
 
 			// Check the task completed as expected
-			task.done(function(_err, result) {
+			task.done(function (_err, result) {
 				++checks
 				equal(
 					task.status,
@@ -367,21 +367,21 @@ kava.suite('test-unit: task', function(suite) {
 			)
 
 			// Check that all our special checks have run
-			wait(delay, function() {
+			wait(delay, function () {
 				++checks
 				equal(checks, 3, 'all our special checks have run')
 				done()
 			})
 		})
 
-		test('should detect sync throw error on synchronous task', function(done) {
+		test('should detect sync throw error on synchronous task', function (done) {
 			// Specify how many special checks we are expecting
 			let checks = 0
 			const errMessage = 'deliberate sync throw error'
 			const err = new Error(errMessage)
 
 			// Create our synchronous task
-			const task = new Task(function() {
+			const task = new Task(function () {
 				++checks
 				equal(task.result, null, "result to be null as we haven't set it yet")
 				equal(
@@ -393,7 +393,7 @@ kava.suite('test-unit: task', function(suite) {
 			})
 
 			// Check the task completed as expected
-			task.done(function(_err, result) {
+			task.done(function (_err, result) {
 				++checks
 				equal(
 					task.status,
@@ -432,14 +432,14 @@ kava.suite('test-unit: task', function(suite) {
 			)
 
 			// Check that all our special checks have run
-			wait(delay, function() {
+			wait(delay, function () {
 				++checks
 				equal(checks, 3, 'all our special checks have run')
 				done()
 			})
 		})
 
-		test('should detect async throw error on asynchronous task', function(done) {
+		test('should detect async throw error on asynchronous task', function (done) {
 			// Check node version
 			if (process.versions.node.substr(0, 3) === '0.8') {
 				console.log(
@@ -455,8 +455,8 @@ kava.suite('test-unit: task', function(suite) {
 
 			// Create our asynchronous task
 			/* eslint no-unused-vars:0 */
-			const task = new Task(function(done) {
-				wait(delay, function() {
+			const task = new Task(function (done) {
+				wait(delay, function () {
 					++checks
 					equal(
 						task.status,
@@ -469,7 +469,7 @@ kava.suite('test-unit: task', function(suite) {
 			})
 
 			// Check the task completed as expected
-			task.done(function(_err, result) {
+			task.done(function (_err, result) {
 				++checks
 				equal(
 					task.status,
@@ -508,7 +508,7 @@ kava.suite('test-unit: task', function(suite) {
 			)
 
 			// Check that all our special checks have run
-			wait(delay * 2, function() {
+			wait(delay * 2, function () {
 				++checks
 				equal(checks, 3, 'all our special checks have run')
 				done()
@@ -516,13 +516,13 @@ kava.suite('test-unit: task', function(suite) {
 		})
 
 		// https://github.com/bevry/taskgroup/issues/17
-		test('it should not catch errors within the completion callback: issue 17, with domains', function(done) {
+		test('it should not catch errors within the completion callback: issue 17, with domains', function (done) {
 			// Run our test file
 			/* eslint handle-callback-err:0 */
 			require('safeps').exec(
 				`node ${__dirname}/test-issue17-a.js`,
 				{ cwd: __dirname },
-				function(err, stdout, stderr) {
+				function (err, stdout, stderr) {
 					// Check if we got the error we expected
 					if (stderr.indexOf('Error: goodbye world') !== -1) {
 						done()
@@ -535,13 +535,13 @@ kava.suite('test-unit: task', function(suite) {
 			)
 		})
 
-		test('it should not catch errors within the completion callback: issue 17, without domains', function(done) {
+		test('it should not catch errors within the completion callback: issue 17, without domains', function (done) {
 			// Run our test file
 			/* eslint handle-callback-err:0 */
 			require('safeps').exec(
 				`node ${__dirname}/test-issue17-b.js`,
 				{ cwd: __dirname },
-				function(err, stdout, stderr) {
+				function (err, stdout, stderr) {
 					// Check if we got the error we expected
 					if (stderr.indexOf('Error: goodbye world\n    at Task.') !== -1) {
 						done()
@@ -556,14 +556,14 @@ kava.suite('test-unit: task', function(suite) {
 	})
 
 	// Basic
-	suite('arguments', function(suite, test) {
+	suite('arguments', function (suite, test) {
 		// Sync
-		test('should work with arguments in sync', function(done) {
+		test('should work with arguments in sync', function (done) {
 			// Prepare
 			const checks = []
 
 			// Create
-			const task = new Task(function(a, b) {
+			const task = new Task(function (a, b) {
 				checks.push('my task')
 				equal(task.result, null)
 				return a * b
@@ -573,7 +573,7 @@ kava.suite('test-unit: task', function(suite) {
 			task.setConfig({ args: [2, 5] })
 
 			// Check
-			task.done(function(err, result) {
+			task.done(function (err, result) {
 				checks.push('completion callback')
 				deepEqual(task.result, [result])
 				errorEqual(err, null)
@@ -581,7 +581,7 @@ kava.suite('test-unit: task', function(suite) {
 			})
 
 			// Check
-			wait(delay, function() {
+			wait(delay, function () {
 				deepEqual(checks, ['my task', 'completion callback'])
 				done()
 			})
@@ -591,14 +591,14 @@ kava.suite('test-unit: task', function(suite) {
 		})
 
 		// Async
-		test('should work with arguments in async', function(done) {
+		test('should work with arguments in async', function (done) {
 			// Prepare
 			const checks = []
 
 			// Create
-			const task = new Task(function(a, b, complete) {
+			const task = new Task(function (a, b, complete) {
 				checks.push('my task - before wait')
-				wait(delay, function() {
+				wait(delay, function () {
 					checks.push('my task - after wait')
 					equal(task.result, null)
 					complete(null, a * b)
@@ -609,7 +609,7 @@ kava.suite('test-unit: task', function(suite) {
 			task.setConfig({ args: [2, 5] })
 
 			// Check
-			task.done(function(err, result) {
+			task.done(function (err, result) {
 				checks.push('completion callback')
 				deepEqual(task.result, [result])
 				errorEqual(err, null)
@@ -617,11 +617,11 @@ kava.suite('test-unit: task', function(suite) {
 			})
 
 			// Check
-			wait(delay * 2, function() {
+			wait(delay * 2, function () {
 				deepEqual(checks, [
 					'my task - before wait',
 					'my task - after wait',
-					'completion callback'
+					'completion callback',
 				])
 				done()
 			})
@@ -633,13 +633,13 @@ kava.suite('test-unit: task', function(suite) {
 })
 
 // Task Group
-kava.suite('test-unit: taskgroup', function(suite) {
+kava.suite('test-unit: taskgroup', function (suite) {
 	// Basic
-	suite('basic', function(suite, test) {
+	suite('basic', function (suite, test) {
 		// Serial
-		test('should work when running in serial', function(done) {
+		test('should work when running in serial', function (done) {
 			const tasks = new TaskGroupDebug({ name: 'my parent group' })
-			tasks.done(function(err, result) {
+			tasks.done(function (err, result) {
 				errorEqual(err, null)
 				equal(tasks.config.concurrency, 1)
 
@@ -649,10 +649,10 @@ kava.suite('test-unit: taskgroup', function(suite) {
 						done: ['my task 1', 'my task 2'],
 						result: [
 							[null, 10],
-							[null, 20]
+							[null, 20],
 						],
 						resultArgument: result,
-						errorArgument: err
+						errorArgument: err,
 					},
 					'inside tasks.done'
 				)
@@ -660,22 +660,22 @@ kava.suite('test-unit: taskgroup', function(suite) {
 				done()
 			})
 
-			tasks.addTask('my task 1', function(complete) {
+			tasks.addTask('my task 1', function (complete) {
 				tasks.compare(
 					{
 						status: 'running',
 						remaining: ['my task 2'],
-						running: ['my task 1']
+						running: ['my task 1'],
 					},
 					'inside task 1 before wait'
 				)
 
-				wait(delay, function() {
+				wait(delay, function () {
 					tasks.compare(
 						{
 							status: 'running',
 							remaining: ['my task 2'],
-							running: ['my task 1']
+							running: ['my task 1'],
 						},
 						'inside task 1 after wait'
 					)
@@ -684,13 +684,13 @@ kava.suite('test-unit: taskgroup', function(suite) {
 				})
 			})
 
-			tasks.addTask('my task 2', function() {
+			tasks.addTask('my task 2', function () {
 				tasks.compare(
 					{
 						status: 'running',
 						running: ['my task 2'],
 						done: ['my task 1'],
-						result: [[null, 10]]
+						result: [[null, 10]],
 					},
 					'inside task 2'
 				)
@@ -702,7 +702,7 @@ kava.suite('test-unit: taskgroup', function(suite) {
 				{
 					status: 'created',
 					remaining: ['my task 1', 'my task 2'],
-					result: null
+					result: null,
 				},
 				'before tasks.run'
 			)
@@ -712,16 +712,16 @@ kava.suite('test-unit: taskgroup', function(suite) {
 			tasks.compare(
 				{
 					status: 'pending',
-					remaining: ['my task 1', 'my task 2']
+					remaining: ['my task 1', 'my task 2'],
 				},
 				'after tasks.run'
 			)
 		})
 
 		// Parallel with new API
-		test('should work when running in parallel', function(done) {
+		test('should work when running in parallel', function (done) {
 			const tasks = new TaskGroupDebug({ concurrency: 0 })
-			tasks.done(function(err, result) {
+			tasks.done(function (err, result) {
 				errorEqual(err, null)
 				equal(tasks.config.concurrency, 0)
 
@@ -731,10 +731,10 @@ kava.suite('test-unit: taskgroup', function(suite) {
 						done: ['task 2', 'task 1'],
 						result: [
 							[null, 20],
-							[null, 10]
+							[null, 10],
 						],
 						resultArgument: result,
-						errorArgument: err
+						errorArgument: err,
 					},
 					'inside tasks.done'
 				)
@@ -742,23 +742,23 @@ kava.suite('test-unit: taskgroup', function(suite) {
 				done()
 			})
 
-			tasks.addTask('task 1', function(complete) {
+			tasks.addTask('task 1', function (complete) {
 				tasks.compare(
 					{
 						status: 'running',
 						pending: ['task 2'],
-						running: ['task 1']
+						running: ['task 1'],
 					},
 					'inside task 1 before wait'
 				)
 
-				wait(delay, function() {
+				wait(delay, function () {
 					tasks.compare(
 						{
 							status: 'running',
 							running: ['task 1'],
 							done: ['task 2'],
-							result: [[null, 20]]
+							result: [[null, 20]],
 						},
 						'inside task 1 after wait'
 					)
@@ -767,11 +767,11 @@ kava.suite('test-unit: taskgroup', function(suite) {
 				})
 			})
 
-			tasks.addTask('task 2', function() {
+			tasks.addTask('task 2', function () {
 				tasks.compare(
 					{
 						status: 'running',
-						running: ['task 1', 'task 2']
+						running: ['task 1', 'task 2'],
 					},
 					'inside task 2'
 				)
@@ -783,7 +783,7 @@ kava.suite('test-unit: taskgroup', function(suite) {
 				{
 					status: 'created',
 					remaining: ['task 1', 'task 2'],
-					result: null
+					result: null,
 				},
 				'before tasks.run'
 			)
@@ -793,14 +793,14 @@ kava.suite('test-unit: taskgroup', function(suite) {
 			tasks.compare(
 				{
 					status: 'pending',
-					remaining: ['task 1', 'task 2']
+					remaining: ['task 1', 'task 2'],
 				},
 				'after tasks.run'
 			)
 		})
 
 		// Parallel
-		test('should work when running in parallel with new API', function(done) {
+		test('should work when running in parallel with new API', function (done) {
 			const tasks = TaskGroupDebug.create({
 				name: 'my tasks',
 				concurrency: 0,
@@ -814,10 +814,10 @@ kava.suite('test-unit: taskgroup', function(suite) {
 							done: ['task 2 for [my tasks]', 'task 1 for [my tasks]'],
 							result: [
 								[null, 20],
-								[null, 10]
+								[null, 10],
 							],
 							resultArgument: result,
-							errorArgument: err
+							errorArgument: err,
 						},
 						'inside tasks.done'
 					)
@@ -826,23 +826,23 @@ kava.suite('test-unit: taskgroup', function(suite) {
 				},
 
 				tasks: [
-					function(complete) {
+					function (complete) {
 						tasks.compare(
 							{
 								status: 'running',
 								pending: ['task 2 for [my tasks]'],
-								running: ['task 1 for [my tasks]']
+								running: ['task 1 for [my tasks]'],
 							},
 							'inside task 1 before wait'
 						)
 
-						wait(delay, function() {
+						wait(delay, function () {
 							tasks.compare(
 								{
 									status: 'running',
 									running: ['task 1 for [my tasks]'],
 									done: ['task 2 for [my tasks]'],
-									result: [[null, 20]]
+									result: [[null, 20]],
 								},
 								'inside task 1 after wait'
 							)
@@ -850,25 +850,25 @@ kava.suite('test-unit: taskgroup', function(suite) {
 							complete(null, 10)
 						})
 					},
-					function() {
+					function () {
 						tasks.compare(
 							{
 								status: 'running',
-								running: ['task 1 for [my tasks]', 'task 2 for [my tasks]']
+								running: ['task 1 for [my tasks]', 'task 2 for [my tasks]'],
 							},
 							'inside task 1 after wait'
 						)
 
 						return 20
-					}
-				]
+					},
+				],
 			})
 
 			tasks.compare(
 				{
 					status: 'created',
 					remaining: ['task 1 for [my tasks]', 'task 2 for [my tasks]'],
-					result: null
+					result: null,
 				},
 				'before tasks.run'
 			)
@@ -878,7 +878,7 @@ kava.suite('test-unit: taskgroup', function(suite) {
 			tasks.compare(
 				{
 					status: 'pending',
-					remaining: ['task 1 for [my tasks]', 'task 2 for [my tasks]']
+					remaining: ['task 1 for [my tasks]', 'task 2 for [my tasks]'],
 				},
 				'after tasks.run'
 			)
@@ -886,16 +886,16 @@ kava.suite('test-unit: taskgroup', function(suite) {
 	})
 
 	// Basic
-	suite('errors', function(suite, test) {
+	suite('errors', function (suite, test) {
 		const err1 = new Error('deliberate error')
 		const err2 = new Error('unexpected error')
 
 		// Error Serial
-		test('should handle error correctly in serial', function(done) {
+		test('should handle error correctly in serial', function (done) {
 			const tasks = new TaskGroupDebug({
 				name: 'my tasks',
-				concurrency: 1
-			}).done(function(err, result) {
+				concurrency: 1,
+			}).done(function (err, result) {
 				equal(tasks.config.concurrency, 1)
 
 				tasks.compare(
@@ -906,7 +906,7 @@ kava.suite('test-unit: taskgroup', function(suite) {
 						result: [[err1]],
 						resultArgument: result,
 						error: err1,
-						errorArgument: err
+						errorArgument: err,
 					},
 					'inside tasks.done'
 				)
@@ -914,12 +914,12 @@ kava.suite('test-unit: taskgroup', function(suite) {
 				done()
 			})
 
-			tasks.addTask('task 1', function(complete) {
+			tasks.addTask('task 1', function (complete) {
 				tasks.compare(
 					{
 						status: 'running',
 						remaining: ['task 2'],
-						running: ['task 1']
+						running: ['task 1'],
 					},
 					'inside task 1'
 				)
@@ -927,7 +927,7 @@ kava.suite('test-unit: taskgroup', function(suite) {
 				complete(err1)
 			})
 
-			tasks.addTask('task 2', function() {
+			tasks.addTask('task 2', function () {
 				throw err2
 			})
 
@@ -935,7 +935,7 @@ kava.suite('test-unit: taskgroup', function(suite) {
 				{
 					status: 'created',
 					remaining: ['task 1', 'task 2'],
-					result: null
+					result: null,
 				},
 				'before tasks.run'
 			)
@@ -945,18 +945,18 @@ kava.suite('test-unit: taskgroup', function(suite) {
 			tasks.compare(
 				{
 					status: 'pending',
-					remaining: ['task 1', 'task 2']
+					remaining: ['task 1', 'task 2'],
 				},
 				'after tasks.run'
 			)
 		})
 
 		// Parallel
-		test('should handle error correctly in parallel', function(done) {
+		test('should handle error correctly in parallel', function (done) {
 			const tasks = new TaskGroupDebug({
 				name: 'my tasks',
-				concurrency: 0
-			}).done(function(err, result) {
+				concurrency: 0,
+			}).done(function (err, result) {
 				equal(tasks.config.concurrency, 0)
 
 				tasks.compare(
@@ -966,7 +966,7 @@ kava.suite('test-unit: taskgroup', function(suite) {
 						result: [[err2], [err1]],
 						resultArgument: result,
 						error: err2,
-						errorArgument: err
+						errorArgument: err,
 					},
 					'inside tasks.done'
 				)
@@ -975,26 +975,26 @@ kava.suite('test-unit: taskgroup', function(suite) {
 			})
 
 			// Error via completion callback
-			tasks.addTask('task 1', function(complete) {
+			tasks.addTask('task 1', function (complete) {
 				tasks.compare(
 					{
 						status: 'running',
 						pending: ['task 2'],
 						running: ['task 1'],
 						total: 2,
-						result: []
+						result: [],
 					},
 					'inside task 1 before wait'
 				)
 
-				wait(delay, function() {
+				wait(delay, function () {
 					tasks.compare(
 						{
 							status: 'running',
 							running: ['task 1'],
 							done: ['task 2'],
 							error: err2,
-							result: [[err2]]
+							result: [[err2]],
 						},
 						'inside task 1 after wait'
 					)
@@ -1006,11 +1006,11 @@ kava.suite('test-unit: taskgroup', function(suite) {
 			})
 
 			// Error via return
-			tasks.addTask('task 2', function() {
+			tasks.addTask('task 2', function () {
 				tasks.compare(
 					{
 						status: 'running',
-						running: ['task 1', 'task 2']
+						running: ['task 1', 'task 2'],
 					},
 					'inside task 2'
 				)
@@ -1022,7 +1022,7 @@ kava.suite('test-unit: taskgroup', function(suite) {
 				{
 					status: 'created',
 					remaining: ['task 1', 'task 2'],
-					result: null
+					result: null,
 				},
 				'before tasks.run'
 			)
@@ -1032,7 +1032,7 @@ kava.suite('test-unit: taskgroup', function(suite) {
 			tasks.compare(
 				{
 					status: 'pending',
-					remaining: ['task 1', 'task 2']
+					remaining: ['task 1', 'task 2'],
 				},
 				'after tasks.run'
 			)
@@ -1041,14 +1041,14 @@ kava.suite('test-unit: taskgroup', function(suite) {
 })
 
 // Test Runner
-kava.suite('test-unit: nested', function(suite, test) {
+kava.suite('test-unit: nested', function (suite, test) {
 	// Traditional
-	test('traditional format', function(done) {
+	test('traditional format', function (done) {
 		const checks = []
 
 		const tasks = new TaskGroupDebug({ name: 'my parent group' }).run()
 
-		tasks.addTask('my task a', function(complete) {
+		tasks.addTask('my task a', function (complete) {
 			checks.push('my task a - part 1/2')
 			equal(this.name, 'my task a')
 
@@ -1057,12 +1057,12 @@ kava.suite('test-unit: nested', function(suite, test) {
 				{
 					status: 'running',
 					remaining: ['my group b'],
-					running: ['my task a']
+					running: ['my task a'],
 				},
 				'inside my task a before wait'
 			)
 
-			wait(delay, function() {
+			wait(delay, function () {
 				checks.push('my task a - part 2/2')
 
 				// totals for parent group
@@ -1070,7 +1070,7 @@ kava.suite('test-unit: nested', function(suite, test) {
 					{
 						status: 'running',
 						remaining: ['my group b'],
-						running: ['my task a']
+						running: ['my task a'],
 					},
 					'inside my task a after wait'
 				)
@@ -1079,7 +1079,7 @@ kava.suite('test-unit: nested', function(suite, test) {
 			})
 		})
 
-		tasks.addTaskGroup('my group b', function() {
+		tasks.addTaskGroup('my group b', function () {
 			const myGroup = this
 			checks.push('my group b')
 			equal(this.name, 'my group b')
@@ -1090,7 +1090,7 @@ kava.suite('test-unit: nested', function(suite, test) {
 					status: 'running',
 					running: ['my group b'],
 					done: ['my task a'],
-					result: [[null, 10]]
+					result: [[null, 10]],
 				},
 				'inside my group b method, comparing parent'
 			)
@@ -1099,12 +1099,12 @@ kava.suite('test-unit: nested', function(suite, test) {
 			myGroup.compare(
 				{
 					status: 'running',
-					running: ['taskgroup method for my group b']
+					running: ['taskgroup method for my group b'],
 				},
 				'inside my group b method, comparing my group'
 			)
 
-			this.addTask('my task c', function() {
+			this.addTask('my task c', function () {
 				checks.push('my task c')
 				equal(this.name, 'my task c')
 
@@ -1114,7 +1114,7 @@ kava.suite('test-unit: nested', function(suite, test) {
 						status: 'running',
 						running: ['my group b'],
 						done: ['my task a'],
-						result: [[null, 10]]
+						result: [[null, 10]],
 					},
 					'inside my group b task c, comparing parent'
 				)
@@ -1124,7 +1124,7 @@ kava.suite('test-unit: nested', function(suite, test) {
 					{
 						status: 'running',
 						running: ['my task c'],
-						done: ['taskgroup method for my group b']
+						done: ['taskgroup method for my group b'],
 					},
 					'inside my group b task c, comparing my group'
 				)
@@ -1137,20 +1137,20 @@ kava.suite('test-unit: nested', function(suite, test) {
 				{
 					status: 'running',
 					remaining: ['my task c'],
-					running: ['taskgroup method for my group b']
+					running: ['taskgroup method for my group b'],
 				},
 				'inside my group b method, at end, comparing my group'
 			)
 		})
 
-		tasks.done(function(err, result) {
+		tasks.done(function (err, result) {
 			deepEqual(
 				checks,
 				[
 					'my task a - part 1/2',
 					'my task a - part 2/2',
 					'my group b',
-					'my task c'
+					'my task c',
 				],
 				'all the expected checks ran'
 			)
@@ -1162,10 +1162,10 @@ kava.suite('test-unit: nested', function(suite, test) {
 					done: ['my task a', 'my group b'],
 					result: [
 						[null, 10],
-						[null, [[null, 20]]]
+						[null, [[null, 20]]],
 					],
 					resultArgument: result,
-					errorArgument: err
+					errorArgument: err,
 				},
 				'inside tasks.done'
 			)
@@ -1175,16 +1175,16 @@ kava.suite('test-unit: nested', function(suite, test) {
 	})
 
 	// Inline
-	test('inline format', function(done) {
+	test('inline format', function (done) {
 		const checks = []
 
-		const tasks = new TaskGroupDebug('my parent group', function(
+		const tasks = new TaskGroupDebug('my parent group', function (
 			addGroup,
 			addTask
 		) {
 			equal(this.name, 'my parent group')
 
-			addTask('my task a', function(complete) {
+			addTask('my task a', function (complete) {
 				checks.push('my task a - part 1/2')
 				equal(this.name, 'my task a')
 
@@ -1193,12 +1193,12 @@ kava.suite('test-unit: nested', function(suite, test) {
 						status: 'running',
 						remaining: ['my group b'],
 						running: ['my task a'],
-						done: ['taskgroup method for my parent group']
+						done: ['taskgroup method for my parent group'],
 					},
 					'inside my task a before wait'
 				)
 
-				wait(delay, function() {
+				wait(delay, function () {
 					checks.push('my task a - part 2/2')
 
 					tasks.compare(
@@ -1206,7 +1206,7 @@ kava.suite('test-unit: nested', function(suite, test) {
 							status: 'running',
 							remaining: ['my group b'],
 							running: ['my task a'],
-							done: ['taskgroup method for my parent group']
+							done: ['taskgroup method for my parent group'],
 						},
 						'inside my task a after wait'
 					)
@@ -1215,7 +1215,7 @@ kava.suite('test-unit: nested', function(suite, test) {
 				})
 			})
 
-			addGroup('my group b', function(addGroup, addTask) {
+			addGroup('my group b', function (addGroup, addTask) {
 				const myGroup = this
 				checks.push('my group b')
 				equal(this.name, 'my group b')
@@ -1226,7 +1226,7 @@ kava.suite('test-unit: nested', function(suite, test) {
 						status: 'running',
 						running: ['my group b'],
 						done: ['taskgroup method for my parent group', 'my task a'],
-						result: [[null, 10]]
+						result: [[null, 10]],
 					},
 					'inside my group b method, comparing parent group'
 				)
@@ -1235,12 +1235,12 @@ kava.suite('test-unit: nested', function(suite, test) {
 				myGroup.compare(
 					{
 						status: 'running',
-						running: ['taskgroup method for my group b']
+						running: ['taskgroup method for my group b'],
 					},
 					'inside my group b method, comparing my group b'
 				)
 
-				addTask('my task c', function() {
+				addTask('my task c', function () {
 					checks.push('my task c')
 					equal(this.name, 'my task c')
 
@@ -1250,7 +1250,7 @@ kava.suite('test-unit: nested', function(suite, test) {
 							status: 'running',
 							running: ['my group b'],
 							done: ['taskgroup method for my parent group', 'my task a'],
-							result: [[null, 10]]
+							result: [[null, 10]],
 						},
 						'inside my group b task c, comparing parent group'
 					)
@@ -1260,7 +1260,7 @@ kava.suite('test-unit: nested', function(suite, test) {
 						{
 							status: 'running',
 							running: ['my task c'],
-							done: ['taskgroup method for my group b']
+							done: ['taskgroup method for my group b'],
 						},
 						'inside my group b task c, comparing my group b'
 					)
@@ -1273,21 +1273,21 @@ kava.suite('test-unit: nested', function(suite, test) {
 					{
 						status: 'running',
 						remaining: ['my task c'],
-						running: ['taskgroup method for my group b']
+						running: ['taskgroup method for my group b'],
 					},
 					'inside my group b method, at end, comparing my group b'
 				)
 			})
 		})
 
-		tasks.done(function(err, result) {
+		tasks.done(function (err, result) {
 			deepEqual(
 				checks,
 				[
 					'my task a - part 1/2',
 					'my task a - part 2/2',
 					'my group b',
-					'my task c'
+					'my task c',
 				],
 				'all the expected checks ran'
 			)
@@ -1299,14 +1299,14 @@ kava.suite('test-unit: nested', function(suite, test) {
 					done: [
 						'taskgroup method for my parent group',
 						'my task a',
-						'my group b'
+						'my group b',
 					],
 					result: [
 						[null, 10],
-						[null, [[null, 20]]]
+						[null, [[null, 20]]],
 					],
 					resultArgument: result,
-					errorArgument: err
+					errorArgument: err,
 				},
 				'inside tasks.done'
 			)
@@ -1316,12 +1316,12 @@ kava.suite('test-unit: nested', function(suite, test) {
 	})
 
 	// Mixed
-	test('mixed format', function(done) {
+	test('mixed format', function (done) {
 		const checks = []
 
 		const tasks = new TaskGroupDebug({ name: 'my parent group' })
 
-		tasks.addTask('my task 1', function() {
+		tasks.addTask('my task 1', function () {
 			checks.push('my task 1')
 
 			// totals for parent group
@@ -1329,7 +1329,7 @@ kava.suite('test-unit: nested', function(suite, test) {
 				{
 					status: 'running',
 					remaining: ['my group 1', 'my task 3'],
-					running: ['my task 1']
+					running: ['my task 1'],
 				},
 				'inside my task 1'
 			)
@@ -1337,7 +1337,7 @@ kava.suite('test-unit: nested', function(suite, test) {
 			return 10
 		})
 
-		tasks.addTaskGroup('my group 1', function() {
+		tasks.addTaskGroup('my group 1', function () {
 			const myGroup = this
 			checks.push('my group 1')
 			equal(this.name, 'my group 1')
@@ -1349,7 +1349,7 @@ kava.suite('test-unit: nested', function(suite, test) {
 					remaining: ['my task 3'],
 					running: ['my group 1'],
 					done: ['my task 1'],
-					result: [[null, 10]]
+					result: [[null, 10]],
 				},
 				'inside my group 1 method, comparing parent'
 			)
@@ -1358,12 +1358,12 @@ kava.suite('test-unit: nested', function(suite, test) {
 			myGroup.compare(
 				{
 					status: 'running',
-					running: ['taskgroup method for my group 1']
+					running: ['taskgroup method for my group 1'],
 				},
 				'inside my group 1 method, comparing my group'
 			)
 
-			this.addTask('my task 2', function() {
+			this.addTask('my task 2', function () {
 				checks.push('my task 2')
 				equal(this.name, 'my task 2')
 
@@ -1374,7 +1374,7 @@ kava.suite('test-unit: nested', function(suite, test) {
 						remaining: ['my task 3'],
 						running: ['my group 1'],
 						done: ['my task 1'],
-						result: [[null, 10]]
+						result: [[null, 10]],
 					},
 					'inside my group 1 my task 2, comparing parent'
 				)
@@ -1384,7 +1384,7 @@ kava.suite('test-unit: nested', function(suite, test) {
 					{
 						status: 'running',
 						running: ['my task 2'],
-						done: ['taskgroup method for my group 1']
+						done: ['taskgroup method for my group 1'],
 					},
 					'inside my group 1 my task 2, comparing my group'
 				)
@@ -1397,13 +1397,13 @@ kava.suite('test-unit: nested', function(suite, test) {
 				{
 					status: 'running',
 					remaining: ['my task 2'],
-					running: ['taskgroup method for my group 1']
+					running: ['taskgroup method for my group 1'],
 				},
 				'inside my group 1 method, comparing my group'
 			)
 		})
 
-		tasks.addTask('my task 3', function() {
+		tasks.addTask('my task 3', function () {
 			checks.push('my task 3')
 			equal(this.name, 'my task 3')
 
@@ -1415,8 +1415,8 @@ kava.suite('test-unit: nested', function(suite, test) {
 					done: ['my task 1', 'my group 1'],
 					result: [
 						[null, 10],
-						[null, [[null, 20]]]
-					]
+						[null, [[null, 20]]],
+					],
 				},
 				'inside my task 3'
 			)
@@ -1424,7 +1424,7 @@ kava.suite('test-unit: nested', function(suite, test) {
 			return 30
 		})
 
-		tasks.done(function(err, result) {
+		tasks.done(function (err, result) {
 			deepEqual(
 				checks,
 				['my task 1', 'my group 1', 'my task 2', 'my task 3'],
@@ -1439,10 +1439,10 @@ kava.suite('test-unit: nested', function(suite, test) {
 					result: [
 						[null, 10],
 						[null, [[null, 20]]],
-						[null, 30]
+						[null, 30],
 					],
 					resultArgument: result,
-					errorArgument: err
+					errorArgument: err,
 				},
 				'inside tasks.done'
 			)

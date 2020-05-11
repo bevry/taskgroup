@@ -11,7 +11,7 @@ const domain =
 const queue =
 	(global || window).setImmediate ||
 	(process && process.nextTick) ||
-	function(fn) {
+	function (fn) {
 		setTimeout(fn, 0)
 	}
 

@@ -68,7 +68,7 @@ class Task extends BaseInterface {
 		extendr.defaults(this.state, {
 			result: null,
 			error: null,
-			status: 'created'
+			status: 'created',
 		})
 
 		// Configuration defaults
@@ -83,7 +83,7 @@ class Task extends BaseInterface {
 			errorOnExcessCompletions: true,
 			ambi: true,
 			domain: null,
-			args: null
+			args: null,
 		})
 
 		// Apply user configuration
@@ -138,7 +138,7 @@ class Task extends BaseInterface {
 			'passed',
 			'completed',
 			'done',
-			'destroyed'
+			'destroyed',
 		]
 	}
 
@@ -290,7 +290,7 @@ class Task extends BaseInterface {
 		const opts = {}
 
 		// Extract the configuration from the arguments
-		args.forEach(function(arg) {
+		args.forEach(function (arg) {
 			if (arg == null) return
 			const type = typeof arg
 			switch (type) {
@@ -529,7 +529,7 @@ class Task extends BaseInterface {
 			} else {
 				// Use the next tick workaround to escape the try...catch scope
 				// Which would otherwise catch errors inside our code when it shouldn't therefore suppressing errors
-				queue(function() {
+				queue(function () {
 					exitMethod(...args)
 				})
 			}
