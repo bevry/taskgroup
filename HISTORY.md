@@ -1,5 +1,10 @@
 # History
 
+## v7.2.0 2020 May 21
+
+-   Correctly relocate `safeps` from `dependencies` to `devDependencies`
+-   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
+
 ## v7.1.0 2020 May 21
 
 -   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
