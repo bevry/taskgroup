@@ -1,7 +1,7 @@
 {
   "title": "TaskGroup",
   "name": "taskgroup",
-  "version": "7.2.0",
+  "version": "7.3.0",
   "description": "Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.",
   "homepage": "https://github.com/bevry/taskgroup",
   "license": "MIT",
@@ -105,12 +105,11 @@
     }
   ],
   "type": "commonjs",
-  "main": "index.js",
+  "main": "source/index.js",
   "browser": "edition-browsers/index.js",
   "dependencies": {
     "ambi": "3.2.0",
     "eachr": "^4.5.0",
-    "editions": "^3.0.0",
     "extendr": "^5.2.0",
     "unbounded": "^3.0.0"
   },
@@ -157,7 +156,7 @@
     "our:verify:directory": "valid-directory",
     "our:verify:eslint": "eslint --fix --ignore-pattern '**/*.d.ts' --ignore-pattern '**/vendor/' --ignore-pattern '**/node_modules/' --ext .mjs,.js,.jsx,.ts,.tsx ./source",
     "our:verify:prettier": "prettier --write .",
-    "test": "node ./test.js"
+    "test": "node ./source/test.js"
   },
   "eslintConfig": {
     "extends": [
