@@ -1,7 +1,7 @@
 {
   "title": "TaskGroup",
   "name": "taskgroup",
-  "version": "7.10.0",
+  "version": "7.11.0",
   "description": "Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.",
   "homepage": "https://github.com/bevry/taskgroup",
   "license": "MIT",
@@ -118,7 +118,7 @@
     "@babel/core": "^7.7.5",
     "@babel/plugin-proposal-object-rest-spread": "^7.9.5",
     "@babel/preset-env": "^7.7.6",
-    "@bevry/update-contributors": "1.9.0",
+    "@bevry/update-contributors": "^1.9.0",
     "assert-helpers": "^6.8.0",
     "eslint": "^7.3.0",
     "eslint-config-bevry": "^3.8.0",
@@ -130,7 +130,7 @@
     "projectz": "^2.9.0",
     "safeps": "^10.6.0",
     "surge": "^0.21.3",
-    "valid-directory": "2.2.0"
+    "valid-directory": "^2.5.0"
   },
   "scripts": {
     "our:clean": "rm -Rf ./docs ./edition* ./es2015 ./es5 ./out ./.next",
