@@ -825,13 +825,21 @@ ajv@^6.10.0, ajv@^6.10.2, ajv@^6.5.5:
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
-ambi@3, ambi@3.2.0:
+ambi@3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/ambi/-/ambi-3.2.0.tgz#13b45fcf6845465f652137f80176322e911b70d6"
   integrity sha512-nj5sHLPFd7u2OLmHdFs4DHt3gK6edpNw35hTRIKyI/Vd2Th5e4io50rw1lhmCdUNO2Mm4/4FkHmv6shEANAWcw==
   dependencies:
     editions "^2.1.0"
     typechecker "^4.3.0"
+
+ambi@8:
+  version "8.7.0"
+  resolved "https://registry.yarnpkg.com/ambi/-/ambi-8.7.0.tgz#19b29927e4a9cd422e16e1fafd2da625786276de"
+  integrity sha512-8ntpYOPjSwsTLXZnII5TgGg9p4P2j1OH7ZoBeLTWXPJeoSCh8EQBdTcy0gQxMTUJOhd5bPu2RCqFixE0VNqnIg==
+  dependencies:
+    editions "3.5.0"
+    typechecker "7.5.0"
 
 ansi-colors@^3.2.1:
   version "3.2.4"
