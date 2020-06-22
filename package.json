@@ -111,7 +111,7 @@
     "ambi": "3",
     "eachr": "^4.5.0",
     "extendr": "^5.7.0",
-    "unbounded": "3.4.0"
+    "unbounded": "3.7.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.3",
