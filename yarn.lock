@@ -860,6 +860,13 @@ ambi@3:
     editions "^2.1.0"
     typechecker "^4.3.0"
 
+ambi@8:
+  version "8.9.0"
+  resolved "https://registry.yarnpkg.com/ambi/-/ambi-8.9.0.tgz#36904e83d1941584cead1a72c481ca9b1886fdd8"
+  integrity sha512-+WH7zL+HiWzlAbIWtaWo7yQg7iuFwjO24XGoTfdP5fx8zdHPgL7LfVLp7f7M0AUOGByvM+2SwPUbuwXoCG6jOQ==
+  dependencies:
+    typechecker "7.10.0"
+
 ansi-colors@^3.2.1:
   version "3.2.4"
   resolved "https://registry.yarnpkg.com/ansi-colors/-/ansi-colors-3.2.4.tgz#e3a3da4bfbae6c86a9c285625de124a234026fbf"
