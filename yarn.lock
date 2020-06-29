@@ -3792,6 +3792,11 @@ unbounded@3.7.0:
   resolved "https://registry.yarnpkg.com/unbounded/-/unbounded-3.7.0.tgz#c1f8c97b5d173e7e7a1ff0349da00269c6fd9662"
   integrity sha512-gqIxGgyzb1krnJHGk2BkGUlDTDJRvogqi05hsWKyie0m67Hihqe3yYmeEnnPnQKI8tC4b3NR9/JjF3fWR4G/Kw==
 
+unbounded@3.8.0:
+  version "3.8.0"
+  resolved "https://registry.yarnpkg.com/unbounded/-/unbounded-3.8.0.tgz#b6bab7655277a5c2b86d609e6a0c98ad95489443"
+  integrity sha512-kz/lmG1QEGqlRaGMHEm7cTdKvKvRgaUl/F8d3YuBz5eyIdloubiddDUYqa48PSOz1pQZupyE0rnlRhkA27zxPQ==
+
 underscore@~1.10.2:
   version "1.10.2"
   resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.10.2.tgz#73d6aa3668f3188e4adb0f1943bd12cfd7efaaaf"
