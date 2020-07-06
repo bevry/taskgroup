@@ -860,6 +860,13 @@ ambi@3:
     editions "^2.1.0"
     typechecker "^4.3.0"
 
+ambi@8:
+  version "8.16.0"
+  resolved "https://registry.yarnpkg.com/ambi/-/ambi-8.16.0.tgz#db25b7ea1d745e4b691658a70012cbd392b2e413"
+  integrity sha512-W8UjztcWbfgHS4JlBq5HduOUR6AhASfWncM8KBgxQ+m2x8pi3M4aDH1FfH6XGsO37A3+oHwtgP8K3ry5X+DrnA==
+  dependencies:
+    typechecker "^7.11.0"
+
 ansi-colors@^3.2.1:
   version "3.2.4"
   resolved "https://registry.yarnpkg.com/ansi-colors/-/ansi-colors-3.2.4.tgz#e3a3da4bfbae6c86a9c285625de124a234026fbf"
@@ -3776,6 +3783,11 @@ typechecker@^6.2.0:
   version "6.4.0"
   resolved "https://registry.yarnpkg.com/typechecker/-/typechecker-6.4.0.tgz#c087dc744c5a0f17524d58a17eb31a9660ab7324"
   integrity sha512-EbOu+9szY13mhl0EsvLXnR+pTCa3gTHQQPLdce72ujcC9fRHXlVFBNXtHeRhgzLxLlKUh4zA9C0tezLDgshf+A==
+
+typechecker@^7.11.0:
+  version "7.11.0"
+  resolved "https://registry.yarnpkg.com/typechecker/-/typechecker-7.11.0.tgz#50bdf6e54f881c18d57f618151c172f1cbc61650"
+  integrity sha512-xGAKaBilIT5fPJZenLoJfzwpTAeAABZvjPIAhn72cBtTFwFuIA6drwp+PdDDq6fmNSwx0IYjF5lQZUYC6EkMSw==
 
 uc.micro@^1.0.1, uc.micro@^1.0.5:
   version "1.0.6"
