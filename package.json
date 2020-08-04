@@ -1,7 +1,7 @@
 {
   "title": "TaskGroup",
   "name": "taskgroup",
-  "version": "7.13.0",
+  "version": "7.14.0",
   "description": "Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.",
   "homepage": "https://github.com/bevry/taskgroup",
   "license": "MIT",
@@ -110,27 +110,27 @@
   "dependencies": {
     "ambi": "3.2.0",
     "eachr": "^4.5.0",
-    "extendr": "^5.12.0",
-    "unbounded": "^3.8.0"
+    "extendr": "^5.13.0",
+    "unbounded": "^3.9.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.5",
-    "@babel/core": "^7.10.5",
-    "@babel/plugin-proposal-object-rest-spread": "^7.10.4",
-    "@babel/preset-env": "^7.10.4",
-    "@bevry/update-contributors": "^1.13.0",
-    "assert-helpers": "^6.18.0",
-    "eslint": "^7.5.0",
-    "eslint-config-bevry": "^3.17.0",
+    "@babel/core": "^7.11.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.11.0",
+    "@babel/preset-env": "^7.11.0",
+    "@bevry/update-contributors": "^1.14.0",
+    "assert-helpers": "^6.19.0",
+    "eslint": "^7.6.0",
+    "eslint-config-bevry": "^3.18.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
-    "jsdoc": "^3.6.4",
-    "kava": "^5.9.0",
+    "jsdoc": "^3.6.5",
+    "kava": "^5.10.0",
     "prettier": "^2.0.5",
-    "projectz": "^2.12.0",
-    "safeps": "^10.11.0",
+    "projectz": "^2.13.0",
+    "safeps": "^10.12.0",
     "surge": "^0.21.6",
-    "valid-directory": "^2.6.0"
+    "valid-directory": "^2.7.0"
   },
   "scripts": {
     "our:clean": "rm -Rf ./docs ./edition* ./es2015 ./es5 ./out ./.next",
