@@ -131,7 +131,7 @@
     "prettier": "^2.1.2",
     "projectz": "^2.17.0",
     "safeps": "^10.15.0",
-    "surge": "^0.21.6",
+    "surge": "^0.22.1",
     "valid-directory": "^3.4.0"
   },
   "scripts": {
