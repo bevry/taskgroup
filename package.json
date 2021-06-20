@@ -110,7 +110,7 @@
   "main": "source/index.js",
   "browser": "edition-browsers/index.js",
   "dependencies": {
-    "ambi": "3.2.0",
+    "ambi": "8.25.0",
     "eachr": "^4.5.0",
     "extendr": "^5.16.0",
     "unbounded": "^3.12.0"
