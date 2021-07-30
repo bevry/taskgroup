@@ -35,7 +35,7 @@ Group together synchronous and asynchronous tasks and execute them with support 
 
 ## Usage
 
-[Complete API Documentation.](http://master.taskgroup.bevry.surge.sh/docs/index.html)
+[Complete API Documentation.](http://master.taskgroup.bevry.surge.sh/docs/)
 
 [Tutorials & Guides.](https://taskgroup.bevry.me)
 
@@ -56,7 +56,7 @@ Group together synchronous and asynchronous tasks and execute them with support 
 
 ``` html
 <script type="module">
-    import * as pkg from '//dev.jspm.io/taskgroup@7.18.0'
+    import * as pkg from '//dev.jspm.io/taskgroup@7.19.0'
 </script>
 ```
 
@@ -65,7 +65,7 @@ Group together synchronous and asynchronous tasks and execute them with support 
 <p>This package is published with the following editions:</p>
 
 <ul><li><code>taskgroup</code> aliases <code>taskgroup/source/index.js</code></li>
-<li><code>taskgroup/source/index.js</code> is <a href="https://en.wikipedia.org/wiki/ECMAScript#ES.Next" title="ECMAScript Next">ESNext</a> source code for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> 10 || 12 || 14 with <a href="https://nodejs.org/dist/latest-v5.x/docs/api/modules.html" title="Node/CJS Modules">Require</a> for modules</li>
+<li><code>taskgroup/source/index.js</code> is <a href="https://en.wikipedia.org/wiki/ECMAScript#ES.Next" title="ECMAScript Next">ESNext</a> source code for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> 10 || 12 || 14 || 16 with <a href="https://nodejs.org/dist/latest-v5.x/docs/api/modules.html" title="Node/CJS Modules">Require</a> for modules</li>
 <li><code>taskgroup/edition-browsers/index.js</code> is <a href="https://en.wikipedia.org/wiki/ECMAScript#ES.Next" title="ECMAScript Next">ESNext</a> compiled for web browsers with <a href="https://nodejs.org/dist/latest-v5.x/docs/api/modules.html" title="Node/CJS Modules">Require</a> for modules</li></ul>
 
 <h3><a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a></h3>
