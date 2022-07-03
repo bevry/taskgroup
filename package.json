@@ -122,7 +122,7 @@
     "@babel/preset-env": "^7.14.8",
     "@bevry/update-contributors": "^1.19.0",
     "assert-helpers": "^8.4.0",
-    "eslint": "^7.31.0",
+    "eslint": "^8.19.0",
     "eslint-config-bevry": "^3.27.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
