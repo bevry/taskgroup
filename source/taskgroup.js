@@ -411,7 +411,7 @@ class TaskGroup extends BaseInterface {
 	*/
 	clearRunning() {
 		const error = new Error(
-			'Clearing running items is not possible. Instead remaining items and wait for running items to complete.'
+			'Clearing running items is not possible. Instead remaining items and wait for running items to complete.',
 		)
 		this.emit('error', error)
 		return this
@@ -513,7 +513,7 @@ class TaskGroup extends BaseInterface {
 					break
 				default: {
 					throw new Error(
-						`Unknown argument type of [${type}] given to TaskGroup::setConfig()`
+						`Unknown argument type of [${type}] given to TaskGroup::setConfig()`,
 					)
 				}
 			}
@@ -570,7 +570,7 @@ class TaskGroup extends BaseInterface {
 				case 'exit':
 				case 'nestedConfig':
 					throw new Error(
-						`Deprecated configuration property [${key}] given to TaskGroup::setConfig()`
+						`Deprecated configuration property [${key}] given to TaskGroup::setConfig()`,
 					)
 
 				default:
@@ -682,7 +682,7 @@ class TaskGroup extends BaseInterface {
 				itemConfig,
 				{ nestedTaskConfig, nestedTaskGroupConfig },
 				nestedTaskGroupConfig,
-				...args
+				...args,
 			)
 
 		// Name default
@@ -1077,7 +1077,7 @@ class TaskGroup extends BaseInterface {
 		// Prevent running on destroy
 		if (this.state.status === 'destroyed') {
 			const error = new Error(
-				`Invalid run status for the TaskGroup [${this.names}], it was [${this.state.status}].`
+				`Invalid run status for the TaskGroup [${this.names}], it was [${this.state.status}].`,
 			)
 			this.emit('error', error)
 			return this

@@ -1,10 +1,10 @@
 {
   "title": "TaskGroup",
   "name": "taskgroup",
-  "version": "7.19.0",
+  "version": "7.20.0",
   "description": "Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.",
   "homepage": "https://github.com/bevry/taskgroup",
-  "license": "MIT",
+  "license": "Artistic-2.0",
   "keywords": [
     "async",
     "batch",
@@ -24,10 +24,9 @@
       "githubworkflow",
       "npmversion",
       "npmdownloads",
-      "daviddm",
-      "daviddmdev",
       "---",
       "githubsponsors",
+      "thanksdev",
       "patreon",
       "flattr",
       "liberapay",
@@ -40,6 +39,7 @@
     "config": {
       "githubWorkflow": "bevry",
       "githubSponsorsUsername": "balupton",
+      "thanksdevGithubUsername": "balupton",
       "buymeacoffeeUsername": "balupton",
       "cryptoURL": "https://bevry.me/crypto",
       "flattrUsername": "balupton",
@@ -77,7 +77,7 @@
   },
   "editions": [
     {
-      "description": "ESNext source code for Node.js 10 || 12 || 14 || 16 with Require for modules",
+      "description": "ESNext source code for Node.js 10 || 12 || 14 || 16 || 18 || 20 || 21 with Require for modules",
       "directory": "source",
       "entry": "index.js",
       "tags": [
@@ -87,7 +87,7 @@
         "require"
       ],
       "engines": {
-        "node": "10 || 12 || 14 || 16",
+        "node": "10 || 12 || 14 || 16 || 18 || 20 || 21",
         "browsers": false
       }
     },
@@ -112,44 +112,44 @@
   "dependencies": {
     "ambi": "3.2.0",
     "eachr": "^4.5.0",
-    "extendr": "^5.19.0",
-    "unbounded": "^3.14.0"
+    "extendr": "^5.20.0",
+    "unbounded": "^3.15.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.14.8",
-    "@babel/core": "^7.14.8",
-    "@babel/plugin-proposal-object-rest-spread": "^7.14.7",
-    "@babel/preset-env": "^7.14.8",
-    "@bevry/update-contributors": "^1.19.0",
+    "@babel/cli": "^7.23.0",
+    "@babel/core": "^7.23.2",
+    "@babel/plugin-proposal-object-rest-spread": "^7.20.7",
+    "@babel/preset-env": "^7.23.2",
+    "@bevry/update-contributors": "^1.22.0",
     "assert-helpers": "^8.4.0",
-    "eslint": "^7.31.0",
-    "eslint-config-bevry": "^3.27.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^3.4.0",
-    "jsdoc": "^3.6.7",
-    "kava": "^5.15.0",
-    "prettier": "^2.3.2",
-    "projectz": "^2.22.0",
-    "safeps": "^10.17.0",
-    "surge": "^0.23.0",
-    "valid-directory": "^3.7.0"
+    "eslint": "^8.52.0",
+    "eslint-config-bevry": "^3.28.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "jsdoc": "^4.0.2",
+    "kava": "^5.17.0",
+    "prettier": "^3.0.3",
+    "projectz": "^2.23.0",
+    "safeps": "^10.18.0",
+    "surge": "^0.23.1",
+    "valid-directory": "^4.0.0"
   },
   "scripts": {
     "our:clean": "rm -Rf ./docs ./edition* ./es2015 ./es5 ./out ./.next",
     "our:compile": "npm run our:compile:edition-browsers",
     "our:compile:edition-browsers": "env BABEL_ENV=edition-browsers babel --out-dir ./edition-browsers ./source",
-    "our:deploy": "echo no need for this project",
+    "our:deploy": "printf '%s\n' 'no need for this project'",
     "our:meta": "npm run our:meta:contributors && npm run our:meta:docs && npm run our:meta:projectz",
     "our:meta:contributors": "update-contributors",
     "our:meta:docs": "npm run our:meta:docs:jsdoc",
     "our:meta:docs:jsdoc": "rm -Rf ./docs && jsdoc --recurse --pedantic --access all --destination ./docs --package ./package.json --readme ./README.md ./source && mv ./docs/$npm_package_name/$npm_package_version/* ./docs/ && rm -Rf ./docs/$npm_package_name/$npm_package_version",
     "our:meta:projectz": "projectz compile",
     "our:release": "npm run our:release:prepare && npm run our:release:check-changelog && npm run our:release:check-dirty && npm run our:release:tag && npm run our:release:push",
-    "our:release:check-changelog": "cat ./HISTORY.md | grep v$npm_package_version || (echo add a changelog entry for v$npm_package_version && exit -1)",
+    "our:release:check-changelog": "cat ./HISTORY.md | grep \"v$npm_package_version\" || (printf '%s\n' \"add a changelog entry for v$npm_package_version\" && exit -1)",
     "our:release:check-dirty": "git diff --exit-code",
     "our:release:prepare": "npm run our:clean && npm run our:compile && npm run our:test && npm run our:meta",
     "our:release:push": "git push origin && git push origin --tags",
-    "our:release:tag": "export MESSAGE=$(cat ./HISTORY.md | sed -n \"/## v$npm_package_version/,/##/p\" | sed 's/## //' | awk 'NR>1{print buf}{buf = $0}') && test \"$MESSAGE\" || (echo 'proper changelog entry not found' && exit -1) && git tag v$npm_package_version -am \"$MESSAGE\"",
+    "our:release:tag": "export MESSAGE=$(cat ./HISTORY.md | sed -n \"/## v$npm_package_version/,/##/p\" | sed 's/## //' | awk 'NR>1{print buf}{buf = $0}') && test \"$MESSAGE\" || (printf '%s\n' 'proper changelog entry not found' && exit -1) && git tag \"v$npm_package_version\" -am \"$MESSAGE\"",
     "our:setup": "npm run our:setup:install",
     "our:setup:install": "npm install",
     "our:test": "npm run our:verify && npm test",
