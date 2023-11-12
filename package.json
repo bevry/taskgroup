@@ -1,7 +1,7 @@
 {
   "title": "TaskGroup",
   "name": "taskgroup",
-  "version": "7.20.0",
+  "version": "8.0.0",
   "description": "Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.",
   "homepage": "https://github.com/bevry/taskgroup",
   "license": "Artistic-2.0",
@@ -73,11 +73,11 @@
     "url": "https://github.com/bevry/taskgroup.git"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=8"
   },
   "editions": [
     {
-      "description": "ESNext source code for Node.js 10 || 12 || 14 || 16 || 18 || 20 || 21 with Require for modules",
+      "description": "ESNext source code for Node.js 8 || 10 || 12 || 14 || 16 || 18 || 20 || 21 with Require for modules",
       "directory": "source",
       "entry": "index.js",
       "tags": [
@@ -87,7 +87,7 @@
         "require"
       ],
       "engines": {
-        "node": "10 || 12 || 14 || 16 || 18 || 20 || 21",
+        "node": "8 || 10 || 12 || 14 || 16 || 18 || 20 || 21",
         "browsers": false
       }
     },
@@ -112,27 +112,27 @@
   "dependencies": {
     "ambi": "3.2.0",
     "eachr": "^4.5.0",
-    "extendr": "^5.20.0",
-    "unbounded": "^3.15.0"
+    "extendr": "^6.0.0",
+    "unbounded": "^4.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.23.0",
-    "@babel/core": "^7.23.2",
+    "@babel/core": "^7.23.3",
     "@babel/plugin-proposal-object-rest-spread": "^7.20.7",
-    "@babel/preset-env": "^7.23.2",
-    "@bevry/update-contributors": "^1.22.0",
-    "assert-helpers": "^8.4.0",
-    "eslint": "^8.52.0",
-    "eslint-config-bevry": "^3.28.0",
+    "@babel/preset-env": "^7.23.3",
+    "@bevry/update-contributors": "^1.23.0",
+    "assert-helpers": "^10.0.0",
+    "eslint": "^8.53.0",
+    "eslint-config-bevry": "^3.29.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",
     "jsdoc": "^4.0.2",
-    "kava": "^5.17.0",
+    "kava": "3.2.0",
     "prettier": "^3.0.3",
     "projectz": "^2.23.0",
     "safeps": "^10.18.0",
     "surge": "^0.23.1",
-    "valid-directory": "^4.0.0"
+    "valid-directory": "^4.1.0"
   },
   "scripts": {
     "our:clean": "rm -Rf ./docs ./edition* ./es2015 ./es5 ./out ./.next",
