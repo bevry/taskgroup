@@ -1,7 +1,7 @@
 {
   "title": "TaskGroup",
   "name": "taskgroup",
-  "version": "9.0.0",
+  "version": "9.1.0",
   "description": "Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.",
   "homepage": "https://github.com/bevry/taskgroup",
   "license": "Artistic-2.0",
@@ -157,9 +157,9 @@
     "eslint-plugin-prettier": "^5.0.1",
     "jsdoc": "^4.0.2",
     "kava": "3.2.0",
-    "prettier": "^3.0.3",
+    "prettier": "^3.1.0",
     "projectz": "^2.23.0",
-    "safeps": "7.0.1",
+    "safeps": "^11.0.0",
     "surge": "^0.23.1",
     "valid-directory": "^4.1.0"
   },
@@ -197,7 +197,8 @@
   },
   "prettier": {
     "semi": false,
-    "singleQuote": true
+    "singleQuote": true,
+    "trailingComma": "es5"
   },
   "babel": {
     "env": {

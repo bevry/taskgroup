@@ -305,7 +305,7 @@ class Task extends BaseInterface {
 					break
 				default: {
 					throw new Error(
-						`Unknown argument type of [${type}] given to Task::setConfig()`,
+						`Unknown argument type of [${type}] given to Task::setConfig()`
 					)
 				}
 			}
@@ -344,7 +344,7 @@ class Task extends BaseInterface {
 				case 'timeout':
 				case 'exit':
 					throw new Error(
-						`Deprecated configuration property [${key}] given to Task::setConfig()`,
+						`Deprecated configuration property [${key}] given to Task::setConfig()`
 					)
 
 				default:
@@ -446,7 +446,7 @@ class Task extends BaseInterface {
 				'no longer present'
 			).toString()
 			const completedError = new Error(
-				`The task [${this.names}] just completed, but it had already completed earlier, this is unexpected.\nTask Source: ${source}`,
+				`The task [${this.names}] just completed, but it had already completed earlier, this is unexpected.\nTask Source: ${source}`
 			)
 			this.emit('error', completedError)
 		}
@@ -495,7 +495,7 @@ class Task extends BaseInterface {
 		// Check that we have a method to fire
 		if (!method) {
 			const error = new Error(
-				`The task [${this.names}] failed to run as no method was defined for it.`,
+				`The task [${this.names}] failed to run as no method was defined for it.`
 			)
 			this.emit('error', error)
 			return this
@@ -513,7 +513,7 @@ class Task extends BaseInterface {
 			}
 		} else if (this.config.domain === true) {
 			const error = new Error(
-				`The task [${this.names}] failed to run as it requested to use domains but domains are not available.`,
+				`The task [${this.names}] failed to run as it requested to use domains but domains are not available.`
 			)
 			this.emit('error', error)
 			return this
@@ -581,7 +581,7 @@ class Task extends BaseInterface {
 		// Already started?
 		if (this.state.status !== 'created') {
 			const error = new Error(
-				`Invalid run status for the Task [${this.names}], it was [${this.state.status}] instead of [created].`,
+				`Invalid run status for the Task [${this.names}], it was [${this.state.status}] instead of [created].`
 			)
 			this.emit('error', error)
 			return this
