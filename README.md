@@ -55,7 +55,7 @@ Group together synchronous and asynchronous tasks and execute them with support 
 
 ``` html
 <script type="module">
-    import * as pkg from '//dev.jspm.io/taskgroup@9.2.0'
+    import * as pkg from '//dev.jspm.io/taskgroup@9.3.0'
 </script>
 ```
 
