@@ -6,7 +6,7 @@ const { BaseInterface } = require('./interface.js')
 const { queue, domain } = require('./util.js')
 const ambi = require('ambi')
 const extendr = require('extendr')
-const eachr = require('eachr')
+const eachr = require('eachr').default
 const unbounded = require('unbounded')
 
 /**

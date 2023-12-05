@@ -6,7 +6,7 @@ const { BaseInterface } = require('./interface.js')
 const { Task } = require('./task.js')
 const { queue, ensureArray } = require('./util.js')
 const extendr = require('extendr')
-const eachr = require('eachr')
+const eachr = require('eachr').default
 const unbounded = require('unbounded')
 
 /**
