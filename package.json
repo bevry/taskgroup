@@ -1,16 +1,25 @@
 {
   "title": "TaskGroup",
   "name": "taskgroup",
-  "version": "9.5.1",
+  "version": "9.6.0",
+  "license": "Artistic-2.0",
   "description": "Group together synchronous and asynchronous tasks and execute them with support for concurrency, naming, and nesting.",
   "homepage": "https://github.com/bevry/taskgroup",
-  "license": "Artistic-2.0",
+  "funding": "https://bevry.me/fund",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bevry/taskgroup.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bevry/taskgroup/issues"
+  },
   "keywords": [
     "async",
     "batch",
     "browser",
     "concurrency",
     "control",
+    "es5",
     "esnext",
     "flow",
     "node",
@@ -58,24 +67,44 @@
       "npmPackageName": "taskgroup"
     }
   },
-  "funding": "https://bevry.me/fund",
-  "author": "2013+ Bevry Pty Ltd <us@bevry.me> (http://bevry.me), 2011-2012 Benjamin Lupton <b@lupton.cc> (https://balupton.com)",
+  "author": "Benjamin Lupton <b@lupton.cc> (https://balupton.com) (https://github.com/balupton)",
+  "authors": [
+    "Benjamin Lupton <b@lupton.cc> (https://balupton.com) (https://github.com/balupton): Accelerating collaborative wisdom."
+  ],
   "maintainers": [
-    "Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)"
+    "Benjamin Lupton <b@lupton.cc> (https://balupton.com) (https://github.com/balupton): Accelerating collaborative wisdom."
   ],
   "contributors": [
-    "Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)",
+    "Benjamin Lupton <b@lupton.cc> (https://balupton.com) (https://github.com/balupton)",
+    "crito <crito@cryptodrunks.net> (https://github.com/crito)",
     "Peter Flannery (https://github.com/pflannery)",
-    "Sean Fridman <mail@seanfridman.com> (https://github.com/sfrdmn)",
-    "crito <crito@cryptodrunks.net> (https://github.com/crito)"
+    "Sean Fridman <mail@seanfridman.com> (https://seanfridman.com) (https://github.com/sfrdmn)"
   ],
-  "bugs": {
-    "url": "https://github.com/bevry/taskgroup/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/bevry/taskgroup.git"
-  },
+  "sponsors": [
+    "Andrew Nesbitt (https://nesbitt.io) (https://github.com/andrew): Software engineer and researcher",
+    "Balsa <hello@balsa.com> (https://balsa.com) (https://github.com/balsa): We're Balsa, and we're building tools for builders.",
+    "Codecov <hello-codecov@sentry.io> (https://codecov.io/) (https://github.com/codecov): Empower developers with tools to improve code quality and testing.",
+    "Poonacha Medappa (https://poonachamedappa.com) (https://github.com/km-Poonacha)",
+    "Rob Morris <rob@prismatik.com.au> (https://github.com/Rob-Morris)",
+    "Sentry (https://sentry.io) (https://github.com/getsentry): Real-time crash reporting for your web apps, mobile apps, and games.",
+    "Syntax <scott@syntax.fm> (https://syntax.fm) (https://github.com/syntaxfm): Syntax Podcast"
+  ],
+  "donors": [
+    "Andrew Nesbitt (https://nesbitt.io) (https://github.com/andrew)",
+    "Balsa <hello@balsa.com> (https://balsa.com) (https://github.com/balsa)",
+    "Chad (https://opencollective.com/chad8)",
+    "Codecov <hello-codecov@sentry.io> (https://codecov.io/) (https://github.com/codecov)",
+    "entroniq (https://gitlab.com/entroniq) (https://thanks.dev/d/gl/entroniq)",
+    "Jean-Luc Geering (https://github.com/jlgeering) (https://opencollective.com/jlgeering) (https://twitter.com/jlgeering)",
+    "Michael Duane Mooring (https://mdm.cc) (https://github.com/mikeumus) (https://opencollective.com/mikeumus) (https://twitter.com/mikeumus)",
+    "Mohammed Shah <shah@idk.uno> (https://github.com/smashah) (https://thanks.dev/d/gh/smashah) (https://twitter.com/smashah)",
+    "Poonacha Medappa (https://poonachamedappa.com) (https://github.com/km-Poonacha)",
+    "Rob Morris <rob@prismatik.com.au> (https://github.com/Rob-Morris)",
+    "Sentry (https://sentry.io) (https://github.com/getsentry)",
+    "ServieJS (https://github.com/serviejs) (https://thanks.dev/d/gh/serviejs)",
+    "Skunk Team (https://skunk.team) (https://github.com/skunkteam)",
+    "Syntax <scott@syntax.fm> (https://syntax.fm) (https://github.com/syntaxfm)"
+  ],
   "engines": {
     "node": ">=4"
   },
@@ -110,12 +139,13 @@
       }
     },
     {
-      "description": "ESNext compiled for Node.js 4 with Require for modules",
+      "description": "ESNext compiled for Node.js 4 || 6 || 8 || 10 || 12 || 14 || 16 || 18 || 20 || 21 with Require for modules",
       "directory": "edition-node-4",
       "entry": "index.js",
       "tags": [
         "compiled",
         "javascript",
+        "es5",
         "require"
       ],
       "engines": {
@@ -129,28 +159,27 @@
   "browser": "edition-browsers/index.js",
   "dependencies": {
     "ambi": "3.2.0",
-    "eachr": "^7.1.0",
-    "editions": "^6.18.0",
-    "extendr": "^7.5.0",
-    "unbounded": "^6.0.0"
+    "eachr": "^7.3.0",
+    "editions": "^6.20.0",
+    "extendr": "^7.8.0",
+    "unbounded": "^6.2.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.23.4",
-    "@babel/core": "^7.23.5",
+    "@babel/core": "^7.23.6",
     "@babel/plugin-proposal-object-rest-spread": "^7.20.7",
-    "@babel/preset-env": "^7.23.5",
-    "@bevry/update-contributors": "^1.23.0",
-    "assert-helpers": "^11.8.0",
-    "eslint": "^8.55.0",
-    "eslint-config-bevry": "^5.2.0",
+    "@babel/preset-env": "^7.23.6",
+    "assert-helpers": "^11.11.0",
+    "eslint": "^8.56.0",
+    "eslint-config-bevry": "^5.3.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-prettier": "^5.1.2",
     "jsdoc": "^4.0.2",
-    "kava": "^7.4.0",
-    "prettier": "^3.1.0",
-    "projectz": "^3.4.0",
-    "safeps": "^11.4.0",
-    "valid-directory": "^4.6.0"
+    "kava": "^7.5.0",
+    "prettier": "^3.1.1",
+    "projectz": "^4.0.0",
+    "safeps": "^11.5.0",
+    "valid-directory": "^4.7.0"
   },
   "scripts": {
     "our:clean": "rm -rf ./docs ./edition* ./es2015 ./es5 ./out ./.next",
@@ -158,11 +187,10 @@
     "our:compile:edition-browsers": "env BABEL_ENV=edition-browsers babel --out-dir ./edition-browsers ./source",
     "our:compile:edition-node-4": "env BABEL_ENV=edition-node-4 babel --out-dir ./edition-node-4 ./source && printf '%s' '{\"type\": \"commonjs\"}' > edition-node-4/package.json",
     "our:deploy": "printf '%s\n' 'no need for this project'",
-    "our:meta": "npm run our:meta:contributors && npm run our:meta:docs && npm run our:meta:projectz",
-    "our:meta:contributors": "update-contributors",
+    "our:meta": "npm run our:meta:docs && npm run our:meta:projectz",
     "our:meta:docs": "npm run our:meta:docs:jsdoc",
     "our:meta:docs:jsdoc": "rm -rf ./docs && jsdoc --recurse --pedantic --access all --destination ./docs --package ./package.json --readme ./README.md ./source && mv ./docs/$npm_package_name/$npm_package_version/* ./docs/ && rm -rf ./docs/$npm_package_name/$npm_package_version",
-    "our:meta:projectz": "projectz compile",
+    "our:meta:projectz": "projectz",
     "our:release": "npm run our:release:prepare && npm run our:release:check-changelog && npm run our:release:check-dirty && npm run our:release:tag && npm run our:release:push",
     "our:release:check-changelog": "cat ./HISTORY.md | grep \"v$npm_package_version\" || (printf '%s\n' \"add a changelog entry for v$npm_package_version\" && exit -1)",
     "our:release:check-dirty": "git diff --exit-code",
@@ -172,21 +200,10 @@
     "our:setup": "npm run our:setup:install",
     "our:setup:install": "npm install",
     "our:test": "npm run our:verify && npm test",
-    "our:verify": "npm run our:verify:directory && npm run our:verify:eslint && npm run our:verify:prettier",
-    "our:verify:directory": "valid-directory",
+    "our:verify": "npm run our:verify:eslint && npm run our:verify:prettier",
     "our:verify:eslint": "eslint --fix --ignore-pattern '**/*.d.ts' --ignore-pattern '**/vendor/' --ignore-pattern '**/node_modules/' --ext .mjs,.js,.jsx,.ts,.tsx ./source",
     "our:verify:prettier": "prettier --write .",
     "test": "node ./test.cjs"
-  },
-  "eslintConfig": {
-    "extends": [
-      "bevry"
-    ]
-  },
-  "prettier": {
-    "semi": false,
-    "singleQuote": true,
-    "trailingComma": "es5"
   },
   "babel": {
     "env": {
@@ -197,7 +214,6 @@
             "@babel/preset-env",
             {
               "targets": {
-                "esmodules": false,
                 "browsers": "defaults"
               },
               "modules": "commonjs"
@@ -231,5 +247,16 @@
     "versions": {
       "ambi": 3
     }
+  },
+  "eslintConfig": {
+    "extends": [
+      "bevry"
+    ]
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "endOfLine": "lf"
   }
 }
